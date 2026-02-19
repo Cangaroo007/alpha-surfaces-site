@@ -1,0 +1,6 @@
+{
+  "name": "alpha-surfaces",
+  "scripts": {
+    "start": "npx serve -s . -l $PORT"
+  }
+}
