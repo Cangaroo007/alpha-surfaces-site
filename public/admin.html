@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpha Surfaces — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#111110;--surface:#1a1a18;--surface2:#222220;--border:#2a2a28;--text:#e8e6e0;--text2:#9c9890;--olive:#5C5A1E;--gold:#B8A472;--red:#c0392b;--green:#27ae60}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* Login */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+.login-box{background:var(--surface);border:1px solid var(--border);padding:48px;max-width:380px;width:100%}
+.login-box h1{font-size:1.4rem;font-weight:600;margin-bottom:6px}
+.login-box p{font-size:.82rem;color:var(--text2);margin-bottom:28px}
+.login-box input{width:100%;padding:12px 16px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:.88rem;font-family:inherit;margin-bottom:16px;outline:none;transition:border .3s}
+.login-box input:focus{border-color:var(--gold)}
+.login-box button{width:100%;padding:12px;background:var(--olive);color:#fff;border:none;font-size:.82rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .3s}
+.login-box button:hover{background:var(--gold)}
+.login-error{color:var(--red);font-size:.78rem;margin-bottom:12px;display:none}
+
+/* Layout */
+.admin-layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-brand{padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.sidebar-brand h2{font-size:1.1rem;font-weight:600;color:var(--text)}
+.sidebar-brand span{font-size:.65rem;color:var(--gold);letter-spacing:.15em;text-transform:uppercase}
+.sidebar-nav a{display:flex;align-items:center;gap:10px;padding:10px 20px;color:var(--text2);text-decoration:none;font-size:.82rem;font-weight:400;transition:all .2s;border-left:2px solid transparent}
+.sidebar-nav a:hover,.sidebar-nav a.active{color:var(--text);background:rgba(255,255,255,.03);border-left-color:var(--gold)}
+.sidebar-nav .divider{height:1px;background:var(--border);margin:12px 20px}
+.sidebar-bottom{position:absolute;bottom:0;left:0;right:0;padding:16px 20px;border-top:1px solid var(--border)}
+.sidebar-bottom a{color:var(--text2);text-decoration:none;font-size:.78rem;transition:color .2s}
+.sidebar-bottom a:hover{color:var(--red)}
+
+.main{padding:32px 40px;overflow-y:auto}
+.main-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.main-header h1{font-size:1.3rem;font-weight:600}
+.save-bar{display:flex;gap:10px;align-items:center}
+.save-msg{font-size:.75rem;color:var(--green);opacity:0;transition:opacity .3s}
+.save-msg.show{opacity:1}
+.btn{padding:10px 24px;border:none;font-size:.78rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .3s;font-family:inherit}
+.btn-save{background:var(--olive);color:#fff}
+.btn-save:hover{background:var(--gold)}
+.btn-preview{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-preview:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Panels */
+.panel{display:none}
+.panel.active{display:block}
+
+/* Form elements */
+.field{margin-bottom:20px}
+.field label{display:block;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
+.field input[type="text"],.field input[type="color"],.field textarea,.field select{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:.85rem;font-family:inherit;outline:none;transition:border .3s;resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold)}
+.field textarea{min-height:80px}
+.field input[type="color"]{height:42px;padding:4px;cursor:pointer}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.card{background:var(--surface);border:1px solid var(--border);padding:20px;margin-bottom:16px;position:relative}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.card-header h3{font-size:.88rem;font-weight:600}
+.card-actions{display:flex;gap:8px}
+.btn-sm{padding:5px 12px;font-size:.68rem;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-sm:hover{border-color:var(--gold);color:var(--gold)}
+.btn-sm.danger:hover{border-color:var(--red);color:var(--red)}
+.btn-add{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:transparent;border:1px dashed var(--border);color:var(--text2);font-size:.78rem;cursor:pointer;transition:all .2s;font-family:inherit;margin-top:8px}
+.btn-add:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
+.toggle-row span{font-size:.85rem}
+.toggle{width:42px;height:24px;background:var(--border);border-radius:12px;position:relative;cursor:pointer;transition:background .3s}
+.toggle.on{background:var(--olive)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .3s}
+.toggle.on::after{transform:translateX(18px)}
+
+/* Section order */
+.order-list{list-style:none}
+.order-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);margin-bottom:4px;cursor:grab;transition:all .2s}
+.order-item:hover{border-color:var(--gold)}
+.order-item .grip{color:var(--text2);font-size:1rem;user-select:none}
+.order-item .name{font-size:.85rem;flex:1}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen" class="login-wrap">
+  <div class="login-box">
+    <h1>Alpha CMS</h1>
+    <p>Enter your admin password to continue.</p>
+    <div id="login-error" class="login-error">Incorrect password</div>
+    <input type="password" id="login-pass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-screen" class="admin-layout hidden">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><h2>Alpha CMS</h2><span>Content Manager</span></div>
+    <nav class="sidebar-nav">
+      <a href="#" data-panel="styles" class="active" onclick="showPanel('styles',this)">🎨 Brand Styles</a>
+      <a href="#" data-panel="layout" onclick="showPanel('layout',this)">📐 Layout & Order</a>
+      <div class="divider"></div>
+      <a href="#" data-panel="nav" onclick="showPanel('nav',this)">🔗 Navigation</a>
+      <a href="#" data-panel="hero" onclick="showPanel('hero',this)">🏠 Hero</a>
+      <a href="#" data-panel="features" onclick="showPanel('features',this)">✨ Features Strip</a>
+      <a href="#" data-panel="about" onclick="showPanel('about',this)">📖 About</a>
+      <a href="#" data-panel="collections" onclick="showPanel('collections',this)">🗂️ Collections</a>
+      <a href="#" data-panel="product" onclick="showPanel('product',this)">💎 Product Detail</a>
+      <a href="#" data-panel="advantage" onclick="showPanel('advantage',this)">⚡ Advantage</a>
+      <a href="#" data-panel="warranty" onclick="showPanel('warranty',this)">🛡️ Warranty</a>
+      <a href="#" data-panel="cta" onclick="showPanel('cta',this)">📣 Call to Action</a>
+      <a href="#" data-panel="footer" onclick="showPanel('footer',this)">📋 Footer</a>
+    </nav>
+    <div class="sidebar-bottom"><a href="#" onclick="doLogout()">Sign Out</a></div>
+  </aside>
+  <main class="main">
+    <div class="main-header">
+      <h1 id="panel-title">Brand Styles</h1>
+      <div class="save-bar">
+        <span id="save-msg" class="save-msg">Saved!</span>
+        <a href="/" target="_blank" class="btn btn-preview">Preview</a>
+        <button class="btn btn-save" onclick="saveAll()">Save Changes</button>
+      </div>
+    </div>
+    <div id="panels">
+
+      <!-- STYLES -->
+      <div id="panel-styles" class="panel active">
+        <div class="field-row-3" id="color-fields"></div>
+        <div class="field-row">
+          <div class="field"><label>Serif Font Family</label><input type="text" data-bind="styles.fontSerif"></div>
+          <div class="field"><label>Sans Font Family</label><input type="text" data-bind="styles.fontSans"></div>
+        </div>
+      </div>
+
+      <!-- LAYOUT -->
+      <div id="panel-layout" class="panel">
+        <p style="font-size:.82rem;color:var(--text2);margin-bottom:20px">Drag sections to reorder. Toggle visibility on or off.</p>
+        <ul id="section-order" class="order-list"></ul>
+      </div>
+
+      <!-- NAV -->
+      <div id="panel-nav" class="panel">
+        <div class="field-row">
+          <div class="field"><label>Brand Name</label><input type="text" data-bind="nav.brand"></div>
+          <div class="field"><label>Brand Subtitle</label><input type="text" data-bind="nav.brandSub"></div>
+        </div>
+        <h3 style="font-size:.88rem;margin:20px 0 12px">Navigation Links</h3>
+        <div id="nav-links-list"></div>
+      </div>
+
+      <!-- HERO -->
+      <div id="panel-hero" class="panel">
+        <div class="field"><label>Badge Text</label><input type="text" data-bind="hero.badge"></div>
+        <div class="field"><label>Heading (HTML allowed)</label><textarea data-bind="hero.heading" rows="2"></textarea></div>
+        <div class="field"><label>Tagline</label><input type="text" data-bind="hero.tagline"></div>
+        <div class="field"><label>Subtext</label><textarea data-bind="hero.subtext" rows="3"></textarea></div>
+        <div class="field-row">
+          <div class="field"><label>CTA Button Text</label><input type="text" data-bind="hero.ctaText"></div>
+          <div class="field"><label>CTA Link</label><input type="text" data-bind="hero.ctaLink"></div>
+        </div>
+      </div>
+
+      <!-- FEATURES -->
+      <div id="panel-features" class="panel">
+        <div id="features-list"></div>
+      </div>
+
+      <!-- ABOUT -->
+      <div id="panel-about" class="panel">
+        <div class="field"><label>Section Label</label><input type="text" data-bind="about.label"></div>
+        <div class="field"><label>Visual Overlay Text</label><input type="text" data-bind="about.visualText"></div>
+        <div class="field"><label>Heading</label><input type="text" data-bind="about.heading"></div>
+        <div id="about-paragraphs"></div>
+        <button class="btn-add" onclick="addAboutParagraph()">+ Add Paragraph</button>
+        <div class="field" style="margin-top:20px"><label>Quote</label><textarea data-bind="about.quote" rows="3"></textarea></div>
+        <div class="field"><label>Quote Author</label><input type="text" data-bind="about.quoteAuthor"></div>
+      </div>
+
+      <!-- COLLECTIONS -->
+      <div id="panel-collections" class="panel">
+        <div class="field"><label>Section Label</label><input type="text" data-bind="collections.label"></div>
+        <div class="field"><label>Heading (HTML allowed)</label><textarea data-bind="collections.heading" rows="2"></textarea></div>
+        <div class="field"><label>Subtext</label><textarea data-bind="collections.subtext" rows="2"></textarea></div>
+        <h3 style="font-size:.88rem;margin:20px 0 12px">Collection Cards</h3>
+        <div id="collections-list"></div>
+        <button class="btn-add" onclick="addCollection()">+ Add Collection</button>
+      </div>
+
+      <!-- PRODUCT -->
+      <div id="panel-product" class="panel">
+        <div class="field"><label>Section Label</label><input type="text" data-bind="product.label"></div>
+        <div class="field-row">
+          <div class="field"><label>Product Name</label><input type="text" data-bind="product.name"></div>
+          <div class="field"><label>Collection</label><input type="text" data-bind="product.collection"></div>
+        </div>
+        <div class="field"><label>Description</label><textarea data-bind="product.desc" rows="2"></textarea></div>
+        <h3 style="font-size:.88rem;margin:20px 0 12px">Specifications</h3>
+        <div id="product-specs"></div>
+        <button class="btn-add" onclick="addSpec()">+ Add Spec</button>
+        <div class="field" style="margin-top:20px"><label>Shield Badge Text</label><textarea data-bind="product.shieldText" rows="2"></textarea></div>
+        <div class="field"><label>CTA Button Text</label><input type="text" data-bind="product.ctaText"></div>
+      </div>
+
+      <!-- ADVANTAGE -->
+      <div id="panel-advantage" class="panel">
+        <div class="field"><label>Section Label</label><input type="text" data-bind="advantage.label"></div>
+        <div class="field"><label>Heading (HTML allowed)</label><textarea data-bind="advantage.heading" rows="2"></textarea></div>
+        <div id="advantage-paragraphs"></div>
+        <h3 style="font-size:.88rem;margin:20px 0 12px">Feature Cards</h3>
+        <div id="advantage-cards"></div>
+      </div>
+
+      <!-- WARRANTY -->
+      <div id="panel-warranty" class="panel">
+        <div class="field"><label>Section Label</label><input type="text" data-bind="warranty.label"></div>
+        <div class="field"><label>Heading (HTML allowed)</label><textarea data-bind="warranty.heading" rows="2"></textarea></div>
+        <div class="field"><label>Subtext</label><textarea data-bind="warranty.subtext" rows="3"></textarea></div>
+        <div id="warranty-cards"></div>
+      </div>
+
+      <!-- CTA -->
+      <div id="panel-cta" class="panel">
+        <div class="field"><label>Heading (HTML allowed)</label><textarea data-bind="cta.heading" rows="2"></textarea></div>
+        <div class="field"><label>Subtext</label><textarea data-bind="cta.subtext" rows="3"></textarea></div>
+        <div class="field-row">
+          <div class="field"><label>Primary Button Text</label><input type="text" data-bind="cta.primaryBtn.text"></div>
+          <div class="field"><label>Primary Button Link</label><input type="text" data-bind="cta.primaryBtn.link"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Secondary Button Text</label><input type="text" data-bind="cta.secondaryBtn.text"></div>
+          <div class="field"><label>Secondary Button Link</label><input type="text" data-bind="cta.secondaryBtn.link"></div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div id="panel-footer" class="panel">
+        <div class="field"><label>Description</label><textarea data-bind="footer.desc" rows="3"></textarea></div>
+        <div class="field"><label>Copyright</label><input type="text" data-bind="footer.copyright"></div>
+        <div class="field"><label>Legal Text</label><input type="text" data-bind="footer.legal"></div>
+        <h3 style="font-size:.88rem;margin:20px 0 12px">Footer Columns</h3>
+        <div id="footer-columns"></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+let DATA = {};
+const SECTION_LABELS = { hero:'Hero', features:'Features Strip', about:'About', collections:'Collections', product:'Product Detail', advantage:'Advantage', warranty:'Warranty', cta:'Call to Action' };
+const COLOR_LABELS = { olive:'Olive (Primary)', oliveDark:'Olive Dark', cream:'Cream (Background)', creamDark:'Cream Dark', white:'White', charcoal:'Charcoal (Text)', warmGray:'Warm Gray', gold:'Gold (Accent)' };
+
+// ─── Auth ───
+async function checkAuth() {
+  const res = await fetch('/api/auth-check');
+  const { authenticated } = await res.json();
+  if (authenticated) { showAdmin(); } else { document.getElementById('login-screen').classList.remove('hidden'); }
+}
+async function doLogin() {
+  const pass = document.getElementById('login-pass').value;
+  const res = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password:pass}) });
+  if (res.ok) { showAdmin(); } else { document.getElementById('login-error').style.display='block'; }
+}
+async function doLogout() {
+  await fetch('/api/logout', { method:'POST' });
+  location.reload();
+}
+async function showAdmin() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('admin-screen').classList.remove('hidden');
+  const res = await fetch('/api/content');
+  DATA = await res.json();
+  renderAll();
+}
+
+// ─── Save ───
+async function saveAll() {
+  syncFromDOM();
+  const res = await fetch('/api/content', { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(DATA) });
+  if (res.ok) { const msg = document.getElementById('save-msg'); msg.classList.add('show'); setTimeout(() => msg.classList.remove('show'), 2000); }
+}
+
+// ─── Panel switch ───
+function showPanel(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  el?.classList.add('active');
+  const titles = { styles:'Brand Styles', layout:'Layout & Order', nav:'Navigation', hero:'Hero', features:'Features Strip', about:'About', collections:'Collections', product:'Product Detail', advantage:'Advantage', warranty:'Warranty', cta:'Call to Action', footer:'Footer' };
+  document.getElementById('panel-title').textContent = titles[id] || id;
+  return false;
+}
+
+// ─── Deep get/set ───
+function deepGet(obj, path) { return path.split('.').reduce((o,k) => o?.[k], obj); }
+function deepSet(obj, path, val) { const keys = path.split('.'); const last = keys.pop(); keys.reduce((o,k) => o[k] = o[k]||{}, obj)[last] = val; }
+
+// ─── Sync DOM → DATA ───
+function syncFromDOM() {
+  document.querySelectorAll('[data-bind]').forEach(el => {
+    deepSet(DATA, el.dataset.bind, el.value);
+  });
+  // Sync section order + visibility
+  const items = document.querySelectorAll('#section-order .order-item');
+  DATA.sectionOrder = [];
+  items.forEach(item => {
+    const key = item.dataset.section;
+    DATA.sectionOrder.push(key);
+    if (DATA[key]) DATA[key].visible = item.querySelector('.toggle')?.classList.contains('on') ?? true;
+  });
+}
+
+// ─── Render ───
+function renderAll() {
+  // Bind simple fields
+  document.querySelectorAll('[data-bind]').forEach(el => {
+    const val = deepGet(DATA, el.dataset.bind);
+    if (val !== undefined) el.value = val;
+  });
+  renderColorFields();
+  renderSectionOrder();
+  renderNavLinks();
+  renderFeatures();
+  renderAboutParagraphs();
+  renderCollections();
+  renderProductSpecs();
+  renderAdvantageParagraphs();
+  renderAdvantageCards();
+  renderWarrantyCards();
+  renderFooterColumns();
+}
+
+function renderColorFields() {
+  const el = document.getElementById('color-fields');
+  el.innerHTML = Object.entries(COLOR_LABELS).map(([key, label]) =>
+    `<div class="field"><label>${label}</label><input type="color" data-bind="styles.${key}" value="${DATA.styles[key]}" oninput="deepSet(DATA,'styles.${key}',this.value)"></div>`
+  ).join('');
+}
+
+function renderSectionOrder() {
+  const el = document.getElementById('section-order');
+  el.innerHTML = DATA.sectionOrder.map(key => {
+    const vis = DATA[key]?.visible !== false;
+    return `<li class="order-item" data-section="${key}" draggable="true">
+      <span class="grip">⠿</span><span class="name">${SECTION_LABELS[key]||key}</span>
+      <div class="toggle ${vis?'on':''}" onclick="this.classList.toggle('on')"></div>
+    </li>`;
+  }).join('');
+  // Drag and drop
+  let dragItem = null;
+  el.querySelectorAll('.order-item').forEach(item => {
+    item.addEventListener('dragstart', () => { dragItem = item; item.style.opacity = '.4'; });
+    item.addEventListener('dragend', () => { dragItem = null; item.style.opacity = '1'; });
+    item.addEventListener('dragover', e => { e.preventDefault(); });
+    item.addEventListener('drop', e => {
+      e.preventDefault();
+      if (dragItem && dragItem !== item) { el.insertBefore(dragItem, item); }
+    });
+  });
+}
+
+function renderNavLinks() {
+  const el = document.getElementById('nav-links-list');
+  el.innerHTML = DATA.nav.links.map((l,i) => `
+    <div class="card"><div class="card-header"><h3>Link ${i+1}</h3><div class="card-actions"><button class="btn-sm danger" onclick="DATA.nav.links.splice(${i},1);renderNavLinks()">Remove</button></div></div>
+    <div class="field-row"><div class="field"><label>Label</label><input type="text" value="${l.label}" oninput="DATA.nav.links[${i}].label=this.value"></div><div class="field"><label>Href</label><input type="text" value="${l.href}" oninput="DATA.nav.links[${i}].href=this.value"></div></div></div>`).join('');
+  el.innerHTML += `<button class="btn-add" onclick="DATA.nav.links.push({label:'New',href:'#'});renderNavLinks()">+ Add Link</button>`;
+}
+
+function renderFeatures() {
+  const el = document.getElementById('features-list');
+  el.innerHTML = DATA.features.items.map((f,i) => `
+    <div class="card"><div class="card-header"><h3>${f.title}</h3><div class="card-actions"><button class="btn-sm danger" onclick="DATA.features.items.splice(${i},1);renderFeatures()">Remove</button></div></div>
+    <div class="field"><label>Icon (check-circle, sun, layers, shield, tool, maximize)</label><input type="text" value="${f.icon}" oninput="DATA.features.items[${i}].icon=this.value"></div>
+    <div class="field"><label>Title</label><input type="text" value="${f.title}" oninput="DATA.features.items[${i}].title=this.value"></div>
+    <div class="field"><label>Text</label><textarea rows="2" oninput="DATA.features.items[${i}].text=this.value">${f.text}</textarea></div></div>`).join('');
+  el.innerHTML += `<button class="btn-add" onclick="DATA.features.items.push({icon:'check-circle',title:'New Feature',text:'Description'});renderFeatures()">+ Add Feature</button>`;
+}
+
+function renderAboutParagraphs() {
+  const el = document.getElementById('about-paragraphs');
+  el.innerHTML = DATA.about.paragraphs.map((p,i) => `
+    <div class="field" style="position:relative"><label>Paragraph ${i+1} <span style="cursor:pointer;color:var(--red)" onclick="DATA.about.paragraphs.splice(${i},1);renderAboutParagraphs()">✕ remove</span></label>
+    <textarea rows="3" oninput="DATA.about.paragraphs[${i}]=this.value">${p}</textarea></div>`).join('');
+}
+function addAboutParagraph() { DATA.about.paragraphs.push('New paragraph'); renderAboutParagraphs(); }
+
+function renderCollections() {
+  const el = document.getElementById('collections-list');
+  el.innerHTML = DATA.collections.items.map((c,i) => `
+    <div class="card"><div class="card-header"><h3>${c.name}</h3><div class="card-actions"><button class="btn-sm danger" onclick="DATA.collections.items.splice(${i},1);renderCollections()">Remove</button></div></div>
+    <div class="field-row"><div class="field"><label>Tier Label</label><input type="text" value="${c.tier}" oninput="DATA.collections.items[${i}].tier=this.value"></div>
+    <div class="field"><label>Name</label><input type="text" value="${c.name}" oninput="DATA.collections.items[${i}].name=this.value"></div></div>
+    <div class="field"><label>Description</label><textarea rows="2" oninput="DATA.collections.items[${i}].desc=this.value">${c.desc}</textarea></div></div>`).join('');
+}
+function addCollection() { DATA.collections.items.push({tier:'New',name:'Collection',desc:'Description'}); renderCollections(); }
+
+function renderProductSpecs() {
+  const el = document.getElementById('product-specs');
+  el.innerHTML = DATA.product.specs.map((s,i) => `
+    <div class="card"><div class="field-row"><div class="field"><label>Label</label><input type="text" value="${s.label}" oninput="DATA.product.specs[${i}].label=this.value"></div>
+    <div class="field"><label>Value</label><input type="text" value="${s.value}" oninput="DATA.product.specs[${i}].value=this.value"></div></div>
+    <button class="btn-sm danger" style="margin-top:8px" onclick="DATA.product.specs.splice(${i},1);renderProductSpecs()">Remove</button></div>`).join('');
+}
+function addSpec() { DATA.product.specs.push({label:'New',value:'Value'}); renderProductSpecs(); }
+
+function renderAdvantageParagraphs() {
+  const el = document.getElementById('advantage-paragraphs');
+  el.innerHTML = DATA.advantage.paragraphs.map((p,i) => `
+    <div class="field"><label>Paragraph ${i+1}</label><textarea rows="3" oninput="DATA.advantage.paragraphs[${i}]=this.value">${p}</textarea></div>`).join('');
+}
+
+function renderAdvantageCards() {
+  const el = document.getElementById('advantage-cards');
+  el.innerHTML = DATA.advantage.cards.map((c,i) => `
+    <div class="card"><div class="card-header"><h3>${c.title}</h3></div>
+    <div class="field-row"><div class="field"><label>Icon</label><input type="text" value="${c.icon}" oninput="DATA.advantage.cards[${i}].icon=this.value"></div>
+    <div class="field"><label>Title</label><input type="text" value="${c.title}" oninput="DATA.advantage.cards[${i}].title=this.value"></div></div>
+    <div class="field"><label>Text</label><textarea rows="2" oninput="DATA.advantage.cards[${i}].text=this.value">${c.text}</textarea></div></div>`).join('');
+}
+
+function renderWarrantyCards() {
+  const el = document.getElementById('warranty-cards');
+  el.innerHTML = DATA.warranty.cards.map((c,i) => `
+    <div class="card"><div class="field-row-3"><div class="field"><label>Number</label><input type="text" value="${c.number}" oninput="DATA.warranty.cards[${i}].number=this.value"></div>
+    <div class="field"><label>Title</label><input type="text" value="${c.title}" oninput="DATA.warranty.cards[${i}].title=this.value"></div>
+    <div class="field"><label>Text</label><input type="text" value="${c.text}" oninput="DATA.warranty.cards[${i}].text=this.value"></div></div></div>`).join('');
+}
+
+function renderFooterColumns() {
+  const el = document.getElementById('footer-columns');
+  el.innerHTML = DATA.footer.columns.map((col,ci) => `
+    <div class="card"><div class="card-header"><h3>${col.title}</h3></div>
+    <div class="field"><label>Column Title</label><input type="text" value="${col.title}" oninput="DATA.footer.columns[${ci}].title=this.value"></div>
+    ${col.links.map((l,li) => `<div class="field-row"><div class="field"><label>Label</label><input type="text" value="${l.label}" oninput="DATA.footer.columns[${ci}].links[${li}].label=this.value"></div>
+    <div class="field"><label>Href</label><input type="text" value="${l.href}" oninput="DATA.footer.columns[${ci}].links[${li}].href=this.value"></div></div>`).join('')}
+    <button class="btn-add" onclick="DATA.footer.columns[${ci}].links.push({label:'New',href:'#'});renderFooterColumns()">+ Add Link</button></div>`).join('');
+}
+
+checkAuth();
+</script>
+</body>
+</html>

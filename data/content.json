@@ -1,0 +1,164 @@
+{
+  "styles": {
+    "olive": "#5C5A1E",
+    "oliveDark": "#3D3B14",
+    "cream": "#F7F5F0",
+    "creamDark": "#EDE9E0",
+    "white": "#FFFFFF",
+    "charcoal": "#2A2A28",
+    "warmGray": "#9C9890",
+    "gold": "#B8A472",
+    "fontSerif": "'Cormorant Garamond', Georgia, serif",
+    "fontSans": "'Outfit', sans-serif"
+  },
+  "nav": {
+    "brand": "Alpha",
+    "brandSub": "Surfaces",
+    "links": [
+      { "label": "Collections", "href": "#collections" },
+      { "label": "About", "href": "#about" },
+      { "label": "Advantage", "href": "#advantage" },
+      { "label": "Contact", "href": "#contact" }
+    ]
+  },
+  "hero": {
+    "visible": true,
+    "badge": "Premium Australian Surfaces",
+    "heading": "The Complete<br>Surface <em>Solution</em>",
+    "tagline": "Stone. Life. Style.",
+    "subtext": "Mineral stone surfaces of unmatched natural-stone realism and contemporary sophistication — crafted for Australian homes.",
+    "ctaText": "Explore Collections",
+    "ctaLink": "#collections"
+  },
+  "features": {
+    "visible": true,
+    "items": [
+      {
+        "icon": "check-circle",
+        "title": "Zero Crystalline Silica",
+        "text": "Exclusive silica-free formulation for safer fabrication and healthier homes"
+      },
+      {
+        "icon": "sun",
+        "title": "UV-Stable Indoor-Outdoor",
+        "text": "Versatile range designed for both interior and exterior applications"
+      },
+      {
+        "icon": "layers",
+        "title": "Lifetime Stain Guarantee",
+        "text": "AlphaShield™ protectant backed by a Lifetime Stain Resistance Guarantee"
+      }
+    ]
+  },
+  "about": {
+    "visible": true,
+    "label": "About Alpha",
+    "visualText": "30+ Surfaces",
+    "heading": "A premium Australian benchtop brand built on innovation",
+    "paragraphs": [
+      "Alpha Surfaces is built on a solid foundation of leading innovation and a wealth of industry expertise. Cutting-edge technology delivers mineral stone surfaces of leading durability and practicality, with unmatched natural-stone realism.",
+      "As pioneers of silica-free surface technology, we've set a new industry benchmark while delivering the quality and consistency trusted by architects, designers, builders, and fabricators nationwide."
+    ],
+    "quote": "We deliver a complete surface solution that redefines the standard for benchtops in Australia — beautiful, durable, low maintenance, safe, and sustainable.",
+    "quoteAuthor": "Belinda Kelaher — Managing Director"
+  },
+  "collections": {
+    "visible": true,
+    "label": "Collections",
+    "heading": "A stone to suit your style.<br>A price to suit your budget.",
+    "subtext": "Explore our 30+ mineral stone surfaces curated for Australian living, structured into 5 collections — each with its own aesthetic expression.",
+    "items": [
+      { "tier": "Entry", "name": "Collection 01", "desc": "Pure whites and organic neutrals at the most accessible price point." },
+      { "tier": "Popular", "name": "Collection 02", "desc": "Most sought-after surfaces, from pure white to gently patterned neutrals." },
+      { "tier": "Mid-Tier", "name": "Collection 03", "desc": "Sophisticated stone styles with subtle veining and refined textures." },
+      { "tier": "Upper", "name": "Collection 04", "desc": "Authentic natural-stone recreations with bolder veining and luxe textures." },
+      { "tier": "Premium", "name": "Collection 05", "desc": "Striking veined surfaces with enhanced realism of through-body veining." }
+    ]
+  },
+  "product": {
+    "visible": true,
+    "label": "Featured Surface",
+    "name": "Arabescato",
+    "collection": "Collection 05",
+    "desc": "Ornate grey veins laced with opulent gold on a lustrous backdrop.",
+    "specs": [
+      { "label": "Finish", "value": "Polished" },
+      { "label": "Slab Size", "value": "3200 × 1600mm" },
+      { "label": "Thickness", "value": "20mm" },
+      { "label": "Weight", "value": "236kg" },
+      { "label": "Warranty", "value": "15-Year Limited" }
+    ],
+    "shieldText": "AlphaShield™ protectant guards against everyday wear and tear for long-term durability — with Lifetime Stain Resistance Guarantee.",
+    "certs": ["NSF", "GG", "GG+", "UL"],
+    "ctaText": "Order A Sample"
+  },
+  "advantage": {
+    "visible": true,
+    "label": "The Alpha Advantage",
+    "heading": "Natural-stone realism with <em>exceptional</em> durability",
+    "paragraphs": [
+      "Exclusive AlphaShield™ protection guards against everyday wear and tear for low-maintenance care, so your surface stays beautiful for longer.",
+      "All surfaces are silica-free and certified to NSF and GREENGUARD Gold standards, ensuring health, safety and environmental compliance."
+    ],
+    "cards": [
+      { "icon": "shield", "title": "Silica-Free", "text": "Zero crystalline silica for safer fabrication and healthier environments" },
+      { "icon": "maximize", "title": "Jumbo Slabs", "text": "3200 × 1600mm slabs at 20mm thickness for seamless coverage" },
+      { "icon": "sun", "title": "UV Stable", "text": "Indoor-outdoor range that resists fading and discolouration" },
+      { "icon": "tool", "title": "Easy Fabrication", "text": "Designed for ease of cutting, shaping, and installation" }
+    ]
+  },
+  "warranty": {
+    "visible": true,
+    "label": "Quality Assurance",
+    "heading": "Our quality assurance.<br>Your <em>peace of mind</em>.",
+    "subtext": "At Alpha Surfaces, we understand that our responsibility extends far beyond installation; a commitment to ongoing support and satisfaction is essential.",
+    "cards": [
+      { "number": "15", "title": "Year Limited Warranty", "text": "Comprehensive warranty on manufacturing defects for lasting confidence in your investment." },
+      { "number": "∞", "title": "Lifetime Stain Guarantee", "text": "AlphaShield™ surface protectant is supported by a Lifetime Stain Resistance Guarantee." }
+    ]
+  },
+  "cta": {
+    "visible": true,
+    "heading": "Experience the<br><em>Alpha</em> difference",
+    "subtext": "Discover 30+ mineral stone surfaces curated for Australian living. Order a sample or speak with our team today.",
+    "primaryBtn": { "text": "Order A Sample", "link": "#" },
+    "secondaryBtn": { "text": "Contact Us", "link": "#" }
+  },
+  "footer": {
+    "desc": "Premium Australian mineral stone surfaces — the complete surface solution for homes, architects, designers, and fabricators.",
+    "columns": [
+      {
+        "title": "Collections",
+        "links": [
+          { "label": "Collection 01", "href": "#" },
+          { "label": "Collection 02", "href": "#" },
+          { "label": "Collection 03", "href": "#" },
+          { "label": "Collection 04", "href": "#" },
+          { "label": "Collection 05", "href": "#" },
+          { "label": "Original Alpha Zero", "href": "#" }
+        ]
+      },
+      {
+        "title": "Company",
+        "links": [
+          { "label": "About Us", "href": "#" },
+          { "label": "AlphaShield™", "href": "#" },
+          { "label": "Sustainability", "href": "#" },
+          { "label": "Warranty", "href": "#" }
+        ]
+      },
+      {
+        "title": "Support",
+        "links": [
+          { "label": "Contact", "href": "#" },
+          { "label": "Order Samples", "href": "#" },
+          { "label": "Find a Fabricator", "href": "#" },
+          { "label": "Care & Maintenance", "href": "#" }
+        ]
+      }
+    ],
+    "copyright": "© 2025 Alpha Surfaces. All rights reserved.",
+    "legal": "Privacy Policy · Terms of Service"
+  },
+  "sectionOrder": ["hero", "features", "about", "collections", "product", "advantage", "warranty", "cta"]
+}

@@ -1,6 +1,11 @@
 {
-  "name": "alpha-surfaces",
+  "name": "alpha-surfaces-cms",
+  "version": "1.0.0",
   "scripts": {
-    "start": "npx serve -s . -l $PORT"
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cookie-parser": "^1.4.6"
   }
 }
