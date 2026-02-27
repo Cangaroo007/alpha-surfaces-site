@@ -26,7 +26,7 @@ function loadContent() {
   try {
     return JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8'));
   } catch {
-    const defaults = require('./data/defaults.json');
+    const defaults = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'defaults.json'), 'utf8'));
     saveContent(defaults);
     return defaults;
   }
