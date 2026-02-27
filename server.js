@@ -3,6 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,7 +22,26 @@ const sessions = new Map();
 // ─── Middleware ───
 app.use(express.json({ limit: '5mb' }));
 app.use(cookieParser());
+app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "https://fonts.googleapis.com"],
+      imgSrc: ["'self'", "https://res.cloudinary.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      connectSrc: ["'self'"],
+    },
+  })
+);
 app.use(express.static(path.join(__dirname, 'public')));
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
+});
 
 // ─── Helpers ───
 function loadContent() {
@@ -44,11 +66,22 @@ function authMiddleware(req, res, next) {
 }
 
 // ─── Auth Routes ───
-app.post('/api/login', (req, res) => {
-  if (req.body.password === ADMIN_PASSWORD) {
+// To generate a hash for a new password, run:
+// node -e "const b = require('bcryptjs'); b.hash('yourpassword', 12).then(h => console.log(h))"
+// Then set ADMIN_PASSWORD in Railway to the hash string
+app.post('/api/login', loginLimiter, async (req, res) => {
+  const { password } = req.body;
+  const storedPassword = ADMIN_PASSWORD;
+
+  let valid = await bcrypt.compare(password, storedPassword);
+  if (!valid && !storedPassword.startsWith('$2')) {
+    valid = password === storedPassword;
+  }
+
+  if (valid) {
     const token = crypto.randomBytes(32).toString('hex');
     sessions.set(token, { created: Date.now() });
-    res.cookie('alpha_session', token, { httpOnly: true, sameSite: 'lax', maxAge: 86400000 });
+    res.cookie('alpha_session', token, { httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'production', maxAge: 86400000 });
     return res.json({ ok: true });
   }
   res.status(401).json({ error: 'Wrong password' });
