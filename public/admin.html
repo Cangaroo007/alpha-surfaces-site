@@ -313,6 +313,90 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .ai-diff-more-toggle:hover{text-decoration:underline}
 .ai-diff-more-section{display:none}
 .ai-diff-more-section.expanded{display:block}
+
+/* ─── Version History Panel ─── */
+.vh-desc{font-size:.82rem;color:var(--text2);line-height:1.6;margin-bottom:20px}
+.vh-tabs{display:flex;gap:0;margin-bottom:16px;flex-wrap:wrap}
+.vh-tab{padding:8px 18px;font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:1px solid var(--border);color:var(--text2);cursor:pointer;font-family:inherit;transition:all .2s}
+.vh-tab.active{background:var(--surface);color:var(--gold);border-color:var(--gold)}
+.vh-top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.vh-checkpoint-btn{padding:8px 18px;background:rgba(184,164,114,.15);border:1px solid rgba(184,164,114,.3);color:var(--gold);font-size:.78rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;gap:6px}
+.vh-checkpoint-btn:hover{background:rgba(184,164,114,.25);border-color:var(--gold)}
+.vh-checkpoint-form{background:var(--surface);border:1px solid var(--border);padding:16px 20px;margin-bottom:16px;display:none}
+.vh-checkpoint-form.open{display:block}
+.vh-checkpoint-form p{font-size:.82rem;color:var(--text2);margin-bottom:12px}
+.vh-checkpoint-form input{width:100%;padding:8px 12px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:.84rem;font-family:inherit;outline:none;margin-bottom:12px}
+.vh-checkpoint-form input:focus{border-color:var(--gold)}
+.vh-checkpoint-form input::placeholder{color:var(--text2)}
+.vh-checkpoint-actions{display:flex;gap:10px}
+.vh-checkpoint-save{padding:8px 18px;background:var(--gold);color:#111;border:none;font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px}
+.vh-checkpoint-save:hover{background:#cbb87f}
+.vh-checkpoint-cancel{padding:8px 18px;background:transparent;color:var(--text2);border:1px solid var(--border);font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit}
+.vh-checkpoint-cancel:hover{color:var(--text);border-color:var(--text2)}
+
+.vh-list{display:flex;flex-direction:column;gap:8px}
+.vh-empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:.82rem;line-height:1.6}
+.vh-loading{text-align:center;padding:40px 20px;color:var(--text2);font-size:.82rem}
+
+.vh-card{background:#1A1A18;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:16px 20px;position:relative}
+.vh-card.protected{border-left:3px solid #B8A472}
+.vh-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+.vh-card-id{font-size:.72rem;color:var(--text2);font-family:'Courier New',monospace}
+.vh-card-time{font-size:.78rem;color:var(--text)}
+.vh-card-badge{display:inline-flex;padding:3px 10px;font-size:.68rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:2px;border:1px solid}
+.vh-badge-nl-cms{background:rgba(184,164,114,.2);color:var(--gold);border-color:rgba(184,164,114,.3)}
+.vh-badge-cms-save{background:rgba(100,120,160,.2);color:#8AB;border-color:rgba(100,120,160,.3)}
+.vh-badge-checkpoint{background:rgba(92,90,30,.3);color:#B8C472;border-color:rgba(92,90,30,.5)}
+.vh-badge-restore{background:rgba(130,100,180,.2);color:#B8A4D4;border-color:rgba(130,100,180,.3)}
+.vh-badge-startup{background:rgba(255,255,255,.08);color:#777;border-color:rgba(255,255,255,.1)}
+.vh-card-label{font-size:.84rem;color:var(--text);font-weight:500;margin-bottom:4px}
+.vh-card-label-input{width:100%;padding:6px 10px;background:var(--bg);border:1px solid var(--gold);color:var(--text);font-size:.84rem;font-family:inherit;outline:none;margin-bottom:4px}
+.vh-card-auto{font-size:.78rem;color:var(--text2);margin-bottom:4px}
+.vh-card-meta{font-size:.72rem;color:var(--text2)}
+.vh-card-star{background:none;border:none;color:var(--text2);font-size:1rem;cursor:pointer;padding:0 4px;transition:color .2s}
+.vh-card-star:hover{color:var(--gold)}
+.vh-card-star.active{color:var(--gold)}
+.vh-card-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.vh-btn{padding:6px 14px;font-size:.72rem;font-weight:600;letter-spacing:.04em;cursor:pointer;font-family:inherit;transition:all .2s;border:1px solid var(--border);background:transparent;color:var(--text2)}
+.vh-btn:hover{border-color:var(--gold);color:var(--gold)}
+.vh-btn-restore{border-color:rgba(184,164,114,.3);color:var(--gold)}
+.vh-btn-restore:hover{background:rgba(184,164,114,.1)}
+.vh-btn-delete{opacity:.6}
+.vh-btn-delete:hover{border-color:var(--red);color:var(--red);opacity:1}
+.vh-btn-delete.disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
+
+.vh-confirm{background:var(--surface);border:1px solid var(--border);padding:14px 18px;margin-top:10px;border-radius:4px}
+.vh-confirm p{font-size:.82rem;color:var(--text2);line-height:1.5;margin-bottom:12px}
+.vh-confirm-actions{display:flex;gap:10px}
+.vh-confirm-yes{padding:8px 18px;background:var(--gold);color:#111;border:none;font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit}
+.vh-confirm-yes:hover{background:#cbb87f}
+.vh-confirm-danger{padding:8px 18px;background:var(--red);color:#fff;border:none;font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit}
+.vh-confirm-danger:hover{opacity:.85}
+.vh-confirm-cancel{padding:8px 18px;background:transparent;color:var(--text2);border:1px solid var(--border);font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit}
+
+.vh-toast{position:fixed;top:20px;right:20px;background:#1a2e1a;border:1px solid rgba(39,174,96,.3);color:var(--green);padding:12px 24px;font-size:.82rem;font-weight:500;z-index:10001;opacity:0;transition:opacity .3s;pointer-events:none;border-radius:4px}
+.vh-toast.show{opacity:1}
+
+/* Diff Modal */
+.vh-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:10000;display:none;align-items:center;justify-content:center;padding:24px}
+.vh-modal-overlay.open{display:flex}
+.vh-modal{background:var(--bg);border:1px solid var(--border);max-width:720px;width:100%;max-height:90vh;display:flex;flex-direction:column;border-radius:6px;overflow:hidden}
+.vh-modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0}
+.vh-modal-header h3{font-size:1rem;font-weight:600;margin-bottom:4px}
+.vh-modal-header p{font-size:.78rem;color:var(--text2)}
+.vh-modal-close{background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer;padding:4px 8px}
+.vh-modal-close:hover{color:var(--text)}
+.vh-modal-body{padding:20px 24px;overflow-y:auto;flex:1}
+.vh-modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:center;flex-shrink:0}
+.vh-diff-field{margin-bottom:16px}
+.vh-diff-field-name{font-size:.78rem;color:var(--gold);font-weight:500;margin-bottom:6px}
+.vh-diff-remove{color:#ff6b6b;font-size:.82rem;text-decoration:line-through;padding:4px 8px;background:rgba(255,107,107,.06);margin-bottom:2px;word-break:break-word;border-radius:2px}
+.vh-diff-add{color:#69db7c;font-size:.82rem;padding:4px 8px;background:rgba(105,219,124,.06);word-break:break-word;border-radius:2px}
+.vh-diff-note{font-size:.78rem;color:var(--text2);margin-bottom:16px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px}
+.vh-html-diff{font-size:.82rem;color:var(--text2);line-height:1.6;padding:16px;text-align:center}
+.vh-view-raw{font-size:.72rem;color:var(--gold);text-decoration:none;cursor:pointer}
+.vh-view-raw:hover{text-decoration:underline}
+.vh-no-diff{font-size:.82rem;color:var(--text2);text-align:center;padding:20px}
 </style>
 </head>
 <body>
@@ -351,6 +435,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
       <div class="divider"></div>
       <span class="nav-section-label">Integrations</span>
       <a href="#" data-panel="apikeys" onclick="showPanel('apikeys',this)">🔑 API Keys</a>
+      <a href="#" data-panel="versions" onclick="showPanel('versions',this)">◷ Version History</a>
     </nav>
     <div class="sidebar-bottom"><a href="#" onclick="doLogout()">Sign Out</a></div>
   </aside>
@@ -631,6 +716,43 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
         </div>
       </div>
 
+      <!-- VERSION HISTORY -->
+      <div id="panel-versions" class="panel">
+        <div class="vh-desc">Every save, AI edit, and manual checkpoint &mdash; all restorable.</div>
+        <div id="vh-tabs" class="vh-tabs"></div>
+        <div class="vh-top-bar">
+          <div></div>
+          <button class="vh-checkpoint-btn" onclick="vhToggleCheckpointForm()">&#9733; Checkpoint</button>
+        </div>
+        <div id="vh-checkpoint-form" class="vh-checkpoint-form">
+          <p>Save a checkpoint of the current live site.</p>
+          <input type="text" id="vh-checkpoint-label" placeholder="e.g. Before homepage update, Belinda approved">
+          <div class="vh-checkpoint-actions">
+            <button class="vh-checkpoint-save" onclick="vhSaveCheckpoint()">&#9733; Save Checkpoint</button>
+            <button class="vh-checkpoint-cancel" onclick="vhToggleCheckpointForm()">Cancel</button>
+          </div>
+        </div>
+        <div id="vh-list" class="vh-list"></div>
+      </div>
+
+      <!-- Diff Modal -->
+      <div id="vh-diff-modal" class="vh-modal-overlay" onclick="if(event.target===this)vhCloseDiffModal()">
+        <div class="vh-modal">
+          <div class="vh-modal-header">
+            <div>
+              <h3 id="vh-modal-title">Changes in this version vs. current live</h3>
+              <p id="vh-modal-subtitle"></p>
+            </div>
+            <button class="vh-modal-close" onclick="vhCloseDiffModal()">&times;</button>
+          </div>
+          <div class="vh-modal-body" id="vh-modal-body"></div>
+          <div class="vh-modal-footer" id="vh-modal-footer"></div>
+        </div>
+      </div>
+
+      <!-- Version History Toast -->
+      <div id="vh-toast" class="vh-toast"></div>
+
       <!-- AI ASSISTANT -->
       <div id="panel-ai" class="panel">
         <div class="ai-cms-header">
@@ -791,7 +913,7 @@ function showPanel(id, el) {
   document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el?.classList.add('active');
-  const titles = { styles:'Brand Styles', layout:'Layout & Order', nav:'Navigation', hero:'Hero', features:'Features Strip', about:'About', collections:'Collections', product:'Product Detail', advantage:'Advantage', warranty:'Warranty', cta:'Call to Action', footer:'Footer', apikeys:'API Keys & Integrations', ai:'AI Content Assistant' };
+  const titles = { styles:'Brand Styles', layout:'Layout & Order', nav:'Navigation', hero:'Hero', features:'Features Strip', about:'About', collections:'Collections', product:'Product Detail', advantage:'Advantage', warranty:'Warranty', cta:'Call to Action', footer:'Footer', apikeys:'API Keys & Integrations', ai:'AI Content Assistant', versions:'Version History' };
   document.getElementById('panel-title').textContent = titles[id] || id;
   // Toggle AI-active mode on main container
   const mainEl = document.querySelector('.main');
@@ -1661,8 +1783,8 @@ async function applyAIChanges(diffId, btn) {
     if (actionsEl) {
       actionsEl.innerHTML = `<div class="ai-diff-applied">✓ Applied — changes are live</div>`;
     }
-    // Add undo link below the card
-    const undoHtml = `<span class="ai-diff-undo-link" onclick="undoAIChanges('${diffId}')">↩ Undo last change</span>`;
+    // Add "View in Version History" link below the card
+    const undoHtml = `<span class="ai-diff-undo-link" onclick="showPanel('versions',document.querySelector('[data-panel=versions]'))">↩ View in Version History</span>`;
     card.insertAdjacentHTML('beforeend', undoHtml);
 
     saveAISession();
@@ -1688,28 +1810,9 @@ function discardAIChanges(diffId) {
   saveAISession();
 }
 
-async function undoAIChanges(diffId) {
-  try {
-    const res = await fetch('/api/ai/undo', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (!res.ok) throw new Error('Undo failed');
-
-    const contentRes = await fetch('/api/content');
-    DATA = await contentRes.json();
-    renderAll();
-
-    const card = document.getElementById(diffId);
-    if (card) {
-      card.innerHTML = '<div style="font-size:.78rem;color:var(--text2)">Reverted</div>';
-    }
-
-    addAISystemMessage('Reverted to previous version');
-    saveAISession();
-  } catch {
-    addAISystemMessage('Failed to undo — please try again');
-  }
+function undoAIChanges(diffId) {
+  // Redirect to Version History panel for multi-level undo
+  showPanel('versions', document.querySelector('[data-panel=versions]'));
 }
 
 function addAISystemMessage(text) {
@@ -1857,11 +1960,12 @@ function populateKeyInputs() {
   });
 }
 
-// Load keys when the API Keys panel is shown
+// Load keys/versions when panels are shown
 const origShowPanel = showPanel;
 showPanel = function(id, el) {
   const result = origShowPanel(id, el);
   if (id === 'apikeys') loadKeysStatus();
+  if (id === 'versions') vhInit();
   return result;
 };
 
@@ -2006,6 +2110,412 @@ async function clearKey(keyName) {
     // Reload status bar
     loadKeysStatus();
   } catch {}
+}
+
+// ─── Version History ───
+let vhCurrentPage = 'content';
+let vhPages = ['content']; // Discovered page tabs
+let vhVersions = []; // Current page's version list
+let vhInitialized = false;
+
+const VH_PAGE_LABELS = {
+  content: 'Main Site',
+  kc: 'kc \u2014 Kitchen Connection',
+};
+
+async function vhInit() {
+  // Discover available pages by loading content index and checking for page tabs
+  if (!vhInitialized) {
+    vhInitialized = true;
+    // Try to discover landing pages by fetching their version indexes
+    const candidates = ['kc']; // Known landing pages; expand as needed
+    for (const key of candidates) {
+      try {
+        const res = await fetch(`/api/versions/${key}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.versions && data.versions.length > 0 && !vhPages.includes(key)) {
+            vhPages.push(key);
+          }
+        }
+      } catch {}
+    }
+  }
+  vhRenderTabs();
+  vhLoadVersions(vhCurrentPage);
+}
+
+function vhRenderTabs() {
+  const el = document.getElementById('vh-tabs');
+  el.innerHTML = vhPages.map(p => {
+    const label = VH_PAGE_LABELS[p] || p;
+    const active = p === vhCurrentPage ? ' active' : '';
+    return `<button class="vh-tab${active}" onclick="vhSwitchTab('${p}', this)">${escapeHtml(label)}</button>`;
+  }).join('');
+}
+
+function vhSwitchTab(pageKey, btn) {
+  vhCurrentPage = pageKey;
+  document.querySelectorAll('.vh-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  vhLoadVersions(pageKey);
+}
+
+async function vhLoadVersions(pageKey) {
+  const listEl = document.getElementById('vh-list');
+  listEl.innerHTML = '<div class="vh-loading">Loading versions...</div>';
+
+  try {
+    const res = await fetch(`/api/versions/${pageKey}`);
+    if (!res.ok) throw new Error('Failed to load');
+    const data = await res.json();
+    vhVersions = data.versions || [];
+    vhRenderList();
+  } catch (err) {
+    listEl.innerHTML = '<div class="vh-empty">Failed to load versions.</div>';
+  }
+}
+
+function vhRelativeTime(isoStr) {
+  const date = new Date(isoStr);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHr / 24);
+
+  if (diffSec < 60) return 'Just now';
+  if (diffMin < 60) return `${diffMin} minute${diffMin !== 1 ? 's' : ''} ago`;
+  if (diffHr < 24) return `${diffHr} hour${diffHr !== 1 ? 's' : ''} ago`;
+  if (diffDay === 1) {
+    return `Yesterday at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  }
+  if (diffDay < 7) return `${diffDay} days ago`;
+  return date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function vhBadgeClass(source) {
+  const map = {
+    'nl-cms': 'vh-badge-nl-cms',
+    'cms-save': 'vh-badge-cms-save',
+    'checkpoint': 'vh-badge-checkpoint',
+    'restore': 'vh-badge-restore',
+    'startup': 'vh-badge-startup',
+  };
+  return map[source] || 'vh-badge-startup';
+}
+
+function vhBadgeLabel(source) {
+  const map = {
+    'nl-cms': 'AI',
+    'cms-save': 'Manual',
+    'checkpoint': 'Checkpoint',
+    'restore': 'Restore',
+    'startup': 'Startup',
+  };
+  return map[source] || source;
+}
+
+function vhRenderList() {
+  const listEl = document.getElementById('vh-list');
+  if (vhVersions.length === 0) {
+    listEl.innerHTML = '<div class="vh-empty">No versions yet. Versions are created automatically each time you save or apply an AI edit.</div>';
+    return;
+  }
+
+  listEl.innerHTML = vhVersions.map(v => {
+    const isProtected = v.protected;
+    const protectedClass = isProtected ? ' protected' : '';
+    const starClass = isProtected ? ' active' : '';
+    const starChar = isProtected ? '&#9733;' : '&#9734;';
+    const deleteDisabled = isProtected ? ' disabled' : '';
+    const deleteTitle = isProtected ? ' title="Unprotect before deleting"' : '';
+    const relTime = vhRelativeTime(v.timestamp);
+    const labelHtml = v.label
+      ? `<div class="vh-card-label" id="label-display-${v.id}">${escapeHtml(v.label)}</div>`
+      : '';
+    const autoLabelHtml = v.autoLabel
+      ? `<div class="vh-card-auto">${escapeHtml(v.autoLabel)}</div>`
+      : '';
+    const changeHtml = v.source === 'nl-cms' && v.changeCount > 0
+      ? `${v.changeCount} field${v.changeCount !== 1 ? 's' : ''} changed &middot; `
+      : '';
+    const sizeStr = v.sizeBytes ? vhFormatBytes(v.sizeBytes) : '';
+
+    return `<div class="vh-card${protectedClass}" id="vh-card-${v.id}">
+      <div class="vh-card-top">
+        <div>
+          <div class="vh-card-time" title="${escapeHtml(v.timestamp)}">${escapeHtml(relTime)}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="vh-card-star${starClass}" onclick="vhToggleProtect('${v.id}', ${!isProtected})" title="${isProtected ? 'Unprotect' : 'Protect'}">${starChar}</button>
+          <span class="vh-card-badge ${vhBadgeClass(v.source)}">${vhBadgeLabel(v.source)}</span>
+        </div>
+      </div>
+      ${labelHtml}
+      ${autoLabelHtml}
+      <div class="vh-card-meta">${changeHtml}${sizeStr}</div>
+      <div class="vh-card-actions">
+        <button class="vh-btn" onclick="vhPreviewDiff('${v.id}')">Preview Diff</button>
+        <button class="vh-btn vh-btn-restore" onclick="vhConfirmRestore('${v.id}')">Restore</button>
+        <button class="vh-btn" onclick="vhStartRename('${v.id}')" title="Rename">&#9998;</button>
+        <button class="vh-btn vh-btn-delete${deleteDisabled}"${deleteTitle} onclick="vhConfirmDelete('${v.id}')">&#128465;</button>
+      </div>
+      <div id="vh-confirm-${v.id}"></div>
+    </div>`;
+  }).join('');
+}
+
+function vhFormatBytes(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  return (bytes / 1024).toFixed(1) + ' KB';
+}
+
+// ─── Checkpoint ───
+function vhToggleCheckpointForm() {
+  const form = document.getElementById('vh-checkpoint-form');
+  form.classList.toggle('open');
+  if (form.classList.contains('open')) {
+    document.getElementById('vh-checkpoint-label').value = '';
+    document.getElementById('vh-checkpoint-label').focus();
+  }
+}
+
+async function vhSaveCheckpoint() {
+  const label = document.getElementById('vh-checkpoint-label').value.trim() || null;
+  try {
+    const res = await fetch(`/api/versions/${vhCurrentPage}/checkpoint`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ label }),
+    });
+    if (!res.ok) throw new Error('Failed');
+    vhToggleCheckpointForm();
+    vhShowToast('Checkpoint saved.');
+    vhLoadVersions(vhCurrentPage);
+  } catch (err) {
+    vhShowToast('Failed to save checkpoint.');
+  }
+}
+
+// ─── Protect toggle ───
+async function vhToggleProtect(id, newVal) {
+  try {
+    const res = await fetch(`/api/versions/${vhCurrentPage}/${id}/protect`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ protected: newVal }),
+    });
+    if (!res.ok) throw new Error('Failed');
+    vhLoadVersions(vhCurrentPage);
+  } catch {}
+}
+
+// ─── Rename ───
+function vhStartRename(id) {
+  const v = vhVersions.find(v => v.id === id);
+  if (!v) return;
+  const card = document.getElementById('vh-card-' + id);
+  if (!card) return;
+
+  // Find label display or create inline editor after the top bar
+  let labelDisplay = card.querySelector('.vh-card-label');
+  let autoLabel = card.querySelector('.vh-card-auto');
+  const insertAfter = labelDisplay || card.querySelector('.vh-card-top');
+
+  // Create inline input
+  const input = document.createElement('input');
+  input.className = 'vh-card-label-input';
+  input.value = v.label || '';
+  input.placeholder = 'Type a label and press Enter...';
+
+  // Replace or insert
+  if (labelDisplay) {
+    labelDisplay.replaceWith(input);
+  } else {
+    insertAfter.after(input);
+  }
+
+  input.focus();
+  input.select();
+
+  const save = async () => {
+    const newLabel = input.value.trim() || null;
+    try {
+      await fetch(`/api/versions/${vhCurrentPage}/${id}/label`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label: newLabel }),
+      });
+    } catch {}
+    vhLoadVersions(vhCurrentPage);
+  };
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); save(); }
+    if (e.key === 'Escape') { vhLoadVersions(vhCurrentPage); }
+  });
+  input.addEventListener('blur', save);
+}
+
+// ─── Delete ───
+function vhConfirmDelete(id) {
+  const v = vhVersions.find(v => v.id === id);
+  if (!v) return;
+  if (v.protected) return;
+
+  const el = document.getElementById('vh-confirm-' + id);
+  if (!el) return;
+  el.innerHTML = `<div class="vh-confirm">
+    <p>Delete this version? This cannot be undone.</p>
+    <div class="vh-confirm-actions">
+      <button class="vh-confirm-danger" onclick="vhDoDelete('${id}')">Delete</button>
+      <button class="vh-confirm-cancel" onclick="document.getElementById('vh-confirm-${id}').innerHTML=''">Cancel</button>
+    </div>
+  </div>`;
+}
+
+async function vhDoDelete(id) {
+  try {
+    const res = await fetch(`/api/versions/${vhCurrentPage}/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (!data.ok) {
+      vhShowToast(data.message || 'Cannot delete.');
+      return;
+    }
+    vhShowToast('Version deleted.');
+    vhLoadVersions(vhCurrentPage);
+  } catch {
+    vhShowToast('Failed to delete version.');
+  }
+}
+
+// ─── Restore ───
+function vhConfirmRestore(id) {
+  const v = vhVersions.find(v => v.id === id);
+  if (!v) return;
+  const relTime = vhRelativeTime(v.timestamp);
+
+  const el = document.getElementById('vh-confirm-' + id);
+  if (!el) return;
+  el.innerHTML = `<div class="vh-confirm">
+    <p>Restore this version?<br><br>This will make the version from <strong>${escapeHtml(relTime)}</strong> the live site. Your current version will be saved as a new snapshot first &mdash; nothing will be lost.</p>
+    <div class="vh-confirm-actions">
+      <button class="vh-confirm-yes" onclick="vhDoRestore('${id}')">Yes, Restore</button>
+      <button class="vh-confirm-cancel" onclick="document.getElementById('vh-confirm-${id}').innerHTML=''">Cancel</button>
+    </div>
+  </div>`;
+}
+
+async function vhDoRestore(id) {
+  try {
+    const res = await fetch(`/api/versions/${vhCurrentPage}/${id}/restore`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) throw new Error('Failed');
+    vhShowToast('Restored. The previous version was saved.');
+    // Reload in-memory content if main site
+    if (vhCurrentPage === 'content') {
+      const contentRes = await fetch('/api/content');
+      DATA = await contentRes.json();
+      renderAll();
+    }
+    vhLoadVersions(vhCurrentPage);
+  } catch {
+    vhShowToast('Failed to restore.');
+  }
+}
+
+// ─── Preview Diff ───
+async function vhPreviewDiff(id) {
+  const v = vhVersions.find(v => v.id === id);
+  if (!v) return;
+
+  const modal = document.getElementById('vh-diff-modal');
+  const body = document.getElementById('vh-modal-body');
+  const footer = document.getElementById('vh-modal-footer');
+  const subtitle = document.getElementById('vh-modal-subtitle');
+
+  subtitle.textContent = `${v.id} \u2014 ${vhRelativeTime(v.timestamp)} \u2014 ${v.autoLabel || v.source}`;
+  body.innerHTML = '<div class="vh-loading">Loading diff...</div>';
+  footer.innerHTML = '';
+  modal.classList.add('open');
+
+  try {
+    const res = await fetch(`/api/versions/${vhCurrentPage}/${id}/diff`);
+    if (!res.ok) throw new Error('Failed to load diff');
+    const data = await res.json();
+
+    let html = '';
+
+    if (data.htmlDiff) {
+      // HTML page diff
+      const delta = data.htmlDiff.deltaBytes;
+      const direction = delta > 0 ? 'larger' : delta < 0 ? 'smaller' : 'the same size as';
+      const absDelta = Math.abs(delta);
+      html += `<div class="vh-html-diff">
+        This version is <strong>${absDelta} bytes ${direction}</strong> than the current live page.<br>
+        File-level preview not available for HTML pages.<br><br>
+        <a class="vh-view-raw" href="/api/versions/${vhCurrentPage}/${id}/snapshot" target="_blank">View Raw</a>
+      </div>`;
+    } else if (data.diff && data.diff.length > 0) {
+      // Content diff
+      const note = data.snapshotIsOlder
+        ? 'If restored, these values will change:'
+        : 'This version is newer than current \u2014 these are the changes it introduced:';
+      html += `<div class="vh-diff-note">${escapeHtml(note)}</div>`;
+
+      for (const change of data.diff) {
+        const snapshotVal = change.snapshot || '(empty)';
+        const currentVal = change.current || '(empty)';
+        if (data.snapshotIsOlder) {
+          // Red = current (will be replaced), Green = snapshot (will become live)
+          html += `<div class="vh-diff-field">
+            <div class="vh-diff-field-name">${escapeHtml(change.path)}</div>
+            <div class="vh-diff-remove">&minus; ${escapeHtml(currentVal)}</div>
+            <div class="vh-diff-add">+ ${escapeHtml(snapshotVal)}</div>
+          </div>`;
+        } else {
+          html += `<div class="vh-diff-field">
+            <div class="vh-diff-field-name">${escapeHtml(change.path)}</div>
+            <div class="vh-diff-remove">&minus; ${escapeHtml(snapshotVal)}</div>
+            <div class="vh-diff-add">+ ${escapeHtml(currentVal)}</div>
+          </div>`;
+        }
+      }
+
+      html += '<div class="vh-no-diff" style="color:var(--text2);font-size:.78rem;margin-top:12px">[No other differences]</div>';
+    } else {
+      html += '<div class="vh-no-diff">No differences found between this version and the current live content.</div>';
+    }
+
+    body.innerHTML = html;
+
+    // Restore button in footer
+    footer.innerHTML = `<button class="vh-confirm-yes" onclick="vhDoRestoreFromModal('${id}')">Restore This Version</button>`;
+
+  } catch (err) {
+    body.innerHTML = '<div class="vh-empty">Failed to load diff.</div>';
+  }
+}
+
+async function vhDoRestoreFromModal(id) {
+  vhCloseDiffModal();
+  await vhDoRestore(id);
+}
+
+function vhCloseDiffModal() {
+  document.getElementById('vh-diff-modal').classList.remove('open');
+}
+
+// ─── Toast ───
+function vhShowToast(msg) {
+  const el = document.getElementById('vh-toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
 }
 
 checkAuth();
