@@ -12,6 +12,8 @@ const Anthropic = require('@anthropic-ai/sdk');
 const OpenAI = require('openai');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+const versions = require('./lib/versions');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -193,6 +195,13 @@ app.get('/api/content', (req, res) => {
 
 app.put('/api/content', authMiddleware, (req, res) => {
   try {
+    // Auto-snapshot current content before writing
+    const current = loadContent();
+    versions.createVersion('content', current, {
+      source: 'cms-save',
+      autoLabel: 'Manual save',
+      changeCount: 0,
+    });
     saveContent(req.body);
     res.json({ ok: true });
   } catch (err) {
@@ -257,7 +266,6 @@ app.post('/api/upload', authMiddleware, upload.single('image'), (req, res) => {
 });
 
 // ─── AI CMS Routes ───
-const BACKUP_FILE = path.join(DATA_DIR, 'content.backup.json');
 
 const aiLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -627,33 +635,24 @@ app.post('/api/ai/apply', authMiddleware, async (req, res) => {
     if (!proposedContent) {
       return res.status(400).json({ error: 'proposedContent is required.' });
     }
-    // Backup current content
+    // Snapshot current content via version history
     const current = loadContent();
-    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-    fs.writeFileSync(BACKUP_FILE, JSON.stringify(current, null, 2));
+    const diff = computeDiff(current, proposedContent);
+    versions.createVersion('content', current, {
+      source: 'nl-cms',
+      autoLabel: versions.generateAutoLabel(diff),
+      changeCount: diff.length,
+    });
     // Write new content
     saveContent(proposedContent);
-    res.json({ ok: true, message: 'Changes applied. Backup saved.' });
+    res.json({ ok: true, message: 'Changes applied. Version saved.' });
   } catch (err) {
     console.error('AI apply error:', err);
     res.status(500).json({ error: 'Failed to apply changes.' });
   }
 });
 
-// POST /api/ai/undo — Revert to backup
-app.post('/api/ai/undo', authMiddleware, async (req, res) => {
-  try {
-    if (!fs.existsSync(BACKUP_FILE)) {
-      return res.status(404).json({ error: 'No backup found to revert to.' });
-    }
-    const backup = JSON.parse(fs.readFileSync(BACKUP_FILE, 'utf8'));
-    saveContent(backup);
-    res.json({ ok: true, message: 'Reverted to previous version' });
-  } catch (err) {
-    console.error('AI undo error:', err);
-    res.status(500).json({ error: 'Failed to revert.' });
-  }
-});
+// /api/ai/undo removed — replaced by multi-level version history (see /api/versions/*)
 
 // GET /api/ai/status — Provider availability & model capability data
 app.get('/api/ai/status', (req, res) => {
@@ -1075,6 +1074,175 @@ app.delete('/api/keys/:keyName', authMiddleware, (req, res) => {
   res.json({ ok: true, cleared: keyName });
 });
 
+// ─── Version History API Routes ───
+
+// GET /api/versions/:page — List versions
+app.get('/api/versions/:page', authMiddleware, (req, res) => {
+  try {
+    const pageKey = req.params.page;
+    const versionList = versions.getIndex(pageKey);
+    res.json({ ok: true, page: pageKey, versions: versionList.slice(0, MAX_VERSIONS) });
+  } catch (err) {
+    console.error('Version list error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to load versions.' });
+  }
+});
+
+// GET /api/versions/:page/:id/snapshot — Get full snapshot
+app.get('/api/versions/:page/:id/snapshot', authMiddleware, (req, res) => {
+  try {
+    const { page, id } = req.params;
+    const snapshot = versions.getSnapshot(page, id);
+    if (snapshot === null) {
+      return res.status(404).json({ ok: false, message: 'Snapshot not found.' });
+    }
+    if (page === 'content') {
+      res.json(snapshot);
+    } else {
+      res.type('text/html').send(snapshot);
+    }
+  } catch (err) {
+    console.error('Snapshot error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to load snapshot.' });
+  }
+});
+
+// GET /api/versions/:page/:id/diff — Diff vs current live
+app.get('/api/versions/:page/:id/diff', authMiddleware, (req, res) => {
+  try {
+    const { page, id } = req.params;
+    let currentLive;
+    if (page === 'content') {
+      currentLive = loadContent();
+    } else {
+      const htmlPath = path.join(__dirname, 'public', page + '.html');
+      if (!fs.existsSync(htmlPath)) {
+        return res.status(404).json({ ok: false, message: 'Live page not found.' });
+      }
+      currentLive = fs.readFileSync(htmlPath, 'utf8');
+    }
+    const result = versions.getDiff(page, id, currentLive);
+    if (!result) {
+      return res.status(404).json({ ok: false, message: 'Snapshot not found.' });
+    }
+    res.json(result);
+  } catch (err) {
+    console.error('Diff error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to compute diff.' });
+  }
+});
+
+// POST /api/versions/:page/checkpoint — Create manual checkpoint
+app.post('/api/versions/:page/checkpoint', authMiddleware, (req, res) => {
+  try {
+    const pageKey = req.params.page;
+    const label = req.body.label || null;
+    let currentLive;
+    if (pageKey === 'content') {
+      currentLive = loadContent();
+    } else {
+      const htmlPath = path.join(__dirname, 'public', pageKey + '.html');
+      if (!fs.existsSync(htmlPath)) {
+        return res.status(404).json({ ok: false, message: 'Page not found.' });
+      }
+      currentLive = fs.readFileSync(htmlPath, 'utf8');
+    }
+    const version = versions.createCheckpoint(pageKey, currentLive, label);
+    res.json({ ok: true, version });
+  } catch (err) {
+    console.error('Checkpoint error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to create checkpoint.' });
+  }
+});
+
+// PUT /api/versions/:page/:id/label — Rename a version
+app.put('/api/versions/:page/:id/label', authMiddleware, (req, res) => {
+  try {
+    const { page, id } = req.params;
+    let label = req.body.label;
+    if (label !== null && label !== undefined) {
+      label = String(label).trim();
+      if (label === '') label = null;
+    }
+    const updated = versions.renameVersion(page, id, label);
+    if (!updated) {
+      return res.status(404).json({ ok: false, message: 'Version not found.' });
+    }
+    res.json({ ok: true, version: updated });
+  } catch (err) {
+    console.error('Label error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to update label.' });
+  }
+});
+
+// DELETE /api/versions/:page/:id — Delete a version
+app.delete('/api/versions/:page/:id', authMiddleware, (req, res) => {
+  try {
+    const { page, id } = req.params;
+    const result = versions.deleteVersion(page, id);
+    res.json(result);
+  } catch (err) {
+    console.error('Delete version error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to delete version.' });
+  }
+});
+
+// PUT /api/versions/:page/:id/protect — Toggle protected status
+app.put('/api/versions/:page/:id/protect', authMiddleware, (req, res) => {
+  try {
+    const { page, id } = req.params;
+    const protectedVal = !!req.body.protected;
+    const updated = versions.toggleProtect(page, id, protectedVal);
+    if (!updated) {
+      return res.status(404).json({ ok: false, message: 'Version not found.' });
+    }
+    res.json({ ok: true, version: updated });
+  } catch (err) {
+    console.error('Protect error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to update protection.' });
+  }
+});
+
+// POST /api/versions/:page/:id/restore — Restore a version
+app.post('/api/versions/:page/:id/restore', authMiddleware, (req, res) => {
+  try {
+    const { page, id } = req.params;
+    let currentLive;
+    let writeLiveFile;
+
+    if (page === 'content') {
+      currentLive = loadContent();
+      writeLiveFile = (snapshot) => {
+        saveContent(snapshot);
+      };
+    } else {
+      const htmlPath = path.join(__dirname, 'public', page + '.html');
+      if (!fs.existsSync(htmlPath)) {
+        return res.status(404).json({ ok: false, message: 'Page not found.' });
+      }
+      currentLive = fs.readFileSync(htmlPath, 'utf8');
+      writeLiveFile = (snapshot) => {
+        fs.writeFileSync(htmlPath, snapshot);
+      };
+    }
+
+    const result = versions.restoreVersion(page, id, currentLive, writeLiveFile);
+
+    // If restoring content, reload in-memory DATA
+    if (page === 'content' && result.ok) {
+      // Content is already written to disk by writeLiveFile
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.error('Restore error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to restore version.' });
+  }
+});
+
+// Expose MAX_VERSIONS for the version list route
+const MAX_VERSIONS = 50;
+
 // ─── Admin route ───
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
@@ -1089,6 +1257,11 @@ app.get('/kc', (req, res) => {
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
+// ─── Version History Startup ───
+versions.ensureDirectories();
+versions.snapshotContentOnStartup(loadContent());
+versions.detectAndSnapshotPages();
 
 app.listen(PORT, () => {
   console.log(`Alpha Surfaces CMS running on port ${PORT}`);
