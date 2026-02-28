@@ -32,6 +32,7 @@ app.use(
       imgSrc: ["'self'", "https://res.cloudinary.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       connectSrc: ["'self'"],
+      scriptSrcAttr: ["'unsafe-inline'"],
     },
   })
 );
