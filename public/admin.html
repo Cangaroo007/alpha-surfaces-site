@@ -86,22 +86,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .hidden{display:none}
 
 /* ─── AI Panel ─── */
-.ai-trigger{display:flex;align-items:center;gap:8px;padding:10px 20px;color:var(--gold);text-decoration:none;font-size:.82rem;font-weight:500;cursor:pointer;border-left:2px solid transparent;transition:all .2s;background:none;border-top:none;border-right:none;border-bottom:none;width:100%;font-family:inherit}
-.ai-trigger:hover{background:rgba(184,164,114,.08);border-left-color:var(--gold)}
-.ai-trigger .pulse{width:8px;height:8px;background:var(--gold);border-radius:50%;animation:aiPulse 2s infinite}
-@keyframes aiPulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-.ai-panel{position:fixed;top:0;right:-500px;width:480px;height:100vh;background:var(--bg);border-left:1px solid var(--border);z-index:1000;display:flex;flex-direction:column;transition:right .35s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 32px rgba(0,0,0,.5)}
-.ai-panel.open{right:0}
-.ai-panel.fullscreen{width:100vw;right:-100vw}
-.ai-panel.fullscreen.open{right:0}
-
-.ai-panel-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface)}
-.ai-panel-header h3{font-size:.88rem;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
-.ai-panel-header h3 .ai-icon{color:var(--gold);font-size:1rem}
-.ai-header-actions{display:flex;gap:4px}
-.ai-header-btn{background:none;border:1px solid var(--border);color:var(--text2);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:all .2s}
-.ai-header-btn:hover{border-color:var(--gold);color:var(--gold)}
 
 .ai-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
 
@@ -186,10 +170,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .ai-send-btn:disabled{opacity:.4;cursor:not-allowed}
 .ai-send-btn .spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,.2);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* Overlay backdrop */
-.ai-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:999;opacity:0;pointer-events:none;transition:opacity .35s}
-.ai-backdrop.show{opacity:1;pointer-events:auto}
 
 /* ─── Model Selector ─── */
 .ai-model-bar{padding:10px 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:10px;flex-shrink:0}
@@ -311,6 +291,28 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .keys-save-btn.error{background:var(--red)}
 
 .keys-security-note{display:flex;align-items:flex-start;gap:10px;padding:16px;background:rgba(255,255,255,.02);border:1px solid var(--border);margin-top:32px;font-size:.76rem;color:var(--text2);line-height:1.6}
+
+/* ─── AI Main Panel (replaces drawer) ─── */
+.main.ai-active{padding:0;overflow:hidden}
+.main.ai-active .main-header{display:none}
+#panel-ai.active{display:flex !important;flex-direction:column;height:100vh}
+.ai-cms-header{padding:24px 32px 20px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface)}
+.ai-cms-header h2{font-size:1.1rem;font-weight:600;display:flex;align-items:center;gap:10px;margin-bottom:6px;color:var(--text)}
+.ai-cms-header .sparkle{color:var(--gold);font-size:1.2rem}
+.ai-cms-header p{font-size:.82rem;color:var(--text2);line-height:1.5}
+.ai-key-banner{margin:0 32px;padding:20px 24px;background:rgba(184,164,114,.08);border:1px solid rgba(184,164,114,.25);margin-top:20px;flex-shrink:0}
+.ai-key-banner .banner-icon{font-size:1rem;margin-bottom:8px;display:block}
+.ai-key-banner .banner-title{font-size:.88rem;font-weight:600;color:var(--gold);margin-bottom:4px}
+.ai-key-banner .banner-text{font-size:.8rem;color:var(--text2);line-height:1.5;margin-bottom:12px}
+.ai-key-banner a{color:var(--gold);font-size:.8rem;font-weight:600;text-decoration:none;letter-spacing:.04em}
+.ai-key-banner a:hover{text-decoration:underline}
+.ai-nav-link{color:var(--gold) !important;font-weight:500 !important}
+.ai-nav-link .sparkle{color:var(--gold);font-size:.9rem}
+.ai-footer-info{padding:6px 16px 10px;font-size:.68rem;color:var(--text2);text-align:center;flex-shrink:0;border-top:1px solid rgba(255,255,255,.04)}
+.ai-diff-more-toggle{font-size:.72rem;color:var(--gold);cursor:pointer;margin-top:8px;display:inline-block;transition:color .2s}
+.ai-diff-more-toggle:hover{text-decoration:underline}
+.ai-diff-more-section{display:none}
+.ai-diff-more-section.expanded{display:block}
 </style>
 </head>
 <body>
@@ -331,6 +333,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   <aside class="sidebar">
     <div class="sidebar-brand"><h2>Alpha CMS</h2><span>Content Manager</span></div>
     <nav class="sidebar-nav">
+      <a href="#" data-panel="ai" class="ai-nav-link" onclick="showPanel('ai',this)"><span class="sparkle">✦</span> AI Assistant</a>
+      <div class="divider"></div>
       <a href="#" data-panel="styles" class="active" onclick="showPanel('styles',this)">🎨 Brand Styles</a>
       <a href="#" data-panel="layout" onclick="showPanel('layout',this)">📐 Layout & Order</a>
       <div class="divider"></div>
@@ -344,8 +348,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
       <a href="#" data-panel="warranty" onclick="showPanel('warranty',this)">🛡️ Warranty</a>
       <a href="#" data-panel="cta" onclick="showPanel('cta',this)">📣 Call to Action</a>
       <a href="#" data-panel="footer" onclick="showPanel('footer',this)">📋 Footer</a>
-      <div class="divider"></div>
-      <button class="ai-trigger" onclick="toggleAIPanel()"><span class="pulse"></span> AI Assistant</button>
       <div class="divider"></div>
       <span class="nav-section-label">Integrations</span>
       <a href="#" data-panel="apikeys" onclick="showPanel('apikeys',this)">🔑 API Keys</a>
@@ -629,126 +631,122 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
         </div>
       </div>
 
+      <!-- AI ASSISTANT -->
+      <div id="panel-ai" class="panel">
+        <div class="ai-cms-header">
+          <h2><span class="sparkle">✦</span> AI Content Assistant</h2>
+          <p>Edit your site in plain English. Claude knows everything on your site and will propose changes before applying anything.</p>
+        </div>
+        <div id="ai-key-banner" class="ai-key-banner" style="display:none">
+          <span class="banner-icon">⚠</span>
+          <div class="banner-title">Claude API key not configured</div>
+          <div class="banner-text">To use the AI Assistant, add your Anthropic API key in the API Keys panel.</div>
+          <a href="#" onclick="showPanel('apikeys',document.querySelector('[data-panel=apikeys]'));return false">→ Go to API Keys</a>
+        </div>
+        <!-- Model Selector -->
+        <div class="ai-model-bar">
+          <label>Model:</label>
+          <select id="ai-model-select" class="ai-model-select" onchange="onModelChange()">
+            <option value="claude-sonnet-4-20250514">Claude Sonnet</option>
+          </select>
+          <span id="ai-model-caps" class="ai-model-caps"></span>
+        </div>
+        <div id="ai-messages" class="ai-messages">
+          <div id="ai-empty" class="ai-empty">
+            <div class="icon">✦</div>
+            <h4>What would you like to change?</h4>
+            <div class="ai-prompts">
+              <button class="ai-prompt-pill" onclick="usePrompt(this)">Make the hero heading more evocative and premium</button>
+              <button class="ai-prompt-pill" onclick="usePrompt(this)">Rewrite the about section in a warmer, more personal tone</button>
+              <button class="ai-prompt-pill" onclick="usePrompt(this)">The warranty section needs more gravitas — rewrite it</button>
+              <button class="ai-prompt-pill" onclick="usePrompt(this)">Strengthen the main CTA — it needs to feel more urgent</button>
+            </div>
+          </div>
+        </div>
+        <!-- Generate Panel (Image / Video) -->
+        <div id="ai-gen-panel" class="ai-gen-panel">
+          <div class="ai-gen-header">
+            <span>✦ GENERATE MEDIA</span>
+            <button class="ai-gen-close" onclick="closeGenPanel()">✕</button>
+          </div>
+          <div class="ai-gen-tabs">
+            <button class="ai-gen-tab active" onclick="switchGenTab('image', this)">Image</button>
+            <button class="ai-gen-tab" onclick="switchGenTab('video', this)">Video</button>
+          </div>
+          <div id="gen-tab-image" class="ai-gen-body">
+            <div class="field"><label>Describe the image</label><textarea id="gen-img-prompt" placeholder="A premium calacatta benchtop in a luxury kitchen setting..."></textarea></div>
+            <div class="ai-gen-row">
+              <div class="field"><label>Provider</label>
+                <select id="gen-img-provider">
+                  <option value="dalle3">DALL-E 3</option>
+                  <option value="imagen3">Google Imagen 3</option>
+                  <option value="grok-aurora">Grok Aurora</option>
+                </select>
+              </div>
+              <div class="field"><label>Size</label>
+                <select id="gen-img-size">
+                  <option value="1792x1024">Landscape (1792×1024)</option>
+                  <option value="1024x1024">Square (1024×1024)</option>
+                  <option value="1024x1792">Portrait (1024×1792)</option>
+                </select>
+              </div>
+            </div>
+            <div class="field"><label>Apply to</label>
+              <select id="gen-img-target">
+                <option value="hero.backgroundImage">Hero Background</option>
+                <option value="about.visualImage">About Section</option>
+                <option value="collections.items[0].slabImage">Collection 01 Slab</option>
+                <option value="collections.items[0].lifestyleImage">Collection 01 Lifestyle</option>
+                <option value="collections.items[1].slabImage">Collection 02 Slab</option>
+                <option value="collections.items[1].lifestyleImage">Collection 02 Lifestyle</option>
+                <option value="collections.items[2].slabImage">Collection 03 Slab</option>
+                <option value="collections.items[2].lifestyleImage">Collection 03 Lifestyle</option>
+                <option value="product.slabImage">Featured Product Slab</option>
+                <option value="product.lifestyleImage">Featured Product Lifestyle</option>
+              </select>
+            </div>
+            <button id="gen-img-btn" class="ai-gen-submit" onclick="generateImage()">✦ Generate Image</button>
+          </div>
+          <div id="gen-tab-video" class="ai-gen-body" style="display:none">
+            <div class="field"><label>Describe the video</label><textarea id="gen-vid-prompt" placeholder="Slow cinematic pan across a polished marble surface..."></textarea></div>
+            <div class="ai-gen-row">
+              <div class="field"><label>Provider</label>
+                <select id="gen-vid-provider">
+                  <option value="runway">Runway ML</option>
+                </select>
+              </div>
+              <div class="field"><label>Duration</label>
+                <select id="gen-vid-duration">
+                  <option value="5">5 seconds</option>
+                  <option value="10">10 seconds</option>
+                </select>
+              </div>
+            </div>
+            <div class="field"><label>Apply to</label>
+              <select id="gen-vid-target">
+                <option value="hero.backgroundVideo">Hero Background</option>
+                <option value="about.visualVideo">About Section</option>
+                <option value="product.video">Featured Product</option>
+              </select>
+            </div>
+            <button id="gen-vid-btn" class="ai-gen-submit" onclick="generateVideo()">✦ Generate Video</button>
+          </div>
+        </div>
+        <div class="ai-input-area">
+          <div id="ai-attachments" class="ai-attachments-preview"></div>
+          <div class="ai-input-row">
+            <button class="ai-attach-btn" onclick="document.getElementById('ai-file-input').click()" title="Attach file">📎</button>
+            <button class="ai-attach-btn" onclick="toggleGenPanel()" title="Generate image or video" style="font-size:.9rem">✦</button>
+            <input type="file" id="ai-file-input" multiple accept="image/*,application/pdf" style="display:none" onchange="handleAIFiles(this.files)">
+            <textarea id="ai-input" class="ai-input" rows="1" placeholder="Describe a change, ask a question, or just say what's not working..." onkeydown="handleAIKeydown(event)" oninput="autoResizeInput(this)"></textarea>
+            <button id="ai-send" class="ai-send-btn" onclick="sendAIMessage()" title="Send">↑</button>
+          </div>
+          <div class="ai-footer-info">Using claude-sonnet-4-20250514 · Responses may take 5–15 seconds</div>
+        </div>
+      </div>
+
     </div>
   </main>
-</div>
-
-<!-- AI Panel Backdrop -->
-<div id="ai-backdrop" class="ai-backdrop" onclick="closeAIPanel()"></div>
-
-<!-- AI Panel -->
-<div id="ai-panel" class="ai-panel">
-  <div class="ai-panel-header">
-    <h3><span class="ai-icon">✦</span> AI Content Manager</h3>
-    <div class="ai-header-actions">
-      <button class="ai-header-btn" onclick="toggleAIFullscreen()" title="Toggle fullscreen">⤢</button>
-      <button class="ai-header-btn" onclick="closeAIPanel()" title="Close">✕</button>
-    </div>
-  </div>
-  <!-- Model Selector -->
-  <div class="ai-model-bar">
-    <label>Model:</label>
-    <select id="ai-model-select" class="ai-model-select" onchange="onModelChange()">
-      <option value="claude-sonnet-4-20250514">Claude Sonnet</option>
-    </select>
-    <span id="ai-model-caps" class="ai-model-caps"></span>
-  </div>
-  <div id="ai-messages" class="ai-messages">
-    <div id="ai-empty" class="ai-empty">
-      <div class="icon">✦</div>
-      <h4>AI Content Manager</h4>
-      <p>Ask me anything about your site, or tell me what you'd like to change.<br><br>I have full knowledge of your current content and can update any part of your site through natural conversation.</p>
-      <div class="ai-prompts">
-        <button class="ai-prompt-pill" onclick="usePrompt(this)">Rewrite the hero headline to be bolder</button>
-        <button class="ai-prompt-pill" onclick="usePrompt(this)">Add a new collection and describe it</button>
-        <button class="ai-prompt-pill" onclick="usePrompt(this)">Make the about section more personal</button>
-        <button class="ai-prompt-pill" onclick="usePrompt(this)">Update the warranty card copy</button>
-        <button class="ai-prompt-pill" onclick="usePrompt(this)">Create a tagline for the footer</button>
-        <button class="ai-prompt-pill" onclick="usePrompt(this)">Suggest improvements to the CTA section</button>
-      </div>
-    </div>
-  </div>
-  <!-- Generate Panel (Image / Video) -->
-  <div id="ai-gen-panel" class="ai-gen-panel">
-    <div class="ai-gen-header">
-      <span>✦ GENERATE MEDIA</span>
-      <button class="ai-gen-close" onclick="closeGenPanel()">✕</button>
-    </div>
-    <div class="ai-gen-tabs">
-      <button class="ai-gen-tab active" onclick="switchGenTab('image', this)">Image</button>
-      <button class="ai-gen-tab" onclick="switchGenTab('video', this)">Video</button>
-    </div>
-    <!-- Image Tab -->
-    <div id="gen-tab-image" class="ai-gen-body">
-      <div class="field"><label>Describe the image</label><textarea id="gen-img-prompt" placeholder="A premium calacatta benchtop in a luxury kitchen setting..."></textarea></div>
-      <div class="ai-gen-row">
-        <div class="field"><label>Provider</label>
-          <select id="gen-img-provider">
-            <option value="dalle3">DALL-E 3</option>
-            <option value="imagen3">Google Imagen 3</option>
-            <option value="grok-aurora">Grok Aurora</option>
-          </select>
-        </div>
-        <div class="field"><label>Size</label>
-          <select id="gen-img-size">
-            <option value="1792x1024">Landscape (1792×1024)</option>
-            <option value="1024x1024">Square (1024×1024)</option>
-            <option value="1024x1792">Portrait (1024×1792)</option>
-          </select>
-        </div>
-      </div>
-      <div class="field"><label>Apply to</label>
-        <select id="gen-img-target">
-          <option value="hero.backgroundImage">Hero Background</option>
-          <option value="about.visualImage">About Section</option>
-          <option value="collections.items[0].slabImage">Collection 01 Slab</option>
-          <option value="collections.items[0].lifestyleImage">Collection 01 Lifestyle</option>
-          <option value="collections.items[1].slabImage">Collection 02 Slab</option>
-          <option value="collections.items[1].lifestyleImage">Collection 02 Lifestyle</option>
-          <option value="collections.items[2].slabImage">Collection 03 Slab</option>
-          <option value="collections.items[2].lifestyleImage">Collection 03 Lifestyle</option>
-          <option value="product.slabImage">Featured Product Slab</option>
-          <option value="product.lifestyleImage">Featured Product Lifestyle</option>
-        </select>
-      </div>
-      <button id="gen-img-btn" class="ai-gen-submit" onclick="generateImage()">✦ Generate Image</button>
-    </div>
-    <!-- Video Tab -->
-    <div id="gen-tab-video" class="ai-gen-body" style="display:none">
-      <div class="field"><label>Describe the video</label><textarea id="gen-vid-prompt" placeholder="Slow cinematic pan across a polished marble surface..."></textarea></div>
-      <div class="ai-gen-row">
-        <div class="field"><label>Provider</label>
-          <select id="gen-vid-provider">
-            <option value="runway">Runway ML</option>
-          </select>
-        </div>
-        <div class="field"><label>Duration</label>
-          <select id="gen-vid-duration">
-            <option value="5">5 seconds</option>
-            <option value="10">10 seconds</option>
-          </select>
-        </div>
-      </div>
-      <div class="field"><label>Apply to</label>
-        <select id="gen-vid-target">
-          <option value="hero.backgroundVideo">Hero Background</option>
-          <option value="about.visualVideo">About Section</option>
-          <option value="product.video">Featured Product</option>
-        </select>
-      </div>
-      <button id="gen-vid-btn" class="ai-gen-submit" onclick="generateVideo()">✦ Generate Video</button>
-    </div>
-  </div>
-  <div class="ai-input-area">
-    <div id="ai-attachments" class="ai-attachments-preview"></div>
-    <div class="ai-input-row">
-      <button class="ai-attach-btn" onclick="document.getElementById('ai-file-input').click()" title="Attach file">📎</button>
-      <button class="ai-attach-btn" onclick="toggleGenPanel()" title="Generate image or video" style="font-size:.9rem">✦</button>
-      <input type="file" id="ai-file-input" multiple accept="image/*,application/pdf" style="display:none" onchange="handleAIFiles(this.files)">
-      <textarea id="ai-input" class="ai-input" rows="1" placeholder="Ask me to change anything on the site..." onkeydown="handleAIKeydown(event)" oninput="autoResizeInput(this)"></textarea>
-      <button id="ai-send" class="ai-send-btn" onclick="sendAIMessage()" title="Send">→</button>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -768,6 +766,7 @@ async function doLogin() {
   if (res.ok) { showAdmin(); } else { document.getElementById('login-error').style.display='block'; }
 }
 async function doLogout() {
+  sessionStorage.removeItem('nl-cms-history');
   await fetch('/api/logout', { method:'POST' });
   location.reload();
 }
@@ -792,8 +791,19 @@ function showPanel(id, el) {
   document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el?.classList.add('active');
-  const titles = { styles:'Brand Styles', layout:'Layout & Order', nav:'Navigation', hero:'Hero', features:'Features Strip', about:'About', collections:'Collections', product:'Product Detail', advantage:'Advantage', warranty:'Warranty', cta:'Call to Action', footer:'Footer', apikeys:'API Keys & Integrations' };
+  const titles = { styles:'Brand Styles', layout:'Layout & Order', nav:'Navigation', hero:'Hero', features:'Features Strip', about:'About', collections:'Collections', product:'Product Detail', advantage:'Advantage', warranty:'Warranty', cta:'Call to Action', footer:'Footer', apikeys:'API Keys & Integrations', ai:'AI Content Assistant' };
   document.getElementById('panel-title').textContent = titles[id] || id;
+  // Toggle AI-active mode on main container
+  const mainEl = document.querySelector('.main');
+  if (id === 'ai') {
+    mainEl.classList.add('ai-active');
+    checkAIKeyStatus();
+    restoreAISessionToPanel();
+    loadAIModels();
+    setTimeout(() => { if (aiInput) aiInput.focus(); scrollAIToBottom(); }, 100);
+  } else {
+    mainEl.classList.remove('ai-active');
+  }
   return false;
 }
 
@@ -944,8 +954,6 @@ function renderFooterColumns() {
 }
 
 // ─── AI Assistant ───
-const aiPanel = document.getElementById('ai-panel');
-const aiBackdrop = document.getElementById('ai-backdrop');
 const aiMessages = document.getElementById('ai-messages');
 const aiInput = document.getElementById('ai-input');
 const aiSend = document.getElementById('ai-send');
@@ -1005,48 +1013,58 @@ function updateModelCaps() {
   aiModelCaps.textContent = MODEL_CAP_LABELS[aiSelectedModel] || '';
 }
 
-// Restore session from sessionStorage
-(function restoreAISession() {
-  try {
-    const saved = sessionStorage.getItem('ai_conversation');
-    const savedHtml = sessionStorage.getItem('ai_messages_html');
-    const savedModel = sessionStorage.getItem('ai_selected_model');
-    if (saved) {
-      aiConversation = JSON.parse(saved);
-      if (savedHtml && aiConversation.length > 0) {
-        aiEmpty.style.display = 'none';
-        aiMessages.innerHTML = savedHtml;
-      }
-    }
-    if (savedModel) aiSelectedModel = savedModel;
-  } catch {}
-})();
-
+// Session storage for message history (survives panel switches, not page reloads)
 function saveAISession() {
   try {
-    sessionStorage.setItem('ai_conversation', JSON.stringify(aiConversation));
-    sessionStorage.setItem('ai_messages_html', aiMessages.innerHTML);
-    sessionStorage.setItem('ai_selected_model', aiSelectedModel);
+    sessionStorage.setItem('nl-cms-history', JSON.stringify({
+      conversation: aiConversation,
+      html: aiMessages.innerHTML,
+      model: aiSelectedModel
+    }));
   } catch {}
 }
 
-function toggleAIPanel() {
-  aiPanel.classList.toggle('open');
-  aiBackdrop.classList.toggle('show');
-  if (aiPanel.classList.contains('open')) {
-    loadAIModels();
-    aiInput.focus();
-    scrollAIToBottom();
-  }
+function restoreAISessionToPanel() {
+  try {
+    const raw = sessionStorage.getItem('nl-cms-history');
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (saved.conversation && saved.conversation.length > 0) {
+      aiConversation = saved.conversation;
+      if (saved.html) {
+        aiEmpty.style.display = 'none';
+        aiMessages.innerHTML = saved.html;
+        // Mark any old diff cards as resolved (remove Apply/Discard buttons)
+        aiMessages.querySelectorAll('.ai-diff-actions').forEach(el => el.remove());
+      }
+    }
+    if (saved.model) aiSelectedModel = saved.model;
+  } catch {}
 }
 
-function closeAIPanel() {
-  aiPanel.classList.remove('open');
-  aiBackdrop.classList.remove('show');
-}
-
-function toggleAIFullscreen() {
-  aiPanel.classList.toggle('fullscreen');
+// Check if Anthropic key is configured and show/hide banner
+async function checkAIKeyStatus() {
+  try {
+    const res = await fetch('/api/ai/status');
+    const data = await res.json();
+    const banner = document.getElementById('ai-key-banner');
+    const inputArea = document.querySelector('#panel-ai .ai-input-area');
+    const messagesArea = document.getElementById('ai-messages');
+    const modelBar = document.querySelector('#panel-ai .ai-model-bar');
+    const genPanel = document.getElementById('ai-gen-panel');
+    if (!data.anthropic) {
+      if (banner) banner.style.display = 'block';
+      if (inputArea) inputArea.style.display = 'none';
+      if (messagesArea) messagesArea.style.display = 'none';
+      if (modelBar) modelBar.style.display = 'none';
+      if (genPanel) genPanel.style.display = 'none';
+    } else {
+      if (banner) banner.style.display = 'none';
+      if (inputArea) inputArea.style.display = '';
+      if (messagesArea) messagesArea.style.display = '';
+      if (modelBar) modelBar.style.display = '';
+    }
+  } catch {}
 }
 
 function usePrompt(el) {
@@ -1105,13 +1123,23 @@ function scrollAIToBottom() {
 // File attachments
 function handleAIFiles(files) {
   for (const file of files) {
+    // Check limits: 3 attachments max, 10MB per file
+    if (aiAttachedFiles.length >= 3) {
+      addAISystemMessage('Maximum 3 attachments allowed');
+      break;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      addAISystemMessage(`File "${file.name}" exceeds 10MB limit`);
+      continue;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64Full = e.target.result;
       const base64Data = base64Full.split(',')[1];
       const isImage = file.type.startsWith('image/');
+      const isPDF = file.type === 'application/pdf';
       aiAttachedFiles.push({
-        type: isImage ? 'image' : 'pdf',
+        type: isImage ? 'image' : 'document',
         base64: base64Data,
         mimeType: file.type,
         name: file.name,
@@ -1138,12 +1166,15 @@ function removeAttachment(idx) {
   renderAttachmentPreviews();
 }
 
-// Drag and drop on the panel
-aiPanel.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); });
-aiPanel.addEventListener('drop', (e) => {
-  e.preventDefault(); e.stopPropagation();
-  if (e.dataTransfer.files.length) handleAIFiles(e.dataTransfer.files);
-});
+// Drag and drop on the AI panel
+const aiPanelEl = document.getElementById('panel-ai');
+if (aiPanelEl) {
+  aiPanelEl.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); });
+  aiPanelEl.addEventListener('drop', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    if (e.dataTransfer.files.length) handleAIFiles(e.dataTransfer.files);
+  });
+}
 
 // ─── Generate Panel ───
 function toggleGenPanel() {
@@ -1494,9 +1525,9 @@ async function sendAIMessage() {
   const currentAttachments = [...aiAttachedFiles];
   for (const att of currentAttachments) {
     if (att.type === 'image') {
-      attachmentHtml += `<img class="ai-attachment-thumb" src="${att.previewUrl}" alt="${att.name}">`;
+      attachmentHtml += `<img class="ai-attachment-thumb" src="${att.previewUrl}" alt="${escapeHtml(att.name)}">`;
     } else {
-      attachmentHtml += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:.78rem;color:var(--text2)">📄 ${att.name}</div>`;
+      attachmentHtml += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:.78rem;color:var(--text2)">📄 ${escapeHtml(att.name)}</div>`;
     }
   }
 
@@ -1514,11 +1545,12 @@ async function sendAIMessage() {
   scrollAIToBottom();
 
   try {
+    // Include both images and documents (PDFs) in attachments
     const payload = {
       model: aiSelectedModel,
       messages: aiConversation,
-      attachments: currentAttachments.filter(a => a.type === 'image').map(a => ({
-        type: 'image', base64: a.base64, mimeType: a.mimeType,
+      attachments: currentAttachments.map(a => ({
+        type: a.type, base64: a.base64, mimeType: a.mimeType,
       })),
     };
 
@@ -1530,7 +1562,7 @@ async function sendAIMessage() {
 
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.error || 'Request failed');
+      throw new Error(errData.message || errData.error || 'Request failed');
     }
 
     const data = await res.json();
@@ -1540,35 +1572,31 @@ async function sendAIMessage() {
 
     const modelLabel = MODEL_LABELS[data.model || aiSelectedModel] || 'AI';
 
-    // Handle image generation action from NL
-    if (data.action && data.action.type === 'generate-image') {
-      let assistantHtml = `<div class="ai-msg ai-msg-assistant"><div class="ai-label">${escapeHtml(modelLabel)}</div><div class="ai-bubble">${renderMarkdown(data.reply)}</div>`;
-      const tokenInfo = data.tokens ? `<div class="ai-token-info">~${data.tokens.toLocaleString()} tokens · ${escapeHtml(modelLabel)}</div>` : '';
-      assistantHtml += `${tokenInfo}<div class="ai-time">${formatTime()}</div></div>`;
-      aiMessages.insertAdjacentHTML('beforeend', assistantHtml);
-      scrollAIToBottom();
-      saveAISession();
-
-      // Auto-trigger image generation
-      generateImage(
-        data.action.prompt,
-        data.action.provider || 'dalle3',
-        '1792x1024',
-        data.action.targetField || 'hero.backgroundImage'
-      );
-      return;
-    }
-
     // Build assistant message HTML
     let assistantHtml = `<div class="ai-msg ai-msg-assistant"><div class="ai-label">${escapeHtml(modelLabel)}</div><div class="ai-bubble">${renderMarkdown(data.reply)}</div>`;
 
-    // Add diff card if changes proposed
-    if (data.diff && data.proposedContent) {
+    // Add diff card if changes proposed (diff is now an array of {path, before, after})
+    if (data.hasChanges && data.diff && data.diff.length > 0 && data.proposedContent) {
       const diffId = 'diff-' + Date.now();
+      const maxVisible = 5;
       let diffFieldsHtml = '';
-      for (const [fieldPath, change] of Object.entries(data.diff)) {
-        diffFieldsHtml += `<div class="ai-diff-field"><div class="ai-diff-field-name">${escapeHtml(fieldPath)}</div><div class="ai-diff-remove">− ${escapeHtml(change.before)}</div><div class="ai-diff-add">+ ${escapeHtml(change.after)}</div></div>`;
+      const visibleDiffs = data.diff.slice(0, maxVisible);
+      const hiddenDiffs = data.diff.slice(maxVisible);
+
+      for (const change of visibleDiffs) {
+        diffFieldsHtml += `<div class="ai-diff-field"><div class="ai-diff-field-name">${escapeHtml(change.path)}</div><div class="ai-diff-remove">− ${escapeHtml(change.before)}</div><div class="ai-diff-add">+ ${escapeHtml(change.after)}</div></div>`;
       }
+
+      if (hiddenDiffs.length > 0) {
+        const moreId = diffId + '-more';
+        let hiddenFieldsHtml = '';
+        for (const change of hiddenDiffs) {
+          hiddenFieldsHtml += `<div class="ai-diff-field"><div class="ai-diff-field-name">${escapeHtml(change.path)}</div><div class="ai-diff-remove">− ${escapeHtml(change.before)}</div><div class="ai-diff-add">+ ${escapeHtml(change.after)}</div></div>`;
+        }
+        diffFieldsHtml += `<span class="ai-diff-more-toggle" onclick="var s=document.getElementById('${moreId}');s.classList.toggle('expanded');this.textContent=s.classList.contains('expanded')?'Show less':'+ ${hiddenDiffs.length} more changes'">+ ${hiddenDiffs.length} more changes</span>`;
+        diffFieldsHtml += `<div class="ai-diff-more-section" id="${moreId}">${hiddenFieldsHtml}</div>`;
+      }
+
       assistantHtml += `<div class="ai-diff-card" id="${diffId}"><div class="ai-diff-header">Proposed Changes</div>${diffFieldsHtml}<div class="ai-diff-actions"><button class="ai-diff-apply" onclick="applyAIChanges('${diffId}', this)">✓ Apply Changes</button><button class="ai-diff-discard" onclick="discardAIChanges('${diffId}')">✗ Discard</button></div></div>`;
       setTimeout(() => {
         const card = document.getElementById(diffId);
@@ -1585,7 +1613,7 @@ async function sendAIMessage() {
   } catch (err) {
     setAILoading(false);
     const modelLabel = MODEL_LABELS[aiSelectedModel] || 'AI';
-    const errorHtml = `<div class="ai-msg ai-msg-assistant"><div class="ai-label">${escapeHtml(modelLabel)}</div><div class="ai-bubble" style="border-left:2px solid var(--red);padding-left:12px"><p style="color:#ff6b6b">Something went wrong — ${escapeHtml(err.message)}. Please try again.</p></div></div>`;
+    const errorHtml = `<div class="ai-msg ai-msg-assistant"><div class="ai-label">${escapeHtml(modelLabel)}</div><div class="ai-bubble" style="border-left:2px solid rgba(184,164,114,.4);padding-left:12px;background:rgba(184,164,114,.06)"><p style="color:#e2b45a">⚠ Something went wrong: ${escapeHtml(err.message)}</p><p style="font-size:.78rem;color:var(--text2)">Try again, or check that your Claude API key is configured in API Keys.</p></div></div>`;
     aiMessages.insertAdjacentHTML('beforeend', errorHtml);
     aiConversation.pop();
     scrollAIToBottom();
@@ -1615,7 +1643,7 @@ async function applyAIChanges(diffId, btn) {
   if (!card || !card._proposedContent) return;
 
   btn.disabled = true;
-  btn.textContent = 'Applying...';
+  btn.innerHTML = '<span class="spinner" style="width:12px;height:12px;border:2px solid rgba(0,0,0,.2);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px"></span>Applying...';
 
   try {
     const res = await fetch('/api/ai/apply', {
@@ -1628,10 +1656,15 @@ async function applyAIChanges(diffId, btn) {
     DATA = card._proposedContent;
     renderAll();
 
-    card.classList.add('collapsed');
-    card.innerHTML = `<div class="ai-diff-applied">✓ Applied</div><span class="ai-diff-undo-link" onclick="undoAIChanges('${diffId}')">Undo</span>`;
+    // Replace buttons with applied confirmation + undo link
+    const actionsEl = card.querySelector('.ai-diff-actions');
+    if (actionsEl) {
+      actionsEl.innerHTML = `<div class="ai-diff-applied">✓ Applied — changes are live</div>`;
+    }
+    // Add undo link below the card
+    const undoHtml = `<span class="ai-diff-undo-link" onclick="undoAIChanges('${diffId}')">↩ Undo last change</span>`;
+    card.insertAdjacentHTML('beforeend', undoHtml);
 
-    addAISystemMessage('Changes applied ✓');
     saveAISession();
 
   } catch (err) {
@@ -1644,8 +1677,14 @@ async function applyAIChanges(diffId, btn) {
 function discardAIChanges(diffId) {
   const card = document.getElementById(diffId);
   if (!card) return;
-  card.remove();
-  addAISystemMessage('Changes discarded');
+  const actionsEl = card.querySelector('.ai-diff-actions');
+  if (actionsEl) {
+    actionsEl.innerHTML = '<span style="font-size:.78rem;color:var(--text2)">✗ Discarded</span>';
+    setTimeout(() => {
+      if (actionsEl) { actionsEl.style.transition = 'opacity .5s'; actionsEl.style.opacity = '0'; }
+      setTimeout(() => { if (actionsEl) actionsEl.remove(); }, 500);
+    }, 2000);
+  }
   saveAISession();
 }
 
@@ -1684,6 +1723,54 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+// ─── Deep Diff Utility (shared JS) ───
+// Recursively walks both objects, identifies changed leaf values.
+// Returns array of { path: "hero.heading", before: "...", after: "..." }
+// Skips image objects ({ url, publicId, thumb, medium, large }).
+function deepDiff(original, proposed) {
+  const diffs = [];
+
+  function isImageObj(obj) {
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false;
+    const keys = Object.keys(obj);
+    return keys.some(k => ['url', 'publicId', 'thumb', 'medium', 'large'].includes(k));
+  }
+
+  function walk(a, b, currentPath) {
+    if (a === b) return;
+
+    const aIsObj = a !== null && a !== undefined && typeof a === 'object';
+    const bIsObj = b !== null && b !== undefined && typeof b === 'object';
+
+    if (aIsObj && bIsObj && !Array.isArray(a) && !Array.isArray(b)) {
+      if (isImageObj(a) || isImageObj(b)) return;
+      const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
+      for (const key of allKeys) {
+        walk(a[key], b[key], currentPath ? `${currentPath}.${key}` : key);
+      }
+      return;
+    }
+
+    if (Array.isArray(a) && Array.isArray(b)) {
+      const maxLen = Math.max(a.length, b.length);
+      for (let i = 0; i < maxLen; i++) {
+        walk(a[i], b[i], `${currentPath}[${i}]`);
+      }
+      return;
+    }
+
+    // Leaf comparison
+    const aStr = a != null ? String(a) : '';
+    const bStr = b != null ? String(b) : '';
+    if (aStr !== bStr) {
+      diffs.push({ path: currentPath, before: aStr, after: bStr });
+    }
+  }
+
+  walk(original, proposed, '');
+  return diffs;
 }
 
 // ─── API Keys Panel ───
