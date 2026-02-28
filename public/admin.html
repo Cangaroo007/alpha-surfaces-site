@@ -259,6 +259,58 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 
 /* Token cost indicator */
 .ai-token-info{font-size:.65rem;color:var(--text2);margin-top:3px;display:flex;align-items:center;gap:4px}
+
+/* ─── API Keys Panel ─── */
+.sidebar-nav .nav-section-label{display:block;padding:6px 20px;font-size:.6rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--text2);margin-top:4px}
+
+.keys-status-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.keys-status-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;font-size:.72rem;font-weight:500;border-radius:2px}
+.keys-status-pill.set{background:rgba(39,174,96,.15);color:#69db7c}
+.keys-status-pill.unset{background:rgba(255,255,255,.04);color:var(--text2)}
+
+.keys-panel-desc{font-size:.82rem;color:var(--text2);line-height:1.6;margin-bottom:28px}
+
+.keys-group{margin-bottom:32px}
+.keys-group-header{display:flex;align-items:center;gap:8px;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text2);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+.key-row{display:grid;grid-template-columns:160px 1fr auto;gap:12px;align-items:center;padding:12px 16px;background:var(--surface);border:1px solid var(--border);margin-bottom:4px}
+.key-row-info{display:flex;flex-direction:column;gap:2px}
+.key-row-name{font-size:.85rem;font-weight:500;color:var(--text)}
+.key-row-sub{font-size:.68rem;color:var(--text2)}
+.key-row-help a{font-size:.62rem;color:var(--gold);text-decoration:none;opacity:.7;transition:opacity .2s}
+.key-row-help a:hover{opacity:1}
+
+.key-input-wrap{position:relative;display:flex;align-items:center}
+.key-input{width:100%;padding:8px 32px 8px 12px;background:#0D0D0B;border:1px solid rgba(255,255,255,.08);color:var(--text);font-size:.82rem;font-family:'Courier New',monospace;outline:none;transition:border .3s}
+.key-input:focus{border-color:var(--gold)}
+.key-input::placeholder{color:rgba(255,255,255,.2);font-family:'Outfit',sans-serif}
+.key-clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text2);cursor:pointer;font-size:.7rem;padding:4px;transition:color .2s;display:none}
+.key-clear.visible{display:block}
+.key-clear:hover{color:var(--red)}
+
+.key-row-actions{display:flex;align-items:center;gap:8px;min-width:140px}
+.key-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.key-status-dot.green{background:var(--green)}
+.key-status-dot.red{background:var(--red)}
+.key-status-dot.gray{background:var(--text2);opacity:.4}
+
+.key-test-btn{padding:5px 14px;font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:1px solid var(--border);color:var(--text2);cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap}
+.key-test-btn:hover{border-color:var(--gold);color:var(--gold)}
+.key-test-btn:disabled{opacity:.5;cursor:not-allowed}
+.key-test-result{font-size:.68rem;white-space:nowrap}
+.key-test-result.success{color:var(--green)}
+.key-test-result.fail{color:var(--red)}
+
+.key-test-spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite}
+
+.keys-save-btn{padding:10px 28px;background:var(--olive);color:#fff;border:none;font-size:.78rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:all .3s;margin-top:12px;display:inline-flex;align-items:center;gap:8px}
+.keys-save-btn:hover{background:var(--gold)}
+.keys-save-btn:disabled{opacity:.5;cursor:not-allowed}
+.keys-save-btn .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+.keys-save-btn.success{background:var(--green)}
+.keys-save-btn.error{background:var(--red)}
+
+.keys-security-note{display:flex;align-items:flex-start;gap:10px;padding:16px;background:rgba(255,255,255,.02);border:1px solid var(--border);margin-top:32px;font-size:.76rem;color:var(--text2);line-height:1.6}
 </style>
 </head>
 <body>
@@ -294,6 +346,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
       <a href="#" data-panel="footer" onclick="showPanel('footer',this)">📋 Footer</a>
       <div class="divider"></div>
       <button class="ai-trigger" onclick="toggleAIPanel()"><span class="pulse"></span> AI Assistant</button>
+      <div class="divider"></div>
+      <span class="nav-section-label">Integrations</span>
+      <a href="#" data-panel="apikeys" onclick="showPanel('apikeys',this)">🔑 API Keys</a>
     </nav>
     <div class="sidebar-bottom"><a href="#" onclick="doLogout()">Sign Out</a></div>
   </aside>
@@ -424,6 +479,154 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
         <div class="field"><label>Legal Text</label><input type="text" data-bind="footer.legal"></div>
         <h3 style="font-size:.88rem;margin:20px 0 12px">Footer Columns</h3>
         <div id="footer-columns"></div>
+      </div>
+
+      <!-- API KEYS -->
+      <div id="panel-apikeys" class="panel">
+        <div class="keys-panel-desc">Manage your AI provider and media keys. Keys are stored securely on the server and never exposed in the browser.</div>
+
+        <div id="keys-status-bar" class="keys-status-bar"></div>
+
+        <!-- AI Providers -->
+        <div class="keys-group">
+          <div class="keys-group-header">🤖 AI Providers</div>
+
+          <div class="key-row" data-key="anthropic">
+            <div class="key-row-info">
+              <div class="key-row-name">Claude</div>
+              <div class="key-row-sub">(Anthropic)</div>
+              <div class="key-row-help"><a href="https://console.anthropic.com" target="_blank" rel="noopener">Get key at console.anthropic.com ↗</a></div>
+            </div>
+            <div class="key-input-wrap">
+              <input type="text" class="key-input" id="key-anthropic" placeholder="Paste key here..." autocomplete="off" spellcheck="false">
+              <button class="key-clear" onclick="clearKey('anthropic')" title="Clear key">✕</button>
+            </div>
+            <div class="key-row-actions">
+              <span class="key-status-dot gray" id="dot-anthropic"></span>
+              <button class="key-test-btn" onclick="testKey('anthropic')">Test</button>
+              <span class="key-test-result" id="result-anthropic"></span>
+            </div>
+          </div>
+
+          <div class="key-row" data-key="openai">
+            <div class="key-row-info">
+              <div class="key-row-name">GPT-4o</div>
+              <div class="key-row-sub">(OpenAI)</div>
+              <div class="key-row-help"><a href="https://platform.openai.com" target="_blank" rel="noopener">Get key at platform.openai.com ↗</a></div>
+            </div>
+            <div class="key-input-wrap">
+              <input type="text" class="key-input" id="key-openai" placeholder="Paste key here..." autocomplete="off" spellcheck="false">
+              <button class="key-clear" onclick="clearKey('openai')" title="Clear key">✕</button>
+            </div>
+            <div class="key-row-actions">
+              <span class="key-status-dot gray" id="dot-openai"></span>
+              <button class="key-test-btn" onclick="testKey('openai')">Test</button>
+              <span class="key-test-result" id="result-openai"></span>
+            </div>
+          </div>
+
+          <div class="key-row" data-key="google">
+            <div class="key-row-info">
+              <div class="key-row-name">Gemini</div>
+              <div class="key-row-sub">(Google)</div>
+              <div class="key-row-help"><a href="https://aistudio.google.com" target="_blank" rel="noopener">Get key at aistudio.google.com ↗</a></div>
+            </div>
+            <div class="key-input-wrap">
+              <input type="text" class="key-input" id="key-google" placeholder="Paste key here..." autocomplete="off" spellcheck="false">
+              <button class="key-clear" onclick="clearKey('google')" title="Clear key">✕</button>
+            </div>
+            <div class="key-row-actions">
+              <span class="key-status-dot gray" id="dot-google"></span>
+              <button class="key-test-btn" onclick="testKey('google')">Test</button>
+              <span class="key-test-result" id="result-google"></span>
+            </div>
+          </div>
+
+          <div class="key-row" data-key="xai">
+            <div class="key-row-info">
+              <div class="key-row-name">Grok</div>
+              <div class="key-row-sub">(xAI)</div>
+              <div class="key-row-help"><a href="https://console.x.ai" target="_blank" rel="noopener">Get key at console.x.ai ↗</a></div>
+            </div>
+            <div class="key-input-wrap">
+              <input type="text" class="key-input" id="key-xai" placeholder="Paste key here..." autocomplete="off" spellcheck="false">
+              <button class="key-clear" onclick="clearKey('xai')" title="Clear key">✕</button>
+            </div>
+            <div class="key-row-actions">
+              <span class="key-status-dot gray" id="dot-xai"></span>
+              <button class="key-test-btn" onclick="testKey('xai')">Test</button>
+              <span class="key-test-result" id="result-xai"></span>
+            </div>
+          </div>
+
+          <div class="key-row" data-key="runway">
+            <div class="key-row-info">
+              <div class="key-row-name">Runway ML</div>
+              <div class="key-row-sub">(Video)</div>
+              <div class="key-row-help"><a href="https://app.runwayml.com" target="_blank" rel="noopener">Get key at app.runwayml.com ↗</a></div>
+            </div>
+            <div class="key-input-wrap">
+              <input type="text" class="key-input" id="key-runway" placeholder="Paste key here..." autocomplete="off" spellcheck="false">
+              <button class="key-clear" onclick="clearKey('runway')" title="Clear key">✕</button>
+            </div>
+            <div class="key-row-actions">
+              <span class="key-status-dot gray" id="dot-runway"></span>
+              <button class="key-test-btn" onclick="testKey('runway')">Test</button>
+              <span class="key-test-result" id="result-runway"></span>
+            </div>
+          </div>
+
+          <button class="keys-save-btn" id="save-ai-keys" onclick="saveAIKeys()">Save AI Keys</button>
+        </div>
+
+        <!-- Cloudinary -->
+        <div class="keys-group">
+          <div class="keys-group-header">🖼 Cloudinary (Image & Video CDN)</div>
+
+          <div class="key-row" data-key="cloudinary_cloud_name">
+            <div class="key-row-info">
+              <div class="key-row-name">Cloud Name</div>
+            </div>
+            <div class="key-input-wrap">
+              <input type="text" class="key-input" id="key-cloudinary_cloud_name" placeholder="Paste key here..." autocomplete="off" spellcheck="false">
+              <button class="key-clear" onclick="clearKey('cloudinary_cloud_name')" title="Clear key">✕</button>
+            </div>
+            <div class="key-row-actions">
+              <span class="key-status-dot gray" id="dot-cloudinary_cloud_name"></span>
+              <button class="key-test-btn" onclick="testKey('cloudinary')">Test</button>
+              <span class="key-test-result" id="result-cloudinary"></span>
+            </div>
+          </div>
+
+          <div class="key-row" data-key="cloudinary_api_key">
+            <div class="key-row-info">
+              <div class="key-row-name">API Key</div>
+            </div>
+            <div class="key-input-wrap">
+              <input type="text" class="key-input" id="key-cloudinary_api_key" placeholder="Paste key here..." autocomplete="off" spellcheck="false">
+              <button class="key-clear" onclick="clearKey('cloudinary_api_key')" title="Clear key">✕</button>
+            </div>
+            <div class="key-row-actions"></div>
+          </div>
+
+          <div class="key-row" data-key="cloudinary_api_secret">
+            <div class="key-row-info">
+              <div class="key-row-name">API Secret</div>
+            </div>
+            <div class="key-input-wrap">
+              <input type="text" class="key-input" id="key-cloudinary_api_secret" placeholder="Paste key here..." autocomplete="off" spellcheck="false">
+              <button class="key-clear" onclick="clearKey('cloudinary_api_secret')" title="Clear key">✕</button>
+            </div>
+            <div class="key-row-actions"></div>
+          </div>
+
+          <button class="keys-save-btn" id="save-cloudinary-keys" onclick="saveCloudinaryKeys()">Save Cloudinary Keys</button>
+        </div>
+
+        <div class="keys-security-note">
+          <span style="font-size:1rem">🔒</span>
+          <span>Keys are stored encrypted on the server and never sent to your browser in full. The masked values shown above are for reference only. If you need to rotate a key, paste the new value and save — the old key is immediately replaced.</span>
+        </div>
       </div>
 
     </div>
@@ -589,7 +792,7 @@ function showPanel(id, el) {
   document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el?.classList.add('active');
-  const titles = { styles:'Brand Styles', layout:'Layout & Order', nav:'Navigation', hero:'Hero', features:'Features Strip', about:'About', collections:'Collections', product:'Product Detail', advantage:'Advantage', warranty:'Warranty', cta:'Call to Action', footer:'Footer' };
+  const titles = { styles:'Brand Styles', layout:'Layout & Order', nav:'Navigation', hero:'Hero', features:'Features Strip', about:'About', collections:'Collections', product:'Product Detail', advantage:'Advantage', warranty:'Warranty', cta:'Call to Action', footer:'Footer', apikeys:'API Keys & Integrations' };
   document.getElementById('panel-title').textContent = titles[id] || id;
   return false;
 }
@@ -1481,6 +1684,241 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+// ─── API Keys Panel ───
+let keysData = {};
+let keysMaskedCache = {};
+
+const KEY_LABELS = {
+  anthropic: 'Claude',
+  openai: 'GPT-4o',
+  google: 'Gemini',
+  xai: 'Grok',
+  runway: 'Runway',
+  cloudinary_cloud_name: 'Cloudinary',
+  cloudinary_api_key: 'Cloudinary',
+  cloudinary_api_secret: 'Cloudinary',
+};
+
+const PROVIDER_PILL_LABELS = {
+  anthropic: 'Claude',
+  openai: 'GPT-4o',
+  google: 'Gemini',
+  xai: 'Grok',
+  runway: 'Runway',
+  cloudinary: 'Cloudinary',
+};
+
+async function loadKeysStatus() {
+  try {
+    const res = await fetch('/api/keys');
+    if (!res.ok) return;
+    keysData = await res.json();
+    renderKeysStatus();
+    populateKeyInputs();
+  } catch {}
+}
+
+function renderKeysStatus() {
+  const bar = document.getElementById('keys-status-bar');
+  if (!bar) return;
+  const providers = { anthropic:'Claude', openai:'GPT-4o', google:'Gemini', xai:'Grok', runway:'Runway', cloudinary_cloud_name:'Cloudinary' };
+  bar.innerHTML = Object.entries(providers).map(([k, label]) => {
+    const isSet = keysData[k]?.set;
+    return `<span class="keys-status-pill ${isSet ? 'set' : 'unset'}">${isSet ? '✓' : '–'} ${label}</span>`;
+  }).join('');
+}
+
+function populateKeyInputs() {
+  for (const [k, info] of Object.entries(keysData)) {
+    const input = document.getElementById('key-' + k);
+    if (!input) continue;
+
+    const clearBtn = input.parentElement.querySelector('.key-clear');
+
+    if (info.set && info.masked) {
+      input.value = info.masked;
+      input.dataset.masked = info.masked;
+      input.dataset.isSet = 'true';
+      if (clearBtn) clearBtn.classList.add('visible');
+    } else {
+      input.value = '';
+      input.dataset.masked = '';
+      input.dataset.isSet = 'false';
+      if (clearBtn) clearBtn.classList.remove('visible');
+    }
+
+    // Update status dot
+    const dot = document.getElementById('dot-' + k);
+    if (dot) {
+      dot.className = 'key-status-dot ' + (info.set ? 'gray' : 'gray');
+    }
+  }
+  // Set up focus/blur handlers
+  document.querySelectorAll('.key-input').forEach(input => {
+    input.addEventListener('focus', function() {
+      if (this.dataset.isSet === 'true' && this.value === this.dataset.masked) {
+        this.value = '';
+      }
+    });
+    input.addEventListener('blur', function() {
+      if (this.dataset.isSet === 'true' && this.value.trim() === '') {
+        this.value = this.dataset.masked || '';
+      }
+    });
+  });
+}
+
+// Load keys when the API Keys panel is shown
+const origShowPanel = showPanel;
+showPanel = function(id, el) {
+  const result = origShowPanel(id, el);
+  if (id === 'apikeys') loadKeysStatus();
+  return result;
+};
+
+async function saveAIKeys() {
+  const keys = ['anthropic', 'openai', 'google', 'xai', 'runway'];
+  await saveKeyGroup(keys, 'save-ai-keys');
+}
+
+async function saveCloudinaryKeys() {
+  const keys = ['cloudinary_cloud_name', 'cloudinary_api_key', 'cloudinary_api_secret'];
+  await saveKeyGroup(keys, 'save-cloudinary-keys');
+}
+
+async function saveKeyGroup(keyNames, btnId) {
+  const btn = document.getElementById(btnId);
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Saving...';
+
+  const payload = {};
+  let hasChanges = false;
+  for (const k of keyNames) {
+    const input = document.getElementById('key-' + k);
+    if (!input) continue;
+    const val = input.value.trim();
+    // Skip if it's the masked value (unchanged)
+    if (val === input.dataset.masked && input.dataset.isSet === 'true') continue;
+    // Skip if empty and was empty
+    if (!val && input.dataset.isSet !== 'true') continue;
+    payload[k] = val;
+    hasChanges = true;
+  }
+
+  if (!hasChanges) {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/keys', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error('Save failed');
+    const data = await res.json();
+
+    btn.classList.add('success');
+    btn.innerHTML = '✓ Saved';
+    setTimeout(() => {
+      btn.classList.remove('success');
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }, 2000);
+
+    // Reload status
+    loadKeysStatus();
+  } catch (err) {
+    btn.classList.add('error');
+    btn.innerHTML = '✗ Failed — try again';
+    setTimeout(() => {
+      btn.classList.remove('error');
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }, 3000);
+  }
+}
+
+async function testKey(provider) {
+  const btn = event.target.closest('.key-test-btn');
+  const resultEl = document.getElementById('result-' + provider);
+  if (!btn || !resultEl) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="key-test-spinner"></span>';
+  resultEl.textContent = '';
+  resultEl.className = 'key-test-result';
+
+  try {
+    const res = await fetch(`/api/keys/test/${provider}`, { method: 'POST' });
+    const data = await res.json();
+
+    if (data.ok) {
+      resultEl.textContent = `✓ Connected · ${data.latencyMs}ms`;
+      resultEl.className = 'key-test-result success';
+      // Update dot
+      updateDot(provider, 'green');
+      // Fade after 5 seconds
+      setTimeout(() => {
+        if (resultEl.classList.contains('success')) {
+          resultEl.style.transition = 'opacity .5s';
+          resultEl.style.opacity = '0';
+          setTimeout(() => { resultEl.textContent = ''; resultEl.style.opacity = '1'; resultEl.style.transition = ''; }, 500);
+        }
+      }, 5000);
+    } else {
+      resultEl.textContent = `✗ ${data.message || 'Failed'}`;
+      resultEl.className = 'key-test-result fail';
+      updateDot(provider, 'red');
+    }
+  } catch (err) {
+    resultEl.textContent = '✗ Connection error';
+    resultEl.className = 'key-test-result fail';
+    updateDot(provider, 'red');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Test';
+}
+
+function updateDot(provider, color) {
+  // For cloudinary, update all three dots
+  if (provider === 'cloudinary') {
+    ['cloudinary_cloud_name', 'cloudinary_api_key', 'cloudinary_api_secret'].forEach(k => {
+      const dot = document.getElementById('dot-' + k);
+      if (dot) dot.className = 'key-status-dot ' + color;
+    });
+  } else {
+    const dot = document.getElementById('dot-' + provider);
+    if (dot) dot.className = 'key-status-dot ' + color;
+  }
+}
+
+async function clearKey(keyName) {
+  try {
+    const res = await fetch(`/api/keys/${keyName}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Clear failed');
+
+    const input = document.getElementById('key-' + keyName);
+    if (input) {
+      input.value = '';
+      input.dataset.masked = '';
+      input.dataset.isSet = 'false';
+      const clearBtn = input.parentElement.querySelector('.key-clear');
+      if (clearBtn) clearBtn.classList.remove('visible');
+    }
+
+    const dot = document.getElementById('dot-' + keyName);
+    if (dot) dot.className = 'key-status-dot gray';
+
+    // Reload status bar
+    loadKeysStatus();
+  } catch {}
 }
 
 checkAuth();
