@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcryptjs');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +17,16 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'alpha2025';
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const CONTENT_FILE = path.join(DATA_DIR, 'content.json');
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+
+// ─── Cloudinary ───
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// ─── Multer (memory storage) ───
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 // Active sessions (in-memory, resets on restart)
 const sessions = new Map();
@@ -124,6 +136,50 @@ app.patch('/api/content/:section', authMiddleware, (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Failed to save' });
   }
+});
+
+// ─── File type validation (magic bytes) ───
+function validateImageType(buffer) {
+  if (buffer.length < 12) return false;
+
+  // JPEG: FF D8 FF
+  if (buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF) return true;
+
+  // PNG: 89 50 4E 47
+  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) return true;
+
+  // WebP: bytes 8-11 are "WEBP" (57 45 42 50)
+  if (buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50) return true;
+
+  // GIF87a: 47 49 46 38 37 61
+  // GIF89a: 47 49 46 38 39 61
+  if (
+    buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46 &&
+    buffer[3] === 0x38 && (buffer[4] === 0x37 || buffer[4] === 0x39) && buffer[5] === 0x61
+  ) return true;
+
+  return false;
+}
+
+// ─── Upload route ───
+app.post('/api/upload', authMiddleware, upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file provided.' });
+  }
+
+  if (!validateImageType(req.file.buffer)) {
+    return res.status(400).json({ error: 'Invalid file type. Only JPEG, PNG, WebP and GIF images are allowed.' });
+  }
+
+  const b64 = req.file.buffer.toString('base64');
+  const dataUri = `data:${req.file.mimetype};base64,${b64}`;
+
+  cloudinary.uploader.upload(dataUri, { folder: 'alpha-surfaces' }, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Upload failed.' });
+    }
+    res.json({ url: result.secure_url });
+  });
 });
 
 // ─── Admin route ───
