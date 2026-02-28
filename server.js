@@ -19,14 +19,85 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'alpha2025';
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const CONTENT_FILE = path.join(DATA_DIR, 'content.json');
+const KEYS_FILE = path.join(DATA_DIR, 'keys.json');
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
 
+// ─── API Keys Management ───
+const KEY_NAMES = [
+  'anthropic', 'openai', 'google', 'xai', 'runway',
+  'cloudinary_cloud_name', 'cloudinary_api_key', 'cloudinary_api_secret'
+];
+
+const ENV_MAP = {
+  anthropic: 'ANTHROPIC_API_KEY',
+  openai: 'OPENAI_API_KEY',
+  google: 'GOOGLE_AI_API_KEY',
+  xai: 'XAI_API_KEY',
+  runway: 'RUNWAY_API_KEY',
+  cloudinary_cloud_name: 'CLOUDINARY_CLOUD_NAME',
+  cloudinary_api_key: 'CLOUDINARY_API_KEY',
+  cloudinary_api_secret: 'CLOUDINARY_API_SECRET',
+};
+
+let KEYS = {};
+let keysFromFile = {};
+
+function loadKeys() {
+  // Start with empty keys
+  const merged = {};
+  for (const k of KEY_NAMES) merged[k] = '';
+
+  // Load from keys.json if it exists
+  try {
+    if (fs.existsSync(KEYS_FILE)) {
+      keysFromFile = JSON.parse(fs.readFileSync(KEYS_FILE, 'utf8'));
+      for (const k of KEY_NAMES) {
+        if (keysFromFile[k]) merged[k] = keysFromFile[k];
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load keys.json:', err.message);
+  }
+
+  // Env vars take priority
+  for (const k of KEY_NAMES) {
+    const envName = ENV_MAP[k];
+    if (process.env[envName]) merged[k] = process.env[envName];
+  }
+
+  KEYS = merged;
+}
+
+function saveKeys() {
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.writeFileSync(KEYS_FILE, JSON.stringify(keysFromFile, null, 2));
+}
+
+function getKeySource(keyName) {
+  const envName = ENV_MAP[keyName];
+  if (process.env[envName] && process.env[envName] === KEYS[keyName]) return 'env';
+  if (keysFromFile[keyName] && keysFromFile[keyName] === KEYS[keyName]) return 'admin';
+  return null;
+}
+
+function maskKey(value) {
+  if (!value) return null;
+  if (value.length < 12) return '••••••••';
+  return value.substring(0, 6) + '••••••••' + value.substring(value.length - 4);
+}
+
+// Load keys on startup
+loadKeys();
+
 // ─── Cloudinary ───
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+function configureCloudinary() {
+  cloudinary.config({
+    cloud_name: KEYS.cloudinary_cloud_name,
+    api_key: KEYS.cloudinary_api_key,
+    api_secret: KEYS.cloudinary_api_secret,
+  });
+}
+configureCloudinary();
 
 // ─── Multer (memory storage) ───
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
@@ -254,7 +325,7 @@ IMPORTANT:
 // ─── LLM Provider Functions ───
 
 async function callAnthropic(model, messages, attachments, systemPrompt) {
-  const client = new Anthropic();
+  const client = new Anthropic({ apiKey: KEYS.anthropic });
   const anthropicMessages = messages.map((msg, idx) => {
     const content = [];
     if (msg.role === 'user' && idx === messages.length - 1 && attachments && attachments.length > 0) {
@@ -286,7 +357,7 @@ async function callAnthropic(model, messages, attachments, systemPrompt) {
 
 async function callOpenAI(model, messages, attachments, systemPrompt, baseURL, apiKey) {
   const client = new OpenAI({
-    apiKey: apiKey || process.env.OPENAI_API_KEY,
+    apiKey: apiKey || KEYS.openai,
     ...(baseURL ? { baseURL } : {}),
   });
 
@@ -323,7 +394,7 @@ async function callOpenAI(model, messages, attachments, systemPrompt, baseURL, a
 }
 
 async function callGemini(model, messages, attachments, systemPrompt) {
-  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+  const genAI = new GoogleGenerativeAI(KEYS.google);
   const geminiModel = genAI.getGenerativeModel({ model: model || 'gemini-1.5-pro' });
 
   const history = [];
@@ -367,7 +438,7 @@ async function callGrok(model, messages, attachments, systemPrompt) {
     attachments,
     systemPrompt,
     'https://api.x.ai/v1',
-    process.env.XAI_API_KEY
+    KEYS.xai
   );
 }
 
@@ -391,16 +462,16 @@ app.post('/api/ai/chat', authMiddleware, aiLimiter, async (req, res) => {
     const model = requestedModel || 'claude-sonnet-4-20250514';
 
     // Validate the provider has an API key
-    if (model.startsWith('claude') && !process.env.ANTHROPIC_API_KEY) {
+    if (model.startsWith('claude') && !KEYS.anthropic) {
       return res.status(503).json({ error: 'Anthropic API key not configured.' });
     }
-    if (model.startsWith('gpt') && !process.env.OPENAI_API_KEY) {
+    if (model.startsWith('gpt') && !KEYS.openai) {
       return res.status(503).json({ error: 'OpenAI API key not configured.' });
     }
-    if (model.startsWith('gemini') && !process.env.GOOGLE_AI_API_KEY) {
+    if (model.startsWith('gemini') && !KEYS.google) {
       return res.status(503).json({ error: 'Google AI API key not configured.' });
     }
-    if (model.startsWith('grok') && !process.env.XAI_API_KEY) {
+    if (model.startsWith('grok') && !KEYS.xai) {
       return res.status(503).json({ error: 'xAI API key not configured.' });
     }
 
@@ -488,22 +559,22 @@ app.get('/api/ai/status', (req, res) => {
   res.json({
     models: {
       'claude-sonnet-4-20250514': {
-        available: !!process.env.ANTHROPIC_API_KEY,
+        available: !!KEYS.anthropic,
         label: 'Claude Sonnet',
         capabilities: ['text', 'vision', 'content-edit'],
       },
       'gpt-4o': {
-        available: !!process.env.OPENAI_API_KEY,
+        available: !!KEYS.openai,
         label: 'GPT-4o',
         capabilities: ['text', 'vision', 'content-edit', 'image-gen'],
       },
       'gemini-1.5-pro': {
-        available: !!process.env.GOOGLE_AI_API_KEY,
+        available: !!KEYS.google,
         label: 'Gemini 1.5 Pro',
         capabilities: ['text', 'vision', 'content-edit', 'large-context'],
       },
       'grok-2': {
-        available: !!process.env.XAI_API_KEY,
+        available: !!KEYS.xai,
         label: 'Grok',
         capabilities: ['text', 'content-edit', 'image-gen', 'web-search'],
       },
@@ -539,10 +610,10 @@ app.post('/api/ai/generate-image', authMiddleware, aiLimiter, async (req, res) =
     let imageBuffer;
 
     if (selectedProvider === 'dalle3') {
-      if (!process.env.OPENAI_API_KEY) {
+      if (!KEYS.openai) {
         return res.status(503).json({ error: 'OpenAI API key not configured.' });
       }
-      const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const client = new OpenAI({ apiKey: KEYS.openai });
       const imageSize = size || '1792x1024';
       const response = await client.images.generate({
         model: 'dall-e-3',
@@ -555,10 +626,10 @@ app.post('/api/ai/generate-image', authMiddleware, aiLimiter, async (req, res) =
       imageBuffer = Buffer.from(b64, 'base64');
 
     } else if (selectedProvider === 'imagen3') {
-      if (!process.env.GOOGLE_AI_API_KEY) {
+      if (!KEYS.google) {
         return res.status(503).json({ error: 'Google AI API key not configured.' });
       }
-      const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+      const genAI = new GoogleGenerativeAI(KEYS.google);
       const model = genAI.getGenerativeModel({ model: 'imagen-3.0-generate-002' });
       const result = await model.generateImages({
         prompt,
@@ -568,11 +639,11 @@ app.post('/api/ai/generate-image', authMiddleware, aiLimiter, async (req, res) =
       imageBuffer = Buffer.from(imgBytes, 'base64');
 
     } else if (selectedProvider === 'grok-aurora') {
-      if (!process.env.XAI_API_KEY) {
+      if (!KEYS.xai) {
         return res.status(503).json({ error: 'xAI API key not configured.' });
       }
       const client = new OpenAI({
-        apiKey: process.env.XAI_API_KEY,
+        apiKey: KEYS.xai,
         baseURL: 'https://api.x.ai/v1',
       });
       const response = await client.images.generate({
@@ -621,7 +692,7 @@ app.post('/api/ai/generate-video', authMiddleware, async (req, res) => {
   if ((provider || 'runway') !== 'runway') {
     return res.status(400).json({ error: `Unsupported video provider: ${provider}` });
   }
-  if (!process.env.RUNWAY_API_KEY) {
+  if (!KEYS.runway) {
     return res.status(503).json({ error: 'Runway API key not configured.' });
   }
 
@@ -635,7 +706,7 @@ app.post('/api/ai/generate-video', authMiddleware, async (req, res) => {
       const startRes = await fetch('https://api.dev.runwayml.com/v1/text_to_video', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.RUNWAY_API_KEY}`,
+          'Authorization': `Bearer ${KEYS.runway}`,
           'Content-Type': 'application/json',
           'X-Runway-Version': '2024-11-06',
         },
@@ -664,7 +735,7 @@ app.post('/api/ai/generate-video', authMiddleware, async (req, res) => {
 
         const pollRes = await fetch(`https://api.dev.runwayml.com/v1/tasks/${taskId}`, {
           headers: {
-            'Authorization': `Bearer ${process.env.RUNWAY_API_KEY}`,
+            'Authorization': `Bearer ${KEYS.runway}`,
             'X-Runway-Version': '2024-11-06',
           },
         });
@@ -760,6 +831,143 @@ function parsePath(path) {
   }
   return keys;
 }
+
+// ─── API Keys Management Routes ───
+
+// GET /api/keys — Return key status (masked values only)
+app.get('/api/keys', authMiddleware, (req, res) => {
+  const result = {};
+  for (const k of KEY_NAMES) {
+    const value = KEYS[k];
+    result[k] = {
+      set: !!value,
+      masked: maskKey(value),
+      source: value ? getKeySource(k) : null,
+    };
+  }
+  res.json(result);
+});
+
+// PUT /api/keys — Save one or more keys
+app.put('/api/keys', authMiddleware, (req, res) => {
+  const updated = [];
+  const cloudinaryChanged = false;
+  let reloadCloudinary = false;
+
+  for (const [key, value] of Object.entries(req.body)) {
+    if (!KEY_NAMES.includes(key)) continue;
+
+    const trimmed = String(value).trim();
+
+    // Skip if value is only bullet characters (masked value submitted accidentally)
+    if (/^[•]+$/.test(trimmed)) continue;
+
+    // Update keys.json data
+    keysFromFile[key] = trimmed;
+    updated.push(key);
+
+    if (key.startsWith('cloudinary_')) reloadCloudinary = true;
+  }
+
+  if (updated.length > 0) {
+    saveKeys();
+    loadKeys();
+    if (reloadCloudinary) configureCloudinary();
+  }
+
+  res.json({ ok: true, updated });
+});
+
+// POST /api/keys/test/:provider — Test a provider connection
+app.post('/api/keys/test/:provider', authMiddleware, async (req, res) => {
+  const { provider } = req.params;
+  const start = Date.now();
+
+  try {
+    if (provider === 'anthropic') {
+      if (!KEYS.anthropic) return res.json({ ok: false, provider, message: 'No API key configured' });
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': KEYS.anthropic,
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1,
+          messages: [{ role: 'user', content: 'hi' }],
+        }),
+      });
+      if (!resp.ok) {
+        const body = await resp.text();
+        throw new Error(resp.status === 401 ? 'Invalid API key — check and try again' : `API error ${resp.status}`);
+      }
+      return res.json({ ok: true, provider, latencyMs: Date.now() - start, message: 'Connected' });
+
+    } else if (provider === 'openai') {
+      if (!KEYS.openai) return res.json({ ok: false, provider, message: 'No API key configured' });
+      const resp = await fetch('https://api.openai.com/v1/models', {
+        headers: { 'Authorization': `Bearer ${KEYS.openai}` },
+      });
+      if (!resp.ok) throw new Error(resp.status === 401 ? 'Invalid API key — check and try again' : `API error ${resp.status}`);
+      return res.json({ ok: true, provider, latencyMs: Date.now() - start, message: 'Connected' });
+
+    } else if (provider === 'google') {
+      if (!KEYS.google) return res.json({ ok: false, provider, message: 'No API key configured' });
+      const resp = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${encodeURIComponent(KEYS.google)}`);
+      if (!resp.ok) throw new Error(resp.status === 400 || resp.status === 403 ? 'Invalid API key — check and try again' : `API error ${resp.status}`);
+      return res.json({ ok: true, provider, latencyMs: Date.now() - start, message: 'Connected' });
+
+    } else if (provider === 'xai') {
+      if (!KEYS.xai) return res.json({ ok: false, provider, message: 'No API key configured' });
+      const resp = await fetch('https://api.x.ai/v1/models', {
+        headers: { 'Authorization': `Bearer ${KEYS.xai}` },
+      });
+      if (!resp.ok) throw new Error(resp.status === 401 ? 'Invalid API key — check and try again' : `API error ${resp.status}`);
+      return res.json({ ok: true, provider, latencyMs: Date.now() - start, message: 'Connected' });
+
+    } else if (provider === 'runway') {
+      if (!KEYS.runway) return res.json({ ok: false, provider, message: 'No API key configured' });
+      const resp = await fetch('https://api.dev.runwayml.com/v1/organizations', {
+        headers: {
+          'Authorization': `Bearer ${KEYS.runway}`,
+          'X-Runway-Version': '2024-11-06',
+        },
+      });
+      // 200 or 401 both count as reachable
+      if (resp.status === 200 || resp.status === 401) {
+        return res.json({ ok: true, provider, latencyMs: Date.now() - start, message: 'Connected' });
+      }
+      throw new Error(`API error ${resp.status}`);
+
+    } else if (provider === 'cloudinary') {
+      if (!KEYS.cloudinary_cloud_name || !KEYS.cloudinary_api_key || !KEYS.cloudinary_api_secret) {
+        return res.json({ ok: false, provider, message: 'Cloudinary credentials not fully configured' });
+      }
+      await cloudinary.api.ping();
+      return res.json({ ok: true, provider, latencyMs: Date.now() - start, message: 'Connected' });
+
+    } else {
+      return res.status(400).json({ ok: false, provider, message: `Unknown provider: ${provider}` });
+    }
+  } catch (err) {
+    return res.json({ ok: false, provider, message: err.message || 'Connection failed' });
+  }
+});
+
+// DELETE /api/keys/:keyName — Clear a single key
+app.delete('/api/keys/:keyName', authMiddleware, (req, res) => {
+  const { keyName } = req.params;
+  if (!KEY_NAMES.includes(keyName)) {
+    return res.status(400).json({ error: `Unknown key: ${keyName}` });
+  }
+  keysFromFile[keyName] = '';
+  saveKeys();
+  loadKeys();
+  if (keyName.startsWith('cloudinary_')) configureCloudinary();
+  res.json({ ok: true, cleared: keyName });
+});
 
 // ─── Admin route ───
 app.get('/admin', (req, res) => {
