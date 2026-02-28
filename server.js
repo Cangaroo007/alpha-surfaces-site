@@ -270,56 +270,138 @@ const videoJobs = new Map();
 
 // Build the system prompt used by all LLM providers
 function buildSystemPrompt(currentContent) {
-  return `You are the AI content manager for Alpha Surfaces, a premium Australian benchtop brand. You have full knowledge of and control over the website content.
+  return `You are the AI content editor for Alpha Surfaces, a premium Australian benchtop brand. You have full knowledge of and control over the website's content via a JSON content store.
 
-CURRENT WEBSITE CONTENT:
+Alpha Surfaces brand context:
+- Premium mineral stone benchtops with zero crystalline silica (silicosis-safe)
+- AlphaShield™ Lifetime Stain Resistance Guarantee
+- 30+ surfaces across 5 collections (01–05) plus Original Alpha Zero
+- Jumbo slabs: 3200 × 1600mm, 20mm thickness
+- Target markets: fabricators, architects, designers, builders, homeowners
+- Managing Director: Belinda Kelaher
+- Tone: Luxury editorial — confident, precise, premium without being cold
+
+Brand voice guidelines:
+- Avoid generic superlatives ("world-class", "leading", "best-in-class")
+- Prefer sensory and material language ("tactile", "weight", "grain", "depth")
+- Short declarative sentences work better than long compound ones for headlines
+- Australian English spelling throughout (e.g. "colour" not "color")
+- HTML <em> tags may be used in headings for italic emphasis — preserve this pattern
+
+The current website content.json is below. This is the live content of the site:
+
+<content>
 ${JSON.stringify(currentContent, null, 2)}
+</content>
 
-YOUR ROLE:
-- Help Belinda and Sean manage their website through natural conversation
-- Make content changes, improve copy, rewrite sections, add/remove items
-- Understand the brand: luxury, premium, mineral stone, zero crystalline silica, AlphaShield™ Lifetime Stain Resistance Guarantee, Australian market
-- Keep all copy consistent with the brand voice: confident, premium, editorial
+When the user asks you to make changes to the site:
+1. Make the changes thoughtfully, in the brand voice described above
+2. Return your conversational reply AND the proposed content changes in this exact format at the end of your response:
 
-RESPONSE FORMAT:
-Always respond in this exact JSON structure:
-{
-  "reply": "Your conversational response explaining what you did or answering their question",
-  "changes": {
-    "fieldPath": "newValue"
-  },
-  "action": null
+<proposed_changes>
+{ ...only the changed fields as a deep partial object... }
+</proposed_changes>
+
+The proposed_changes object must use the exact same key structure as content.json. Only include keys that have actually changed — do not return the entire content object in proposed_changes, only the changed portions.
+
+Examples:
+- If you changed hero.heading: { "hero": { "heading": "new value" } }
+- If you changed two collections: { "collections": { "items": [null, { "name": "new name" }, null] } } — use null for unchanged array items
+- If you changed a colour: { "styles": { "olive": "#6B6820" } }
+
+If the user is asking a question and no changes are needed, reply helpfully and omit the <proposed_changes> block entirely.
+
+If the user asks you to do something outside your capabilities (e.g. upload images, change passwords, deploy code), explain what you can and can't do, and suggest alternatives where possible.`;
 }
 
-Field paths use dot notation matching the content schema. Examples:
-- "hero.heading" → changes the hero heading
-- "hero.badge" → changes the badge text
-- "about.quote" → changes the MD quote
-- "nav.brand" → changes the brand name in the nav
-- "collections.items[0].name" → changes the first collection's name
-- "footer.copyright" → changes the footer copyright text
+// ─── Deep Merge & Diff Utilities ───
 
-If no content changes are needed, set "changes" to null.
+// Deep merge a partial object into the original, producing a full updated object.
+// For arrays, null entries in partial mean "keep the original item at this index".
+function deepMergeContent(original, partial) {
+  const result = JSON.parse(JSON.stringify(original));
 
-IMAGE GENERATION:
-If the user asks you to generate, create, or make an image (e.g. "generate a hero background image of ..."), respond with an action instead of changes:
-{
-  "reply": "I'll generate that image for you...",
-  "changes": null,
-  "action": {
-    "type": "generate-image",
-    "prompt": "Detailed image generation prompt based on their request...",
-    "targetField": "hero.backgroundImage",
-    "provider": "dalle3"
+  function mergeInto(target, source) {
+    if (Array.isArray(source)) {
+      if (!Array.isArray(target)) return source;
+      for (let i = 0; i < source.length; i++) {
+        if (source[i] === null) continue;
+        if (i >= target.length) {
+          target[i] = source[i];
+        } else if (typeof source[i] === 'object' && source[i] !== null && typeof target[i] === 'object' && target[i] !== null) {
+          target[i] = mergeInto(target[i], source[i]);
+        } else {
+          target[i] = source[i];
+        }
+      }
+      return target;
+    }
+
+    if (typeof source === 'object' && source !== null) {
+      if (typeof target !== 'object' || target === null || Array.isArray(target)) {
+        return source;
+      }
+      for (const key of Object.keys(source)) {
+        if (typeof source[key] === 'object' && source[key] !== null && typeof target[key] === 'object' && target[key] !== null) {
+          target[key] = mergeInto(target[key], source[key]);
+        } else {
+          target[key] = source[key];
+        }
+      }
+      return target;
+    }
+
+    return source;
   }
-}
-Choose the targetField based on context (hero.backgroundImage, about.visualImage, collections.items[N].slabImage, etc.).
 
-IMPORTANT:
-- Never invent product specifications — only use what is in the current content
-- Preserve all HTML tags (e.g. <em>) in heading fields
-- When rewriting copy, match the existing tone and style unless asked to change it
-- Always confirm what you changed in your reply so the user can decide whether to apply it`;
+  mergeInto(result, partial);
+  return result;
+}
+
+// Recursively compare two objects, returning an array of {path, before, after} for changed leaf values.
+// Skips image objects (those containing url/publicId/thumb/medium/large keys).
+function computeDiff(original, proposed) {
+  const diffs = [];
+
+  function isImageObj(obj) {
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false;
+    const keys = Object.keys(obj);
+    return keys.some(k => ['url', 'publicId', 'thumb', 'medium', 'large'].includes(k));
+  }
+
+  function walk(a, b, currentPath) {
+    if (a === b) return;
+
+    const aIsObj = a !== null && a !== undefined && typeof a === 'object';
+    const bIsObj = b !== null && b !== undefined && typeof b === 'object';
+
+    if (aIsObj && bIsObj && !Array.isArray(a) && !Array.isArray(b)) {
+      if (isImageObj(a) || isImageObj(b)) return;
+      const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
+      for (const key of allKeys) {
+        walk(a[key], b[key], currentPath ? `${currentPath}.${key}` : key);
+      }
+      return;
+    }
+
+    if (Array.isArray(a) && Array.isArray(b)) {
+      const maxLen = Math.max(a.length, b.length);
+      for (let i = 0; i < maxLen; i++) {
+        walk(a[i], b[i], `${currentPath}[${i}]`);
+      }
+      return;
+    }
+
+    // Leaf comparison
+    const aStr = a != null ? String(a) : '';
+    const bStr = b != null ? String(b) : '';
+    if (aStr !== bStr) {
+      diffs.push({ path: currentPath, before: aStr, after: bStr });
+    }
+  }
+
+  walk(original, proposed, '');
+  return diffs;
 }
 
 // ─── LLM Provider Functions ───
@@ -333,6 +415,11 @@ async function callAnthropic(model, messages, attachments, systemPrompt) {
         if (att.type === 'image' && att.base64 && att.mimeType) {
           content.push({
             type: 'image',
+            source: { type: 'base64', media_type: att.mimeType, data: att.base64 },
+          });
+        } else if (att.type === 'document' && att.base64 && att.mimeType) {
+          content.push({
+            type: 'document',
             source: { type: 'base64', media_type: att.mimeType, data: att.base64 },
           });
         }
@@ -456,66 +543,80 @@ app.post('/api/ai/chat', authMiddleware, aiLimiter, async (req, res) => {
   try {
     const { messages, attachments, model: requestedModel } = req.body;
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return res.status(400).json({ error: 'Messages array is required.' });
+      return res.status(400).json({ ok: false, message: 'Messages array is required.' });
     }
 
     const model = requestedModel || 'claude-sonnet-4-20250514';
 
     // Validate the provider has an API key
     if (model.startsWith('claude') && !KEYS.anthropic) {
-      return res.status(503).json({ error: 'Anthropic API key not configured.' });
+      return res.status(503).json({ ok: false, message: 'Claude API key not configured. Add it in API Keys → Claude.' });
     }
     if (model.startsWith('gpt') && !KEYS.openai) {
-      return res.status(503).json({ error: 'OpenAI API key not configured.' });
+      return res.status(503).json({ ok: false, message: 'OpenAI API key not configured. Add it in API Keys → GPT-4o.' });
     }
     if (model.startsWith('gemini') && !KEYS.google) {
-      return res.status(503).json({ error: 'Google AI API key not configured.' });
+      return res.status(503).json({ ok: false, message: 'Google AI API key not configured. Add it in API Keys → Gemini.' });
     }
     if (model.startsWith('grok') && !KEYS.xai) {
-      return res.status(503).json({ error: 'xAI API key not configured.' });
+      return res.status(503).json({ ok: false, message: 'xAI API key not configured. Add it in API Keys → Grok.' });
     }
 
+    // Always read fresh content from disk
     const currentContent = loadContent();
     const { rawText, tokens } = await routeToLLM(model, messages, attachments, currentContent);
 
-    // Parse the JSON response
-    let parsed;
-    try {
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-      parsed = JSON.parse(jsonMatch ? jsonMatch[0] : rawText);
-    } catch {
-      return res.json({ reply: rawText, diff: null, proposedContent: null, action: null, model, tokens });
+    // Parse response: extract reply text and <proposed_changes> block
+    const changesMatch = rawText.match(/<proposed_changes>\s*([\s\S]*?)\s*<\/proposed_changes>/);
+
+    let reply = rawText;
+    let proposedChanges = null;
+
+    if (changesMatch) {
+      reply = rawText.substring(0, rawText.indexOf('<proposed_changes>')).trim();
+      try {
+        proposedChanges = JSON.parse(changesMatch[1]);
+      } catch (e) {
+        // JSON parsing failed — treat as no changes
+        proposedChanges = null;
+      }
     }
 
-    const reply = parsed.reply || rawText;
-    const changes = parsed.changes;
-    const action = parsed.action || null;
-
-    if (action) {
-      return res.json({ reply, diff: null, proposedContent: null, action, model, tokens });
+    if (!proposedChanges) {
+      return res.json({
+        ok: true,
+        reply,
+        diff: [],
+        proposedContent: null,
+        hasChanges: false,
+        model,
+        tokens
+      });
     }
 
-    if (!changes || Object.keys(changes).length === 0) {
-      return res.json({ reply, diff: null, proposedContent: null, action: null, model, tokens });
-    }
+    // Deep merge proposed changes with current content
+    const proposedContent = deepMergeContent(currentContent, proposedChanges);
 
-    // Build diff and proposedContent
-    const proposedContent = JSON.parse(JSON.stringify(currentContent));
-    const diff = {};
+    // Compute diff array
+    const diff = computeDiff(currentContent, proposedContent);
 
-    for (const [fieldPath, newValue] of Object.entries(changes)) {
-      const before = getNestedValue(currentContent, fieldPath);
-      setNestedValue(proposedContent, fieldPath, newValue);
-      diff[fieldPath] = {
-        before: before !== undefined ? String(before) : '',
-        after: String(newValue),
-      };
-    }
-
-    res.json({ reply, diff, proposedContent, action: null, model, tokens });
+    res.json({
+      ok: true,
+      reply,
+      diff,
+      proposedContent,
+      hasChanges: diff.length > 0,
+      model,
+      tokens
+    });
   } catch (err) {
     console.error('AI chat error:', err);
-    res.status(500).json({ error: 'AI request failed. Please try again.' });
+    const message = err?.status === 401
+      ? 'Invalid API key. Check your key in API Keys settings.'
+      : err?.status === 429
+      ? 'Rate limit exceeded. Please wait a moment and try again.'
+      : err?.message || 'AI request failed. Please try again.';
+    res.status(500).json({ ok: false, message });
   }
 });
 
@@ -532,7 +633,7 @@ app.post('/api/ai/apply', authMiddleware, async (req, res) => {
     fs.writeFileSync(BACKUP_FILE, JSON.stringify(current, null, 2));
     // Write new content
     saveContent(proposedContent);
-    res.json({ ok: true });
+    res.json({ ok: true, message: 'Changes applied. Backup saved.' });
   } catch (err) {
     console.error('AI apply error:', err);
     res.status(500).json({ error: 'Failed to apply changes.' });
@@ -554,9 +655,14 @@ app.post('/api/ai/undo', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/ai/status — Full model capability data
+// GET /api/ai/status — Provider availability & model capability data
 app.get('/api/ai/status', (req, res) => {
   res.json({
+    anthropic: !!KEYS.anthropic,
+    openai: !!KEYS.openai,
+    google: !!KEYS.google,
+    xai: !!KEYS.xai,
+    runway: !!KEYS.runway,
     models: {
       'claude-sonnet-4-20250514': {
         available: !!KEYS.anthropic,
