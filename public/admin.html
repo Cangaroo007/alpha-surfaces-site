@@ -190,6 +190,75 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 /* Overlay backdrop */
 .ai-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:999;opacity:0;pointer-events:none;transition:opacity .35s}
 .ai-backdrop.show{opacity:1;pointer-events:auto}
+
+/* ─── Model Selector ─── */
+.ai-model-bar{padding:10px 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ai-model-bar label{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);white-space:nowrap}
+.ai-model-select{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:.8rem;font-family:inherit;padding:6px 10px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239c9890'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.ai-model-select:focus{border-color:var(--gold)}
+.ai-model-select option{background:var(--bg);color:var(--text)}
+.ai-model-select option:disabled{color:var(--text2)}
+.ai-model-caps{font-size:.65rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+
+/* ─── Generate Panel ─── */
+.ai-gen-panel{border-top:1px solid var(--border);background:var(--bg);flex-shrink:0;display:none;max-height:360px;overflow-y:auto}
+.ai-gen-panel.open{display:block}
+.ai-gen-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;font-size:.78rem;font-weight:600;color:var(--gold)}
+.ai-gen-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:.85rem;padding:4px}
+.ai-gen-close:hover{color:var(--text)}
+.ai-gen-tabs{display:flex;gap:0;padding:0 16px;margin-bottom:10px}
+.ai-gen-tab{padding:6px 16px;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:1px solid var(--border);color:var(--text2);cursor:pointer;font-family:inherit;transition:all .2s}
+.ai-gen-tab.active{background:var(--surface);color:var(--gold);border-color:var(--gold)}
+.ai-gen-body{padding:0 16px 14px}
+.ai-gen-body .field{margin-bottom:10px}
+.ai-gen-body .field label{font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);margin-bottom:4px;display:block}
+.ai-gen-body textarea,.ai-gen-body select{width:100%;padding:8px 10px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:.8rem;font-family:inherit;outline:none;resize:vertical}
+.ai-gen-body textarea:focus,.ai-gen-body select:focus{border-color:var(--gold)}
+.ai-gen-body textarea{min-height:60px}
+.ai-gen-body select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239c9890'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer}
+.ai-gen-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ai-gen-submit{width:100%;padding:10px;background:var(--gold);color:#111;border:none;font-size:.78rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px}
+.ai-gen-submit:hover{background:#cbb87f}
+.ai-gen-submit:disabled{opacity:.5;cursor:not-allowed}
+.ai-gen-submit .spinner{width:14px;height:14px;border:2px solid rgba(0,0,0,.2);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite}
+
+/* ─── Generated image/video cards in chat ─── */
+.ai-gen-result{background:#1A1A18;border:1px solid rgba(184,164,114,.2);padding:14px;margin-top:10px}
+.ai-gen-result-title{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.ai-gen-result img,.ai-gen-result video{width:100%;max-height:280px;object-fit:cover;border:1px solid var(--border);margin-bottom:8px;display:block}
+.ai-gen-result .prompt-used{font-size:.72rem;color:var(--text2);margin-bottom:10px;line-height:1.4}
+.ai-gen-result .prompt-used strong{color:var(--text)}
+.ai-gen-result-actions{display:flex;gap:8px;flex-wrap:wrap}
+.ai-gen-result-actions button{padding:7px 16px;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:all .2s;border:none}
+.ai-gen-apply{background:var(--gold);color:#111}
+.ai-gen-apply:hover{background:#cbb87f}
+.ai-gen-regen{background:transparent;color:var(--text2);border:1px solid var(--border) !important}
+.ai-gen-regen:hover{border-color:var(--gold) !important;color:var(--gold)}
+.ai-gen-discard{background:transparent;color:var(--text2);border:1px solid var(--border) !important}
+.ai-gen-discard:hover{border-color:var(--red) !important;color:var(--red)}
+
+/* Video progress */
+.ai-video-progress{margin-top:10px}
+.ai-video-progress-bar{width:100%;height:6px;background:var(--surface);overflow:hidden;margin:8px 0}
+.ai-video-progress-fill{height:100%;background:var(--gold);width:0%;transition:width .5s;animation:progressPulse 2s infinite}
+@keyframes progressPulse{0%,100%{opacity:1}50%{opacity:.6}}
+.ai-video-progress-text{font-size:.72rem;color:var(--text2)}
+
+/* Generation failed */
+.ai-gen-failed{background:#1A1A18;border:1px solid rgba(192,57,43,.3);padding:14px;margin-top:10px}
+.ai-gen-failed-title{font-size:.78rem;color:var(--red);font-weight:600;margin-bottom:6px}
+.ai-gen-failed-text{font-size:.78rem;color:var(--text2);margin-bottom:10px;line-height:1.5}
+.ai-gen-failed button{padding:7px 16px;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit;background:transparent;color:var(--text2);border:1px solid var(--border);transition:all .2s}
+.ai-gen-failed button:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Capability note */
+.ai-cap-note{background:rgba(184,164,114,.08);border:1px solid rgba(184,164,114,.2);padding:10px 14px;margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.ai-cap-note-text{font-size:.78rem;color:var(--text);line-height:1.5}
+.ai-cap-note-actions{display:flex;gap:8px}
+.ai-cap-note-actions button{padding:6px 14px;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:all .2s;border:none}
+
+/* Token cost indicator */
+.ai-token-info{font-size:.65rem;color:var(--text2);margin-top:3px;display:flex;align-items:center;gap:4px}
 </style>
 </head>
 <body>
@@ -373,6 +442,14 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
       <button class="ai-header-btn" onclick="closeAIPanel()" title="Close">✕</button>
     </div>
   </div>
+  <!-- Model Selector -->
+  <div class="ai-model-bar">
+    <label>Model:</label>
+    <select id="ai-model-select" class="ai-model-select" onchange="onModelChange()">
+      <option value="claude-sonnet-4-20250514">Claude Sonnet</option>
+    </select>
+    <span id="ai-model-caps" class="ai-model-caps"></span>
+  </div>
   <div id="ai-messages" class="ai-messages">
     <div id="ai-empty" class="ai-empty">
       <div class="icon">✦</div>
@@ -388,10 +465,82 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
       </div>
     </div>
   </div>
+  <!-- Generate Panel (Image / Video) -->
+  <div id="ai-gen-panel" class="ai-gen-panel">
+    <div class="ai-gen-header">
+      <span>✦ GENERATE MEDIA</span>
+      <button class="ai-gen-close" onclick="closeGenPanel()">✕</button>
+    </div>
+    <div class="ai-gen-tabs">
+      <button class="ai-gen-tab active" onclick="switchGenTab('image', this)">Image</button>
+      <button class="ai-gen-tab" onclick="switchGenTab('video', this)">Video</button>
+    </div>
+    <!-- Image Tab -->
+    <div id="gen-tab-image" class="ai-gen-body">
+      <div class="field"><label>Describe the image</label><textarea id="gen-img-prompt" placeholder="A premium calacatta benchtop in a luxury kitchen setting..."></textarea></div>
+      <div class="ai-gen-row">
+        <div class="field"><label>Provider</label>
+          <select id="gen-img-provider">
+            <option value="dalle3">DALL-E 3</option>
+            <option value="imagen3">Google Imagen 3</option>
+            <option value="grok-aurora">Grok Aurora</option>
+          </select>
+        </div>
+        <div class="field"><label>Size</label>
+          <select id="gen-img-size">
+            <option value="1792x1024">Landscape (1792×1024)</option>
+            <option value="1024x1024">Square (1024×1024)</option>
+            <option value="1024x1792">Portrait (1024×1792)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Apply to</label>
+        <select id="gen-img-target">
+          <option value="hero.backgroundImage">Hero Background</option>
+          <option value="about.visualImage">About Section</option>
+          <option value="collections.items[0].slabImage">Collection 01 Slab</option>
+          <option value="collections.items[0].lifestyleImage">Collection 01 Lifestyle</option>
+          <option value="collections.items[1].slabImage">Collection 02 Slab</option>
+          <option value="collections.items[1].lifestyleImage">Collection 02 Lifestyle</option>
+          <option value="collections.items[2].slabImage">Collection 03 Slab</option>
+          <option value="collections.items[2].lifestyleImage">Collection 03 Lifestyle</option>
+          <option value="product.slabImage">Featured Product Slab</option>
+          <option value="product.lifestyleImage">Featured Product Lifestyle</option>
+        </select>
+      </div>
+      <button id="gen-img-btn" class="ai-gen-submit" onclick="generateImage()">✦ Generate Image</button>
+    </div>
+    <!-- Video Tab -->
+    <div id="gen-tab-video" class="ai-gen-body" style="display:none">
+      <div class="field"><label>Describe the video</label><textarea id="gen-vid-prompt" placeholder="Slow cinematic pan across a polished marble surface..."></textarea></div>
+      <div class="ai-gen-row">
+        <div class="field"><label>Provider</label>
+          <select id="gen-vid-provider">
+            <option value="runway">Runway ML</option>
+          </select>
+        </div>
+        <div class="field"><label>Duration</label>
+          <select id="gen-vid-duration">
+            <option value="5">5 seconds</option>
+            <option value="10">10 seconds</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Apply to</label>
+        <select id="gen-vid-target">
+          <option value="hero.backgroundVideo">Hero Background</option>
+          <option value="about.visualVideo">About Section</option>
+          <option value="product.video">Featured Product</option>
+        </select>
+      </div>
+      <button id="gen-vid-btn" class="ai-gen-submit" onclick="generateVideo()">✦ Generate Video</button>
+    </div>
+  </div>
   <div class="ai-input-area">
     <div id="ai-attachments" class="ai-attachments-preview"></div>
     <div class="ai-input-row">
       <button class="ai-attach-btn" onclick="document.getElementById('ai-file-input').click()" title="Attach file">📎</button>
+      <button class="ai-attach-btn" onclick="toggleGenPanel()" title="Generate image or video" style="font-size:.9rem">✦</button>
       <input type="file" id="ai-file-input" multiple accept="image/*,application/pdf" style="display:none" onchange="handleAIFiles(this.files)">
       <textarea id="ai-input" class="ai-input" rows="1" placeholder="Ask me to change anything on the site..." onkeydown="handleAIKeydown(event)" oninput="autoResizeInput(this)"></textarea>
       <button id="ai-send" class="ai-send-btn" onclick="sendAIMessage()" title="Send">→</button>
@@ -600,16 +749,65 @@ const aiSend = document.getElementById('ai-send');
 const aiEmpty = document.getElementById('ai-empty');
 const aiAttachments = document.getElementById('ai-attachments');
 const aiFileInput = document.getElementById('ai-file-input');
+const aiModelSelect = document.getElementById('ai-model-select');
+const aiModelCaps = document.getElementById('ai-model-caps');
 
 let aiConversation = []; // {role, content} pairs for API
 let aiAttachedFiles = []; // {type, base64, mimeType, name, previewUrl}
 let aiIsLoading = false;
+let aiModelsData = {}; // Populated from /api/ai/status
+let aiSelectedModel = 'claude-sonnet-4-20250514';
+
+const MODEL_CAP_LABELS = {
+  'claude-sonnet-4-20250514': '✦ Content · Vision',
+  'gpt-4o': '✦ Content · Vision · Images',
+  'gemini-1.5-pro': '✦ Content · Vision · 1M context',
+  'grok-2': '✦ Content · Web · Images',
+};
+
+const MODEL_LABELS = {
+  'claude-sonnet-4-20250514': 'Claude',
+  'gpt-4o': 'GPT-4o',
+  'gemini-1.5-pro': 'Gemini',
+  'grok-2': 'Grok',
+};
+
+// Load available models from the server
+async function loadAIModels() {
+  try {
+    const res = await fetch('/api/ai/status');
+    const data = await res.json();
+    aiModelsData = data.models || {};
+    renderModelSelector();
+  } catch {}
+}
+
+function renderModelSelector() {
+  let html = '';
+  for (const [modelId, info] of Object.entries(aiModelsData)) {
+    const disabled = !info.available;
+    const suffix = disabled ? ' — Not configured' : '';
+    html += `<option value="${modelId}" ${disabled ? 'disabled' : ''} ${modelId === aiSelectedModel ? 'selected' : ''}>${info.label}${suffix}</option>`;
+  }
+  if (html) aiModelSelect.innerHTML = html;
+  updateModelCaps();
+}
+
+function onModelChange() {
+  aiSelectedModel = aiModelSelect.value;
+  updateModelCaps();
+}
+
+function updateModelCaps() {
+  aiModelCaps.textContent = MODEL_CAP_LABELS[aiSelectedModel] || '';
+}
 
 // Restore session from sessionStorage
 (function restoreAISession() {
   try {
     const saved = sessionStorage.getItem('ai_conversation');
     const savedHtml = sessionStorage.getItem('ai_messages_html');
+    const savedModel = sessionStorage.getItem('ai_selected_model');
     if (saved) {
       aiConversation = JSON.parse(saved);
       if (savedHtml && aiConversation.length > 0) {
@@ -617,6 +815,7 @@ let aiIsLoading = false;
         aiMessages.innerHTML = savedHtml;
       }
     }
+    if (savedModel) aiSelectedModel = savedModel;
   } catch {}
 })();
 
@@ -624,6 +823,7 @@ function saveAISession() {
   try {
     sessionStorage.setItem('ai_conversation', JSON.stringify(aiConversation));
     sessionStorage.setItem('ai_messages_html', aiMessages.innerHTML);
+    sessionStorage.setItem('ai_selected_model', aiSelectedModel);
   } catch {}
 }
 
@@ -631,6 +831,7 @@ function toggleAIPanel() {
   aiPanel.classList.toggle('open');
   aiBackdrop.classList.toggle('show');
   if (aiPanel.classList.contains('open')) {
+    loadAIModels();
     aiInput.focus();
     scrollAIToBottom();
   }
@@ -674,7 +875,6 @@ function renderMarkdown(text) {
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     .replace(/`(.+?)`/g, '<code>$1</code>');
-  // Split into paragraphs
   const lines = html.split('\n');
   let result = '';
   let inList = false;
@@ -742,15 +942,351 @@ aiPanel.addEventListener('drop', (e) => {
   if (e.dataTransfer.files.length) handleAIFiles(e.dataTransfer.files);
 });
 
-// Send message
-async function sendAIMessage() {
-  const text = aiInput.value.trim();
-  if (!text || aiIsLoading) return;
+// ─── Generate Panel ───
+function toggleGenPanel() {
+  document.getElementById('ai-gen-panel').classList.toggle('open');
+}
+
+function closeGenPanel() {
+  document.getElementById('ai-gen-panel').classList.remove('open');
+}
+
+function switchGenTab(tab, btn) {
+  document.querySelectorAll('.ai-gen-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('gen-tab-image').style.display = tab === 'image' ? 'block' : 'none';
+  document.getElementById('gen-tab-video').style.display = tab === 'video' ? 'block' : 'none';
+}
+
+// ─── Image Generation ───
+async function generateImage(prompt, provider, size, targetField) {
+  // If called from the panel (no args), read from form
+  if (!prompt) {
+    prompt = document.getElementById('gen-img-prompt').value.trim();
+    provider = document.getElementById('gen-img-provider').value;
+    size = document.getElementById('gen-img-size').value;
+    targetField = document.getElementById('gen-img-target').value;
+  }
+  if (!prompt) return;
+
+  // Check provider capability
+  const needsOpenAI = provider === 'dalle3';
+  const needsGoogle = provider === 'imagen3';
+  const needsXAI = provider === 'grok-aurora';
+  if (needsOpenAI && aiModelsData['gpt-4o'] && !aiModelsData['gpt-4o'].available) {
+    showCapabilityNote('Image generation with DALL-E 3 requires an OpenAI API key.', 'dalle3');
+    return;
+  }
+  if (needsGoogle && aiModelsData['gemini-1.5-pro'] && !aiModelsData['gemini-1.5-pro'].available) {
+    showCapabilityNote('Image generation with Imagen 3 requires a Google AI API key.', 'imagen3');
+    return;
+  }
+  if (needsXAI && aiModelsData['grok-2'] && !aiModelsData['grok-2'].available) {
+    showCapabilityNote('Image generation with Grok Aurora requires an xAI API key.', 'grok-aurora');
+    return;
+  }
+
+  const btn = document.getElementById('gen-img-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Generating...'; }
+  closeGenPanel();
 
   // Hide empty state
   aiEmpty.style.display = 'none';
 
-  // Build attachment HTML for user message
+  // Show progress in chat
+  const genId = 'gen-' + Date.now();
+  const providerLabel = provider === 'dalle3' ? 'DALL-E 3' : provider === 'imagen3' ? 'Imagen 3' : 'Grok Aurora';
+  const progressHtml = `<div class="ai-msg ai-msg-assistant" id="${genId}"><div class="ai-label">${providerLabel}</div><div class="ai-bubble"><p>✦ Generating image...</p></div></div>`;
+  aiMessages.insertAdjacentHTML('beforeend', progressHtml);
+  scrollAIToBottom();
+
+  try {
+    const res = await fetch('/api/ai/generate-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, provider, size, targetField }),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || 'Generation failed');
+    }
+
+    const data = await res.json();
+    const targetLabel = getTargetLabel(data.targetField);
+
+    // Replace progress with result
+    const resultEl = document.getElementById(genId);
+    if (resultEl) {
+      resultEl.innerHTML = `
+        <div class="ai-label">${providerLabel}</div>
+        <div class="ai-bubble">
+          <div class="ai-gen-result" id="${genId}-result">
+            <div class="ai-gen-result-title">✦ Generated image using ${providerLabel}</div>
+            <img src="${escapeHtml(data.medium || data.url)}" alt="Generated image">
+            <div class="prompt-used"><strong>Prompt:</strong> ${escapeHtml(data.prompt)}</div>
+            <div class="ai-gen-result-actions">
+              <button class="ai-gen-apply" onclick="applyGenImage('${genId}-result', '${escapeHtml(data.targetField)}', '${escapeHtml(data.url)}')">✓ Apply to ${escapeHtml(targetLabel)}</button>
+              <button class="ai-gen-regen" onclick="regenerateImage('${escapeHtml(prompt)}', '${provider}', '${size}', '${escapeHtml(targetField)}')">↺ Regenerate</button>
+              <button class="ai-gen-discard" onclick="document.getElementById('${genId}').remove()">✗ Discard</button>
+            </div>
+          </div>
+        </div>
+        <div class="ai-time">${formatTime()}</div>`;
+    }
+    scrollAIToBottom();
+    saveAISession();
+
+  } catch (err) {
+    const resultEl = document.getElementById(genId);
+    if (resultEl) {
+      resultEl.innerHTML = `
+        <div class="ai-label">${providerLabel}</div>
+        <div class="ai-bubble">
+          <div class="ai-gen-failed">
+            <div class="ai-gen-failed-title">✗ Generation failed</div>
+            <div class="ai-gen-failed-text">${escapeHtml(providerLabel)} returned an error: ${escapeHtml(err.message)}<br>The prompt may have been rejected by the content filter. Try a different description.</div>
+            <button onclick="regenerateImage('${escapeHtml(prompt)}', '${provider}', '${size}', '${escapeHtml(targetField)}')">↺ Try Again</button>
+          </div>
+        </div>`;
+    }
+    scrollAIToBottom();
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '✦ Generate Image'; }
+  }
+}
+
+function regenerateImage(prompt, provider, size, targetField) {
+  generateImage(prompt, provider, size, targetField);
+}
+
+async function applyGenImage(resultId, targetField, imageUrl) {
+  const parts = targetField.split('.');
+  const section = parts[0];
+
+  try {
+    const content = await (await fetch('/api/content')).json();
+    setNestedValueJS(content, targetField, imageUrl);
+
+    const res = await fetch(`/api/content/${section}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(content[section]),
+    });
+    if (!res.ok) throw new Error('Patch failed');
+
+    DATA = content;
+    renderAll();
+
+    const targetLabel = getTargetLabel(targetField);
+    addAISystemMessage(`✓ ${targetLabel} updated with the generated image`);
+    saveAISession();
+  } catch (err) {
+    addAISystemMessage('Failed to apply image — please try again');
+  }
+}
+
+// JS version of nested value setter (handles bracket notation)
+function setNestedValueJS(obj, path, value) {
+  const keys = [];
+  const parts = path.split('.');
+  for (const part of parts) {
+    const match = part.match(/^([^[]+)(?:\[(\d+)\])?$/);
+    if (match) {
+      keys.push(match[1]);
+      if (match[2] !== undefined) keys.push(parseInt(match[2], 10));
+    } else {
+      keys.push(part);
+    }
+  }
+  let current = obj;
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    if (current[key] == null) {
+      current[key] = typeof keys[i + 1] === 'number' ? [] : {};
+    }
+    current = current[key];
+  }
+  current[keys[keys.length - 1]] = value;
+}
+
+function getTargetLabel(fieldPath) {
+  const labels = {
+    'hero.backgroundImage': 'Hero Background',
+    'about.visualImage': 'About Section',
+    'collections.items[0].slabImage': 'Collection 01 Slab',
+    'collections.items[0].lifestyleImage': 'Collection 01 Lifestyle',
+    'collections.items[1].slabImage': 'Collection 02 Slab',
+    'collections.items[1].lifestyleImage': 'Collection 02 Lifestyle',
+    'collections.items[2].slabImage': 'Collection 03 Slab',
+    'collections.items[2].lifestyleImage': 'Collection 03 Lifestyle',
+    'product.slabImage': 'Featured Product Slab',
+    'product.lifestyleImage': 'Featured Product Lifestyle',
+    'hero.backgroundVideo': 'Hero Background',
+    'about.visualVideo': 'About Section',
+    'product.video': 'Featured Product',
+  };
+  return labels[fieldPath] || fieldPath;
+}
+
+// ─── Video Generation ───
+async function generateVideo() {
+  const prompt = document.getElementById('gen-vid-prompt').value.trim();
+  const provider = document.getElementById('gen-vid-provider').value;
+  const duration = parseInt(document.getElementById('gen-vid-duration').value, 10);
+  const targetField = document.getElementById('gen-vid-target').value;
+  if (!prompt) return;
+
+  const btn = document.getElementById('gen-vid-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Starting...';
+  closeGenPanel();
+
+  aiEmpty.style.display = 'none';
+
+  const genId = 'vidgen-' + Date.now();
+  const progressHtml = `<div class="ai-msg ai-msg-assistant" id="${genId}">
+    <div class="ai-label">Runway ML</div>
+    <div class="ai-bubble">
+      <p>✦ Generating video with Runway ML...</p>
+      <div class="ai-video-progress">
+        <div class="ai-video-progress-bar"><div class="ai-video-progress-fill" id="${genId}-bar" style="width:10%"></div></div>
+        <div class="ai-video-progress-text" id="${genId}-status">Processing... Usually takes 30–90 seconds</div>
+      </div>
+    </div>
+  </div>`;
+  aiMessages.insertAdjacentHTML('beforeend', progressHtml);
+  scrollAIToBottom();
+
+  try {
+    const res = await fetch('/api/ai/generate-video', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, provider, duration, targetField }),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || 'Failed to start video generation');
+    }
+
+    const { jobId } = await res.json();
+
+    // Poll for completion
+    let attempts = 0;
+    const maxAttempts = 120;
+    const pollInterval = setInterval(async () => {
+      attempts++;
+      const progress = Math.min(10 + (attempts * 1.5), 95);
+      const bar = document.getElementById(`${genId}-bar`);
+      if (bar) bar.style.width = progress + '%';
+
+      try {
+        const statusRes = await fetch(`/api/ai/video-status/${jobId}`);
+        const statusData = await statusRes.json();
+
+        if (statusData.status === 'complete') {
+          clearInterval(pollInterval);
+          const result = statusData.result;
+          const targetLabel = getTargetLabel(result.targetField || targetField);
+          const el = document.getElementById(genId);
+          if (el) {
+            el.innerHTML = `
+              <div class="ai-label">Runway ML</div>
+              <div class="ai-bubble">
+                <div class="ai-gen-result" id="${genId}-result">
+                  <div class="ai-gen-result-title">✦ Video ready</div>
+                  <video src="${escapeHtml(result.url)}" controls style="width:100%;max-height:280px"></video>
+                  <div class="prompt-used"><strong>Prompt:</strong> ${escapeHtml(result.prompt || prompt)}</div>
+                  <div class="ai-gen-result-actions">
+                    <button class="ai-gen-apply" onclick="applyGenImage('${genId}-result', '${escapeHtml(result.targetField || targetField)}', '${escapeHtml(result.url)}')">✓ Apply as ${escapeHtml(targetLabel)}</button>
+                    <button class="ai-gen-discard" onclick="document.getElementById('${genId}').remove()">✗ Discard</button>
+                  </div>
+                </div>
+              </div>
+              <div class="ai-time">${formatTime()}</div>`;
+          }
+          btn.disabled = false;
+          btn.innerHTML = '✦ Generate Video';
+          scrollAIToBottom();
+          saveAISession();
+
+        } else if (statusData.status === 'failed') {
+          clearInterval(pollInterval);
+          const el = document.getElementById(genId);
+          if (el) {
+            el.innerHTML = `
+              <div class="ai-label">Runway ML</div>
+              <div class="ai-bubble">
+                <div class="ai-gen-failed">
+                  <div class="ai-gen-failed-title">✗ Video generation failed</div>
+                  <div class="ai-gen-failed-text">${escapeHtml(statusData.error || 'Unknown error')}</div>
+                  <button onclick="document.getElementById('${genId}').remove(); generateVideo()">↺ Try Again</button>
+                </div>
+              </div>`;
+          }
+          btn.disabled = false;
+          btn.innerHTML = '✦ Generate Video';
+        }
+      } catch {}
+
+      if (attempts >= maxAttempts) {
+        clearInterval(pollInterval);
+        const statusEl = document.getElementById(`${genId}-status`);
+        if (statusEl) statusEl.textContent = 'Timed out — please try again';
+        btn.disabled = false;
+        btn.innerHTML = '✦ Generate Video';
+      }
+    }, 5000);
+
+  } catch (err) {
+    const el = document.getElementById(genId);
+    if (el) {
+      el.innerHTML = `
+        <div class="ai-label">Runway ML</div>
+        <div class="ai-bubble">
+          <div class="ai-gen-failed">
+            <div class="ai-gen-failed-title">✗ Failed to start video generation</div>
+            <div class="ai-gen-failed-text">${escapeHtml(err.message)}</div>
+          </div>
+        </div>`;
+    }
+    btn.disabled = false;
+    btn.innerHTML = '✦ Generate Video';
+  }
+}
+
+// ─── Capability Note ───
+function showCapabilityNote(message, provider) {
+  aiEmpty.style.display = 'none';
+  const noteId = 'cap-note-' + Date.now();
+  const html = `<div class="ai-msg ai-msg-assistant" id="${noteId}">
+    <div class="ai-label">System</div>
+    <div class="ai-bubble">
+      <div class="ai-cap-note">
+        <div class="ai-cap-note-text">${escapeHtml(message)}</div>
+        <div class="ai-cap-note-actions">
+          <button style="background:var(--gold);color:#111" onclick="switchToProvider('dalle3'); document.getElementById('${noteId}').remove()">Switch to DALL-E 3</button>
+          <button style="background:transparent;color:var(--text2);border:1px solid var(--border)" onclick="document.getElementById('${noteId}').remove()">Dismiss</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  aiMessages.insertAdjacentHTML('beforeend', html);
+  scrollAIToBottom();
+}
+
+function switchToProvider(provider) {
+  document.getElementById('gen-img-provider').value = provider;
+}
+
+// Send message (multi-LLM version)
+async function sendAIMessage() {
+  const text = aiInput.value.trim();
+  if (!text || aiIsLoading) return;
+
+  aiEmpty.style.display = 'none';
+
   let attachmentHtml = '';
   const currentAttachments = [...aiAttachedFiles];
   for (const att of currentAttachments) {
@@ -761,25 +1297,22 @@ async function sendAIMessage() {
     }
   }
 
-  // Add user message to UI
   const userMsgHtml = `<div class="ai-msg ai-msg-user"><div class="ai-bubble">${attachmentHtml}${escapeHtml(text)}</div><div class="ai-time">${formatTime()}</div></div>`;
   aiMessages.insertAdjacentHTML('beforeend', userMsgHtml);
 
-  // Add to conversation
   aiConversation.push({ role: 'user', content: text });
 
-  // Clear input
   aiInput.value = '';
   aiInput.style.height = 'auto';
   aiAttachedFiles = [];
   renderAttachmentPreviews();
 
-  // Show typing indicator
   setAILoading(true);
   scrollAIToBottom();
 
   try {
     const payload = {
+      model: aiSelectedModel,
       messages: aiConversation,
       attachments: currentAttachments.filter(a => a.type === 'image').map(a => ({
         type: 'image', base64: a.base64, mimeType: a.mimeType,
@@ -800,11 +1333,31 @@ async function sendAIMessage() {
     const data = await res.json();
     setAILoading(false);
 
-    // Add assistant reply to conversation
     aiConversation.push({ role: 'assistant', content: data.reply });
 
+    const modelLabel = MODEL_LABELS[data.model || aiSelectedModel] || 'AI';
+
+    // Handle image generation action from NL
+    if (data.action && data.action.type === 'generate-image') {
+      let assistantHtml = `<div class="ai-msg ai-msg-assistant"><div class="ai-label">${escapeHtml(modelLabel)}</div><div class="ai-bubble">${renderMarkdown(data.reply)}</div>`;
+      const tokenInfo = data.tokens ? `<div class="ai-token-info">~${data.tokens.toLocaleString()} tokens · ${escapeHtml(modelLabel)}</div>` : '';
+      assistantHtml += `${tokenInfo}<div class="ai-time">${formatTime()}</div></div>`;
+      aiMessages.insertAdjacentHTML('beforeend', assistantHtml);
+      scrollAIToBottom();
+      saveAISession();
+
+      // Auto-trigger image generation
+      generateImage(
+        data.action.prompt,
+        data.action.provider || 'dalle3',
+        '1792x1024',
+        data.action.targetField || 'hero.backgroundImage'
+      );
+      return;
+    }
+
     // Build assistant message HTML
-    let assistantHtml = `<div class="ai-msg ai-msg-assistant"><div class="ai-label">Claude</div><div class="ai-bubble">${renderMarkdown(data.reply)}</div>`;
+    let assistantHtml = `<div class="ai-msg ai-msg-assistant"><div class="ai-label">${escapeHtml(modelLabel)}</div><div class="ai-bubble">${renderMarkdown(data.reply)}</div>`;
 
     // Add diff card if changes proposed
     if (data.diff && data.proposedContent) {
@@ -814,23 +1367,23 @@ async function sendAIMessage() {
         diffFieldsHtml += `<div class="ai-diff-field"><div class="ai-diff-field-name">${escapeHtml(fieldPath)}</div><div class="ai-diff-remove">− ${escapeHtml(change.before)}</div><div class="ai-diff-add">+ ${escapeHtml(change.after)}</div></div>`;
       }
       assistantHtml += `<div class="ai-diff-card" id="${diffId}"><div class="ai-diff-header">Proposed Changes</div>${diffFieldsHtml}<div class="ai-diff-actions"><button class="ai-diff-apply" onclick="applyAIChanges('${diffId}', this)">✓ Apply Changes</button><button class="ai-diff-discard" onclick="discardAIChanges('${diffId}')">✗ Discard</button></div></div>`;
-      // Store proposedContent on the card
       setTimeout(() => {
         const card = document.getElementById(diffId);
         if (card) card._proposedContent = data.proposedContent;
       }, 0);
     }
 
-    assistantHtml += `<div class="ai-time">${formatTime()}</div></div>`;
+    const tokenInfo = data.tokens ? `<div class="ai-token-info">~${data.tokens.toLocaleString()} tokens · ${escapeHtml(modelLabel)}</div>` : '';
+    assistantHtml += `${tokenInfo}<div class="ai-time">${formatTime()}</div></div>`;
     aiMessages.insertAdjacentHTML('beforeend', assistantHtml);
     scrollAIToBottom();
     saveAISession();
 
   } catch (err) {
     setAILoading(false);
-    const errorHtml = `<div class="ai-msg ai-msg-assistant"><div class="ai-label">Claude</div><div class="ai-bubble" style="border-left:2px solid var(--red);padding-left:12px"><p style="color:#ff6b6b">Something went wrong — ${escapeHtml(err.message)}. Please try again.</p></div></div>`;
+    const modelLabel = MODEL_LABELS[aiSelectedModel] || 'AI';
+    const errorHtml = `<div class="ai-msg ai-msg-assistant"><div class="ai-label">${escapeHtml(modelLabel)}</div><div class="ai-bubble" style="border-left:2px solid var(--red);padding-left:12px"><p style="color:#ff6b6b">Something went wrong — ${escapeHtml(err.message)}. Please try again.</p></div></div>`;
     aiMessages.insertAdjacentHTML('beforeend', errorHtml);
-    // Remove the failed user message from conversation so they can retry
     aiConversation.pop();
     scrollAIToBottom();
   }
@@ -841,9 +1394,10 @@ function setAILoading(loading) {
   aiInput.disabled = loading;
   aiSend.disabled = loading;
   const typingId = 'ai-typing-indicator';
+  const modelLabel = MODEL_LABELS[aiSelectedModel] || 'AI';
   if (loading) {
     aiSend.innerHTML = '<div class="spinner"></div>';
-    const typingHtml = `<div class="ai-typing" id="${typingId}"><div class="ai-label">Claude</div><div class="ai-typing-dots"><span></span><span></span><span></span></div></div>`;
+    const typingHtml = `<div class="ai-typing" id="${typingId}"><div class="ai-label">${escapeHtml(modelLabel)}</div><div class="ai-typing-dots"><span></span><span></span><span></span></div></div>`;
     aiMessages.insertAdjacentHTML('beforeend', typingHtml);
     scrollAIToBottom();
   } else {
@@ -868,15 +1422,12 @@ async function applyAIChanges(diffId, btn) {
     });
     if (!res.ok) throw new Error('Apply failed');
 
-    // Update local DATA so admin panel reflects changes
     DATA = card._proposedContent;
     renderAll();
 
-    // Collapse card to applied state
     card.classList.add('collapsed');
     card.innerHTML = `<div class="ai-diff-applied">✓ Applied</div><span class="ai-diff-undo-link" onclick="undoAIChanges('${diffId}')">Undo</span>`;
 
-    // Add system message
     addAISystemMessage('Changes applied ✓');
     saveAISession();
 
@@ -902,14 +1453,11 @@ async function undoAIChanges(diffId) {
       headers: { 'Content-Type': 'application/json' },
     });
     if (!res.ok) throw new Error('Undo failed');
-    const data = await res.json();
 
-    // Reload content into admin
     const contentRes = await fetch('/api/content');
     DATA = await contentRes.json();
     renderAll();
 
-    // Update the card
     const card = document.getElementById(diffId);
     if (card) {
       card.innerHTML = '<div style="font-size:.78rem;color:var(--text2)">Reverted</div>';
