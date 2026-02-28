@@ -187,6 +187,11 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+// ─── Kitchen Connection landing page ───
+app.get('/kc', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'kc.html'));
+});
+
 // ─── Catch-all for SPA ───
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

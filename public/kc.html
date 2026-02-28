@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpha Surfaces × Kitchen Connection — Partnership Proposal</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #0E0E10;
+    --dark: #1A1A1E;
+    --dark2: #222228;
+    --dark3: #2A2A32;
+    --gold: #B8A472;
+    --gold-light: #D4C08A;
+    --gold-dim: rgba(184,164,114,0.15);
+    --cream: #F2EDE4;
+    --white: #FFFFFF;
+    --gray: #8A8A96;
+    --gray-light: #C4C4CC;
+    --olive: #5C5A1E;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--dark);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  /* CROSSHATCH TEXTURE */
+  .texture {
+    position: relative;
+  }
+  .texture::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='0.3' opacity='0.04'%3E%3Cpath d='M0 0 L40 40'/%3E%3Cpath d='M40 0 L0 40'/%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+  .texture > * { position: relative; z-index: 1; }
+  /* TOPBAR */
+  .topbar {
+    background: var(--black);
+    border-bottom: 1px solid rgba(184,164,114,0.3);
+    padding: 10px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-brand {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .topbar-brand span {
+    color: var(--gray);
+    font-weight: 400;
+    margin: 0 10px;
+  }
+  .topbar-right {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray);
+    background: rgba(184,164,114,0.1);
+    border: 1px solid rgba(184,164,114,0.2);
+    padding: 4px 12px;
+    border-radius: 2px;
+  }
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 80px 80px 80px 80px;
+    gap: 60px;
+    position: relative;
+    overflow: hidden;
+    background: var(--black);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(100px, 18vw, 280px);
+    color: rgba(255,255,255,0.015);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: -0.05em;
+  }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 28px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 4.5vw, 58px);
+    line-height: 1.1;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .hero-sub {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--gray-light);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 480px;
+  }
+  .hero-stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 44px;
+  }
+  .stat-pill {
+    background: rgba(184,164,114,0.1);
+    border: 1px solid rgba(184,164,114,0.25);
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gold-light);
+    white-space: nowrap;
+  }
+  .btn-primary {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--black);
+    padding: 16px 36px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.25s ease;
+    border: 2px solid var(--gold);
+  }
+  .btn-primary:hover {
+    background: transparent;
+    color: var(--gold);
+  }
+  .btn-secondary {
+    display: inline-block;
+    background: transparent;
+    color: var(--cream);
+    padding: 16px 36px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.25s ease;
+    border: 1px solid rgba(255,255,255,0.2);
+    margin-left: 12px;
+  }
+  .btn-secondary:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  /* HERO VISUAL */
+  .hero-visual {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 500px;
+  }
+  .slab-shape {
+    width: 340px;
+    height: 420px;
+    background: linear-gradient(135deg, #e8e0d0 0%, #d4c8b0 20%, #c9bfa8 40%, #e2d8c8 60%, #f0ebe0 80%, #d8cdb8 100%);
+    border-radius: 4px;
+    position: relative;
+    animation: slabFloat 6s ease-in-out infinite;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(184,164,114,0.3);
+  }
+  .slab-shape::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(45deg, transparent 30%, rgba(184,164,114,0.3) 45%, transparent 60%),
+      linear-gradient(135deg, transparent 40%, rgba(150,130,90,0.2) 55%, transparent 70%);
+    border-radius: 4px;
+  }
+  .slab-shape::after {
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: 10%;
+    right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(100,80,40,0.4), rgba(120,100,60,0.6), rgba(100,80,40,0.3), transparent);
+    transform: rotate(-8deg);
+    box-shadow: 0 30px 0 rgba(100,80,40,0.15), 0 80px 0 rgba(120,100,60,0.1), 0 140px 0 rgba(100,80,40,0.2);
+  }
+  .slab-label {
+    position: absolute;
+    bottom: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  .slab-glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(184,164,114,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: glowPulse 6s ease-in-out infinite;
+  }
+  @keyframes slabFloat {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-20px) rotate(-1deg); }
+  }
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+  /* SECTION STYLES */
+  section { padding: 100px 80px; }
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-eyebrow::after {
+    content: '';
+    flex: 1;
+    max-width: 40px;
+    height: 1px;
+    background: var(--gold);
+  }
+  .section-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--white);
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .section-heading em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .section-sub {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--gray-light);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 60px;
+  }
+  /* VALUE CARDS */
+  .value-section {
+    background: var(--dark2);
+  }
+  .value-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .value-card {
+    background: var(--dark3);
+    padding: 44px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+  .value-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .value-card:hover {
+    background: #2E2E38;
+    transform: translateY(-4px);
+  }
+  .value-card:hover::before { opacity: 1; }
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--gold-dim);
+    border: 1px solid rgba(184,164,114,0.25);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    font-size: 20px;
+  }
+  .card-number {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 64px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.03);
+    line-height: 1;
+  }
+  .value-card h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+  .value-card p {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--gray-light);
+    line-height: 1.7;
+  }
+  .value-card .card-tag {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border-bottom: 1px solid rgba(184,164,114,0.3);
+    padding-bottom: 2px;
+  }
+  /* SURFACE SHOWCASE */
+  .showcase-section {
+    background: var(--black);
+  }
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+  .swatch {
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 3/4;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: default;
+  }
+  .swatch:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  }
+  .swatch-body {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  .swatch-body::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    opacity: 0;
+  }
+  .s1 { background: linear-gradient(160deg, #f5f0e8 0%, #ede6d8 30%, #e8dfc8 60%, #f0ead8 100%); }
+  .s1::before { content: ''; position: absolute; top: 20%; left: 15%; width: 70%; height: 1px; background: rgba(180,150,100,0.4); transform: rotate(-5deg); box-shadow: 0 25px 0 rgba(160,130,80,0.25), 0 60px 0 rgba(180,150,100,0.15), 0 95px 0 rgba(160,130,80,0.1); }
+  .s2 { background: linear-gradient(140deg, #f8f5f0 0%, #ede8e0 40%, #e5ddd0 70%, #f0ece4 100%); }
+  .s2::before { content: ''; position: absolute; top: 30%; left: 5%; width: 90%; height: 1px; background: rgba(160,140,110,0.35); transform: rotate(3deg); box-shadow: 0 40px 0 rgba(140,120,90,0.2), 0 85px 0 rgba(160,140,110,0.15); }
+  .s3 { background: linear-gradient(155deg, #1a1a1a 0%, #252525 30%, #1e1e1e 60%, #2a2a2a 100%); }
+  .s3::before { content: ''; position: absolute; top: 25%; left: 10%; width: 80%; height: 1px; background: rgba(255,255,255,0.15); transform: rotate(-8deg); box-shadow: 0 30px 0 rgba(255,255,255,0.08), 0 70px 0 rgba(255,255,255,0.05); }
+  .s4 { background: linear-gradient(165deg, #f0ede8 0%, #e4ddd4 35%, #ddd4c8 65%, #ece6dc 100%); }
+  .s4::before { content: ''; position: absolute; top: 15%; left: 20%; width: 60%; height: 1px; background: rgba(150,120,80,0.4); transform: rotate(6deg); box-shadow: 0 20px 0 rgba(130,100,60,0.3), 0 50px 0 rgba(150,120,80,0.2), 0 85px 0 rgba(130,100,60,0.15); }
+  .s5 { background: linear-gradient(150deg, #e8e0d5 0%, #d8ccbc 35%, #cfc0ac 65%, #e0d6c8 100%); }
+  .s5::before { content: ''; position: absolute; top: 35%; left: 0; width: 100%; height: 1px; background: rgba(120,90,50,0.45); transform: rotate(-3deg); box-shadow: 0 35px 0 rgba(100,70,30,0.25), 0 75px 0 rgba(120,90,50,0.15); }
+  .s6 { background: linear-gradient(145deg, #fafaf8 0%, #f2f2ee 40%, #ebebE6 70%, #f5f5f2 100%); }
+  .s7 { background: linear-gradient(160deg, #c8c0b4 0%, #b8b0a4 35%, #aca49a 65%, #c0b8ac 100%); }
+  .s7::before { content: ''; position: absolute; top: 20%; left: 8%; width: 85%; height: 1px; background: rgba(80,70,55,0.35); transform: rotate(-6deg); box-shadow: 0 45px 0 rgba(80,70,55,0.2), 0 90px 0 rgba(80,70,55,0.12); }
+  .s8 { background: linear-gradient(155deg, #3d2b1e 0%, #4a3525 35%, #3a2818 65%, #4d3828 100%); }
+  .s8::before { content: ''; position: absolute; top: 30%; left: 12%; width: 76%; height: 1px; background: rgba(200,150,80,0.3); transform: rotate(4deg); box-shadow: 0 28px 0 rgba(180,130,60,0.2), 0 65px 0 rgba(200,150,80,0.12); }
+  .s9 { background: linear-gradient(165deg, #f5f2ec 0%, #eeeAe0 40%, #e8e2d6 70%, #f2ede4 100%); }
+  .s10 { background: linear-gradient(150deg, #6a6870 0%, #787680 35%, #6e6c76 65%, #7c7a84 100%); }
+  .s10::before { content: ''; position: absolute; top: 25%; left: 5%; width: 90%; height: 1px; background: rgba(255,255,255,0.1); transform: rotate(-4deg); box-shadow: 0 38px 0 rgba(255,255,255,0.06), 0 78px 0 rgba(255,255,255,0.04); }
+  .s11 { background: linear-gradient(155deg, #ddd5c4 0%, #cec4b0 35%, #c4b8a0 65%, #d4caB8 100%); }
+  .s11::before { content: ''; position: absolute; top: 18%; left: 15%; width: 70%; height: 3px; background: rgba(150,120,70,0.15); transform: rotate(5deg) skewX(20deg); box-shadow: 0 22px 0 rgba(150,120,70,0.1), 0 50px 0 rgba(150,120,70,0.07); }
+  .s12 { background: linear-gradient(160deg, #e8ddd0 0%, #ddd0c0 40%, #d5c8b5 70%, #e2d6c8 100%); }
+  .s13 { background: linear-gradient(145deg, #0a0a0a 0%, #121212 35%, #0e0e0e 65%, #161616 100%); }
+  .s14 { background: linear-gradient(165deg, #fdfcfa 0%, #f8f6f2 40%, #f2efe8 70%, #faf8f4 100%); }
+  .s15 { background: linear-gradient(150deg, #f0e8d8 0%, #e8dcc8 35%, #ddd0b8 65%, #ece0cc 100%); }
+  .s15::before { content: ''; position: absolute; top: 22%; left: 8%; width: 84%; height: 1px; background: rgba(184,164,114,0.5); transform: rotate(-7deg); box-shadow: 0 32px 0 rgba(184,164,114,0.3), 0 68px 0 rgba(184,164,114,0.2), 0 105px 0 rgba(184,164,114,0.12); }
+  .swatch-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 40px 14px 14px;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+  }
+  .swatch-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .swatch-tier {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  /* PERFECT FIT */
+  .fit-section {
+    background: var(--dark2);
+  }
+  .fit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  .fit-item {
+    background: var(--dark3);
+    padding: 50px 48px;
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 28px;
+    align-items: start;
+    transition: background 0.3s ease;
+  }
+  .fit-item:hover { background: #2E2E38; }
+  .fit-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 48px;
+    font-weight: 400;
+    color: var(--gold);
+    line-height: 1;
+    opacity: 0.6;
+  }
+  .fit-item h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+  .fit-item p {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--gray-light);
+    line-height: 1.75;
+  }
+  /* PROOF BAR */
+  .proof-bar {
+    background: var(--black);
+    border-top: 1px solid rgba(184,164,114,0.15);
+    border-bottom: 1px solid rgba(184,164,114,0.15);
+    padding: 48px 80px;
+  }
+  .proof-inner {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+  .proof-item {
+    text-align: center;
+  }
+  .proof-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    font-weight: 400;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .proof-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+  .proof-divider {
+    width: 1px;
+    height: 48px;
+    background: rgba(255,255,255,0.08);
+  }
+  /* CTA SECTION */
+  .cta-section {
+    background: var(--black);
+    text-align: center;
+    padding: 120px 80px;
+  }
+  .cta-section .section-heading {
+    max-width: 700px;
+    margin: 0 auto 20px;
+  }
+  .cta-section .section-sub {
+    max-width: 520px;
+    margin: 0 auto 48px;
+    text-align: center;
+  }
+  .cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  /* FOOTER */
+  footer {
+    background: #080808;
+    padding: 40px 80px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-left {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+  .footer-left strong {
+    display: block;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .footer-right {
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+    text-align: right;
+    line-height: 1.7;
+  }
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .hero { grid-template-columns: 1fr; padding: 60px 40px; min-height: auto; gap: 40px; }
+    .hero-visual { height: 300px; }
+    .slab-shape { width: 220px; height: 280px; }
+    section { padding: 70px 40px; }
+    .value-grid { grid-template-columns: 1fr 1fr; }
+    .swatch-grid { grid-template-columns: repeat(3, 1fr); }
+    .fit-grid { grid-template-columns: 1fr; }
+    footer { padding: 32px 40px; }
+    .proof-bar { padding: 40px; }
+    .cta-section { padding: 80px 40px; }
+  }
+  @media (max-width: 640px) {
+    .topbar { padding: 10px 20px; }
+    .topbar-right { display: none; }
+    .hero { padding: 40px 24px; }
+    section { padding: 60px 24px; }
+    .value-grid { grid-template-columns: 1fr; }
+    .swatch-grid { grid-template-columns: repeat(2, 1fr); }
+    .proof-divider { display: none; }
+    .proof-inner { gap: 24px; }
+    footer { padding: 28px 24px; flex-direction: column; text-align: center; }
+    .footer-right { text-align: center; }
+    .cta-section { padding: 60px 24px; }
+    .cta-buttons { flex-direction: column; align-items: center; }
+    .btn-secondary { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    Alpha Surfaces <span>&times;</span> Kitchen Connection
+  </div>
+  <div class="topbar-right">Confidential Partnership Proposal</div>
+</div>
+<!-- HERO -->
+<section class="hero texture">
+  <div class="hero-bg-text">ALPHA</div>
+  <div class="hero-content reveal">
+    <div class="hero-eyebrow">Prepared exclusively for Kitchen Connection</div>
+    <h1>Australia's #1 Kitchen Renovator Deserves Australia's <em>Best</em> Benchtop</h1>
+    <p class="hero-sub">Let's get Alpha Surfaces onto 26 showroom floors and create a winning partnership. Alpha delivers premium mineral stone benchtops with zero crystalline silica — the safer, more beautiful choice for your renovation customers across QLD and NSW.</p>
+    <div class="hero-stats">
+      <div class="stat-pill">30+ Surfaces</div>
+      <div class="stat-pill">0% Crystalline Silica</div>
+      <div class="stat-pill">Lifetime Guarantee</div>
+      <div class="stat-pill">5 Price Tiers</div>
+      <div class="stat-pill">QLD &amp; NSW Ready</div>
+    </div>
+    <div>
+      <a href="mailto:belinda@alphasurfaces.com.au?subject=Kitchen%20Connection%20%C3%97%20Alpha%20Surfaces%20%E2%80%94%20Partnership%20Meeting&body=Hi%20Belinda%2C%0A%0AI%E2%80%99d%20like%20to%20arrange%20a%20partnership%20meeting%20to%20discuss%20Alpha%20Surfaces%20for%20Kitchen%20Connection." class="btn-primary">Request a Partnership Meeting</a>
+      <a href="#partnership" class="btn-secondary">See the Proposal</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="slab-glow"></div>
+    <div class="slab-shape">
+      <div class="slab-label">Alpha Zero — Arabescato</div>
+    </div>
+  </div>
+</section>
+<!-- VALUE SECTION -->
+<section class="value-section texture" id="partnership">
+  <div class="section-eyebrow">Why This Works</div>
+  <h2 class="section-heading reveal">Six Reasons This Partnership <em>Makes Sense</em></h2>
+  <p class="section-sub reveal">Alpha Surfaces was designed for exactly this kind of business — high-volume, design-led renovation at scale across multiple locations.</p>
+  <div class="value-grid">
+    <div class="value-card reveal">
+      <div class="card-number">01</div>
+      <div class="card-icon">&#x1F6E1;&#xFE0F;</div>
+      <h3>Fabricator &amp; Installer Safety</h3>
+      <p>Zero crystalline silica eliminates the silicosis risk entirely. Protects your licensed installation teams and subcontractors. Your duty of care is fulfilled from the moment the slab arrives.</p>
+      <span class="card-tag">Health &amp; Safety</span>
+    </div>
+    <div class="value-card reveal">
+      <div class="card-number">02</div>
+      <div class="card-icon">&#x26A1;</div>
+      <h3>Jumbo Slabs = Faster Installs</h3>
+      <p>3200 &times; 1600mm slabs at 20mm thickness mean fewer joins, faster templating, and quicker kitchen completions. More renovation throughput per week across all 26 showrooms.</p>
+      <span class="card-tag">Operational Efficiency</span>
+    </div>
+    <div class="value-card reveal">
+      <div class="card-number">03</div>
+      <div class="card-icon">&#x2728;</div>
+      <h3>Lifetime Guarantee Closes Sales</h3>
+      <p>AlphaShield&#x2122; Lifetime Stain Resistance gives your sales team a powerful, credible close. Homeowners selecting a lifetime-guaranteed surface are easier to convert and less likely to switch suppliers.</p>
+      <span class="card-tag">Sales Advantage</span>
+    </div>
+    <div class="value-card reveal">
+      <div class="card-number">04</div>
+      <div class="card-icon">&#x1F4B0;</div>
+      <h3>Every Budget Tier Covered</h3>
+      <p>Five collections from entry-level through ultra-premium. Maps directly to Kitchen Connection's renovation package tiers — one supplier relationship to cover your entire customer range.</p>
+      <span class="card-tag">Range Coverage</span>
+    </div>
+    <div class="value-card reveal">
+      <div class="card-number">05</div>
+      <div class="card-icon">&#x1FAA8;</div>
+      <h3>Natural Stone Realism</h3>
+      <p>Cutting-edge manufacturing delivers authentic marble and stone aesthetics without the maintenance. Your design-conscious customers get the look they want with none of the upkeep worry.</p>
+      <span class="card-tag">Design Appeal</span>
+    </div>
+    <div class="value-card reveal">
+      <div class="card-number">06</div>
+      <div class="card-icon">&#x1F33F;</div>
+      <h3>Indoor-Outdoor Upsell</h3>
+      <p>UV-stable and suitable for outdoor kitchen applications. Expands your sales team's upsell opportunity into alfresco renovations — a growing segment for your QLD and NSW customer base.</p>
+      <span class="card-tag">Revenue Expansion</span>
+    </div>
+  </div>
+</section>
+<!-- SURFACE SHOWCASE -->
+<section class="showcase-section">
+  <div class="section-eyebrow">The Range</div>
+  <h2 class="section-heading reveal">30+ Surfaces. <em>Every Style.</em> Every Budget.</h2>
+  <p class="section-sub reveal">From entry-level to ultra-premium — Alpha's five collections give your showroom consultants a surface for every customer conversation.</p>
+  <div class="swatch-grid">
+    <div class="swatch reveal">
+      <div class="swatch-body s1"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Calacatta Oro</div>
+        <div class="swatch-tier">Premium</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s2"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Statuario</div>
+        <div class="swatch-tier">Upper</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s3"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Nero Marquina</div>
+        <div class="swatch-tier">Upper</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s4"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Carrara Venato</div>
+        <div class="swatch-tier">Mid-Tier</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s5"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Arabescato</div>
+        <div class="swatch-tier">Premium</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s6"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Arctic White</div>
+        <div class="swatch-tier">Entry</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s7"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Grigio Savoia</div>
+        <div class="swatch-tier">Mid-Tier</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s8"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Emperador</div>
+        <div class="swatch-tier">Premium</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s9"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Mont Blanc</div>
+        <div class="swatch-tier">Popular</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s10"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Pietra Grey</div>
+        <div class="swatch-tier">Mid-Tier</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s11"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Travertino</div>
+        <div class="swatch-tier">Popular</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s12"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Crema Marfil</div>
+        <div class="swatch-tier">Entry</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s13"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Absolute Black</div>
+        <div class="swatch-tier">Popular</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s14"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Bianco Puro</div>
+        <div class="swatch-tier">Entry</div>
+      </div>
+    </div>
+    <div class="swatch reveal">
+      <div class="swatch-body s15"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Calacatta Gold</div>
+        <div class="swatch-tier">Premium</div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- PERFECT FIT -->
+<section class="fit-section texture">
+  <div class="section-eyebrow">The Alignment</div>
+  <h2 class="section-heading reveal">Built for How Kitchen Connection <em>Actually Works</em></h2>
+  <p class="section-sub reveal">This isn't a generic supplier pitch. Every element of Alpha's offer has been mapped to Kitchen Connection's specific operations, geography, and customer base.</p>
+  <div class="fit-grid">
+    <div class="fit-item reveal">
+      <div class="fit-number">01</div>
+      <div>
+        <h3>26 Showrooms, 26 Sample Kits</h3>
+        <p>Alpha Surfaces will supply complete display kits to every Kitchen Connection location. Your consultants in Brisbane, Gold Coast, Sunshine Coast, Sydney, Newcastle, and the Central Coast all get the full range — ready to sell from day one.</p>
+      </div>
+    </div>
+    <div class="fit-item reveal">
+      <div class="fit-number">02</div>
+      <div>
+        <h3>Your Price Tiers, Our Collections</h3>
+        <p>Collection 01 (Entry) through Collection 05 (Premium) maps directly to Kitchen Connection's renovation package tiers. Your sales team can match a surface to any customer budget without switching suppliers or compromising on brand consistency.</p>
+      </div>
+    </div>
+    <div class="fit-item reveal">
+      <div class="fit-number">03</div>
+      <div>
+        <h3>QLD &amp; NSW Distribution</h3>
+        <p>Alpha's Australian distribution footprint covers Queensland and New South Wales — an exact match for Kitchen Connection's 26-showroom geographic footprint. No distribution gaps, no lead time surprises.</p>
+      </div>
+    </div>
+    <div class="fit-item reveal">
+      <div class="fit-number">04</div>
+      <div>
+        <h3>Installer Safety, Guaranteed</h3>
+        <p>Zero crystalline silica means your licensed installation teams and subcontractors face zero silicosis risk from Alpha surfaces. This directly supports Kitchen Connection's 10-year workmanship warranty and duty of care obligations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- PROOF BAR -->
+<div class="proof-bar">
+  <div class="proof-inner">
+    <div class="proof-item">
+      <div class="proof-value">15yr</div>
+      <div class="proof-label">Manufacturing Warranty</div>
+    </div>
+    <div class="proof-divider"></div>
+    <div class="proof-item">
+      <div class="proof-value">0%</div>
+      <div class="proof-label">Crystalline Silica</div>
+    </div>
+    <div class="proof-divider"></div>
+    <div class="proof-item">
+      <div class="proof-value">NSF</div>
+      <div class="proof-label">&amp; GreenGuard Gold Certified</div>
+    </div>
+    <div class="proof-divider"></div>
+    <div class="proof-item">
+      <div class="proof-value">&infin;</div>
+      <div class="proof-label">AlphaShield&#x2122; Stain Protection</div>
+    </div>
+    <div class="proof-divider"></div>
+    <div class="proof-item">
+      <div class="proof-value">30+</div>
+      <div class="proof-label">Surface Designs</div>
+    </div>
+  </div>
+</div>
+<!-- CTA -->
+<section class="cta-section texture">
+  <div class="section-eyebrow" style="justify-content:center;">Next Step</div>
+  <h2 class="section-heading reveal">Let's Talk Partnership</h2>
+  <p class="section-sub reveal">Belinda Kelaher, Managing Director of Alpha Surfaces, would love to present the full collection to your team, discuss distribution terms, and get sample kits into your showrooms.</p>
+  <div class="cta-buttons reveal">
+    <a href="mailto:belinda@alphasurfaces.com.au?subject=Kitchen%20Connection%20%C3%97%20Alpha%20Surfaces%20%E2%80%94%20Partnership%20Meeting&body=Hi%20Belinda%2C%0A%0AI%E2%80%99d%20like%20to%20arrange%20a%20partnership%20meeting%20to%20discuss%20Alpha%20Surfaces%20for%20Kitchen%20Connection." class="btn-primary">Email Belinda Directly</a>
+    <a href="#" class="btn-secondary">Download Range Overview</a>
+  </div>
+</section>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">
+    <strong>Alpha Surfaces &times; Kitchen Connection</strong>
+    Prepared exclusively for Kitchen Connection leadership by Alpha Surfaces.<br>
+    alphasurfaces.com.au &nbsp;&middot;&nbsp; belinda@alphasurfaces.com.au
+  </div>
+  <div class="footer-right">
+    This proposal is confidential and intended<br>
+    solely for Kitchen Connection leadership.
+  </div>
+</footer>
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
