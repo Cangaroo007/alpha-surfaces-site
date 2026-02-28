@@ -9,6 +9,8 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const Anthropic = require('@anthropic-ai/sdk');
+const OpenAI = require('openai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -192,20 +194,12 @@ const aiLimiter = rateLimit({
   message: { error: 'Too many AI requests. Please slow down.' },
 });
 
-// POST /api/ai/chat — Core NL CMS endpoint
-app.post('/api/ai/chat', authMiddleware, aiLimiter, async (req, res) => {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return res.status(503).json({ error: 'Anthropic API key not configured.' });
-  }
+// Video generation jobs (in-memory)
+const videoJobs = new Map();
 
-  try {
-    const { messages, attachments } = req.body;
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return res.status(400).json({ error: 'Messages array is required.' });
-    }
-
-    const currentContent = loadContent();
-    const systemPrompt = `You are the AI content manager for Alpha Surfaces, a premium Australian benchtop brand. You have full knowledge of and control over the website content.
+// Build the system prompt used by all LLM providers
+function buildSystemPrompt(currentContent) {
+  return `You are the AI content manager for Alpha Surfaces, a premium Australian benchtop brand. You have full knowledge of and control over the website content.
 
 CURRENT WEBSITE CONTENT:
 ${JSON.stringify(currentContent, null, 2)}
@@ -222,7 +216,8 @@ Always respond in this exact JSON structure:
   "reply": "Your conversational response explaining what you did or answering their question",
   "changes": {
     "fieldPath": "newValue"
-  }
+  },
+  "action": null
 }
 
 Field paths use dot notation matching the content schema. Examples:
@@ -235,62 +230,202 @@ Field paths use dot notation matching the content schema. Examples:
 
 If no content changes are needed, set "changes" to null.
 
+IMAGE GENERATION:
+If the user asks you to generate, create, or make an image (e.g. "generate a hero background image of ..."), respond with an action instead of changes:
+{
+  "reply": "I'll generate that image for you...",
+  "changes": null,
+  "action": {
+    "type": "generate-image",
+    "prompt": "Detailed image generation prompt based on their request...",
+    "targetField": "hero.backgroundImage",
+    "provider": "dalle3"
+  }
+}
+Choose the targetField based on context (hero.backgroundImage, about.visualImage, collections.items[N].slabImage, etc.).
+
 IMPORTANT:
 - Never invent product specifications — only use what is in the current content
 - Preserve all HTML tags (e.g. <em>) in heading fields
 - When rewriting copy, match the existing tone and style unless asked to change it
 - Always confirm what you changed in your reply so the user can decide whether to apply it`;
+}
 
-    // Build the Anthropic messages array
-    const anthropicMessages = messages.map((msg, idx) => {
-      const content = [];
+// ─── LLM Provider Functions ───
 
-      // Attach images to the last user message
-      if (msg.role === 'user' && idx === messages.length - 1 && attachments && attachments.length > 0) {
-        for (const att of attachments) {
-          if (att.type === 'image' && att.base64 && att.mimeType) {
-            content.push({
-              type: 'image',
-              source: { type: 'base64', media_type: att.mimeType, data: att.base64 },
-            });
-          }
+async function callAnthropic(model, messages, attachments, systemPrompt) {
+  const client = new Anthropic();
+  const anthropicMessages = messages.map((msg, idx) => {
+    const content = [];
+    if (msg.role === 'user' && idx === messages.length - 1 && attachments && attachments.length > 0) {
+      for (const att of attachments) {
+        if (att.type === 'image' && att.base64 && att.mimeType) {
+          content.push({
+            type: 'image',
+            source: { type: 'base64', media_type: att.mimeType, data: att.base64 },
+          });
         }
       }
+    }
+    content.push({ type: 'text', text: msg.content });
+    return { role: msg.role, content };
+  });
 
-      content.push({ type: 'text', text: msg.content });
-      return { role: msg.role, content };
+  const response = await client.messages.create({
+    model: model || 'claude-sonnet-4-20250514',
+    max_tokens: 4096,
+    system: systemPrompt,
+    messages: anthropicMessages,
+  });
+
+  const rawText = response.content.filter(b => b.type === 'text').map(b => b.text).join('');
+  const usage = response.usage;
+  const tokens = (usage?.input_tokens || 0) + (usage?.output_tokens || 0);
+  return { rawText, tokens };
+}
+
+async function callOpenAI(model, messages, attachments, systemPrompt, baseURL, apiKey) {
+  const client = new OpenAI({
+    apiKey: apiKey || process.env.OPENAI_API_KEY,
+    ...(baseURL ? { baseURL } : {}),
+  });
+
+  const openaiMessages = [{ role: 'system', content: systemPrompt }];
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i];
+    if (msg.role === 'user' && i === messages.length - 1 && attachments && attachments.length > 0) {
+      const contentParts = [];
+      for (const att of attachments) {
+        if (att.type === 'image' && att.base64 && att.mimeType) {
+          contentParts.push({
+            type: 'image_url',
+            image_url: { url: `data:${att.mimeType};base64,${att.base64}` },
+          });
+        }
+      }
+      contentParts.push({ type: 'text', text: msg.content });
+      openaiMessages.push({ role: 'user', content: contentParts });
+    } else {
+      openaiMessages.push({ role: msg.role, content: msg.content });
+    }
+  }
+
+  const response = await client.chat.completions.create({
+    model: model,
+    max_tokens: 4096,
+    messages: openaiMessages,
+  });
+
+  const rawText = response.choices[0]?.message?.content || '';
+  const usage = response.usage;
+  const tokens = (usage?.prompt_tokens || 0) + (usage?.completion_tokens || 0);
+  return { rawText, tokens };
+}
+
+async function callGemini(model, messages, attachments, systemPrompt) {
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+  const geminiModel = genAI.getGenerativeModel({ model: model || 'gemini-1.5-pro' });
+
+  const history = [];
+  for (let i = 0; i < messages.length - 1; i++) {
+    const msg = messages[i];
+    history.push({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }],
     });
+  }
 
-    const client = new Anthropic();
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
-      system: systemPrompt,
-      messages: anthropicMessages,
-    });
+  const chat = geminiModel.startChat({
+    history,
+    systemInstruction: { parts: [{ text: systemPrompt }] },
+  });
 
-    // Extract text from the response
-    const rawText = response.content
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
-      .join('');
+  const lastMsg = messages[messages.length - 1];
+  const parts = [];
 
-    // Parse the JSON response from Claude
+  if (lastMsg.role === 'user' && attachments && attachments.length > 0) {
+    for (const att of attachments) {
+      if (att.type === 'image' && att.base64 && att.mimeType) {
+        parts.push({ inlineData: { mimeType: att.mimeType, data: att.base64 } });
+      }
+    }
+  }
+  parts.push({ text: lastMsg.content });
+
+  const result = await chat.sendMessage(parts);
+  const response = result.response;
+  const rawText = response.text();
+  const usage = response.usageMetadata;
+  const tokens = (usage?.promptTokenCount || 0) + (usage?.candidatesTokenCount || 0);
+  return { rawText, tokens };
+}
+
+async function callGrok(model, messages, attachments, systemPrompt) {
+  return callOpenAI(
+    model || 'grok-2',
+    messages,
+    attachments,
+    systemPrompt,
+    'https://api.x.ai/v1',
+    process.env.XAI_API_KEY
+  );
+}
+
+async function routeToLLM(model, messages, attachments, currentContent) {
+  const systemPrompt = buildSystemPrompt(currentContent);
+  if (model.startsWith('claude')) return callAnthropic(model, messages, attachments, systemPrompt);
+  if (model.startsWith('gpt'))    return callOpenAI(model, messages, attachments, systemPrompt);
+  if (model.startsWith('gemini')) return callGemini(model, messages, attachments, systemPrompt);
+  if (model.startsWith('grok'))   return callGrok(model, messages, attachments, systemPrompt);
+  throw new Error(`Unknown model: ${model}`);
+}
+
+// POST /api/ai/chat — Core NL CMS endpoint (multi-LLM)
+app.post('/api/ai/chat', authMiddleware, aiLimiter, async (req, res) => {
+  try {
+    const { messages, attachments, model: requestedModel } = req.body;
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: 'Messages array is required.' });
+    }
+
+    const model = requestedModel || 'claude-sonnet-4-20250514';
+
+    // Validate the provider has an API key
+    if (model.startsWith('claude') && !process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({ error: 'Anthropic API key not configured.' });
+    }
+    if (model.startsWith('gpt') && !process.env.OPENAI_API_KEY) {
+      return res.status(503).json({ error: 'OpenAI API key not configured.' });
+    }
+    if (model.startsWith('gemini') && !process.env.GOOGLE_AI_API_KEY) {
+      return res.status(503).json({ error: 'Google AI API key not configured.' });
+    }
+    if (model.startsWith('grok') && !process.env.XAI_API_KEY) {
+      return res.status(503).json({ error: 'xAI API key not configured.' });
+    }
+
+    const currentContent = loadContent();
+    const { rawText, tokens } = await routeToLLM(model, messages, attachments, currentContent);
+
+    // Parse the JSON response
     let parsed;
     try {
-      // Try to extract JSON from the response (handles markdown code fences)
       const jsonMatch = rawText.match(/\{[\s\S]*\}/);
       parsed = JSON.parse(jsonMatch ? jsonMatch[0] : rawText);
     } catch {
-      // If parsing fails, treat the whole response as a plain reply
-      return res.json({ reply: rawText, diff: null, proposedContent: null });
+      return res.json({ reply: rawText, diff: null, proposedContent: null, action: null, model, tokens });
     }
 
     const reply = parsed.reply || rawText;
     const changes = parsed.changes;
+    const action = parsed.action || null;
+
+    if (action) {
+      return res.json({ reply, diff: null, proposedContent: null, action, model, tokens });
+    }
 
     if (!changes || Object.keys(changes).length === 0) {
-      return res.json({ reply, diff: null, proposedContent: null });
+      return res.json({ reply, diff: null, proposedContent: null, action: null, model, tokens });
     }
 
     // Build diff and proposedContent
@@ -298,7 +433,6 @@ IMPORTANT:
     const diff = {};
 
     for (const [fieldPath, newValue] of Object.entries(changes)) {
-      // Get current value using bracket and dot notation
       const before = getNestedValue(currentContent, fieldPath);
       setNestedValue(proposedContent, fieldPath, newValue);
       diff[fieldPath] = {
@@ -307,7 +441,7 @@ IMPORTANT:
       };
     }
 
-    res.json({ reply, diff, proposedContent });
+    res.json({ reply, diff, proposedContent, action: null, model, tokens });
   } catch (err) {
     console.error('AI chat error:', err);
     res.status(500).json({ error: 'AI request failed. Please try again.' });
@@ -349,14 +483,243 @@ app.post('/api/ai/undo', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/ai/status — Check configured AI providers
+// GET /api/ai/status — Full model capability data
 app.get('/api/ai/status', (req, res) => {
   res.json({
-    anthropic: !!process.env.ANTHROPIC_API_KEY,
-    openai: !!process.env.OPENAI_API_KEY,
-    google: !!process.env.GOOGLE_AI_API_KEY,
-    xai: !!process.env.XAI_API_KEY,
+    models: {
+      'claude-sonnet-4-20250514': {
+        available: !!process.env.ANTHROPIC_API_KEY,
+        label: 'Claude Sonnet',
+        capabilities: ['text', 'vision', 'content-edit'],
+      },
+      'gpt-4o': {
+        available: !!process.env.OPENAI_API_KEY,
+        label: 'GPT-4o',
+        capabilities: ['text', 'vision', 'content-edit', 'image-gen'],
+      },
+      'gemini-1.5-pro': {
+        available: !!process.env.GOOGLE_AI_API_KEY,
+        label: 'Gemini 1.5 Pro',
+        capabilities: ['text', 'vision', 'content-edit', 'large-context'],
+      },
+      'grok-2': {
+        available: !!process.env.XAI_API_KEY,
+        label: 'Grok',
+        capabilities: ['text', 'content-edit', 'image-gen', 'web-search'],
+      },
+    },
   });
+});
+
+// ─── Image Generation ───
+
+// Helper: upload a buffer to Cloudinary
+function uploadBufferToCloudinary(buffer, options = {}) {
+  return new Promise((resolve, reject) => {
+    const uploadOptions = {
+      folder: 'alpha-surfaces',
+      ...options,
+    };
+    const stream = cloudinary.uploader.upload_stream(uploadOptions, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+    stream.end(buffer);
+  });
+}
+
+// POST /api/ai/generate-image
+app.post('/api/ai/generate-image', authMiddleware, aiLimiter, async (req, res) => {
+  const { prompt, provider, size, targetField } = req.body;
+  if (!prompt) return res.status(400).json({ error: 'Prompt is required.' });
+
+  const selectedProvider = provider || 'dalle3';
+
+  try {
+    let imageBuffer;
+
+    if (selectedProvider === 'dalle3') {
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(503).json({ error: 'OpenAI API key not configured.' });
+      }
+      const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const imageSize = size || '1792x1024';
+      const response = await client.images.generate({
+        model: 'dall-e-3',
+        prompt,
+        n: 1,
+        size: imageSize,
+        response_format: 'b64_json',
+      });
+      const b64 = response.data[0].b64_json;
+      imageBuffer = Buffer.from(b64, 'base64');
+
+    } else if (selectedProvider === 'imagen3') {
+      if (!process.env.GOOGLE_AI_API_KEY) {
+        return res.status(503).json({ error: 'Google AI API key not configured.' });
+      }
+      const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: 'imagen-3.0-generate-002' });
+      const result = await model.generateImages({
+        prompt,
+        config: { numberOfImages: 1 },
+      });
+      const imgBytes = result.images[0].imageBytes;
+      imageBuffer = Buffer.from(imgBytes, 'base64');
+
+    } else if (selectedProvider === 'grok-aurora') {
+      if (!process.env.XAI_API_KEY) {
+        return res.status(503).json({ error: 'xAI API key not configured.' });
+      }
+      const client = new OpenAI({
+        apiKey: process.env.XAI_API_KEY,
+        baseURL: 'https://api.x.ai/v1',
+      });
+      const response = await client.images.generate({
+        model: 'grok-2-image',
+        prompt,
+        n: 1,
+        response_format: 'b64_json',
+      });
+      const b64 = response.data[0].b64_json;
+      imageBuffer = Buffer.from(b64, 'base64');
+
+    } else {
+      return res.status(400).json({ error: `Unknown image provider: ${selectedProvider}` });
+    }
+
+    // Upload to Cloudinary
+    const result = await uploadBufferToCloudinary(imageBuffer, {
+      public_id: `ai-gen-${Date.now()}`,
+      resource_type: 'image',
+    });
+
+    res.json({
+      ok: true,
+      url: result.secure_url,
+      publicId: result.public_id,
+      thumb: cloudinary.url(result.public_id, { width: 200, crop: 'fill', fetch_format: 'auto' }),
+      medium: cloudinary.url(result.public_id, { width: 800, crop: 'limit', fetch_format: 'auto' }),
+      large: cloudinary.url(result.public_id, { width: 1920, crop: 'limit', fetch_format: 'auto' }),
+      targetField: targetField || null,
+      prompt,
+    });
+  } catch (err) {
+    console.error('Image generation error:', err);
+    const message = err?.message || 'Image generation failed.';
+    res.status(500).json({ error: message });
+  }
+});
+
+// ─── Video Generation ───
+
+// POST /api/ai/generate-video — Start async video job
+app.post('/api/ai/generate-video', authMiddleware, async (req, res) => {
+  const { prompt, provider, duration, targetField } = req.body;
+  if (!prompt) return res.status(400).json({ error: 'Prompt is required.' });
+
+  if ((provider || 'runway') !== 'runway') {
+    return res.status(400).json({ error: `Unsupported video provider: ${provider}` });
+  }
+  if (!process.env.RUNWAY_API_KEY) {
+    return res.status(503).json({ error: 'Runway API key not configured.' });
+  }
+
+  const jobId = 'vid-' + crypto.randomBytes(8).toString('hex');
+  videoJobs.set(jobId, { status: 'processing', prompt, targetField, provider: 'runway', createdAt: Date.now() });
+
+  // Run async
+  (async () => {
+    try {
+      // Start generation
+      const startRes = await fetch('https://api.dev.runwayml.com/v1/text_to_video', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RUNWAY_API_KEY}`,
+          'Content-Type': 'application/json',
+          'X-Runway-Version': '2024-11-06',
+        },
+        body: JSON.stringify({
+          model: 'gen4_turbo',
+          text_prompt: prompt,
+          duration: duration || 5,
+          ratio: '1280:720',
+        }),
+      });
+
+      if (!startRes.ok) {
+        const errBody = await startRes.text();
+        throw new Error(`Runway API error: ${startRes.status} — ${errBody}`);
+      }
+
+      const startData = await startRes.json();
+      const taskId = startData.id;
+
+      // Poll for completion
+      let attempts = 0;
+      const maxAttempts = 60; // 5 minutes max (5s intervals)
+      while (attempts < maxAttempts) {
+        await new Promise(r => setTimeout(r, 5000));
+        attempts++;
+
+        const pollRes = await fetch(`https://api.dev.runwayml.com/v1/tasks/${taskId}`, {
+          headers: {
+            'Authorization': `Bearer ${process.env.RUNWAY_API_KEY}`,
+            'X-Runway-Version': '2024-11-06',
+          },
+        });
+
+        if (!pollRes.ok) continue;
+        const pollData = await pollRes.json();
+
+        if (pollData.status === 'SUCCEEDED') {
+          const videoUrl = pollData.output?.[0];
+          if (!videoUrl) throw new Error('No video URL in Runway response');
+
+          // Download the video
+          const videoRes = await fetch(videoUrl);
+          const videoBuffer = Buffer.from(await videoRes.arrayBuffer());
+
+          // Upload to Cloudinary as video
+          const cloudResult = await uploadBufferToCloudinary(videoBuffer, {
+            public_id: `ai-video-${Date.now()}`,
+            resource_type: 'video',
+          });
+
+          videoJobs.set(jobId, {
+            status: 'complete',
+            prompt,
+            targetField,
+            provider: 'runway',
+            result: {
+              url: cloudResult.secure_url,
+              publicId: cloudResult.public_id,
+              thumb: cloudResult.secure_url.replace(/\.[^.]+$/, '.jpg'),
+              targetField,
+              prompt,
+            },
+          });
+          return;
+        } else if (pollData.status === 'FAILED') {
+          throw new Error(pollData.error || 'Runway generation failed');
+        }
+        // else still processing, continue polling
+      }
+      throw new Error('Video generation timed out');
+    } catch (err) {
+      console.error('Video generation error:', err);
+      videoJobs.set(jobId, { status: 'failed', error: err.message, prompt, targetField, provider: 'runway' });
+    }
+  })();
+
+  res.json({ jobId });
+});
+
+// GET /api/ai/video-status/:jobId — Poll video job status
+app.get('/api/ai/video-status/:jobId', authMiddleware, (req, res) => {
+  const job = videoJobs.get(req.params.jobId);
+  if (!job) return res.status(404).json({ error: 'Job not found.' });
+  res.json(job);
 });
 
 // Helpers for nested value access with bracket notation support (e.g. "collections.items[0].name")
