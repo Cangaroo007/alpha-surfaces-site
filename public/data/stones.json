@@ -1,0 +1,73 @@
+{
+  "collections": [
+    {
+      "id": "collection-01",
+      "name": "Collection 01",
+      "subtitle": "Calacatta & Statuario",
+      "stones": [
+        { "name": "Calacatta Leggera", "finish": "Polished", "slug": "calacatta-leggera", "image": "" },
+        { "name": "Calacatta Borghini", "finish": "Polished", "slug": "calacatta-borghini", "image": "" },
+        { "name": "Acropolis", "finish": "Polished", "slug": "acropolis", "image": "" },
+        { "name": "Statuario Venato", "finish": "Polished", "slug": "statuario-venato", "image": "" },
+        { "name": "Unique Carrara", "finish": "Polished", "slug": "unique-carrara", "image": "" },
+        { "name": "Mont Blanc", "finish": "Soft Touch", "slug": "mont-blanc", "image": "" }
+      ]
+    },
+    {
+      "id": "collection-02",
+      "name": "Collection 02",
+      "subtitle": "Prairie & Sage",
+      "stones": [
+        { "name": "Noosa", "finish": "Polished", "slug": "noosa", "image": "" },
+        { "name": "Fraser", "finish": "Polished", "slug": "fraser", "image": "" },
+        { "name": "Bondi", "finish": "Polished", "slug": "bondi", "image": "" },
+        { "name": "Santorini Gold", "finish": "Polished", "slug": "santorini-gold", "image": "" },
+        { "name": "Travertino Classico", "finish": "Soft Touch", "slug": "travertino-classico", "image": "" },
+        { "name": "Silver Travertine", "finish": "Soft Touch", "slug": "silver-travertine", "image": "" }
+      ]
+    },
+    {
+      "id": "collection-03",
+      "name": "Collection 03",
+      "subtitle": "Soapstone & Verde",
+      "stones": [
+        { "name": "Patagonia", "finish": "Soft Touch", "slug": "patagonia", "image": "" },
+        { "name": "Elba", "finish": "Soft Touch", "slug": "elba", "image": "" },
+        { "name": "Viola Ligera", "finish": "Polished", "slug": "viola-ligera", "image": "" },
+        { "name": "Pearl", "finish": "Polished", "slug": "pearl", "image": "" },
+        { "name": "Crystal", "finish": "Polished", "slug": "crystal", "image": "" },
+        { "name": "Arctic", "finish": "Polished", "slug": "arctic", "image": "" }
+      ]
+    },
+    {
+      "id": "collection-04",
+      "name": "Collection 04",
+      "subtitle": "Dramatic & Noir",
+      "stones": [
+        { "name": "Carbon", "finish": "Polished", "slug": "carbon", "image": "" },
+        { "name": "Graphite", "finish": "Polished", "slug": "graphite", "image": "" },
+        { "name": "Davinci Oro", "finish": "Polished", "slug": "davinci-oro", "image": "" },
+        { "name": "Davinci Gris", "finish": "Polished", "slug": "davinci-gris", "image": "" },
+        { "name": "Brilliance", "finish": "Polished", "slug": "brilliance", "image": "" }
+      ]
+    },
+    {
+      "id": "collection-05",
+      "name": "Collection 05",
+      "subtitle": "Urban & Minimal",
+      "stones": [
+        { "name": "Jewel", "finish": "Polished", "slug": "jewel", "image": "" },
+        { "name": "Torquay", "finish": "Soft Touch", "slug": "torquay", "image": "" }
+      ]
+    },
+    {
+      "id": "original-alpha-zero",
+      "name": "Original Alpha Zero",
+      "subtitle": "The Signature Range",
+      "stones": [
+        { "name": "Alpha Zero Classic", "finish": "Polished", "slug": "alpha-zero-classic", "image": "" },
+        { "name": "Alpha Zero Pure", "finish": "Polished", "slug": "alpha-zero-pure", "image": "" }
+      ]
+    }
+  ]
+}

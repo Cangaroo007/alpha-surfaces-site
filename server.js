@@ -1253,6 +1253,16 @@ app.get('/kc', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'kc.html'));
 });
 
+// ─── Collections page ───
+app.get('/collections', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'collections.html'));
+});
+
+// ─── Stone detail page ───
+app.get('/surfaces/:slug', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'surfaces', 'calacatta-leggera.html'));
+});
+
 // ─── Catch-all for SPA ───
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
