@@ -138,11 +138,11 @@ footer { background: var(--olive-dark); padding: 60px 80px 30px; }
     <div>
       <div class="footer-col-title">Collections</div>
       <ul class="footer-links">
-        <li><a href="/collections">Collection 01 &#8212; Calacatta</a></li>
-        <li><a href="/collections">Collection 02 &#8212; Prairie</a></li>
-        <li><a href="/collections">Collection 03 &#8212; Soapstone</a></li>
-        <li><a href="/collections">Collection 04 &#8212; Dramatic</a></li>
-        <li><a href="/collections">Collection 05 &#8212; Urban</a></li>
+        <li><a href="/collections#collection-01">Calacatta &amp; Statuario</a></li>
+        <li><a href="/collections#collection-02">Prairie &amp; Sage</a></li>
+        <li><a href="/collections#collection-03">Soapstone &amp; Verde</a></li>
+        <li><a href="/collections#collection-04">Dramatic &amp; Noir</a></li>
+        <li><a href="/collections#collection-05">Urban &amp; Minimal</a></li>
         <li><a href="/collections">Original Alpha Zero</a></li>
       </ul>
     </div>
@@ -180,6 +180,7 @@ footer { background: var(--olive-dark); padding: 60px 80px 30px; }
       data.collections.forEach((collection, i) => {
         const group = document.createElement('div');
         group.className = 'collection-group reveal';
+        group.id = collection.id;
         group.style.transitionDelay = (i * 0.08) + 's';
 
         const header = document.createElement('div');
