@@ -2,7 +2,7 @@
   "collections": [
     {
       "id": "collection-01",
-      "name": "Collection 01",
+      "name": "Calacatta & Statuario",
       "subtitle": "Calacatta & Statuario",
       "stones": [
         { "name": "Calacatta Leggera", "finish": "Polished", "slug": "calacatta-leggera", "image": "" },
@@ -15,7 +15,7 @@
     },
     {
       "id": "collection-02",
-      "name": "Collection 02",
+      "name": "Prairie & Sage",
       "subtitle": "Prairie & Sage",
       "stones": [
         { "name": "Noosa", "finish": "Polished", "slug": "noosa", "image": "" },
@@ -28,7 +28,7 @@
     },
     {
       "id": "collection-03",
-      "name": "Collection 03",
+      "name": "Soapstone & Verde",
       "subtitle": "Soapstone & Verde",
       "stones": [
         { "name": "Patagonia", "finish": "Soft Touch", "slug": "patagonia", "image": "" },
@@ -41,7 +41,7 @@
     },
     {
       "id": "collection-04",
-      "name": "Collection 04",
+      "name": "Dramatic & Noir",
       "subtitle": "Dramatic & Noir",
       "stones": [
         { "name": "Carbon", "finish": "Polished", "slug": "carbon", "image": "" },
@@ -53,7 +53,7 @@
     },
     {
       "id": "collection-05",
-      "name": "Collection 05",
+      "name": "Urban & Minimal",
       "subtitle": "Urban & Minimal",
       "stones": [
         { "name": "Jewel", "finish": "Polished", "slug": "jewel", "image": "" },
