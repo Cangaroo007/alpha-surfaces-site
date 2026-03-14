@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpha Surfaces Brand Guidelines 2025</title>
+<style>
+/* ── Font Declarations ── */
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+
+/* ── CSS Variables ── */
+:root {
+  --olive: #564d22;
+  --cream: #f3f1e6;
+  --black: #000000;
+  --white: #ffffff;
+  --red: #f56c6c;
+  --gray: #cccccc;
+  --border: rgba(0,0,0,0.1);
+  --olive-dark: #3D3A18;
+  --olive-mid: #7A7040;
+  --cream-mid: #E8E5D8;
+  --gray-text: #888888;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ── Screen View ── */
+body {
+  background: #e0e0e0;
+  font-family: 'Degular', sans-serif;
+  font-weight: 400;
+  color: var(--black);
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  width: 210mm;
+  height: 297mm;
+  position: relative;
+  overflow: hidden;
+  padding: 20mm;
+  background: var(--cream);
+  margin: 40px auto;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+}
+
+.page--olive {
+  background: var(--olive);
+}
+
+/* ── Page Header (pages 2-11) ── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18mm;
+  padding-bottom: 4mm;
+  border-bottom: 1px solid var(--border);
+}
+.page-header span {
+  font-family: 'Degular', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--olive);
+}
+
+/* ── Page Footer (pages 2-11) ── */
+.page-footer {
+  position: absolute;
+  bottom: 15mm;
+  left: 20mm;
+  right: 20mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.page-footer span {
+  font-family: 'Degular', sans-serif;
+  font-size: 9px;
+  color: var(--olive);
+  letter-spacing: 1px;
+}
+
+/* ── Section Label ── */
+.section-label {
+  font-family: 'Degular', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--olive);
+  margin-bottom: 4px;
+}
+
+.section-subtitle {
+  font-family: 'Concrette S', serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(0,0,0,0.6);
+  margin-bottom: 8mm;
+}
+
+/* ── Typography Helpers ── */
+h2.heading-large {
+  font-family: 'Concrette S', serif;
+  font-weight: 700;
+  font-size: 24px;
+  margin-bottom: 4mm;
+  color: var(--black);
+}
+
+h3.heading-medium {
+  font-family: 'Concrette S', serif;
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 3mm;
+  color: var(--black);
+}
+
+h4.heading-small {
+  font-family: 'Concrette S', serif;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 2mm;
+  color: var(--black);
+}
+
+p.body-text {
+  font-family: 'Degular', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--black);
+  margin-bottom: 4mm;
+}
+
+p.body-small {
+  font-family: 'Degular', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--black);
+}
+
+/* ── Grids ── */
+.grid-2x2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4mm;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 4mm;
+}
+
+.grid-6 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3mm;
+}
+
+/* ── Print View ── */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  body {
+    background: none;
+  }
+  .page {
+    box-shadow: none;
+    margin: 0;
+    page-break-after: always;
+  }
+  .page:last-child {
+    page-break-after: auto;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 1 — COVER
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page page--olive" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+  <img src="../logos/01 Brandmark/Inverse_white/Alpha Surfaces_Brandmark_Inverse.png" alt="Alpha Surfaces Brandmark" style="width: 190px; margin-bottom: 12mm;">
+  <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 3px; color: var(--white); margin-bottom: 3mm;">BRAND GUIDELINES</div>
+  <div style="font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 14mm;">2025 Edition</div>
+  <div style="font-family: 'Concrette S', serif; font-weight: 500; font-size: 28px; font-style: italic; color: var(--white); max-width: 80%; line-height: 1.4; margin-bottom: 14mm;">"Stone that tells a story."</div>
+  <div style="position: absolute; bottom: 22mm; left: 20mm; right: 20mm; text-align: center;">
+    <div style="font-family: 'Degular', sans-serif; font-size: 10px; text-transform: uppercase; color: rgba(255,255,255,0.4); letter-spacing: 1.5px; margin-bottom: 3mm;">CONFIDENTIAL — FOR INTERNAL AND PARTNER USE ONLY</div>
+    <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: rgba(255,255,255,0.4);">alphasurfaces.com.au</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 2 — TABLE OF CONTENTS
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>2</span>
+  </div>
+
+  <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 36px; margin-bottom: 10mm;">Table of Contents</div>
+
+  <div style="display: flex; flex-direction: column; gap: 5mm;">
+    <div style="display: flex; align-items: baseline; gap: 5mm; padding-bottom: 4mm; border-bottom: 1px solid var(--border);">
+      <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--olive); min-width: 14mm;">01</span>
+      <div>
+        <div style="font-family: 'Concrette S', serif; font-weight: 500; font-size: 18px; color: var(--black);">Brand Overview</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 14px; color: var(--gray-text);">Our story, mission, and values</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: baseline; gap: 5mm; padding-bottom: 4mm; border-bottom: 1px solid var(--border);">
+      <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--olive); min-width: 14mm;">02</span>
+      <div>
+        <div style="font-family: 'Concrette S', serif; font-weight: 500; font-size: 18px; color: var(--black);">Logo Usage</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 14px; color: var(--gray-text);">Primary logo, clear space, dos and don'ts</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: baseline; gap: 5mm; padding-bottom: 4mm; border-bottom: 1px solid var(--border);">
+      <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--olive); min-width: 14mm;">03</span>
+      <div>
+        <div style="font-family: 'Concrette S', serif; font-weight: 500; font-size: 18px; color: var(--black);">Colour Palette</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 14px; color: var(--gray-text);">Primary, secondary, and neutral colours</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: baseline; gap: 5mm; padding-bottom: 4mm; border-bottom: 1px solid var(--border);">
+      <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--olive); min-width: 14mm;">04</span>
+      <div>
+        <div style="font-family: 'Concrette S', serif; font-weight: 500; font-size: 18px; color: var(--black);">Typography</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 14px; color: var(--gray-text);">Concrette S and Degular typeface systems</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: baseline; gap: 5mm; padding-bottom: 4mm; border-bottom: 1px solid var(--border);">
+      <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--olive); min-width: 14mm;">05</span>
+      <div>
+        <div style="font-family: 'Concrette S', serif; font-weight: 500; font-size: 18px; color: var(--black);">Photography Style</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 14px; color: var(--gray-text);">Imagery guidelines and tone</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: baseline; gap: 5mm; padding-bottom: 4mm; border-bottom: 1px solid var(--border);">
+      <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--olive); min-width: 14mm;">06</span>
+      <div>
+        <div style="font-family: 'Concrette S', serif; font-weight: 500; font-size: 18px; color: var(--black);">Voice &amp; Tone</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 14px; color: var(--gray-text);">How we write and communicate</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: baseline; gap: 5mm; padding-bottom: 4mm; border-bottom: 1px solid var(--border);">
+      <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--olive); min-width: 14mm;">07</span>
+      <div>
+        <div style="font-family: 'Concrette S', serif; font-weight: 500; font-size: 18px; color: var(--black);">Digital Applications</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 14px; color: var(--gray-text);">Web, email, and social guidelines</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: baseline; gap: 5mm; padding-bottom: 4mm; border-bottom: 1px solid var(--border);">
+      <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--olive); min-width: 14mm;">08</span>
+      <div>
+        <div style="font-family: 'Concrette S', serif; font-weight: 500; font-size: 18px; color: var(--black);">Print &amp; Collateral</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 14px; color: var(--gray-text);">Brochures, stickers, and partner materials</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: baseline; gap: 5mm; padding-bottom: 4mm; border-bottom: 1px solid var(--border);">
+      <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--olive); min-width: 14mm;">09</span>
+      <div>
+        <div style="font-family: 'Concrette S', serif; font-weight: 500; font-size: 18px; color: var(--black);">Do's &amp; Don'ts</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 14px; color: var(--gray-text);">Common mistakes to avoid</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>2</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 3 — 01 BRAND OVERVIEW
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>3</span>
+  </div>
+
+  <div class="section-label">01 — Brand Overview</div>
+  <div class="section-subtitle">Who we are and what we stand for</div>
+
+  <h2 class="heading-large">Our Mission</h2>
+  <p class="body-text">Alpha Surfaces delivers a complete surface solution that redefines the standard for benchtops in Australia — beautiful, durable, low maintenance, safe, and sustainable. Everything you could want in one exceptional surface.</p>
+
+  <div style="background: var(--olive); padding: 6mm 7mm; margin: 5mm 0 6mm; border-radius: 2px;">
+    <div style="font-family: 'Concrette S', serif; font-weight: 500; font-size: 18px; color: var(--white); line-height: 1.5; margin-bottom: 4mm;">"At Alpha Surfaces, we deliver a complete surface solution that redefines the standard for benchtops in Australia."</div>
+    <div style="font-family: 'Degular', sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.6);">BELINDA KELAHER — MANAGING DIRECTOR, ALPHA SURFACES</div>
+  </div>
+
+  <h3 class="heading-medium">Brand Pillars</h3>
+  <div class="grid-2x2" style="margin-top: 3mm;">
+    <div style="background: var(--white); border: 1px solid var(--border); padding: 4mm; border-radius: 2px;">
+      <h4 class="heading-small">Premium Quality</h4>
+      <p class="body-small">Mineral stone surfaces crafted for Australia's most considered spaces.</p>
+    </div>
+    <div style="background: var(--white); border: 1px solid var(--border); padding: 4mm; border-radius: 2px;">
+      <h4 class="heading-small">Zero Silica</h4>
+      <p class="body-small">Industry-leading safety — crystalline silica free, protecting fabricators and families.</p>
+    </div>
+    <div style="background: var(--white); border: 1px solid var(--border); padding: 4mm; border-radius: 2px;">
+      <h4 class="heading-small">Natural Realism</h4>
+      <p class="body-small">Surfaces that honour the beauty of natural stone with engineered durability.</p>
+    </div>
+    <div style="background: var(--white); border: 1px solid var(--border); padding: 4mm; border-radius: 2px;">
+      <h4 class="heading-small">Australian Owned</h4>
+      <p class="body-small">A proudly Australian brand built on local expertise and relationships.</p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>3</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 4 — 02 LOGO USAGE
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>4</span>
+  </div>
+
+  <div class="section-label">02 — Logo Usage</div>
+  <div class="section-subtitle">Primary logo, variations, and clear space rules</div>
+
+  <h2 class="heading-large">Logo Variations</h2>
+  <div class="grid-2x2" style="margin-bottom: 5mm;">
+    <div>
+      <div style="background: var(--olive); height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 2px;">
+        <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 16px; color: var(--white); letter-spacing: 2px;">ALPHA SURFACES</span>
+      </div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 12px; color: var(--gray-text); margin-top: 2mm;">Primary — White on Olive</div>
+    </div>
+    <div>
+      <div style="background: var(--white); height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 2px;">
+        <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 16px; color: var(--olive); letter-spacing: 2px;">ALPHA SURFACES</span>
+      </div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 12px; color: var(--gray-text); margin-top: 2mm;">Reversed — Olive on White</div>
+    </div>
+    <div>
+      <div style="background: var(--cream); height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 2px;">
+        <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 16px; color: var(--olive); letter-spacing: 2px;">ALPHA SURFACES</span>
+      </div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 12px; color: var(--gray-text); margin-top: 2mm;">Cream — Olive on Cream</div>
+    </div>
+    <div>
+      <div style="background: var(--black); height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 2px;">
+        <span style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 16px; color: var(--white); letter-spacing: 2px;">ALPHA SURFACES</span>
+      </div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 12px; color: var(--gray-text); margin-top: 2mm;">Mono — White on Black</div>
+    </div>
+  </div>
+
+  <h3 class="heading-medium">Clear Space Rule</h3>
+  <p class="body-text" style="font-size: 14px;">Always maintain a minimum clear space equal to the height of the 'A' in ALPHA around all sides of the logo. Never crowd the logo with other elements.</p>
+
+  <h3 class="heading-medium" style="margin-top: 4mm;">Do's &amp; Don'ts</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-top: 3mm;">
+    <div>
+      <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 13px; color: var(--olive); margin-bottom: 2mm;">&#10003; Do</div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 13px; line-height: 2;">
+        <div><span style="color: var(--olive); margin-right: 2mm;">&#10003;</span> Use approved logo files only</div>
+        <div><span style="color: var(--olive); margin-right: 2mm;">&#10003;</span> Maintain clear space rules</div>
+        <div><span style="color: var(--olive); margin-right: 2mm;">&#10003;</span> Use on approved backgrounds</div>
+        <div><span style="color: var(--olive); margin-right: 2mm;">&#10003;</span> Scale proportionally</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 13px; color: var(--red); margin-bottom: 2mm;">&#10007; Don't</div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 13px; line-height: 2;">
+        <div><span style="color: var(--red); margin-right: 2mm;">&#10007;</span> Stretch or distort the logo</div>
+        <div><span style="color: var(--red); margin-right: 2mm;">&#10007;</span> Add drop shadows or effects</div>
+        <div><span style="color: var(--red); margin-right: 2mm;">&#10007;</span> Place on busy imagery</div>
+        <div><span style="color: var(--red); margin-right: 2mm;">&#10007;</span> Change the typeface</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>4</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 5 — 03 COLOUR PALETTE
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>5</span>
+  </div>
+
+  <div class="section-label">03 — Colour Palette</div>
+  <div class="section-subtitle">Primary, secondary, and neutral tones</div>
+
+  <h2 class="heading-large">Primary Palette</h2>
+  <div class="grid-4" style="margin-bottom: 6mm;">
+    <div>
+      <div style="background: #564D22; height: 100px; border-radius: 2px;"></div>
+      <div style="margin-top: 2mm;">
+        <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 13px;">Olive</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: var(--gray-text);">#564D22</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: var(--gray-text);">PMS 5815 C</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: var(--gray-text);">CMYK 12/17/70/62</div>
+      </div>
+    </div>
+    <div>
+      <div style="background: #F3F1E6; height: 100px; border-radius: 2px; border: 1px solid var(--border);"></div>
+      <div style="margin-top: 2mm;">
+        <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 13px;">Cream</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: var(--gray-text);">#F3F1E6</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: var(--gray-text);">PMS 9183 C</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: var(--gray-text);">CMYK 2/1/9/0</div>
+      </div>
+    </div>
+    <div>
+      <div style="background: #000000; height: 100px; border-radius: 2px;"></div>
+      <div style="margin-top: 2mm;">
+        <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 13px;">Black</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: var(--gray-text);">#000000</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: var(--gray-text);">PMS Black C</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: var(--gray-text);">CMYK 0/0/0/100</div>
+      </div>
+    </div>
+    <div>
+      <div style="background: #FFFFFF; height: 100px; border-radius: 2px; border: 1px solid var(--border);"></div>
+      <div style="margin-top: 2mm;">
+        <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 13px;">White</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: var(--gray-text);">#FFFFFF</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: var(--gray-text);">PMS White</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 11px; color: var(--gray-text);">CMYK 0/0/0/0</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="heading-medium">Secondary &amp; Support Colours</h3>
+  <div class="grid-6" style="margin-bottom: 6mm;">
+    <div>
+      <div style="background: #3D3A18; height: 50px; border-radius: 2px;"></div>
+      <div style="margin-top: 2mm;">
+        <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 11px;">Olive Dark</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: var(--gray-text);">#3D3A18</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: var(--gray-text);">Footer, deep backgrounds</div>
+      </div>
+    </div>
+    <div>
+      <div style="background: #7A7040; height: 50px; border-radius: 2px;"></div>
+      <div style="margin-top: 2mm;">
+        <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 11px;">Olive Mid</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: var(--gray-text);">#7A7040</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: var(--gray-text);">Hover states, dividers</div>
+      </div>
+    </div>
+    <div>
+      <div style="background: #E8E5D8; height: 50px; border-radius: 2px; border: 1px solid var(--border);"></div>
+      <div style="margin-top: 2mm;">
+        <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 11px;">Cream Mid</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: var(--gray-text);">#E8E5D8</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: var(--gray-text);">Section backgrounds</div>
+      </div>
+    </div>
+    <div>
+      <div style="background: #888888; height: 50px; border-radius: 2px;"></div>
+      <div style="margin-top: 2mm;">
+        <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 11px;">Gray</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: var(--gray-text);">#888888</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: var(--gray-text);">Body text, captions</div>
+      </div>
+    </div>
+    <div>
+      <div style="background: #CCCCCC; height: 50px; border-radius: 2px; border: 1px solid var(--border);"></div>
+      <div style="margin-top: 2mm;">
+        <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 11px;">Border</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: var(--gray-text);">#CCCCCC</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: var(--gray-text);">Dividers, form fields</div>
+      </div>
+    </div>
+    <div>
+      <div style="background: #F56C6C; height: 50px; border-radius: 2px;"></div>
+      <div style="margin-top: 2mm;">
+        <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 11px;">Alert Red</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: var(--gray-text);">#F56C6C</div>
+        <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: var(--gray-text);">Required fields, errors</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="heading-medium">Colour Usage Rules</h3>
+  <ul style="font-family: 'Degular', sans-serif; font-size: 13px; line-height: 1.8; padding-left: 5mm; color: var(--black);">
+    <li>Olive is the primary brand colour — use it for headers, CTAs, and key brand moments.</li>
+    <li>Cream is the default page background; never use pure white as a page background.</li>
+    <li>Black is reserved for body text and high-contrast UI elements only.</li>
+    <li>White is used for text on olive backgrounds and card surfaces.</li>
+    <li>Secondary colours support the primary palette — never use them as dominant colours.</li>
+    <li>Alert Red is functional only — never use it decoratively or as a brand colour.</li>
+  </ul>
+
+  <div class="page-footer">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>5</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 6 — 04 TYPOGRAPHY
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>6</span>
+  </div>
+
+  <div class="section-label">04 — Typography</div>
+  <div class="section-subtitle">Typeface systems and scale</div>
+
+  <h2 class="heading-large" style="margin-bottom: 1mm;">Concrette S</h2>
+  <div style="font-family: 'Degular', sans-serif; font-size: 12px; color: var(--gray-text); margin-bottom: 2mm;">Primary Serif Typeface — Headings, Display, Quotes</div>
+  <div style="font-family: 'Degular', sans-serif; font-size: 12px; color: var(--gray-text); margin-bottom: 3mm;">Light / Regular / Medium / SemiBold / Bold / ExtraBold / Heavy</div>
+  <div style="font-family: 'Concrette S', serif; font-weight: 500; font-size: 32px; margin-bottom: 2mm;">Stone that tells a story.</div>
+  <div style="font-family: 'Concrette S', serif; font-weight: 400; font-size: 14px; color: var(--gray-text); margin-bottom: 6mm;">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</div>
+
+  <h2 class="heading-large" style="margin-bottom: 1mm;">Degular</h2>
+  <div style="font-family: 'Degular', sans-serif; font-size: 12px; color: var(--gray-text); margin-bottom: 2mm;">Primary Sans-Serif — Body, UI, Navigation, Labels</div>
+  <div style="font-family: 'Degular', sans-serif; font-size: 12px; color: var(--gray-text); margin-bottom: 3mm;">Thin / Light / Regular / Medium / Semibold / Bold / Black</div>
+  <div style="font-family: 'Degular', sans-serif; font-weight: 500; font-size: 28px; margin-bottom: 2mm;">The complete surface solution for Australia.</div>
+  <div style="font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; color: var(--gray-text); margin-bottom: 6mm;">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</div>
+
+  <h3 class="heading-medium">Type Scale</h3>
+  <table style="width: 100%; border-collapse: collapse; font-family: 'Degular', sans-serif; font-size: 12px; margin-top: 3mm;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--olive);">
+        <th style="text-align: left; padding: 2mm 2mm 2mm 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 10px; color: var(--olive);">Style</th>
+        <th style="text-align: left; padding: 2mm; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 10px; color: var(--olive);">Typeface</th>
+        <th style="text-align: left; padding: 2mm; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 10px; color: var(--olive);">Size</th>
+        <th style="text-align: left; padding: 2mm; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 10px; color: var(--olive);">Usage</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 2mm 2mm 2mm 0; font-weight: 600;">Display</td>
+        <td style="padding: 2mm;">Concrette S Medium</td>
+        <td style="padding: 2mm;">48–72px / 30–45pt</td>
+        <td style="padding: 2mm;">Hero headlines</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 2mm 2mm 2mm 0; font-weight: 600;">H1</td>
+        <td style="padding: 2mm;">Concrette S Regular</td>
+        <td style="padding: 2mm;">36–48px / 22–30pt</td>
+        <td style="padding: 2mm;">Page titles</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 2mm 2mm 2mm 0; font-weight: 600;">H2</td>
+        <td style="padding: 2mm;">Concrette S Light</td>
+        <td style="padding: 2mm;">28–36px / 18–22pt</td>
+        <td style="padding: 2mm;">Section headings</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 2mm 2mm 2mm 0; font-weight: 600;">H3</td>
+        <td style="padding: 2mm;">Degular Semibold</td>
+        <td style="padding: 2mm;">20–24px / 13–15pt</td>
+        <td style="padding: 2mm;">Sub-headings</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 2mm 2mm 2mm 0; font-weight: 600;">Body</td>
+        <td style="padding: 2mm;">Degular Regular</td>
+        <td style="padding: 2mm;">16–18px / 10–11pt</td>
+        <td style="padding: 2mm;">Body copy, descriptions</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 2mm 2mm 2mm 0; font-weight: 600;">Caption</td>
+        <td style="padding: 2mm;">Degular Regular</td>
+        <td style="padding: 2mm;">12–13px / 7.5–8pt</td>
+        <td style="padding: 2mm;">Image captions, labels</td>
+      </tr>
+      <tr>
+        <td style="padding: 2mm 2mm 2mm 0; font-weight: 600;">Label</td>
+        <td style="padding: 2mm;">Degular Semibold</td>
+        <td style="padding: 2mm;">10–11px / 6–7pt</td>
+        <td style="padding: 2mm;">Nav items, UI labels (uppercase)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>6</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 7 — 05 PHOTOGRAPHY STYLE
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>7</span>
+  </div>
+
+  <div class="section-label">05 — Photography Style</div>
+  <div class="section-subtitle">Visual language and imagery guidelines</div>
+
+  <div class="grid-2x2" style="margin-bottom: 5mm;">
+    <div style="background: var(--cream-mid); border: 1px solid var(--border); padding: 5mm; border-radius: 2px;">
+      <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 15px; margin-bottom: 2mm;">Editorial Lifestyle</div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 12px; line-height: 1.5; color: var(--gray-text);">Real homes, real kitchens. Natural light, considered composition. Show stone in context — not as a product shot.</div>
+    </div>
+    <div style="background: var(--cream-mid); border: 1px solid var(--border); padding: 5mm; border-radius: 2px;">
+      <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 15px; margin-bottom: 2mm;">Texture Close-Ups</div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 12px; line-height: 1.5; color: var(--gray-text);">Macro shots highlighting the grain, movement, and depth of each surface. Warm, natural tones. No harsh studio lighting.</div>
+    </div>
+    <div style="background: var(--cream-mid); border: 1px solid var(--border); padding: 5mm; border-radius: 2px;">
+      <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 15px; margin-bottom: 2mm;">Architectural Spaces</div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 12px; line-height: 1.5; color: var(--gray-text);">Wide interior shots showcasing full benchtops in premium kitchen, bathroom, or commercial settings.</div>
+    </div>
+    <div style="background: var(--cream-mid); border: 1px solid var(--border); padding: 5mm; border-radius: 2px;">
+      <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 15px; margin-bottom: 2mm;">Human Connection</div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 12px; line-height: 1.5; color: var(--gray-text);">Subtle inclusion of people — a hand on stone, a meal prepared. Never forced. Always aspirational.</div>
+    </div>
+  </div>
+
+  <h3 class="heading-medium">Colour &amp; Tone Direction</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-bottom: 5mm;">
+    <div style="padding: 3mm 0;">
+      <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 14px; margin-bottom: 1mm;">Warmth</div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 12px; color: var(--gray-text); line-height: 1.5;">Lean warm — golden hour tones, soft yellows and creams. Avoid cool, blue-tinted photography.</div>
+    </div>
+    <div style="padding: 3mm 0;">
+      <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 14px; margin-bottom: 1mm;">Contrast</div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 12px; color: var(--gray-text); line-height: 1.5;">Medium contrast. Shadows should be soft and open, never harsh or dramatic.</div>
+    </div>
+    <div style="padding: 3mm 0;">
+      <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 14px; margin-bottom: 1mm;">Saturation</div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 12px; color: var(--gray-text); line-height: 1.5;">Slightly desaturated, natural. Avoid oversaturated colours or heavy post-processing filters.</div>
+    </div>
+    <div style="padding: 3mm 0;">
+      <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 14px; margin-bottom: 1mm;">Mood</div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 12px; color: var(--gray-text); line-height: 1.5;">Calm, considered, aspirational. The feeling of a quiet Sunday morning in a beautifully designed home.</div>
+    </div>
+  </div>
+
+  <h3 class="heading-medium">What to Avoid</h3>
+  <ul style="font-family: 'Degular', sans-serif; font-size: 12px; line-height: 1.8; padding-left: 5mm; color: var(--gray-text);">
+    <li>Harsh studio lighting or flash photography</li>
+    <li>Overly staged or artificial-looking scenes</li>
+    <li>Stock photography with generic models or settings</li>
+    <li>Cool, blue-tinted colour grading</li>
+    <li>Cluttered compositions without clear focal points</li>
+    <li>Low-resolution or pixelated imagery</li>
+  </ul>
+
+  <div class="page-footer">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>7</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 8 — 06 VOICE & TONE
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>8</span>
+  </div>
+
+  <div class="section-label">06 — Voice &amp; Tone</div>
+  <div class="section-subtitle">How Alpha Surfaces communicates</div>
+
+  <h2 class="heading-large">Brand Voice</h2>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-bottom: 6mm;">
+    <div style="background: var(--white); border: 1px solid var(--border); padding: 4mm; border-radius: 2px;">
+      <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; margin-bottom: 2mm; color: var(--olive);">Authoritative</div>
+      <p class="body-small" style="color: var(--gray-text);">We speak with confidence born from expertise. Our knowledge of surfaces, materials, and the Australian market is deep and genuine. We educate without lecturing.</p>
+    </div>
+    <div style="background: var(--white); border: 1px solid var(--border); padding: 4mm; border-radius: 2px;">
+      <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; margin-bottom: 2mm; color: var(--olive);">Warm</div>
+      <p class="body-small" style="color: var(--gray-text);">We are approachable and human. Behind every surface is a family, a meal, a memory. We connect emotionally while maintaining professionalism.</p>
+    </div>
+    <div style="background: var(--white); border: 1px solid var(--border); padding: 4mm; border-radius: 2px;">
+      <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; margin-bottom: 2mm; color: var(--olive);">Considered</div>
+      <p class="body-small" style="color: var(--gray-text);">Every word is intentional. We value clarity over cleverness, substance over style. Our communication reflects the same care we put into our surfaces.</p>
+    </div>
+    <div style="background: var(--white); border: 1px solid var(--border); padding: 4mm; border-radius: 2px;">
+      <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; margin-bottom: 2mm; color: var(--olive);">Premium</div>
+      <p class="body-small" style="color: var(--gray-text);">Our language reflects the quality of our product. We avoid discount language, urgency tactics, or cheap marketing clich&eacute;s. We let the product speak.</p>
+    </div>
+  </div>
+
+  <h3 class="heading-medium">Writing Guidelines</h3>
+  <div style="display: flex; flex-direction: column; gap: 4mm; margin-top: 3mm;">
+    <div>
+      <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--olive); margin-bottom: 1mm;">Headlines</div>
+      <p class="body-small" style="color: var(--gray-text);">Use Concrette S. Keep headlines short and evocative. Lead with benefit or emotion. Avoid puns, jargon, or forced wordplay. Example: "Stone that tells a story." not "Rock-solid quality!"</p>
+    </div>
+    <div>
+      <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--olive); margin-bottom: 1mm;">Body Copy</div>
+      <p class="body-small" style="color: var(--gray-text);">Use Degular. Write in short, clear sentences. Aim for a reading level that is accessible but not simplistic. Use Australian English spelling (colour, not color).</p>
+    </div>
+    <div>
+      <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--olive); margin-bottom: 1mm;">CTAs</div>
+      <p class="body-small" style="color: var(--gray-text);">Be direct and specific. "Explore the Collection" not "Click Here". "Request a Sample" not "Learn More". Use sentence case, not all caps.</p>
+    </div>
+    <div>
+      <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--olive); margin-bottom: 1mm;">Product Names</div>
+      <p class="body-small" style="color: var(--gray-text);">Always capitalise collection and stone names. Use the full format: "Alpha Surfaces Calacatta Lucent" on first mention, then "Calacatta Lucent" subsequently. Never abbreviate to just "Calacatta".</p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>8</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 9 — 07 DIGITAL APPLICATIONS
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>9</span>
+  </div>
+
+  <div class="section-label">07 — Digital Applications</div>
+  <div class="section-subtitle">Web, email, and social guidelines</div>
+
+  <div style="margin-bottom: 6mm;">
+    <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--olive); margin-bottom: 3mm;">Website</div>
+    <ul style="font-family: 'Degular', sans-serif; font-size: 13px; line-height: 1.8; padding-left: 5mm; color: var(--black);">
+      <li>Primary domain: alphasurfaces.com.au</li>
+      <li>Default page background: Cream (#F3F1E6), never pure white</li>
+      <li>Navigation: Degular Semibold 11px uppercase, olive on cream</li>
+      <li>Hero sections: full-width imagery with Concrette S display text overlay</li>
+      <li>Buttons: olive background, white text, Degular Semibold 12px uppercase, 4px border-radius</li>
+      <li>Hover states: transition to Olive Mid (#7A7040) with 0.3s ease</li>
+      <li>Card components: white background, 1px border rgba(0,0,0,0.1), subtle shadow on hover</li>
+      <li>Responsive breakpoints: 1440px (desktop), 1024px (tablet), 768px (mobile landscape), 375px (mobile)</li>
+      <li>Image formats: WebP preferred, JPEG fallback. Lazy loading on below-the-fold images.</li>
+      <li>Favicon and touch icons must use the Alpha Surfaces brandmark on olive background</li>
+    </ul>
+  </div>
+
+  <div style="margin-bottom: 6mm;">
+    <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--olive); margin-bottom: 3mm;">Email</div>
+    <ul style="font-family: 'Degular', sans-serif; font-size: 13px; line-height: 1.8; padding-left: 5mm; color: var(--black);">
+      <li>Email width: 600px maximum</li>
+      <li>Header: olive background with white brandmark logo, centered</li>
+      <li>Body background: Cream (#F3F1E6)</li>
+      <li>Body font: system sans-serif stack (Arial, Helvetica) as fallback for Degular</li>
+      <li>CTA buttons: olive background, white text, minimum 44px tap target height</li>
+      <li>Footer: dark olive background with white text, unsubscribe link, physical address</li>
+      <li>Always include plain-text version alongside HTML</li>
+    </ul>
+  </div>
+
+  <div>
+    <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--olive); margin-bottom: 3mm;">Social Media</div>
+    <ul style="font-family: 'Degular', sans-serif; font-size: 13px; line-height: 1.8; padding-left: 5mm; color: var(--black);">
+      <li>Profile images: brandmark on olive background, square crop</li>
+      <li>Cover images: editorial lifestyle photography with subtle olive overlay</li>
+      <li>Post imagery: consistent warm tone, on-brand photography only</li>
+      <li>Text overlays on images: Concrette S Medium, white with drop shadow for legibility</li>
+      <li>Hashtags: #AlphaSurfaces #StoneStory #ZeroSilica #AustralianMade</li>
+      <li>Tone on social: slightly more casual but still considered. Never use slang or excessive emoji.</li>
+      <li>Preferred platforms: Instagram, LinkedIn, Pinterest. Consistent posting schedule.</li>
+    </ul>
+  </div>
+
+  <div class="page-footer">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>9</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 10 — 08 PRINT & COLLATERAL
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>10</span>
+  </div>
+
+  <div class="section-label">08 — Print &amp; Collateral</div>
+  <div class="section-subtitle">Physical materials and specifications</div>
+
+  <h2 class="heading-large">Slab Identification Labels</h2>
+  <p class="body-text" style="font-size: 13px; margin-bottom: 4mm;">Every slab shipped from Alpha Surfaces carries a branded identification label. These labels must adhere to the following specifications.</p>
+
+  <table style="width: 100%; border-collapse: collapse; font-family: 'Degular', sans-serif; font-size: 12px; margin-bottom: 8mm;">
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive); width: 40%;">Label Size</td>
+      <td style="padding: 2.5mm 0;">200mm x 100mm</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">Material</td>
+      <td style="padding: 2.5mm 0;">Weatherproof synthetic, matte laminate finish</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">Background</td>
+      <td style="padding: 2.5mm 0;">Olive (#564D22)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">Logo</td>
+      <td style="padding: 2.5mm 0;">White brandmark, top-left, 30mm wide</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">Typography</td>
+      <td style="padding: 2.5mm 0;">Collection name in Concrette S Bold 14pt white; stone name in Degular Regular 11pt white</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">Required Info</td>
+      <td style="padding: 2.5mm 0;">Collection, stone name, slab dimensions, batch number, QR code</td>
+    </tr>
+    <tr>
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">QR Code</td>
+      <td style="padding: 2.5mm 0;">Links to stone detail page on alphasurfaces.com.au, white on olive, 20mm x 20mm</td>
+    </tr>
+  </table>
+
+  <h2 class="heading-large">Partner Brochure Specifications</h2>
+  <p class="body-text" style="font-size: 13px; margin-bottom: 4mm;">Partner and showroom brochures maintain brand consistency while allowing for co-branding opportunities.</p>
+
+  <table style="width: 100%; border-collapse: collapse; font-family: 'Degular', sans-serif; font-size: 12px;">
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive); width: 40%;">Format</td>
+      <td style="padding: 2.5mm 0;">A4 portrait, saddle-stitched or folded</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">Paper Stock</td>
+      <td style="padding: 2.5mm 0;">Cover: 300gsm uncoated; Inner: 170gsm uncoated</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">Colour Mode</td>
+      <td style="padding: 2.5mm 0;">CMYK + Pantone 5815 C spot colour for olive</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">Cover Design</td>
+      <td style="padding: 2.5mm 0;">Full olive background, white brandmark centred, collection name below</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">Inner Pages</td>
+      <td style="padding: 2.5mm 0;">Cream background, editorial photography, Concrette S headings, Degular body</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">Co-Branding</td>
+      <td style="padding: 2.5mm 0;">Partner logo may appear on back cover only, maximum 40mm wide, greyscale</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">Bleed</td>
+      <td style="padding: 2.5mm 0;">3mm bleed on all sides, 5mm safety margin</td>
+    </tr>
+    <tr>
+      <td style="padding: 2.5mm 3mm 2.5mm 0; font-weight: 600; color: var(--olive);">Approval</td>
+      <td style="padding: 2.5mm 0;">All partner materials must be approved by Alpha Surfaces before print</td>
+    </tr>
+  </table>
+
+  <div class="page-footer">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>10</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 11 — 09 DO'S & DON'TS
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>11</span>
+  </div>
+
+  <div class="section-label">09 — Do's &amp; Don'ts</div>
+  <div class="section-subtitle">Common mistakes to avoid</div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6mm;">
+    <!-- DO Column -->
+    <div>
+      <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 16px; color: var(--olive); margin-bottom: 4mm; padding-bottom: 2mm; border-bottom: 2px solid var(--olive);">&#10003; DO</div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 13px; line-height: 1.6; display: flex; flex-direction: column; gap: 3mm;">
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--olive); flex-shrink: 0;">&#10003;</span> Use the brand colours exactly as specified — no approximations</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--olive); flex-shrink: 0;">&#10003;</span> Always use Concrette S for headings and Degular for body text</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--olive); flex-shrink: 0;">&#10003;</span> Maintain clear space around the logo at all times</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--olive); flex-shrink: 0;">&#10003;</span> Use warm, natural photography that reflects the brand mood</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--olive); flex-shrink: 0;">&#10003;</span> Write in Australian English (colour, centre, specialise)</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--olive); flex-shrink: 0;">&#10003;</span> Capitalise collection and stone names consistently</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--olive); flex-shrink: 0;">&#10003;</span> Use cream (#F3F1E6) as the default background, not white</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--olive); flex-shrink: 0;">&#10003;</span> Get approval before creating any co-branded materials</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--olive); flex-shrink: 0;">&#10003;</span> Use high-resolution imagery (minimum 300dpi for print)</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--olive); flex-shrink: 0;">&#10003;</span> Reference these guidelines for every new brand touchpoint</div>
+      </div>
+    </div>
+
+    <!-- DON'T Column -->
+    <div>
+      <div style="font-family: 'Degular', sans-serif; font-weight: 600; font-size: 16px; color: var(--red); margin-bottom: 4mm; padding-bottom: 2mm; border-bottom: 2px solid var(--red);">&#10007; DON'T</div>
+      <div style="font-family: 'Degular', sans-serif; font-size: 13px; line-height: 1.6; display: flex; flex-direction: column; gap: 3mm;">
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--red); flex-shrink: 0;">&#10007;</span> Alter the brand colours or use similar-but-different shades</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--red); flex-shrink: 0;">&#10007;</span> Substitute other fonts for Concrette S or Degular</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--red); flex-shrink: 0;">&#10007;</span> Stretch, rotate, or add effects to the logo</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--red); flex-shrink: 0;">&#10007;</span> Use cold, blue-tinted, or heavily filtered photography</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--red); flex-shrink: 0;">&#10007;</span> Use American English spellings (color, center, specialize)</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--red); flex-shrink: 0;">&#10007;</span> Abbreviate or informally shorten stone or collection names</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--red); flex-shrink: 0;">&#10007;</span> Use pure white (#FFFFFF) as a page or section background</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--red); flex-shrink: 0;">&#10007;</span> Create partner materials without brand team approval</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--red); flex-shrink: 0;">&#10007;</span> Use low-resolution, pixelated, or stock photography</div>
+        <div style="display: flex; gap: 2mm;"><span style="color: var(--red); flex-shrink: 0;">&#10007;</span> Use discount language, urgency tactics, or cheap marketing clich&eacute;s</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Alpha Surfaces — Brand Guidelines 2025</span>
+    <span>11</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE 12 — BACK COVER
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page page--olive" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+  <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--white); margin-bottom: 6mm;">Questions about brand usage?</div>
+  <div style="font-family: 'Degular', sans-serif; font-weight: 400; font-size: 16px; color: rgba(255,255,255,0.7); max-width: 75%; line-height: 1.6; margin-bottom: 10mm;">Contact the Alpha Surfaces team for approval on all co-branded and partner materials before distribution.</div>
+
+  <div style="margin-bottom: 3mm;">
+    <div style="font-family: 'Concrette S', serif; font-weight: 700; font-size: 16px; color: var(--white);">Belinda Kelaher</div>
+    <div style="font-family: 'Degular', sans-serif; font-size: 13px; color: rgba(255,255,255,0.6);">Managing Director</div>
+  </div>
+  <div style="font-family: 'Degular', sans-serif; font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 2mm;">belinda@alphasurfaces.com.au</div>
+  <div style="font-family: 'Degular', sans-serif; font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 10mm;">alphasurfaces.com.au</div>
+
+  <div style="position: absolute; bottom: 22mm; left: 20mm; right: 20mm; text-align: center;">
+    <div style="font-family: 'Degular', sans-serif; font-size: 10px; text-transform: uppercase; color: rgba(255,255,255,0.3); letter-spacing: 1.5px; margin-bottom: 2mm;">ALPHA SURFACES BRAND GUIDELINES 2025 — CONFIDENTIAL</div>
+    <div style="font-family: 'Degular', sans-serif; font-size: 10px; color: rgba(255,255,255,0.3);">&copy; 2025 Alpha Surfaces Pty Ltd</div>
+  </div>
+</div>
+
+</body>
+</html>

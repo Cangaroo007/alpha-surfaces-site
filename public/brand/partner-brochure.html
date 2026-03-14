@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpha Surfaces — Partner Information Brochure 2025</title>
+<style>
+  /* ── Font Declarations ── */
+  @font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+
+  /* ── Design Tokens ── */
+  :root {
+    --olive: #564d22;
+    --cream: #f3f1e6;
+    --black: #000000;
+    --white: #ffffff;
+  }
+
+  /* ── Reset ── */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ── Screen Layout ── */
+  body {
+    background: #e0e0e0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    width: 210mm;
+    height: 297mm;
+    margin: 40px auto;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── Print Layout ── */
+  @page { size: A4; margin: 0; }
+  @media print {
+    body { background: none; }
+    .page { box-shadow: none; margin: 0; page-break-after: always; }
+    .page:last-child { page-break-after: auto; }
+  }
+
+  /* ══════════════════════════════════════
+     PAGE 1 — FRONT
+     ══════════════════════════════════════ */
+  .page-front {
+    background: var(--olive);
+    color: var(--white);
+    padding: 20mm;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .front-logo img { width: 160px; display: block; }
+
+  .front-spacer { height: 30mm; flex-shrink: 0; }
+
+  .front-headline {
+    font-family: 'Concrette S', serif;
+    font-weight: 500;
+    font-size: 52px;
+    line-height: 1.15;
+    color: var(--white);
+  }
+
+  .front-label {
+    margin-top: 16px;
+    font-family: 'Degular', sans-serif;
+    font-weight: 600;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--white);
+    opacity: 0.5;
+  }
+
+  .front-middle { flex: 1; }
+
+  .front-description {
+    font-family: 'Concrette S', serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--white);
+    opacity: 0.8;
+    max-width: 280px;
+    margin-bottom: 20px;
+  }
+
+  .front-stats {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 16px;
+  }
+  .front-stat {
+    text-align: left;
+    padding: 0 20px;
+  }
+  .front-stat:first-child { padding-left: 0; }
+  .front-stat-number {
+    font-family: 'Concrette S', serif;
+    font-weight: 700;
+    font-size: 36px;
+    color: var(--white);
+    line-height: 1.1;
+  }
+  .front-stat-label {
+    font-family: 'Degular', sans-serif;
+    font-weight: 400;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--white);
+    opacity: 0.5;
+    letter-spacing: 1px;
+  }
+  .front-stat-divider {
+    width: 1px;
+    height: 30px;
+    background: var(--white);
+    opacity: 0.2;
+    flex-shrink: 0;
+  }
+
+  .front-collections {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .front-collection-pill {
+    font-family: 'Degular', sans-serif;
+    font-weight: 400;
+    font-size: 9px;
+    color: var(--white);
+    opacity: 0.5;
+  }
+
+  .front-tagline {
+    font-family: 'Concrette S', serif;
+    font-weight: 500;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--white);
+    opacity: 0.6;
+    margin-bottom: 18px;
+  }
+
+  .front-footer {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .front-footer-heading {
+    font-family: 'Degular', sans-serif;
+    font-weight: 600;
+    font-size: 8px;
+    text-transform: uppercase;
+    color: var(--white);
+    opacity: 0.4;
+    letter-spacing: 1px;
+  }
+  .front-footer-link {
+    font-family: 'Degular', sans-serif;
+    font-weight: 400;
+    font-size: 10px;
+    color: var(--white);
+    opacity: 0.5;
+  }
+
+  /* ══════════════════════════════════════
+     PAGE 2 — BACK
+     ══════════════════════════════════════ */
+  .page-back {
+    background: var(--cream);
+    color: var(--black);
+    padding: 18mm;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .back-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .back-header img { width: 120px; display: block; }
+  .back-header-label {
+    font-family: 'Degular', sans-serif;
+    font-weight: 400;
+    font-size: 9px;
+    text-transform: uppercase;
+    color: var(--olive);
+    letter-spacing: 1px;
+  }
+
+  .back-main-heading {
+    margin-top: 25mm;
+    font-family: 'Concrette S', serif;
+    font-weight: 700;
+    font-size: 30px;
+    color: var(--black);
+    line-height: 1.2;
+  }
+  .back-subheading {
+    margin-top: 6px;
+    font-family: 'Concrette S', serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--black);
+    opacity: 0.6;
+    line-height: 1.4;
+    margin-bottom: 18px;
+  }
+
+  .back-benefits {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15mm;
+    margin-bottom: 18px;
+  }
+  .back-benefit-title {
+    font-family: 'Concrette S', serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--black);
+    margin-bottom: 8px;
+  }
+  .back-benefit-list {
+    list-style: none;
+    padding: 0;
+  }
+  .back-benefit-list li {
+    font-family: 'Degular', sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--black);
+    line-height: 1.5;
+    margin-bottom: 6px;
+    padding-left: 10px;
+    position: relative;
+  }
+  .back-benefit-list li::before {
+    content: '\2022';
+    position: absolute;
+    left: 0;
+    color: var(--olive);
+  }
+
+  .back-collections-divider {
+    border: none;
+    border-top: 1px solid var(--olive);
+    margin-bottom: 14px;
+  }
+  .back-collections-heading {
+    font-family: 'Concrette S', serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--black);
+    margin-bottom: 12px;
+  }
+  .back-collections-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .back-collection-num {
+    font-family: 'Concrette S', serif;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--olive);
+  }
+  .back-collection-name {
+    font-family: 'Concrette S', serif;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--black);
+    margin-bottom: 3px;
+  }
+  .back-collection-desc {
+    font-family: 'Degular', sans-serif;
+    font-weight: 400;
+    font-size: 9px;
+    color: var(--black);
+    opacity: 0.6;
+    line-height: 1.4;
+  }
+
+  .back-certs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .back-cert {
+    font-family: 'Degular', sans-serif;
+    font-weight: 600;
+    font-size: 8px;
+    color: var(--olive);
+    border: 1px solid var(--olive);
+    border-radius: 20px;
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+
+  .back-quote {
+    background: var(--olive);
+    color: var(--white);
+    padding: 16px 20px;
+    margin-left: -18mm;
+    margin-right: -18mm;
+    margin-bottom: 16px;
+  }
+  .back-quote-text {
+    font-family: 'Concrette S', serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--white);
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  .back-quote-attr {
+    font-family: 'Degular', sans-serif;
+    font-weight: 400;
+    font-size: 8px;
+    text-transform: uppercase;
+    color: var(--white);
+    opacity: 0.5;
+    letter-spacing: 1px;
+  }
+
+  .back-cta { margin-top: auto; }
+  .back-cta-heading {
+    font-family: 'Concrette S', serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--black);
+    margin-bottom: 6px;
+  }
+  .back-cta-contact {
+    font-family: 'Degular', sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--black);
+    margin-bottom: 4px;
+  }
+  .back-cta-legal {
+    font-family: 'Degular', sans-serif;
+    font-weight: 400;
+    font-size: 9px;
+    color: var(--black);
+    opacity: 0.4;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     PAGE 1 — FRONT
+     ═══════════════════════════════════════ -->
+<div class="page page-front">
+
+  <div class="front-logo">
+    <img src="../logos/01 Brandmark/Inverse_white/Alpha Surfaces_Brandmark_Inverse.png" alt="Alpha Surfaces">
+  </div>
+
+  <div class="front-spacer"></div>
+
+  <div class="front-headline">
+    Australia's<br>
+    Complete<br>
+    Surface<br>
+    Solution.
+  </div>
+
+  <div class="front-label">Partner Information Brochure &mdash; 2025</div>
+
+  <div class="front-middle"></div>
+
+  <div class="front-description">
+    Premium mineral stone benchtops crafted for Australia's most considered spaces.
+  </div>
+
+  <div class="front-stats">
+    <div class="front-stat">
+      <div class="front-stat-number">30+</div>
+      <div class="front-stat-label">Surfaces</div>
+    </div>
+    <div class="front-stat-divider"></div>
+    <div class="front-stat">
+      <div class="front-stat-number">0%</div>
+      <div class="front-stat-label">Crystalline Silica</div>
+    </div>
+    <div class="front-stat-divider"></div>
+    <div class="front-stat">
+      <div class="front-stat-number">15yr</div>
+      <div class="front-stat-label">Warranty</div>
+    </div>
+  </div>
+
+  <div class="front-collections">
+    <span class="front-collection-pill">01 Calacatta</span>
+    <span class="front-collection-pill">/</span>
+    <span class="front-collection-pill">02 Prairie</span>
+    <span class="front-collection-pill">/</span>
+    <span class="front-collection-pill">03 Soapstone</span>
+    <span class="front-collection-pill">/</span>
+    <span class="front-collection-pill">04 Dramatic</span>
+    <span class="front-collection-pill">/</span>
+    <span class="front-collection-pill">05 Urban</span>
+  </div>
+
+  <div class="front-tagline">Stone that tells a story.</div>
+
+  <div class="front-footer">
+    <span class="front-footer-heading">Partner Enquiries</span>
+    <span class="front-footer-link">belinda@alphasurfaces.com.au</span>
+    <span class="front-footer-link">alphasurfaces.com.au</span>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 2 — BACK
+     ═══════════════════════════════════════ -->
+<div class="page page-back">
+
+  <div class="back-header">
+    <img src="../logos/01 Brandmark/RGB_digital/Alpha Surfaces_Brandmark_RGB.png" alt="Alpha Surfaces">
+    <span class="back-header-label">Partner Information</span>
+  </div>
+
+  <h1 class="back-main-heading">Why Partner with Alpha Surfaces?</h1>
+  <p class="back-subheading">Everything your customers want. Everything you need to grow.</p>
+
+  <div class="back-benefits">
+    <div class="back-benefit">
+      <div class="back-benefit-title">Exclusive Range Access</div>
+      <ul class="back-benefit-list">
+        <li>30+ premium mineral stone surfaces across 5 curated collections.</li>
+        <li>First access to new collection launches before public release.</li>
+        <li>Custom sampling kits and display materials provided.</li>
+      </ul>
+    </div>
+    <div class="back-benefit">
+      <div class="back-benefit-title">Sales &amp; Marketing Support</div>
+      <ul class="back-benefit-list">
+        <li>Co-branded partner landing page on our website.</li>
+        <li>Partner-specific collateral and digital assets.</li>
+        <li>Staff training, product knowledge sessions, and CPD points.</li>
+      </ul>
+    </div>
+    <div class="back-benefit">
+      <div class="back-benefit-title">Business Advantages</div>
+      <ul class="back-benefit-list">
+        <li>Competitive trade pricing with volume incentives.</li>
+        <li>Dedicated account manager &mdash; Belinda Kelaher.</li>
+        <li>15-year manufacturer warranty on all products.</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="back-collections-divider">
+
+  <div class="back-collections-heading">Our Collections</div>
+  <div class="back-collections-row">
+    <div>
+      <div class="back-collection-num">001</div>
+      <div class="back-collection-name">Calacatta &amp; Statuario</div>
+      <div class="back-collection-desc">Classic white marble aesthetics. Timeless, elegant, enduringly popular.</div>
+    </div>
+    <div>
+      <div class="back-collection-num">002</div>
+      <div class="back-collection-name">Prairie &amp; Sage</div>
+      <div class="back-collection-desc">Earthy, warm tones inspired by Australian landscapes. Perfect for contemporary homes.</div>
+    </div>
+    <div>
+      <div class="back-collection-num">003</div>
+      <div class="back-collection-name">Soapstone &amp; Verde</div>
+      <div class="back-collection-desc">Deep, rich surfaces with natural veining. Dramatic and sophisticated.</div>
+    </div>
+    <div>
+      <div class="back-collection-num">004</div>
+      <div class="back-collection-name">Dramatic &amp; Noir</div>
+      <div class="back-collection-desc">Bold blacks and deep charcoals. The choice for statement kitchens.</div>
+    </div>
+    <div>
+      <div class="back-collection-num">005</div>
+      <div class="back-collection-name">Urban &amp; Minimal</div>
+      <div class="back-collection-desc">Concrete-inspired, textural surfaces. Modern, industrial, and versatile.</div>
+    </div>
+  </div>
+
+  <div class="back-certs">
+    <span class="back-cert">&check; Zero Crystalline Silica</span>
+    <span class="back-cert">&check; NSF Certified</span>
+    <span class="back-cert">&check; GreenGuard Gold</span>
+    <span class="back-cert">&check; ACCC Compliant</span>
+    <span class="back-cert">&check; AS/NZS Standards Met</span>
+  </div>
+
+  <div class="back-quote">
+    <div class="back-quote-text">&ldquo;We built Alpha Surfaces because the industry needed a surface that was as beautiful as it was responsible.&rdquo;</div>
+    <div class="back-quote-attr">Belinda Kelaher &mdash; Managing Director</div>
+  </div>
+
+  <div class="back-cta">
+    <div class="back-cta-heading">Ready to become an Alpha Surfaces partner?</div>
+    <div class="back-cta-contact">Contact: belinda@alphasurfaces.com.au &middot; alphasurfaces.com.au &middot; 07 5486 3112</div>
+    <div class="back-cta-legal">&copy; 2025 Alpha Surfaces Pty Ltd &middot; 13 Enterprise St, Kunda Park QLD 4556</div>
+  </div>
+
+</div>
+
+</body>
+</html>
