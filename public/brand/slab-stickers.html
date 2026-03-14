@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alpha Surfaces — Slab Identification Labels</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    @font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+
+    :root {
+      --olive: #564d22;
+      --cream: #f3f1e6;
+      --black: #000000;
+      --white: #ffffff;
+      --red: #f56c6c;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .page-title h1 {
+      font-family: 'Concrette S', serif;
+      font-weight: 700;
+      font-size: 24px;
+      color: var(--black);
+      margin-bottom: 6px;
+    }
+
+    .page-title p {
+      font-family: 'Degular', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .a4-sheet {
+      width: 210mm;
+      height: 297mm;
+      background: var(--white);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+      position: relative;
+      padding: 28.5mm 5mm;
+      display: grid;
+      grid-template-columns: 100mm 100mm;
+      grid-template-rows: repeat(4, 60mm);
+      align-content: start;
+    }
+
+    .sticker {
+      width: 100mm;
+      height: 60mm;
+      border: 0.25pt solid #ccc;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sticker-top-bar {
+      height: 8mm;
+      background: var(--olive);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 3mm;
+      flex-shrink: 0;
+    }
+
+    .sticker-top-bar .brand-name {
+      font-family: 'Degular', sans-serif;
+      font-weight: 600;
+      font-size: 7px;
+      text-transform: uppercase;
+      color: var(--white);
+      letter-spacing: 1px;
+    }
+
+    .sticker-top-bar .silica-free {
+      font-family: 'Degular', sans-serif;
+      font-weight: 600;
+      font-size: 6px;
+      text-transform: uppercase;
+      color: var(--white);
+      border: 1px solid var(--white);
+      border-radius: 8px;
+      padding: 1px 5px;
+      line-height: 1.4;
+    }
+
+    .sticker-body {
+      flex: 1;
+      background: var(--cream);
+      padding: 3mm;
+      display: flex;
+      gap: 2mm;
+    }
+
+    .sticker-body-left {
+      width: 65%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1px;
+    }
+
+    .sticker-body-right {
+      width: 35%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    .collection-label {
+      font-family: 'Degular', sans-serif;
+      font-weight: 400;
+      font-size: 6.5px;
+      text-transform: uppercase;
+      color: var(--olive);
+      line-height: 1.4;
+    }
+
+    .stone-name {
+      font-family: 'Concrette S', serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--black);
+      line-height: 1.2;
+    }
+
+    .finish-line {
+      font-family: 'Degular', sans-serif;
+      font-weight: 400;
+      font-size: 6.5px;
+      text-transform: uppercase;
+      color: var(--black);
+      opacity: 0.5;
+      line-height: 1.4;
+    }
+
+    .sku-line {
+      font-family: 'Degular', sans-serif;
+      font-weight: 400;
+      font-size: 7px;
+      color: var(--black);
+      line-height: 1.5;
+    }
+
+    .dims-line {
+      font-family: 'Degular', sans-serif;
+      font-weight: 400;
+      font-size: 7px;
+      color: var(--black);
+      line-height: 1.5;
+    }
+
+    .care-line {
+      font-family: 'Degular', sans-serif;
+      font-weight: 400;
+      font-size: 6px;
+      color: var(--black);
+      opacity: 0.5;
+      line-height: 1.4;
+      margin-top: 1px;
+    }
+
+    .barcode-container {
+      width: 30mm;
+      height: 12mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .barcode-container svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .qr-container {
+      width: 15mm;
+      height: 15mm;
+    }
+
+    .qr-container img {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .qr-container canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .scan-label {
+      font-family: 'Degular', sans-serif;
+      font-weight: 400;
+      font-size: 6px;
+      color: var(--black);
+      opacity: 0.5;
+    }
+
+    .sticker-bottom {
+      height: 5mm;
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .sticker-bottom span {
+      font-family: 'Degular', sans-serif;
+      font-weight: 400;
+      font-size: 5px;
+      color: var(--black);
+      opacity: 0.3;
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      body {
+        background: none;
+        padding: 0;
+      }
+
+      .page-title {
+        display: none;
+      }
+
+      .a4-sheet {
+        box-shadow: none;
+        width: 210mm;
+        height: 297mm;
+      }
+
+      .sticker {
+        border: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-title">
+    <h1>Alpha Surfaces — Slab Identification Labels</h1>
+    <p>Print-ready sheet · 2-up · A4 · 100mm × 60mm per label</p>
+  </div>
+
+  <div class="a4-sheet" id="stickerSheet"></div>
+
+  <script>
+    const stickers = [
+      { name: 'Calacatta Oro', collection: 'COLLECTION 01', finish: 'POLISHED · MINERAL STONE', sku: 'AS-C01-CAL-001', dims: '3200 × 1600 × 20mm', slug: 'calacatta-oro' },
+      { name: 'Statuario Classico', collection: 'COLLECTION 01', finish: 'HONED · MINERAL STONE', sku: 'AS-C01-STA-002', dims: '3200 × 1600 × 20mm', slug: 'statuario-classico' },
+      { name: 'Prairie White', collection: 'COLLECTION 02', finish: 'POLISHED · MINERAL STONE', sku: 'AS-C02-PRA-003', dims: '3200 × 1600 × 20mm', slug: 'prairie-white' },
+      { name: 'Sage Green', collection: 'COLLECTION 02', finish: 'MATTE · MINERAL STONE', sku: 'AS-C02-SAG-004', dims: '3200 × 1600 × 20mm', slug: 'sage-green' },
+      { name: 'Soapstone Noir', collection: 'COLLECTION 03', finish: 'LEATHERED · MINERAL STONE', sku: 'AS-C03-SOA-005', dims: '3200 × 1600 × 20mm', slug: 'soapstone-noir' },
+      { name: 'Dramatic Black', collection: 'COLLECTION 04', finish: 'POLISHED · MINERAL STONE', sku: 'AS-C04-DRA-006', dims: '3200 × 1600 × 20mm', slug: 'dramatic-black' },
+      { name: 'Autumn Gold', collection: 'COLLECTION 05', finish: 'HONED · MINERAL STONE', sku: 'AS-C05-AUT-007', dims: '3200 × 1600 × 20mm', slug: 'autumn-gold' },
+      { name: 'Urban Concrete', collection: 'COLLECTION 05', finish: 'MATTE · MINERAL STONE', sku: 'AS-C05-URB-008', dims: '3200 × 1600 × 20mm', slug: 'urban-concrete' }
+    ];
+
+    const sheet = document.getElementById('stickerSheet');
+
+    stickers.forEach((s, i) => {
+      const sticker = document.createElement('div');
+      sticker.className = 'sticker';
+      sticker.innerHTML = `
+        <div class="sticker-top-bar">
+          <span class="brand-name">Alpha Surfaces</span>
+          <span class="silica-free">Silica Free</span>
+        </div>
+        <div class="sticker-body">
+          <div class="sticker-body-left">
+            <div class="collection-label">${s.collection}</div>
+            <div class="stone-name">${s.name}</div>
+            <div class="finish-line">${s.finish}</div>
+            <div class="sku-line">SKU: ${s.sku}</div>
+            <div class="dims-line">DIMS: ${s.dims}</div>
+            <div class="care-line">Care: Neutral pH cleaners · No abrasives · Wipe dry</div>
+          </div>
+          <div class="sticker-body-right">
+            <div class="barcode-container"><svg class="barcode" data-sku="${s.sku}"></svg></div>
+            <div class="qr-container" id="qr-${i}"></div>
+            <span class="scan-label">Scan for details</span>
+          </div>
+        </div>
+        <div class="sticker-bottom">
+          <span>alphasurfaces.com.au · &copy; 2025 Alpha Surfaces Pty Ltd · All Rights Reserved</span>
+        </div>
+      `;
+      sheet.appendChild(sticker);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Generate barcodes
+      document.querySelectorAll('.barcode').forEach(svg => {
+        JsBarcode(svg, svg.dataset.sku, {
+          format: 'CODE128',
+          height: 30,
+          width: 1.2,
+          displayValue: false,
+          margin: 0
+        });
+      });
+
+      // Generate QR codes
+      stickers.forEach((s, i) => {
+        new QRCode(document.getElementById('qr-' + i), {
+          text: 'https://alphasurfaces.com.au/surfaces/' + s.slug,
+          width: 56,
+          height: 56,
+          colorDark: '#000000',
+          colorLight: '#f3f1e6'
+        });
+      });
+    });
+  </script>
+</body>
+</html>
