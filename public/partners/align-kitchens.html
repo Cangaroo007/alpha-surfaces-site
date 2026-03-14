@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Alpha Surfaces × Align Kitchens — Partner Program</title>
+<style>
+/* --- FONTS --- */
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+
+/* --- RESET & BASE --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --olive: #564d22;
+  --cream: #f3f1e6;
+  --white: #ffffff;
+  --black: #000000;
+  --red: #f56c6c;
+  --gray: #cccccc;
+  --border: rgba(0,0,0,0.1);
+}
+html { scroll-behavior: smooth; }
+body { background: #f5f5f5; color: var(--black); font-family: 'Degular', sans-serif; font-weight: 400; line-height: 1.2; overflow-x: hidden; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* --- NAV --- */
+.nav { position: sticky; top: 0; z-index: 100; background: var(--olive); display: flex; align-items: center; justify-content: space-between; padding: 18px 90px; }
+.nav-left { display: flex; align-items: center; gap: 24px; padding-left: 35px; }
+.nav-left a { display: flex; align-items: center; }
+.nav-left img { height: 75px; width: auto; }
+.nav-partner { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 18px; color: rgba(255,255,255,0.7); letter-spacing: 0.4px; white-space: nowrap; }
+.nav-menu { display: flex; align-items: center; gap: 85px; }
+.nav-menu a { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 20px; color: var(--white); text-decoration: none; letter-spacing: 0.6px; text-transform: uppercase; }
+.nav-menu a:hover { opacity: 0.8; }
+.nav-hamburger { display: none; }
+
+/* --- HERO --- */
+.hero { position: relative; width: 100%; height: calc(100vh - 111px); min-height: 600px; max-height: 900px; overflow: hidden; }
+.hero img { width: 100%; height: 100%; object-fit: cover; }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 50%, transparent 100%); }
+.hero-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 80px 90px; }
+.hero-content h1 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 60px; line-height: 1.1; color: var(--white); max-width: 800px; margin-bottom: 20px; }
+.hero-content p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 24px; line-height: 1.3; color: rgba(255,255,255,0.85); max-width: 600px; }
+
+/* --- STATEMENT --- */
+.statement { background: var(--olive); display: flex; flex-direction: column; align-items: center; padding: 150px 171px 0; min-height: 661px; position: relative; }
+.statement p { font-family: 'Concrette S', serif; font-weight: 500; font-size: 42px; line-height: 1.2; color: var(--white); max-width: 1100px; }
+.statement .arrow { margin-top: auto; margin-bottom: 80px; width: 62px; height: 70px; }
+.statement .arrow svg { width: 100%; height: 100%; }
+
+/* --- VALUE PROPOSITION --- */
+.value { background: var(--cream); padding: 120px 161px; }
+.value-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--olive); margin-bottom: 16px; }
+.value-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 42px; line-height: 1.15; color: var(--black); max-width: 700px; margin-bottom: 80px; }
+.value-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; }
+.value-card { display: flex; flex-direction: column; gap: 16px; }
+.value-card-num { font-family: 'Concrette S', serif; font-weight: 700; font-size: 48px; line-height: 1; color: var(--olive); opacity: 0.3; }
+.value-card h3 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; line-height: 1.2; color: var(--black); }
+.value-card p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 18px; line-height: 1.4; color: var(--black); opacity: 0.75; }
+
+/* --- COLLECTIONS SHOWCASE --- */
+.showcase { background: var(--white); padding: 120px 90px; }
+.showcase-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--olive); margin-bottom: 16px; }
+.showcase-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 42px; line-height: 1.15; color: var(--black); margin-bottom: 60px; }
+.showcase-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+.showcase-card { position: relative; overflow: hidden; }
+.showcase-card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; transition: transform 0.6s ease; }
+.showcase-card:hover img { transform: scale(1.04); }
+.showcase-card-info { padding: 16px 0; }
+.showcase-card-info .sc-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 16px; color: var(--black); }
+.showcase-card-info .sc-sub { font-family: 'Concrette S', serif; font-weight: 400; font-size: 14px; color: var(--black); opacity: 0.6; }
+
+/* --- CONTACT --- */
+.contact { background: var(--white); padding: 120px 90px 80px; border-top: 1px solid var(--border); }
+.contact-inner { display: flex; gap: 120px; }
+.contact-left { width: 420px; flex-shrink: 0; display: flex; flex-direction: column; gap: 48px; }
+.contact-heading { font-size: 30px; color: var(--black); }
+.contact-heading .ch-bold { font-family: 'Concrette S', serif; font-weight: 700; line-height: 52px; display: block; }
+.contact-heading .ch-regular { font-family: 'Concrette S', serif; font-weight: 400; line-height: 1.2; display: block; max-width: 357px; }
+.contact-person { display: flex; flex-direction: column; gap: 8px; }
+.contact-person .cp-name { font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--black); }
+.contact-person .cp-role { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 16px; color: var(--black); opacity: 0.6; text-transform: uppercase; }
+.contact-details { display: flex; flex-direction: column; gap: 6px; }
+.contact-details a { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px; color: var(--black); text-decoration: underline; }
+.contact-details a:hover { color: var(--olive); }
+
+/* --- FORM --- */
+.contact-form { flex: 1; max-width: 538px; display: flex; flex-direction: column; gap: 45px; }
+.form-group { flex: 1; display: flex; flex-direction: column; gap: 11px; }
+.form-label { display: flex; gap: 8px; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); }
+.form-label .required { color: var(--red); }
+.form-input { border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 4px 0; outline: none; width: 100%; }
+.form-input:focus { border-bottom-color: var(--olive); }
+.form-select-wrap { display: flex; flex-direction: column; gap: 11px; }
+.form-select-label { display: flex; flex-direction: column; gap: 8px; }
+.form-select { border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--gray); padding: 4px 0; outline: none; width: 100%; appearance: none; -webkit-appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right center; background-size: 12px 6px; }
+.form-select:valid { color: var(--black); }
+.form-submit-row { display: flex; justify-content: flex-end; }
+.btn-submit { background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 8px 44px; border-radius: 12px; border: none; cursor: pointer; width: 189px; }
+.btn-submit:hover { opacity: 0.9; }
+
+/* --- FOOTER --- */
+.footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
+.footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
+
+/* --- MOBILE --- */
+@media (max-width: 1024px) {
+  .nav { padding: 24px 21px; }
+  .nav-left { padding-left: 0; gap: 16px; }
+  .nav-left img { height: 54px; }
+  .nav-partner { font-size: 14px; }
+  .nav-menu { display: none; }
+  .nav-hamburger { display: block; cursor: pointer; background: none; border: none; padding: 0; }
+  .nav-hamburger span { display: block; width: 28px; height: 2px; background: var(--white); margin-bottom: 6px; }
+  .nav-hamburger span:last-child { margin-bottom: 0; }
+
+  .hero { height: 60vh; min-height: 400px; }
+  .hero-content { padding: 40px 24px; }
+  .hero-content h1 { font-size: 36px; }
+  .hero-content p { font-size: 18px; }
+
+  .statement { padding: 44px 24px 88px; min-height: auto; gap: 124px; }
+  .statement p { font-weight: 400; font-size: 24px; line-height: 1.15; }
+  .statement .arrow { width: 42px; height: 22px; margin-bottom: 0; }
+
+  .value { padding: 60px 24px; }
+  .value-heading { font-size: 30px; margin-bottom: 48px; }
+  .value-grid { grid-template-columns: 1fr; gap: 48px; }
+
+  .showcase { padding: 60px 24px; }
+  .showcase-heading { font-size: 30px; margin-bottom: 40px; }
+  .showcase-grid { grid-template-columns: repeat(2, 1fr); gap: 3px; }
+  .showcase-grid .showcase-card:last-child { grid-column: span 2; }
+  .showcase-grid .showcase-card:last-child img { aspect-ratio: 16/9; }
+
+  .contact { padding: 60px 24px; }
+  .contact-inner { flex-direction: column; gap: 60px; }
+  .contact-left { width: 100%; }
+  .contact-form { max-width: 100%; }
+  .btn-submit { width: 100%; }
+
+  .footer { padding: 30px 24px; }
+  .footer p { font-size: 12px; letter-spacing: 0.36px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left">
+    <a href="/">
+      <img src="../logos/01 Brandmark/Inverse_white/Alpha Surfaces_Brandmark_Inverse.png" alt="Alpha Surfaces">
+    </a>
+    <span class="nav-partner">&times; Align Kitchens</span>
+  </div>
+  <div class="nav-menu">
+    <a href="#partnership">PARTNERSHIP</a>
+    <a href="#collections">COLLECTIONS</a>
+    <a href="#contact">CONTACT</a>
+  </div>
+  <button class="nav-hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <img src="../images/hero.jpg" alt="Alpha Surfaces × Align Kitchens partnership">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1>Alpha Surfaces &times; Align Kitchens</h1>
+    <p>High-end kitchen renovations in Brisbane and Ipswich — elevated with Alpha Surfaces' premium mineral stone benchtops.</p>
+  </div>
+</section>
+
+<!-- PARTNERSHIP STATEMENT -->
+<section class="statement" id="partnership">
+  <p>Align Kitchens' focus on high-end kitchen renovations demands surfaces that match — Alpha Surfaces' premium mineral stone collections deliver the natural-stone realism, durability, and sophistication that Align's discerning clients expect from every element of their dream kitchen.</p>
+  <div class="arrow">
+    <svg viewBox="0 0 62 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M31 0V65M31 65L5 40M31 65L57 40" stroke="white" stroke-width="2"/>
+    </svg>
+  </div>
+</section>
+
+<!-- VALUE PROPOSITION -->
+<section class="value">
+  <p class="value-label">Partnership Benefits</p>
+  <h2 class="value-heading">Why Align Kitchens partners with Alpha Surfaces.</h2>
+  <div class="value-grid">
+    <div class="value-card">
+      <span class="value-card-num">01</span>
+      <h3>High-End Specialisation</h3>
+      <p>Align Kitchens works exclusively on premium kitchen renovations — Alpha Surfaces' collections are curated to meet the elevated material expectations of clients investing in high-end outcomes.</p>
+    </div>
+    <div class="value-card">
+      <span class="value-card-num">02</span>
+      <h3>Showroom Experience</h3>
+      <p>Visit Align's Brisbane and Ipswich showrooms to see Alpha Surfaces' full collection in person, presented alongside Align's premium cabinetry and design concepts in an inspiring, consultation-ready setting.</p>
+    </div>
+    <div class="value-card">
+      <span class="value-card-num">03</span>
+      <h3>Design-Led Approach</h3>
+      <p>Align's design-first philosophy ensures every Alpha Surfaces benchtop is selected and specified to complement the overall kitchen vision — from material palette through to edge profile and finish.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTIONS SHOWCASE -->
+<section class="showcase" id="collections">
+  <p class="showcase-label">Featured Collections</p>
+  <h2 class="showcase-heading">Available at Align Kitchens.</h2>
+  <div class="showcase-grid">
+    <div class="showcase-card">
+      <img src="../images/collection_221.jpg" alt="Calacatta Collection">
+      <div class="showcase-card-info">
+        <span class="sc-title">Calacatta</span><br>
+        <span class="sc-sub">Collection 01</span>
+      </div>
+    </div>
+    <div class="showcase-card">
+      <img src="../images/collection_228.jpg" alt="Carrara Collection">
+      <div class="showcase-card-info">
+        <span class="sc-title">Carrara</span><br>
+        <span class="sc-sub">Collection 02</span>
+      </div>
+    </div>
+    <div class="showcase-card">
+      <img src="../images/collection_235.jpg" alt="Concrete Collection">
+      <div class="showcase-card-info">
+        <span class="sc-title">Concrete</span><br>
+        <span class="sc-sub">Collection 03</span>
+      </div>
+    </div>
+    <div class="showcase-card">
+      <img src="../images/collection_242.jpg" alt="Statuario Gold Collection">
+      <div class="showcase-card-info">
+        <span class="sc-title">Statuario Gold</span><br>
+        <span class="sc-sub">Collection 04</span>
+      </div>
+    </div>
+    <div class="showcase-card">
+      <img src="../images/collection_249.jpg" alt="Autumn Gold Collection">
+      <div class="showcase-card-info">
+        <span class="sc-title">Autumn Gold</span><br>
+        <span class="sc-sub">Collection 05</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT / CTA -->
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div class="contact-left">
+      <div class="contact-heading">
+        <span class="ch-bold">Get in touch.</span>
+        <span class="ch-regular">For partnership enquiries and store support.</span>
+      </div>
+      <div class="contact-person">
+        <span class="cp-name">Belinda Kelaher</span>
+        <span class="cp-role">Managing Director, Alpha Surfaces</span>
+      </div>
+      <div class="contact-details">
+        <a href="tel:0754863112">07 5486 3112</a>
+        <a href="mailto:belinda@alphasurfaces.com.au">belinda@alphasurfaces.com.au</a>
+      </div>
+    </div>
+    <form class="contact-form" action="#" method="POST">
+      <div class="form-group">
+        <span class="form-label">Name <span class="required">*</span></span>
+        <input type="text" class="form-input" name="name" required>
+      </div>
+      <div class="form-group">
+        <span class="form-label">Phone <span class="required">*</span></span>
+        <input type="tel" class="form-input" name="phone" required>
+      </div>
+      <div class="form-group">
+        <span class="form-label">Email <span class="required">*</span></span>
+        <input type="email" class="form-input" name="email" required>
+      </div>
+      <div class="form-select-wrap">
+        <div class="form-select-label">
+          <span class="form-label">Store Location <span class="required">*</span></span>
+          <select class="form-select" name="store_location" required>
+            <option value="" disabled selected>- Select -</option>
+            <option value="brisbane-north">Brisbane North</option>
+            <option value="brisbane-south">Brisbane South</option>
+            <option value="gold-coast">Gold Coast</option>
+            <option value="sunshine-coast">Sunshine Coast</option>
+            <option value="toowoomba">Toowoomba</option>
+            <option value="townsville">Townsville</option>
+            <option value="cairns">Cairns</option>
+            <option value="sydney-north">Sydney North</option>
+            <option value="sydney-south">Sydney South</option>
+            <option value="sydney-west">Sydney West</option>
+            <option value="central-coast">Central Coast</option>
+            <option value="newcastle">Newcastle</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-submit-row">
+        <button type="submit" class="btn-submit">Submit</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>Copyright &copy; 2024 Alpha Surfaces – ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+</footer>
+
+</body>
+</html>
