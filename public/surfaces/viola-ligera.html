@@ -166,7 +166,7 @@ img { display: block; max-width: 100%; }
 (function() {
   var slug = document.body.getAttribute('data-slug');
 
-  fetch('/data/stones.json')
+  fetch('../data/stones.json')
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var stone = null;
@@ -342,7 +342,7 @@ img { display: block; max-width: 100%; }
       });
 
       section.appendChild(grid);
-    });
+    }).catch(function(err) { console.error('Failed to load stones.json:', err); });
 })();
 </script>
 </body>
