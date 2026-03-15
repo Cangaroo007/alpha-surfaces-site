@@ -4,293 +4,247 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Acropolis | Alpha Surfaces</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+/* --- FONTS --- */
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-SemiBold.woff2') format('woff2'), url('../fonts/Web/ConcretteS-SemiBold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+
+/* --- RESET & BASE --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --olive: #5C5A1E; --olive-dark: #3D3B14; --olive-mid: #7A7830;
-  --cream: #F7F5F0; --cream-dark: #EDE9E0; --charcoal: #2A2A28;
-  --warm-gray: #9C9890; --gold: #B8A472; --gold-light: #D4C08A; --white: #ffffff;
+  --olive: #564d22;
+  --olive-deep: #2a2406;
+  --cream: #f3f1e6;
+  --white: #ffffff;
+  --black: #000000;
+  --red: #f56c6c;
+  --gray: #cccccc;
+  --border: rgba(0,0,0,0.1);
 }
 html { scroll-behavior: smooth; }
-body { background: var(--cream); color: var(--charcoal); font-family: 'Outfit', sans-serif; font-weight: 400; line-height: 1.6; overflow-x: hidden; margin: 0; }
+body { background: #f5f5f5; color: var(--black); font-family: 'Degular', sans-serif; font-weight: 400; line-height: 1.2; overflow-x: hidden; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
 
-/* NAV */
-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--olive); padding: 0 60px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
-.nav-logo { display: flex; flex-direction: column; line-height: 1; gap: 2px; text-decoration: none; }
-.nav-logo-alpha { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--cream); letter-spacing: 0.12em; text-transform: uppercase; }
-.nav-logo-surfaces { font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 500; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold-light); }
-.nav-links { display: flex; gap: 40px; list-style: none; align-items: center; }
-.nav-links a { font-size: 11px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,245,240,0.7); text-decoration: none; transition: color 0.2s; }
-.nav-links a:hover { color: var(--gold-light); }
-.nav-cta { font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--olive); background: var(--gold); padding: 9px 22px; border-radius: 1px; text-decoration: none; transition: all 0.2s; }
-.nav-cta:hover { background: var(--gold-light); }
+/* --- NAV --- */
+.nav { position: sticky; top: 0; z-index: 100; background: var(--olive); display: flex; align-items: center; justify-content: space-between; padding: 18px 90px; }
+.nav-logo { display: flex; align-items: center; padding-left: 35px; }
+.nav-logo img { height: 75px; width: auto; }
+.nav-menu { display: flex; align-items: center; gap: 85px; }
+.nav-menu a { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 20px; color: var(--white); text-decoration: none; letter-spacing: 0.6px; text-transform: uppercase; }
+.nav-menu a:hover { opacity: 0.8; }
+.nav-hamburger { display: none; }
 
-/* BREADCRUMB */
-.breadcrumb { margin-top: 64px; padding: 20px 80px; background: var(--cream-dark); font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--warm-gray); }
-.breadcrumb a { color: var(--warm-gray); text-decoration: none; transition: color 0.2s; }
-.breadcrumb a:hover { color: var(--gold); }
-.breadcrumb span { margin: 0 8px; }
+/* --- INTRO --- */
+.intro { background: var(--white); display: flex; gap: 60px; align-items: center; justify-content: center; padding: 120px; overflow: hidden; }
+.intro-text { flex: 1; min-width: 0; }
+.intro-container { display: flex; flex-direction: column; gap: 36px; max-width: 560px; }
+.intro-title-row { display: flex; align-items: center; justify-content: space-between; }
+.intro-stone-name { font-family: 'Concrette S', serif; font-weight: 600; font-size: 30px; line-height: 1.2; color: var(--black); }
+.intro-meta { display: flex; flex-direction: column; gap: 12px; line-height: 1.2; color: var(--black); }
+.intro-collection { font-family: 'Concrette S', serif; font-weight: 600; font-size: 18px; }
+.intro-tagline { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; }
+.intro-specs { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; line-height: 1.4; color: var(--black); }
+.intro-shield { display: flex; flex-direction: column; gap: 24px; }
+.intro-shield-icon { width: 58px; height: 68px; object-fit: contain; }
+.intro-shield-text { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 16px; line-height: 1.2; color: var(--black); max-width: 361px; }
+.intro-cta { padding-top: 40px; }
+.btn-order { display: inline-flex; align-items: center; justify-content: center; background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 8px 44px; border-radius: 12px; text-decoration: none; width: 207px; }
+.btn-order:hover { opacity: 0.9; }
+.intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+.intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+.intro-swatch-img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; background: #d9d9d9; }
 
-/* STONE HERO */
-.stone-hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 600px; }
-.stone-hero-image { background: var(--cream-dark); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-.stone-hero-image img { width: 100%; height: 100%; object-fit: cover; }
-.stone-hero-placeholder { font-family: 'Cormorant Garamond', serif; font-size: 48px; color: var(--warm-gray); font-style: italic; opacity: 0.5; }
-.stone-hero-content { display: flex; flex-direction: column; justify-content: center; padding: 80px; }
-.stone-collection-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
-.stone-collection-label::before { content: ''; width: 28px; height: 1px; background: var(--gold); }
-.stone-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 4.5vw, 60px); font-weight: 400; color: var(--charcoal); letter-spacing: -0.02em; margin: 0 0 0; line-height: 1.1; }
+/* --- FULL SWATCH --- */
+.full-swatch { width: 100%; height: 715px; overflow: hidden; }
+.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
+.full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
 
-/* Enhancement 2: Gold rule between name and tagline */
-.stone-rule { width: 40px; height: 1px; background: var(--gold); margin: 24px auto 24px 0; }
+/* --- COLLECTION SECTION --- */
+.collection-section { background: var(--olive-deep); padding: 44px 32px; }
+.collection-title-row { display: flex; align-items: center; gap: 16px; margin-bottom: 5px; }
+.collection-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 30px; color: var(--white); }
+.collection-desc { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px; line-height: 1.2; color: var(--white); margin-bottom: 48px; }
 
-.stone-tagline { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; font-style: italic; color: var(--olive-mid); margin-bottom: 28px; line-height: 1.4; }
-.stone-description { font-size: 15px; font-weight: 300; color: var(--charcoal); line-height: 1.85; max-width: 480px; margin-bottom: 36px; }
-.stone-actions { display: flex; gap: 16px; flex-wrap: wrap; }
-.btn-primary { font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--white); background: var(--olive); padding: 14px 28px; border-radius: 1px; text-decoration: none; transition: all 0.2s; display: inline-block; }
-.btn-primary:hover { background: var(--olive-dark); }
-.btn-ghost { font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--olive); background: transparent; padding: 14px 28px; border: 2px solid var(--olive); border-radius: 1px; text-decoration: none; transition: all 0.2s; display: inline-block; }
-.btn-ghost:hover { background: var(--olive); color: var(--white); }
+/* --- STONE GRID --- */
+.stones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 54px 54px; }
+.stone-card { text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; }
+.stone-card-image { position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #1a1a0a; }
+.stone-card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+.stone-card:hover .stone-card-image img { transform: scale(1.04); }
+.stone-card-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 18px; color: rgba(255,255,255,0.25); font-style: italic; }
+.stone-card-info { display: flex; flex-direction: column; gap: 8px; line-height: 1.2; color: var(--white); }
+.stone-card-name { font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; }
+.stone-card-finish { font-family: 'Concrette S', serif; font-weight: 400; font-size: 12px; }
+.stone-card.active .stone-card-image { outline: 2px solid var(--white); outline-offset: -2px; }
 
-/* SPECS */
-.specs-section { padding: 80px; border-top: 1px solid var(--cream-dark); }
-.specs-header { text-align: center; margin-bottom: 60px; }
-.specs-header .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
-.specs-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 400; color: var(--charcoal); margin: 0; }
-.specs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; max-width: 900px; margin: 0 auto; }
-.spec-item { text-align: center; }
-.spec-value { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; color: var(--olive); margin-bottom: 6px; }
-.spec-label { font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--warm-gray); }
+/* --- FOOTER --- */
+.footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
+.footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
 
-/* FEATURES */
-.features-section { padding: 80px; background: var(--olive-dark); }
-.features-header { text-align: center; margin-bottom: 60px; }
-.features-header .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 12px; }
-.features-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 400; color: var(--white); margin: 0; }
-.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; max-width: 900px; margin: 0 auto; }
-.feature-item { text-align: center; }
-.feature-icon { font-size: 24px; margin-bottom: 12px; color: var(--gold-light); }
-.feature-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; color: var(--white); margin-bottom: 8px; }
-.feature-desc { font-size: 13px; color: rgba(247,245,240,0.6); line-height: 1.6; }
+/* --- MOBILE --- */
+@media (max-width: 1024px) {
+  .nav { padding: 24px 21px; }
+  .nav-logo { padding-left: 0; }
+  .nav-logo img { height: 54px; }
+  .nav-menu { display: none; }
+  .nav-hamburger { display: block; cursor: pointer; background: none; border: none; padding: 0; }
+  .nav-hamburger span { display: block; width: 28px; height: 2px; background: var(--white); margin-bottom: 6px; }
+  .nav-hamburger span:last-child { margin-bottom: 0; }
 
-/* CTA */
-.stone-cta { padding: 80px; text-align: center; background: var(--cream-dark); }
-.stone-cta h2 { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 400; color: var(--charcoal); margin: 0 0 12px; }
-.stone-cta p { font-size: 15px; color: var(--warm-gray); margin-bottom: 32px; }
+  .intro { flex-direction: column-reverse; padding: 0; gap: 0; }
+  .intro-swatch { width: 100%; }
+  .intro-swatch-img { min-height: 347px; height: 347px; }
+  .intro-text { width: 100%; padding: 24px 24px 44px; }
+  .intro-container { max-width: 100%; }
 
-/* FOOTER */
-footer { background: var(--olive-dark); padding: 60px 80px 30px; }
-.footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; margin-bottom: 50px; }
-.footer-brand-alpha { display: block; font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: var(--cream); letter-spacing: 0.12em; text-transform: uppercase; }
-.footer-brand-surfaces { display: block; font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 16px; }
-.footer-brand-desc { font-size: 14px; color: rgba(247,245,240,0.5); line-height: 1.7; max-width: 320px; }
-.footer-col-title { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 16px; }
-.footer-links { list-style: none; padding: 0; margin: 0; }
-.footer-links li { margin-bottom: 10px; }
-.footer-links a { font-size: 13px; color: rgba(247,245,240,0.5); text-decoration: none; transition: color 0.2s; }
-.footer-links a:hover { color: var(--gold-light); }
-.footer-bottom { border-top: 1px solid rgba(247,245,240,0.1); padding-top: 24px; display: flex; justify-content: space-between; font-size: 12px; color: rgba(247,245,240,0.3); }
+  .full-swatch { height: 200px; }
 
-/* REVEAL */
-.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
-.reveal.visible { opacity: 1; transform: translateY(0); }
-.reveal-d1 { transition-delay: 0.1s; }
-.reveal-d2 { transition-delay: 0.2s; }
+  .collection-section { padding: 44px 32px; }
+  .stones-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  .stone-card-name { font-size: 16px; }
+  .stone-card-finish { font-size: 11px; }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  nav { padding: 0 24px; }
-  .breadcrumb { padding: 16px 24px; }
-  .stone-hero { grid-template-columns: 1fr; }
-  .stone-hero-image { min-height: 300px; }
-  .stone-hero-content { padding: 48px 24px; }
-  .specs-section { padding: 48px 24px; }
-  .specs-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
-  .features-section { padding: 48px 24px; }
-  .features-grid { grid-template-columns: 1fr; gap: 32px; }
-  .stone-cta { padding: 48px 24px; }
-  footer { padding: 40px 24px 20px; }
-  .footer-top { grid-template-columns: 1fr; gap: 32px; }
+  .footer { padding: 30px 24px; }
+  .footer p { font-size: 12px; letter-spacing: 0.36px; }
 }
 </style>
 </head>
 <body>
 
-<nav>
+<!-- NAV -->
+<nav class="nav">
   <a href="/" class="nav-logo">
-    <span class="nav-logo-alpha">Alpha</span>
-    <span class="nav-logo-surfaces">Surfaces</span>
+    <img src="../logos/01 Brandmark/Inverse_white/Alpha Surfaces_Brandmark_Inverse.png" alt="Alpha Surfaces">
   </a>
-  <ul class="nav-links">
-    <li><a href="/collections">Collections</a></li>
-    <li><a href="/#about">About</a></li>
-    <li><a href="/#contact">Contact</a></li>
-  </ul>
-  <a href="mailto:belinda@alphasurfaces.com.au" class="nav-cta">Book a Consultation</a>
+  <div class="nav-menu">
+    <a href="/collections.html">COLLECTIONS</a>
+    <a href="/#about">ABOUT</a>
+    <a href="/#contact">CONTACT</a>
+  </div>
+  <button class="nav-hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
-<div class="breadcrumb">
-  <a href="/">Home</a>
-  <span>&#8250;</span>
-  <a href="/collections">Collections</a>
-  <span>&#8250;</span>
-  Calacatta & Statuario
-  <span>&#8250;</span>
-  Acropolis
-</div>
-
-<section class="stone-hero">
-  <div class="stone-hero-image">
-    <div class="stone-hero-placeholder">Acropolis</div>
-  </div>
-  <div class="stone-hero-content">
-    <div class="stone-collection-label">Collection 01 &#8212; Calacatta &amp; Statuario</div>
-    <h1 class="stone-name">Acropolis</h1>
-    <div class="stone-rule"></div>
-    <p class="stone-tagline">[TO BE UPDATED]</p>
-    <p class="stone-description">[TO BE UPDATED]</p>
-    <div class="stone-actions">
-      <a href="mailto:belinda@alphasurfaces.com.au?subject=Sample Request – Acropolis" class="btn-primary">Request a Sample</a>
-      <a href="/collections" class="btn-ghost">View All Surfaces</a>
+<!-- INTRO -->
+<section class="intro">
+  <div class="intro-text">
+    <div class="intro-container">
+      <div>
+        <div class="intro-title-row">
+          <h1 class="intro-stone-name">Acropolis</h1>
+        </div>
+        <div class="intro-meta" style="margin-top: 16px;">
+          <p class="intro-collection">Collection 01 – Calacatta & Statuario</p>
+          <p class="intro-tagline">Classic white marble aesthetics with soft grey veining. Timeless, elegant, enduringly popular.</p>
+        </div>
+      </div>
+      <div class="intro-specs">
+        Polished finish<br>
+        Nominal slab size 3200 x 1600mm<br>
+        Slab thickness 20mm<br>
+        Weight 236kg &nbsp;|&nbsp; 15-Year Limited Warranty
+      </div>
+      <div class="intro-shield">
+        <div>
+          <img class="intro-shield-icon" src="../logos/03 Alpha Shield/RGB_digital/Alpha Surfaces_Alpha Shield_RGB.png" alt="AlphaShield">
+        </div>
+        <p class="intro-shield-text">Exclusive AlphaShield&#8482; protectant guards against everyday wear and tear for long-term durability &#8211; with Lifetime Stain Resistance Guarantee.</p>
+      </div>
+      <div class="intro-cta">
+        <a href="/#contact" class="btn-order">Order A Sample</a>
+      </div>
+      <p class="intro-disclaimer">Disclaimer: Alpha Surfaces&#8217; website images are indicative only and colours can vary depending on the device on which they are viewed and user screen settings. We make every effort to represent our surfaces as accurately as possible.</p>
     </div>
   </div>
-</section>
-
-<section class="specs-section reveal">
-  <div class="specs-header">
-    <div class="section-label">Specifications</div>
-    <h2>Technical Details</h2>
-  </div>
-  <div class="specs-grid">
-    <div class="spec-item">
-      <div class="spec-value">[TO BE UPDATED]</div>
-      <div class="spec-label">Product Code</div>
-    </div>
-    <div class="spec-item">
-      <div class="spec-value">Polished</div>
-      <div class="spec-label">Finish</div>
-    </div>
-    <div class="spec-item">
-      <div class="spec-value">0%</div>
-      <div class="spec-label">Crystalline Silica</div>
-    </div>
-    <div class="spec-item">
-      <div class="spec-value">0.01%</div>
-      <div class="spec-label">Water Absorption</div>
-    </div>
-    <div class="spec-item">
-      <div class="spec-value">[TO BE UPDATED]</div>
-      <div class="spec-label">Slab Length</div>
-    </div>
-    <div class="spec-item">
-      <div class="spec-value">[TO BE UPDATED]</div>
-      <div class="spec-label">Slab Width</div>
-    </div>
+  <div class="intro-swatch">
+    <div class="intro-swatch-img" style="background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic;">Acropolis swatch</div>
   </div>
 </section>
 
-<section class="features-section">
-  <div class="features-header reveal">
-    <div class="section-label">AlphaShield&#8482; Protection</div>
-    <h2>Built to Endure</h2>
-  </div>
-  <div class="features-grid">
-    <div class="feature-item reveal">
-      <div class="feature-icon">&#9670;</div>
-      <div class="feature-name">Stain Resistant</div>
-      <div class="feature-desc">Lifetime Stain Resistance Guarantee keeps surfaces looking pristine, every day.</div>
-    </div>
-    <div class="feature-item reveal reveal-d1">
-      <div class="feature-icon">&#9670;</div>
-      <div class="feature-name">Chemical Resistant</div>
-      <div class="feature-desc">Withstands pH levels from 1 to 13. Impervious to household chemicals and acids.</div>
-    </div>
-    <div class="feature-item reveal reveal-d2">
-      <div class="feature-icon">&#9670;</div>
-      <div class="feature-name">Abrasion Resistant</div>
-      <div class="feature-desc">Engineered for superior hardness, protecting against everyday wear and tear.</div>
-    </div>
-    <div class="feature-item reveal">
-      <div class="feature-icon">&#9670;</div>
-      <div class="feature-name">Food Safe</div>
-      <div class="feature-desc">Certified safe for direct food contact. Perfect for kitchen benchtops and islands.</div>
-    </div>
-    <div class="feature-item reveal reveal-d1">
-      <div class="feature-icon">&#9670;</div>
-      <div class="feature-name">Easy Maintenance</div>
-      <div class="feature-desc">Non-porous surface requires no sealing. Simply wipe clean with mild soap and water.</div>
-    </div>
-    <div class="feature-item reveal reveal-d2">
-      <div class="feature-icon">&#9670;</div>
-      <div class="feature-name">15-Year Warranty</div>
-      <div class="feature-desc">Backed by a comprehensive manufacturer warranty for complete peace of mind.</div>
-    </div>
-  </div>
+<!-- FULL SWATCH -->
+<section class="full-swatch">
+  <div class="full-swatch-placeholder">Lifestyle image placeholder</div>
 </section>
 
-<section class="stone-cta reveal">
-  <h2>Experience Acropolis</h2>
-  <p>See this surface in person. Request a sample or book a consultation with Belinda.</p>
-  <div class="stone-actions" style="justify-content: center;">
-    <a href="mailto:belinda@alphasurfaces.com.au?subject=Sample Request – Acropolis" class="btn-primary">Request a Sample</a>
-    <a href="mailto:belinda@alphasurfaces.com.au?subject=Consultation" class="btn-ghost">Talk to Belinda</a>
-  </div>
+<!-- COLLECTION -->
+<section class="collection-section" id="collection-stones">
 </section>
 
-<footer>
-  <div class="footer-top">
-    <div>
-      <span class="footer-brand-alpha">Alpha</span>
-      <span class="footer-brand-surfaces">Surfaces</span>
-      <p class="footer-brand-desc">Premium mineral stone benchtops for Australia&#8217;s most considered spaces. Zero crystalline silica. A Lifetime Stain Resistance Guarantee.</p>
-    </div>
-    <div>
-      <div class="footer-col-title">Collections</div>
-      <ul class="footer-links">
-        <li><a href="/collections#collection-01">Calacatta &amp; Statuario</a></li>
-        <li><a href="/collections#collection-02">Prairie &amp; Sage</a></li>
-        <li><a href="/collections#collection-03">Soapstone &amp; Verde</a></li>
-        <li><a href="/collections#collection-04">Dramatic &amp; Noir</a></li>
-        <li><a href="/collections#collection-05">Urban &amp; Minimal</a></li>
-        <li><a href="/collections">Original Alpha Zero</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Company</div>
-      <ul class="footer-links">
-        <li><a href="/#about">About Alpha</a></li>
-        <li><a href="#">Sustainability</a></li>
-        <li><a href="#">AlphaShield&#8482;</a></li>
-        <li><a href="#">Trade Program</a></li>
-        <li><a href="#">Certifications</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Contact</div>
-      <ul class="footer-links">
-        <li><a href="mailto:belinda@alphasurfaces.com.au">belinda@alphasurfaces.com.au</a></li>
-        <li><a href="mailto:belinda@alphasurfaces.com.au?subject=Consultation">Book a Consultation</a></li>
-        <li><a href="mailto:belinda@alphasurfaces.com.au?subject=Sample Request">Request Samples</a></li>
-        <li><a href="#">Find a Fabricator</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span>&#169; 2026 Alpha Surfaces Pty Ltd. All rights reserved.</span>
-    <span>alphasurfaces.com.au</span>
-  </div>
+<!-- FOOTER -->
+<footer class="footer">
+  <p>Copyright &copy; 2024 Alpha Surfaces &#8211; ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
 </footer>
 
 <script>
-  const revealEls = document.querySelectorAll('.reveal');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+  var currentStone = 'acropolis';
+  var currentCollection = 'collection-01';
+
+  fetch('/data/stones.json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var section = document.getElementById('collection-stones');
+      var collection = data.collections.find(function(c) { return c.id === currentCollection; });
+      if (!collection) return;
+
+      var titleRow = document.createElement('div');
+      titleRow.className = 'collection-title-row';
+      var title = document.createElement('span');
+      title.className = 'collection-title';
+      title.textContent = collection.name;
+      titleRow.appendChild(title);
+      section.appendChild(titleRow);
+
+      var desc = document.createElement('p');
+      desc.className = 'collection-desc';
+      desc.textContent = collection.subtitle;
+      section.appendChild(desc);
+
+      var grid = document.createElement('div');
+      grid.className = 'stones-grid';
+
+      collection.stones.forEach(function(stone) {
+        var card = document.createElement('a');
+        card.className = 'stone-card';
+        card.href = '/surfaces/' + stone.slug;
+        if (stone.slug === currentStone) {
+          card.classList.add('active');
+        }
+
+        var imgWrap = document.createElement('div');
+        imgWrap.className = 'stone-card-image';
+        if (stone.image) {
+          var img = document.createElement('img');
+          img.src = stone.image;
+          img.alt = stone.name;
+          img.loading = 'lazy';
+          imgWrap.appendChild(img);
+        } else {
+          var placeholder = document.createElement('div');
+          placeholder.className = 'stone-card-placeholder';
+          placeholder.textContent = stone.name;
+          imgWrap.appendChild(placeholder);
+        }
+        card.appendChild(imgWrap);
+
+        var info = document.createElement('div');
+        info.className = 'stone-card-info';
+        info.innerHTML =
+          '<div class="stone-card-name">' + stone.name + '</div>' +
+          '<div class="stone-card-finish">' + collection.name + '  |  ' + stone.finish + ' Finish</div>';
+        card.appendChild(info);
+
+        grid.appendChild(card);
+      });
+
+      section.appendChild(grid);
     });
-  }, { threshold: 0.1 });
-  revealEls.forEach(el => io.observe(el));
 </script>
 </body>
 </html>
