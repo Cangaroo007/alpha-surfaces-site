@@ -43,6 +43,10 @@
   /* ── Print Layout ── */
   @page { size: A4; margin: 0; }
   @media print {
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
     body { background: none; }
     .page { box-shadow: none; margin: 0; page-break-after: always; }
     .page:last-child { page-break-after: auto; }
