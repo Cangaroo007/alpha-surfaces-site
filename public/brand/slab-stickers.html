@@ -319,9 +319,9 @@
       sheet.appendChild(sticker);
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-      // Generate barcodes
-      document.querySelectorAll('.barcode').forEach(svg => {
+    // Generate barcodes
+    document.querySelectorAll('.barcode').forEach(svg => {
+      try {
         JsBarcode(svg, svg.dataset.sku, {
           format: 'CODE128',
           height: 30,
@@ -329,10 +329,12 @@
           displayValue: false,
           margin: 0
         });
-      });
+      } catch (e) { console.error('Barcode error:', e); }
+    });
 
-      // Generate QR codes
-      stickers.forEach((s, i) => {
+    // Generate QR codes
+    stickers.forEach((s, i) => {
+      try {
         new QRCode(document.getElementById('qr-' + i), {
           text: 'https://alphasurfaces.com.au/surfaces/' + s.slug,
           width: 56,
@@ -340,7 +342,7 @@
           colorDark: '#000000',
           colorLight: '#f3f1e6'
         });
-      });
+      } catch (e) { console.error('QR error:', e); }
     });
   </script>
 </body>
