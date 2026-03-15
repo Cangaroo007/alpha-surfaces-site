@@ -8,6 +8,7 @@
 /* --- FONTS --- */
 @font-face { font-family: 'Concrette S'; src: url('fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Concrette S'; src: url('fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('fonts/Web/ConcretteS-SemiBold.woff2') format('woff2'), url('fonts/Web/ConcretteS-SemiBold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Concrette S'; src: url('fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Degular'; src: url('fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Degular'; src: url('fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
@@ -17,6 +18,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --olive: #564d22;
+  --olive-deep: #2a2406;
   --cream: #f3f1e6;
   --white: #ffffff;
   --black: #000000;
@@ -38,32 +40,71 @@ img { display: block; max-width: 100%; }
 .nav-menu a:hover { opacity: 0.8; }
 .nav-hamburger { display: none; }
 
-/* --- PAGE HERO --- */
-.page-hero { background: var(--olive); padding: 120px 90px 100px; text-align: center; }
-.page-hero-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; letter-spacing: 0.6px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
-.page-hero h1 { font-family: 'Concrette S', serif; font-weight: 700; font-size: clamp(40px, 5vw, 60px); color: var(--white); line-height: 1.1; margin-bottom: 24px; }
-.page-hero p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px; color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto; line-height: 1.4; }
+/* --- HERO --- */
+.hero { position: relative; width: 100%; height: 838px; overflow: hidden; }
+.hero img { width: 100%; height: 100%; object-fit: cover; }
 
-/* --- COLLECTIONS --- */
-.collections-section { padding: 80px 90px; background: var(--cream); }
-.collection-group { margin-bottom: 80px; }
-.collection-group:last-child { margin-bottom: 0; }
-.collection-header { display: flex; align-items: baseline; gap: 20px; margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
-.collection-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--olive); }
-.collection-name { font-family: 'Concrette S', serif; font-weight: 500; font-size: 30px; color: var(--black); line-height: 1.2; }
+/* --- INTRO --- */
+.intro { background: var(--cream); padding: 180px 161px 120px; overflow: hidden; }
+.intro-inner { display: flex; flex-direction: column; gap: 70px; }
+.intro-top { padding: 10px; }
+.intro-heading { font-family: 'Concrette S', serif; font-weight: 600; font-size: 30px; line-height: 1.2; color: var(--black); margin-bottom: 0; }
+.intro-body { font-family: 'Concrette S', serif; font-weight: 400; font-size: 30px; line-height: 1.2; color: var(--black); }
+.intro-body p { margin-bottom: 0; }
+.intro-bottom { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 10px; }
+.intro-shield { flex-shrink: 0; padding: 50px; }
+.intro-shield img { width: 129px; height: 150px; object-fit: contain; }
+.intro-advantage { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px; line-height: 1.2; color: var(--black); max-width: 489px; }
+.intro-advantage strong { font-family: 'Concrette S', serif; font-weight: 700; }
+.intro-advantage p { margin-bottom: 10px; }
+.intro-advantage p:last-child { margin-bottom: 0; }
 
-/* --- STONE CARDS --- */
-.stones-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 32px; }
-.stone-card { text-decoration: none; color: inherit; display: block; }
-.stone-card-image { position: relative; width: 100%; aspect-ratio: 4/3; background: var(--white); overflow: hidden; }
+/* --- SWATCH --- */
+.swatch { width: 100%; height: 715px; overflow: hidden; }
+.swatch img { width: 100%; height: 100%; object-fit: cover; }
+
+/* --- COLLECTIONS ACCORDION --- */
+.collections-section { /* no bg — each group has its own */ }
+.collection-group { background: var(--olive-deep); border: 1px solid #151203; padding: 44px 32px; }
+.collection-header { display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
+.collection-title-row { display: flex; align-items: center; gap: 16px; }
+.collection-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 30px; color: var(--white); white-space: nowrap; }
+.collection-toggle { width: 16px; height: 16px; flex-shrink: 0; position: relative; transition: transform 0.3s ease; }
+.collection-toggle::before,
+.collection-toggle::after { content: ''; position: absolute; background: var(--white); }
+.collection-toggle::before { width: 16px; height: 2px; top: 7px; left: 0; }
+.collection-toggle::after { width: 2px; height: 16px; top: 0; left: 7px; transition: transform 0.3s ease; }
+.collection-group.open .collection-toggle::after { transform: rotate(90deg); }
+.collection-desc { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px; line-height: 1.2; color: var(--white); }
+.collection-content { display: none; margin-top: 48px; }
+.collection-group.open .collection-content { display: block; }
+
+/* --- STONE GRID --- */
+.stones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 54px 54px; }
+.stone-card { text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; }
+.stone-card-image { position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #1a1a0a; }
 .stone-card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
 .stone-card:hover .stone-card-image img { transform: scale(1.04); }
-.stone-card-image::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: var(--olive); transform: scaleX(0); transform-origin: left; transition: transform 0.35s ease; }
-.stone-card:hover .stone-card-image::after { transform: scaleX(1); }
-.stone-card-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 22px; color: var(--gray); font-style: italic; }
-.stone-card-info { padding: 16px 0 0; }
-.stone-card-name { font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; color: var(--black); margin-bottom: 4px; }
-.stone-card-finish { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--black); opacity: 0.5; }
+.stone-card-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(255,255,255,0.3); font-style: italic; }
+.stone-card-info { display: flex; flex-direction: column; gap: 8px; line-height: 1.2; color: var(--white); }
+.stone-card-name { font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; }
+.stone-card-finish { font-family: 'Concrette S', serif; font-weight: 400; font-size: 12px; }
+
+/* --- QUALITY ASSURANCE --- */
+.quality { background: var(--cream); padding: 120px; }
+.quality-inner { display: flex; justify-content: space-between; align-items: flex-start; min-height: 840px; }
+.quality-left { display: flex; align-items: flex-start; }
+.quality-img-wrap { display: flex; flex-direction: column; gap: 12px; width: 525px; }
+.quality-img-wrap img { width: 100%; height: 702px; object-fit: cover; }
+.quality-caption { font-size: 12px; line-height: 1.2; color: var(--black); width: 293px; }
+.quality-caption .qc-title { font-family: 'Concrette S', serif; font-weight: 700; }
+.quality-caption .qc-sub { font-family: 'Concrette S', serif; font-weight: 400; }
+.quality-right { display: flex; flex: 1; align-items: flex-end; justify-content: flex-end; min-height: 840px; }
+.quality-text { display: flex; flex-direction: column; gap: 36px; width: 434px; }
+.quality-heading { font-family: 'Concrette S', serif; font-weight: 500; font-size: 30px; line-height: 1.2; color: var(--black); }
+.quality-body { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px; line-height: 1.2; color: var(--black); max-width: 379px; }
+.btn-contact { display: inline-flex; align-items: center; justify-content: center; background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 8px 44px; border-radius: 12px; text-decoration: none; width: 174px; }
+.btn-contact:hover { opacity: 0.9; }
 
 /* --- FOOTER --- */
 .footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
@@ -83,12 +124,31 @@ img { display: block; max-width: 100%; }
   .nav-hamburger span { display: block; width: 28px; height: 2px; background: var(--white); margin-bottom: 6px; }
   .nav-hamburger span:last-child { margin-bottom: 0; }
 
-  .page-hero { padding: 80px 24px 60px; }
-  .page-hero h1 { font-size: 36px; }
-  .page-hero p { font-size: 18px; }
+  .hero { height: 400px; }
 
-  .collections-section { padding: 48px 24px; }
-  .stones-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
+  .intro { padding: 60px 24px; }
+  .intro-heading, .intro-body { font-size: 20px; }
+  .intro-bottom { flex-direction: column; align-items: flex-start; }
+  .intro-shield { padding: 20px 0; }
+  .intro-shield img { width: 80px; height: 93px; }
+  .intro-advantage { font-size: 16px; max-width: 100%; }
+
+  .swatch { height: 300px; }
+
+  .collection-group { padding: 32px 24px; }
+  .collection-title { font-size: 22px; }
+  .collection-desc { font-size: 16px; }
+  .stones-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+
+  .quality { padding: 44px 24px; }
+  .quality-inner { flex-direction: column; gap: 44px; min-height: auto; }
+  .quality-img-wrap { width: 100%; }
+  .quality-img-wrap img { height: 400px; }
+  .quality-right { min-height: auto; align-items: flex-start; justify-content: flex-start; }
+  .quality-text { width: 100%; }
+  .quality-heading { font-size: 24px; }
+  .quality-body { font-size: 16px; max-width: 100%; }
+  .btn-contact { width: 100%; }
 
   .footer { padding: 30px 24px; }
   .footer p { font-size: 12px; letter-spacing: 0.36px; }
@@ -112,17 +172,67 @@ img { display: block; max-width: 100%; }
   </button>
 </nav>
 
-<!-- PAGE HERO -->
-<div class="page-hero">
-  <p class="page-hero-label">The Collections</p>
-  <h1>Thirty surfaces.<br>Every aesthetic.</h1>
-  <p>Zero crystalline silica. Natural-stone realism. A Lifetime Stain Resistance Guarantee. Explore the full Alpha Surfaces range, crafted for Australia&#8217;s most considered spaces.</p>
-</div>
+<!-- HERO -->
+<section class="hero">
+  <img src="images/hero.jpg" alt="Alpha Surfaces collections">
+</section>
 
-<!-- COLLECTIONS -->
+<!-- INTRO -->
+<section class="intro">
+  <div class="intro-inner">
+    <div class="intro-top">
+      <p class="intro-heading">A stone to suit your style. A price to suit your budget.</p>
+      <div class="intro-body">
+        <p>Explore our 30+ mineral stone surfaces curated for Australian living, defined by understated luxury and contemporary sophistication.</p>
+        <p>&nbsp;</p>
+        <p>Alpha Surfaces is structured into 5 collections, from the most affordable Collection 01 through to Collection 05. Each collection brings its own aesthetic expression, with the price reflecting production complexity.</p>
+      </div>
+    </div>
+    <div class="intro-bottom">
+      <div class="intro-shield">
+        <img src="logos/03 Alpha Shield/RGB_digital/Alpha Surfaces_Alpha Shield_RGB.png" alt="AlphaShield">
+      </div>
+      <div class="intro-advantage">
+        <p><strong>Discover the Alpha Advantage:</strong></p>
+        <p>natural-stone realism with exceptional durability. Exclusive AlphaShield&#8482; protection guards against everyday wear and tear for low-maintenance care, so your surface stays beautiful for longer.</p>
+        <p>&nbsp;</p>
+        <p>All surfaces are silica-free and certified to NSF and GREENGUARD Gold standards, ensuring health, safety and environmental compliance.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SWATCH -->
+<section class="swatch">
+  <img src="images/collection_235.jpg" alt="Stone surface detail">
+</section>
+
+<!-- COLLECTIONS ACCORDION -->
 <div class="collections-section" id="stones-container">
   <!-- Populated by JS from stones.json -->
 </div>
+
+<!-- QUALITY ASSURANCE -->
+<section class="quality">
+  <div class="quality-inner">
+    <div class="quality-left">
+      <div class="quality-img-wrap">
+        <img src="images/about.jpg" alt="Premium kitchen with Alpha Surfaces benchtop">
+        <div class="quality-caption">
+          <span class="qc-title">Carrara</span><br>
+          <span class="qc-sub">Collection 02</span>
+        </div>
+      </div>
+    </div>
+    <div class="quality-right">
+      <div class="quality-text">
+        <p class="quality-heading">Our quality assurance.<br>Your peace of mind.</p>
+        <p class="quality-body">At Alpha Surfaces, we understand that our responsibility extends far beyond installation; a commitment to ongoing support and satisfaction is essential. Alpha Surfaces come with a 15-Year Limited Warranty on manufacturing defects. AlphaShield&#8482; surface protectant is supported by a Lifetime Stain Resistance Guarantee.</p>
+        <a href="/#contact" class="btn-contact">Contact Us</a>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- FOOTER -->
 <footer class="footer">
@@ -134,18 +244,43 @@ img { display: block; max-width: 100%; }
     .then(r => r.json())
     .then(data => {
       const container = document.getElementById('stones-container');
+
       data.collections.forEach((collection, i) => {
         const group = document.createElement('div');
-        group.className = 'collection-group reveal';
+        group.className = 'collection-group';
         group.id = collection.id;
-        group.style.transitionDelay = (i * 0.08) + 's';
 
+        // Header with toggle
         const header = document.createElement('div');
         header.className = 'collection-header';
-        header.innerHTML =
-          '<span class="collection-label">' + collection.name + '</span>' +
-          '<span class="collection-name">' + collection.subtitle + '</span>';
+
+        const titleRow = document.createElement('div');
+        titleRow.className = 'collection-title-row';
+
+        const title = document.createElement('span');
+        title.className = 'collection-title';
+        title.textContent = collection.name;
+
+        const toggle = document.createElement('span');
+        toggle.className = 'collection-toggle';
+
+        titleRow.appendChild(title);
+        titleRow.appendChild(toggle);
+        header.appendChild(titleRow);
+
+        // Description (shown only when expanded, or always for first)
+        if (collection.subtitle) {
+          const desc = document.createElement('p');
+          desc.className = 'collection-desc';
+          desc.textContent = collection.subtitle;
+          header.appendChild(desc);
+        }
+
         group.appendChild(header);
+
+        // Stone grid content
+        const content = document.createElement('div');
+        content.className = 'collection-content';
 
         const grid = document.createElement('div');
         grid.className = 'stones-grid';
@@ -177,16 +312,28 @@ img { display: block; max-width: 100%; }
           info.className = 'stone-card-info';
           info.innerHTML =
             '<div class="stone-card-name">' + stone.name + '</div>' +
-            '<div class="stone-card-finish">' + stone.finish + '</div>';
+            '<div class="stone-card-finish">' + collection.name + ' | ' + stone.finish + ' Finish</div>';
           card.appendChild(info);
 
           grid.appendChild(card);
         });
 
-        group.appendChild(grid);
+        content.appendChild(grid);
+        group.appendChild(content);
         container.appendChild(group);
+
+        // Open first collection by default
+        if (i === 0) {
+          group.classList.add('open');
+        }
+
+        // Click to toggle
+        header.addEventListener('click', function() {
+          group.classList.toggle('open');
+        });
       });
 
+      // Reveal animation
       const revealEls = document.querySelectorAll('.reveal');
       const io = new IntersectionObserver((entries) => {
         entries.forEach(e => {
