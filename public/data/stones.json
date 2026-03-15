@@ -22,7 +22,18 @@
             "/images/stones/gallery/calacatta-leggera-8.webp",
             "/images/stones/gallery/calacatta-leggera-9.webp",
             "/images/stones/gallery/calacatta-leggera-10.webp"
-          ]
+          ],
+          "tagline": "Soft white marble with delicate grey veining",
+          "description": "Calacatta Leggera brings the timeless elegance of Italian marble to Australian homes. Soft white ground with gentle grey veining and warm undertones \u2014 refined without being imposing.",
+          "indoor_outdoor": false,
+          "uv_stable": false,
+          "swatch": "/images/stones/calacatta-leggera.webp",
+          "slab_width": 3200,
+          "slab_height": 1600,
+          "thickness": 20,
+          "weight": 236,
+          "warranty": "15-Year Limited Warranty",
+          "silica_free": true
         },
         {
           "name": "Calacatta Borghini",
@@ -102,7 +113,18 @@
           "finish": "Polished",
           "slug": "carrara",
           "image": "/images/stones/carrara.webp",
-          "thumbnail": "/images/stones/carrara-thumb.webp"
+          "thumbnail": "/images/stones/carrara-thumb.webp",
+          "tagline": "Classic white with fine grey movement",
+          "description": "Carrara is the benchmark of understated luxury. A crisp white surface with subtle grey veining that works effortlessly across contemporary and classic kitchen styles.",
+          "indoor_outdoor": false,
+          "uv_stable": false,
+          "swatch": "/images/stones/carrara.webp",
+          "slab_width": 3200,
+          "slab_height": 1600,
+          "thickness": 20,
+          "weight": 236,
+          "warranty": "15-Year Limited Warranty",
+          "silica_free": true
         }
       ]
     },
@@ -121,7 +143,18 @@
             "/images/stones/gallery/patagonia-1.webp",
             "/images/stones/gallery/patagonia-2.webp",
             "/images/stones/gallery/patagonia-3.webp"
-          ]
+          ],
+          "tagline": "Dramatic movement in cool grey and white",
+          "description": "Patagonia captures the raw drama of South American quartzite. Sweeping movement in cool grey, white, and charcoal creates a surface of extraordinary visual energy.",
+          "indoor_outdoor": false,
+          "uv_stable": false,
+          "swatch": "/images/stones/patagonia.webp",
+          "slab_width": 3200,
+          "slab_height": 1600,
+          "thickness": 20,
+          "weight": 236,
+          "warranty": "15-Year Limited Warranty",
+          "silica_free": true
         },
         {
           "name": "Elba",
@@ -166,7 +199,18 @@
             "/images/stones/gallery/whitehaven-4.webp",
             "/images/stones/gallery/whitehaven-5.webp",
             "/images/stones/gallery/whitehaven-6.webp"
-          ]
+          ],
+          "tagline": "Coastal white with a soft sandy warmth",
+          "description": "Inspired by the pristine shores of the Whitsundays, Whitehaven delivers a warm white surface with gentle movement. UV-stable and built for indoor-outdoor living.",
+          "indoor_outdoor": true,
+          "uv_stable": true,
+          "swatch": "/images/stones/whitehaven.webp",
+          "slab_width": 3200,
+          "slab_height": 1600,
+          "thickness": 20,
+          "weight": 236,
+          "warranty": "15-Year Limited Warranty",
+          "silica_free": true
         }
       ]
     },
@@ -198,7 +242,18 @@
           "finish": "Polished",
           "slug": "davinci-gris",
           "image": "/images/stones/davinci-gris.webp",
-          "thumbnail": "/images/stones/davinci-gris-thumb.webp"
+          "thumbnail": "/images/stones/davinci-gris-thumb.webp",
+          "tagline": "Warm grey with earthy mineral movement",
+          "description": "Davinci Gris captures the depth and warmth of natural grey stone. Rich mineral movement through a sophisticated grey ground \u2014 perfect for contemporary interiors.",
+          "indoor_outdoor": false,
+          "uv_stable": false,
+          "swatch": "/images/stones/davinci-gris.webp",
+          "slab_width": 3200,
+          "slab_height": 1600,
+          "thickness": 20,
+          "weight": 236,
+          "warranty": "15-Year Limited Warranty",
+          "silica_free": true
         },
         {
           "name": "Brilliance",
@@ -211,14 +266,36 @@
           "finish": "Polished",
           "slug": "opal-mist",
           "image": "/images/stones/opal-mist.webp",
-          "thumbnail": "/images/stones/opal-mist-thumb.webp"
+          "thumbnail": "/images/stones/opal-mist-thumb.webp",
+          "tagline": "Translucent white with a soft misted finish",
+          "description": "Opal Mist is a dream surface \u2014 delicately translucent white with a soft, almost atmospheric quality. Brings light and calm to any space.",
+          "indoor_outdoor": false,
+          "uv_stable": false,
+          "swatch": "/images/stones/opal-mist.webp",
+          "slab_width": 3200,
+          "slab_height": 1600,
+          "thickness": 20,
+          "weight": 236,
+          "warranty": "15-Year Limited Warranty",
+          "silica_free": true
         },
         {
           "name": "Statuario Gold",
           "finish": "Polished",
           "slug": "statuario-gold",
           "image": "/images/stones/statuario-gold.webp",
-          "thumbnail": "/images/stones/statuario-gold-thumb.webp"
+          "thumbnail": "/images/stones/statuario-gold-thumb.webp",
+          "tagline": "Bold gold veining on a luminous white ground",
+          "description": "Statuario Gold makes a statement. Dramatic gold and warm grey veining sweeps across a bright white ground \u2014 one of Alpha\u2019s most sought-after surfaces.",
+          "indoor_outdoor": false,
+          "uv_stable": false,
+          "swatch": "/images/stones/statuario-gold.webp",
+          "slab_width": 3200,
+          "slab_height": 1600,
+          "thickness": 20,
+          "weight": 236,
+          "warranty": "15-Year Limited Warranty",
+          "silica_free": true
         }
       ]
     },
@@ -244,14 +321,36 @@
           "finish": "Polished",
           "slug": "autumn-gold",
           "image": "/images/stones/autumn-gold.webp",
-          "thumbnail": "/images/stones/autumn-gold-thumb.webp"
+          "thumbnail": "/images/stones/autumn-gold-thumb.webp",
+          "tagline": "Warm amber tones with rich golden movement",
+          "description": "Autumn Gold radiates warmth. Deep amber and honey tones move through a soft ground \u2014 a surface that brings genuine character and presence to any benchtop.",
+          "indoor_outdoor": false,
+          "uv_stable": false,
+          "swatch": "/images/stones/autumn-gold.webp",
+          "slab_width": 3200,
+          "slab_height": 1600,
+          "thickness": 20,
+          "weight": 236,
+          "warranty": "15-Year Limited Warranty",
+          "silica_free": true
         },
         {
           "name": "Calacatta Viola",
           "finish": "Polished",
           "slug": "calacatta-viola",
           "image": "/images/stones/calacatta-viola.webp",
-          "thumbnail": "/images/stones/calacatta-viola-thumb.webp"
+          "thumbnail": "/images/stones/calacatta-viola-thumb.webp",
+          "tagline": "White marble with striking violet undertones",
+          "description": "Calacatta Viola is unlike anything else in the range. Pure white ground with distinctive violet and purple veining \u2014 bold, beautiful, and completely unique.",
+          "indoor_outdoor": false,
+          "uv_stable": false,
+          "swatch": "/images/stones/calacatta-viola.webp",
+          "slab_width": 3200,
+          "slab_height": 1600,
+          "thickness": 20,
+          "weight": 236,
+          "warranty": "15-Year Limited Warranty",
+          "silica_free": true
         }
       ]
     },
@@ -294,7 +393,18 @@
             "/images/stones/gallery/taj-mahal-13.webp",
             "/images/stones/gallery/taj-mahal-14.webp",
             "/images/stones/gallery/taj-mahal-15.webp"
-          ]
+          ],
+          "tagline": "Warm cream with soft golden veining",
+          "description": "Taj Mahal is a surface of quiet grandeur. Warm cream ground with soft golden veining and delicate movement \u2014 endlessly versatile and timelessly beautiful.",
+          "indoor_outdoor": false,
+          "uv_stable": false,
+          "swatch": "/images/stones/taj-mahal.webp",
+          "slab_width": 3200,
+          "slab_height": 1600,
+          "thickness": 20,
+          "weight": 236,
+          "warranty": "15-Year Limited Warranty",
+          "silica_free": true
         }
       ]
     }

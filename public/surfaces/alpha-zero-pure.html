@@ -46,9 +46,11 @@ img { display: block; max-width: 100%; }
 .intro-container { display: flex; flex-direction: column; gap: 36px; max-width: 560px; }
 .intro-title-row { display: flex; align-items: center; justify-content: space-between; }
 .intro-stone-name { font-family: 'Concrette S', serif; font-weight: 600; font-size: 30px; line-height: 1.2; color: var(--black); }
-.intro-meta { display: flex; flex-direction: column; gap: 12px; line-height: 1.2; color: var(--black); }
+.intro-badge { width: 44px; height: 44px; flex-shrink: 0; object-fit: contain; }
+.intro-meta { display: flex; flex-direction: column; gap: 12px; line-height: 1.2; color: var(--black); margin-top: 16px; }
 .intro-collection { font-family: 'Concrette S', serif; font-weight: 600; font-size: 18px; }
 .intro-tagline { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; }
+.intro-description { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; line-height: 1.5; color: var(--black); opacity: 0.75; }
 .intro-specs { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; line-height: 1.4; color: var(--black); }
 .intro-shield { display: flex; flex-direction: column; gap: 24px; }
 .intro-shield-icon { width: 58px; height: 68px; object-fit: contain; }
@@ -58,12 +60,20 @@ img { display: block; max-width: 100%; }
 .btn-order:hover { opacity: 0.9; }
 .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
 .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
-.intro-swatch-img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; background: #d9d9d9; }
+.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
+.intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
 
 /* --- FULL SWATCH --- */
 .full-swatch { width: 100%; height: 715px; overflow: hidden; }
 .full-swatch img { width: 100%; height: 100%; object-fit: cover; }
 .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+
+/* --- GALLERY --- */
+.gallery-section { background: var(--cream); padding: 60px 32px; }
+.gallery-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--black); margin-bottom: 32px; }
+.gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.gallery-grid img { width: 100%; aspect-ratio: 4/3; object-fit: cover; cursor: pointer; transition: transform 0.4s ease; }
+.gallery-grid img:hover { transform: scale(1.02); }
 
 /* --- COLLECTION SECTION --- */
 .collection-section { background: var(--olive-deep); padding: 44px 32px; }
@@ -99,11 +109,14 @@ img { display: block; max-width: 100%; }
 
   .intro { flex-direction: column-reverse; padding: 0; gap: 0; }
   .intro-swatch { width: 100%; }
-  .intro-swatch-img { min-height: 347px; height: 347px; }
+  .intro-swatch img, .intro-swatch-placeholder { min-height: 347px; height: 347px; }
   .intro-text { width: 100%; padding: 24px 24px 44px; }
   .intro-container { max-width: 100%; }
 
   .full-swatch { height: 200px; }
+
+  .gallery-section { padding: 40px 24px; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
   .collection-section { padding: 44px 32px; }
   .stones-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
@@ -115,7 +128,7 @@ img { display: block; max-width: 100%; }
 }
 </style>
 </head>
-<body>
+<body data-slug="alpha-zero-pure">
 
 <!-- NAV -->
 <nav class="nav">
@@ -132,50 +145,17 @@ img { display: block; max-width: 100%; }
   </button>
 </nav>
 
-<!-- INTRO -->
-<section class="intro">
-  <div class="intro-text">
-    <div class="intro-container">
-      <div>
-        <div class="intro-title-row">
-          <h1 class="intro-stone-name">Alpha Zero Pure</h1>
-        </div>
-        <div class="intro-meta" style="margin-top: 16px;">
-          <p class="intro-collection">Original Alpha Zero – The Signature Range</p>
-          <p class="intro-tagline">The signature range. Where it all began.</p>
-        </div>
-      </div>
-      <div class="intro-specs">
-        Polished finish<br>
-        Nominal slab size 3200 x 1600mm<br>
-        Slab thickness 20mm<br>
-        Weight 236kg &nbsp;|&nbsp; 15-Year Limited Warranty
-      </div>
-      <div class="intro-shield">
-        <div>
-          <img class="intro-shield-icon" src="../logos/03 Alpha Shield/RGB_digital/Alpha Surfaces_Alpha Shield_RGB.png" alt="AlphaShield">
-        </div>
-        <p class="intro-shield-text">Exclusive AlphaShield&#8482; protectant guards against everyday wear and tear for long-term durability &#8211; with Lifetime Stain Resistance Guarantee.</p>
-      </div>
-      <div class="intro-cta">
-        <a href="/#contact" class="btn-order">Order A Sample</a>
-      </div>
-      <p class="intro-disclaimer">Disclaimer: Alpha Surfaces&#8217; website images are indicative only and colours can vary depending on the device on which they are viewed and user screen settings. We make every effort to represent our surfaces as accurately as possible.</p>
-    </div>
-  </div>
-  <div class="intro-swatch">
-    <div class="intro-swatch-img" style="background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic;">Alpha Zero Pure swatch</div>
-  </div>
-</section>
+<!-- INTRO — populated dynamically -->
+<section class="intro" id="intro"></section>
 
-<!-- FULL SWATCH -->
-<section class="full-swatch">
-  <div class="full-swatch-placeholder">Lifestyle image placeholder</div>
-</section>
+<!-- FULL SWATCH — populated dynamically -->
+<section class="full-swatch" id="full-swatch"></section>
 
-<!-- COLLECTION -->
-<section class="collection-section" id="collection-stones">
-</section>
+<!-- GALLERY — populated dynamically (only if gallery images exist) -->
+<section class="gallery-section" id="gallery-section" style="display:none;"></section>
+
+<!-- COLLECTION GRID -->
+<section class="collection-section" id="collection-stones"></section>
 
 <!-- FOOTER -->
 <footer class="footer">
@@ -183,22 +163,142 @@ img { display: block; max-width: 100%; }
 </footer>
 
 <script>
-  var currentStone = 'alpha-zero-pure';
-  var currentCollection = 'original-alpha-zero';
+(function() {
+  var slug = document.body.getAttribute('data-slug');
 
   fetch('/data/stones.json')
     .then(function(r) { return r.json(); })
     .then(function(data) {
+      var stone = null;
+      var collection = null;
+      var collectionIndex = -1;
+
+      for (var ci = 0; ci < data.collections.length; ci++) {
+        var c = data.collections[ci];
+        for (var si = 0; si < c.stones.length; si++) {
+          if (c.stones[si].slug === slug) {
+            stone = c.stones[si];
+            collection = c;
+            collectionIndex = ci;
+            break;
+          }
+        }
+        if (stone) break;
+      }
+
+      if (!stone) return;
+
+      // --- Title ---
+      document.title = stone.name + ' | Alpha Surfaces';
+
+      // --- Build collection label ---
+      var cLabel = collection.name;
+      var cid = collection.id;
+      if (cid.indexOf('collection-0') === 0) {
+        var num = cid.replace('collection-0', '');
+        cLabel = 'Collection 0' + num + ' \u2013 ' + collection.name;
+      } else if (cid === 'original-alpha-zero') {
+        cLabel = 'Original Alpha Zero \u2013 The Signature Range';
+      }
+
+      // --- INTRO SECTION ---
+      var intro = document.getElementById('intro');
+      var hasImage = stone.image && stone.image.length > 0;
+
+      var textHTML = '<div class="intro-text"><div class="intro-container">';
+      textHTML += '<div><div class="intro-title-row">';
+      textHTML += '<h1 class="intro-stone-name">' + stone.name + '</h1>';
+      if (stone.indoor_outdoor) {
+        textHTML += '<img class="intro-badge" src="../logos/04_Indoor-Outdoor range icon/RGB_digital/Alpha Surfaces_Indoor-Outdoor Range Icon_RGB.png" alt="Indoor-Outdoor">';
+      }
+      textHTML += '</div>';
+      textHTML += '<div class="intro-meta">';
+      textHTML += '<p class="intro-collection">' + cLabel;
+      if (stone.indoor_outdoor) textHTML += ' \u2013 Indoor-Outdoor range';
+      textHTML += '</p>';
+      if (stone.tagline) {
+        textHTML += '<p class="intro-tagline">' + stone.tagline + '</p>';
+      }
+      textHTML += '</div></div>';
+
+      if (stone.description) {
+        textHTML += '<p class="intro-description">' + stone.description + '</p>';
+      }
+
+      // Specs
+      var finish = stone.finish || 'TBC';
+      var w = stone.slab_width || 'TBC';
+      var h = stone.slab_height || 'TBC';
+      var t = stone.thickness || 'TBC';
+      var wt = stone.weight || 'TBC';
+      var warranty = stone.warranty || '15-Year Limited Warranty';
+      textHTML += '<div class="intro-specs">';
+      textHTML += finish + ' finish';
+      if (stone.uv_stable) textHTML += '  |  UV stable';
+      textHTML += '<br>';
+      textHTML += 'Nominal slab size ' + w + ' x ' + h + 'mm<br>';
+      textHTML += 'Slab thickness ' + t + 'mm<br>';
+      textHTML += 'Weight ' + wt + 'kg &nbsp;|&nbsp; ' + warranty;
+      textHTML += '</div>';
+
+      // AlphaShield
+      textHTML += '<div class="intro-shield">';
+      textHTML += '<div><img class="intro-shield-icon" src="../logos/03 Alpha Shield/RGB_digital/Alpha Surfaces_Alpha Shield_RGB.png" alt="AlphaShield"></div>';
+      textHTML += '<p class="intro-shield-text">Exclusive AlphaShield\u2122 protectant guards against everyday wear and tear for long-term durability \u2013 with Lifetime Stain Resistance Guarantee.</p>';
+      textHTML += '</div>';
+
+      // CTA
+      textHTML += '<div class="intro-cta"><a href="/#contact" class="btn-order">Order A Sample</a></div>';
+
+      // Disclaimer
+      textHTML += '<p class="intro-disclaimer">Disclaimer: Alpha Surfaces\u2019 website images are indicative only and colours can vary depending on the device on which they are viewed and user screen settings. We make every effort to represent our surfaces as accurately as possible.</p>';
+
+      textHTML += '</div></div>';
+
+      // Swatch column
+      var swatchHTML = '<div class="intro-swatch">';
+      if (hasImage) {
+        swatchHTML += '<img src="' + stone.image + '" alt="' + stone.name + ' surface">';
+      } else {
+        swatchHTML += '<div class="intro-swatch-placeholder">' + stone.name + '</div>';
+      }
+      swatchHTML += '</div>';
+
+      intro.innerHTML = textHTML + swatchHTML;
+
+      // --- FULL SWATCH ---
+      var fullSwatch = document.getElementById('full-swatch');
+      var galleryImages = stone.gallery || [];
+      if (galleryImages.length > 0) {
+        fullSwatch.innerHTML = '<img src="' + galleryImages[0] + '" alt="' + stone.name + ' lifestyle">';
+      } else if (hasImage) {
+        fullSwatch.innerHTML = '<img src="' + stone.image + '" alt="' + stone.name + ' surface">';
+      } else {
+        fullSwatch.innerHTML = '<div class="full-swatch-placeholder">' + stone.name + '</div>';
+      }
+
+      // --- GALLERY ---
+      if (galleryImages.length > 1) {
+        var gallerySection = document.getElementById('gallery-section');
+        gallerySection.style.display = '';
+        var galleryHTML = '<h2 class="gallery-heading">' + stone.name + ' Gallery</h2>';
+        galleryHTML += '<div class="gallery-grid">';
+        for (var gi = 0; gi < galleryImages.length; gi++) {
+          galleryHTML += '<img src="' + galleryImages[gi] + '" alt="' + stone.name + ' - image ' + (gi + 1) + '" loading="lazy">';
+        }
+        galleryHTML += '</div>';
+        gallerySection.innerHTML = galleryHTML;
+      }
+
+      // --- COLLECTION GRID ---
       var section = document.getElementById('collection-stones');
-      var collection = data.collections.find(function(c) { return c.id === currentCollection; });
-      if (!collection) return;
 
       var titleRow = document.createElement('div');
       titleRow.className = 'collection-title-row';
-      var title = document.createElement('span');
-      title.className = 'collection-title';
-      title.textContent = collection.name;
-      titleRow.appendChild(title);
+      var titleEl = document.createElement('span');
+      titleEl.className = 'collection-title';
+      titleEl.textContent = collection.name;
+      titleRow.appendChild(titleEl);
       section.appendChild(titleRow);
 
       var desc = document.createElement('p');
@@ -209,35 +309,33 @@ img { display: block; max-width: 100%; }
       var grid = document.createElement('div');
       grid.className = 'stones-grid';
 
-      collection.stones.forEach(function(stone) {
+      collection.stones.forEach(function(s) {
         var card = document.createElement('a');
         card.className = 'stone-card';
-        card.href = '/surfaces/' + stone.slug;
-        if (stone.slug === currentStone) {
-          card.classList.add('active');
-        }
+        card.href = '/surfaces/' + s.slug;
+        if (s.slug === slug) card.classList.add('active');
 
         var imgWrap = document.createElement('div');
         imgWrap.className = 'stone-card-image';
-        if (stone.image) {
+        if (s.image) {
           var img = document.createElement('img');
-          img.src = stone.image;
-          img.alt = stone.name;
+          img.src = s.image;
+          img.alt = s.name;
           img.loading = 'lazy';
           imgWrap.appendChild(img);
         } else {
-          var placeholder = document.createElement('div');
-          placeholder.className = 'stone-card-placeholder';
-          placeholder.textContent = stone.name;
-          imgWrap.appendChild(placeholder);
+          var ph = document.createElement('div');
+          ph.className = 'stone-card-placeholder';
+          ph.textContent = s.name;
+          imgWrap.appendChild(ph);
         }
         card.appendChild(imgWrap);
 
         var info = document.createElement('div');
         info.className = 'stone-card-info';
         info.innerHTML =
-          '<div class="stone-card-name">' + stone.name + '</div>' +
-          '<div class="stone-card-finish">' + collection.name + '  |  ' + stone.finish + ' Finish</div>';
+          '<div class="stone-card-name">' + s.name + '</div>' +
+          '<div class="stone-card-finish">' + collection.name + '  |  ' + s.finish + ' Finish</div>';
         card.appendChild(info);
 
         grid.appendChild(card);
@@ -245,6 +343,7 @@ img { display: block; max-width: 100%; }
 
       section.appendChild(grid);
     });
+})();
 </script>
 </body>
 </html>
