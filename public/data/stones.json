@@ -5,12 +5,55 @@
       "name": "Calacatta & Statuario",
       "subtitle": "Calacatta & Statuario",
       "stones": [
-        { "name": "Calacatta Leggera", "finish": "Polished", "slug": "calacatta-leggera", "image": "" },
-        { "name": "Calacatta Borghini", "finish": "Polished", "slug": "calacatta-borghini", "image": "" },
-        { "name": "Acropolis", "finish": "Polished", "slug": "acropolis", "image": "" },
-        { "name": "Statuario Venato", "finish": "Polished", "slug": "statuario-venato", "image": "" },
-        { "name": "Unique Carrara", "finish": "Polished", "slug": "unique-carrara", "image": "" },
-        { "name": "Mont Blanc", "finish": "Soft Touch", "slug": "mont-blanc", "image": "" }
+        {
+          "name": "Calacatta Leggera",
+          "finish": "Polished",
+          "slug": "calacatta-leggera",
+          "image": "/images/stones/calacatta-leggera.webp",
+          "thumbnail": "/images/stones/calacatta-leggera-thumb.webp",
+          "gallery": [
+            "/images/stones/gallery/calacatta-leggera-1.webp",
+            "/images/stones/gallery/calacatta-leggera-2.webp",
+            "/images/stones/gallery/calacatta-leggera-3.webp",
+            "/images/stones/gallery/calacatta-leggera-4.webp",
+            "/images/stones/gallery/calacatta-leggera-5.webp",
+            "/images/stones/gallery/calacatta-leggera-6.webp",
+            "/images/stones/gallery/calacatta-leggera-7.webp",
+            "/images/stones/gallery/calacatta-leggera-8.webp",
+            "/images/stones/gallery/calacatta-leggera-9.webp",
+            "/images/stones/gallery/calacatta-leggera-10.webp"
+          ]
+        },
+        {
+          "name": "Calacatta Borghini",
+          "finish": "Polished",
+          "slug": "calacatta-borghini",
+          "image": ""
+        },
+        {
+          "name": "Acropolis",
+          "finish": "Polished",
+          "slug": "acropolis",
+          "image": ""
+        },
+        {
+          "name": "Statuario Venato",
+          "finish": "Polished",
+          "slug": "statuario-venato",
+          "image": ""
+        },
+        {
+          "name": "Unique Carrara",
+          "finish": "Polished",
+          "slug": "unique-carrara",
+          "image": ""
+        },
+        {
+          "name": "Mont Blanc",
+          "finish": "Soft Touch",
+          "slug": "mont-blanc",
+          "image": ""
+        }
       ]
     },
     {
@@ -18,12 +61,49 @@
       "name": "Prairie & Sage",
       "subtitle": "Prairie & Sage",
       "stones": [
-        { "name": "Noosa", "finish": "Polished", "slug": "noosa", "image": "" },
-        { "name": "Fraser", "finish": "Polished", "slug": "fraser", "image": "" },
-        { "name": "Bondi", "finish": "Polished", "slug": "bondi", "image": "" },
-        { "name": "Santorini Gold", "finish": "Polished", "slug": "santorini-gold", "image": "" },
-        { "name": "Travertino Classico", "finish": "Soft Touch", "slug": "travertino-classico", "image": "" },
-        { "name": "Silver Travertine", "finish": "Soft Touch", "slug": "silver-travertine", "image": "" }
+        {
+          "name": "Noosa",
+          "finish": "Polished",
+          "slug": "noosa",
+          "image": ""
+        },
+        {
+          "name": "Fraser",
+          "finish": "Polished",
+          "slug": "fraser",
+          "image": ""
+        },
+        {
+          "name": "Bondi",
+          "finish": "Polished",
+          "slug": "bondi",
+          "image": ""
+        },
+        {
+          "name": "Santorini Gold",
+          "finish": "Polished",
+          "slug": "santorini-gold",
+          "image": ""
+        },
+        {
+          "name": "Travertino Classico",
+          "finish": "Soft Touch",
+          "slug": "travertino-classico",
+          "image": ""
+        },
+        {
+          "name": "Silver Travertine",
+          "finish": "Soft Touch",
+          "slug": "silver-travertine",
+          "image": ""
+        },
+        {
+          "name": "Carrara",
+          "finish": "Polished",
+          "slug": "carrara",
+          "image": "/images/stones/carrara.webp",
+          "thumbnail": "/images/stones/carrara-thumb.webp"
+        }
       ]
     },
     {
@@ -31,12 +111,63 @@
       "name": "Soapstone & Verde",
       "subtitle": "Soapstone & Verde",
       "stones": [
-        { "name": "Patagonia", "finish": "Soft Touch", "slug": "patagonia", "image": "" },
-        { "name": "Elba", "finish": "Soft Touch", "slug": "elba", "image": "" },
-        { "name": "Viola Ligera", "finish": "Polished", "slug": "viola-ligera", "image": "" },
-        { "name": "Pearl", "finish": "Polished", "slug": "pearl", "image": "" },
-        { "name": "Crystal", "finish": "Polished", "slug": "crystal", "image": "" },
-        { "name": "Arctic", "finish": "Polished", "slug": "arctic", "image": "" }
+        {
+          "name": "Patagonia",
+          "finish": "Soft Touch",
+          "slug": "patagonia",
+          "image": "/images/stones/patagonia.webp",
+          "thumbnail": "/images/stones/patagonia-thumb.webp",
+          "gallery": [
+            "/images/stones/gallery/patagonia-1.webp",
+            "/images/stones/gallery/patagonia-2.webp",
+            "/images/stones/gallery/patagonia-3.webp"
+          ]
+        },
+        {
+          "name": "Elba",
+          "finish": "Soft Touch",
+          "slug": "elba",
+          "image": ""
+        },
+        {
+          "name": "Viola Ligera",
+          "finish": "Polished",
+          "slug": "viola-ligera",
+          "image": ""
+        },
+        {
+          "name": "Pearl",
+          "finish": "Polished",
+          "slug": "pearl",
+          "image": ""
+        },
+        {
+          "name": "Crystal",
+          "finish": "Polished",
+          "slug": "crystal",
+          "image": ""
+        },
+        {
+          "name": "Arctic",
+          "finish": "Polished",
+          "slug": "arctic",
+          "image": ""
+        },
+        {
+          "name": "Whitehaven",
+          "finish": "Polished",
+          "slug": "whitehaven",
+          "image": "/images/stones/whitehaven.webp",
+          "thumbnail": "/images/stones/whitehaven-thumb.webp",
+          "gallery": [
+            "/images/stones/gallery/whitehaven-1.webp",
+            "/images/stones/gallery/whitehaven-2.webp",
+            "/images/stones/gallery/whitehaven-3.webp",
+            "/images/stones/gallery/whitehaven-4.webp",
+            "/images/stones/gallery/whitehaven-5.webp",
+            "/images/stones/gallery/whitehaven-6.webp"
+          ]
+        }
       ]
     },
     {
@@ -44,11 +175,51 @@
       "name": "Dramatic & Noir",
       "subtitle": "Dramatic & Noir",
       "stones": [
-        { "name": "Carbon", "finish": "Polished", "slug": "carbon", "image": "" },
-        { "name": "Graphite", "finish": "Polished", "slug": "graphite", "image": "" },
-        { "name": "Davinci Oro", "finish": "Polished", "slug": "davinci-oro", "image": "" },
-        { "name": "Davinci Gris", "finish": "Polished", "slug": "davinci-gris", "image": "" },
-        { "name": "Brilliance", "finish": "Polished", "slug": "brilliance", "image": "" }
+        {
+          "name": "Carbon",
+          "finish": "Polished",
+          "slug": "carbon",
+          "image": ""
+        },
+        {
+          "name": "Graphite",
+          "finish": "Polished",
+          "slug": "graphite",
+          "image": ""
+        },
+        {
+          "name": "Davinci Oro",
+          "finish": "Polished",
+          "slug": "davinci-oro",
+          "image": ""
+        },
+        {
+          "name": "Davinci Gris",
+          "finish": "Polished",
+          "slug": "davinci-gris",
+          "image": "/images/stones/davinci-gris.webp",
+          "thumbnail": "/images/stones/davinci-gris-thumb.webp"
+        },
+        {
+          "name": "Brilliance",
+          "finish": "Polished",
+          "slug": "brilliance",
+          "image": ""
+        },
+        {
+          "name": "Opal Mist",
+          "finish": "Polished",
+          "slug": "opal-mist",
+          "image": "/images/stones/opal-mist.webp",
+          "thumbnail": "/images/stones/opal-mist-thumb.webp"
+        },
+        {
+          "name": "Statuario Gold",
+          "finish": "Polished",
+          "slug": "statuario-gold",
+          "image": "/images/stones/statuario-gold.webp",
+          "thumbnail": "/images/stones/statuario-gold-thumb.webp"
+        }
       ]
     },
     {
@@ -56,8 +227,32 @@
       "name": "Urban & Minimal",
       "subtitle": "Urban & Minimal",
       "stones": [
-        { "name": "Jewel", "finish": "Polished", "slug": "jewel", "image": "" },
-        { "name": "Torquay", "finish": "Soft Touch", "slug": "torquay", "image": "" }
+        {
+          "name": "Jewel",
+          "finish": "Polished",
+          "slug": "jewel",
+          "image": ""
+        },
+        {
+          "name": "Torquay",
+          "finish": "Soft Touch",
+          "slug": "torquay",
+          "image": ""
+        },
+        {
+          "name": "Autumn Gold",
+          "finish": "Polished",
+          "slug": "autumn-gold",
+          "image": "/images/stones/autumn-gold.webp",
+          "thumbnail": "/images/stones/autumn-gold-thumb.webp"
+        },
+        {
+          "name": "Calacatta Viola",
+          "finish": "Polished",
+          "slug": "calacatta-viola",
+          "image": "/images/stones/calacatta-viola.webp",
+          "thumbnail": "/images/stones/calacatta-viola-thumb.webp"
+        }
       ]
     },
     {
@@ -65,8 +260,42 @@
       "name": "Original Alpha Zero",
       "subtitle": "The Signature Range",
       "stones": [
-        { "name": "Alpha Zero Classic", "finish": "Polished", "slug": "alpha-zero-classic", "image": "" },
-        { "name": "Alpha Zero Pure", "finish": "Polished", "slug": "alpha-zero-pure", "image": "" }
+        {
+          "name": "Alpha Zero Classic",
+          "finish": "Polished",
+          "slug": "alpha-zero-classic",
+          "image": ""
+        },
+        {
+          "name": "Alpha Zero Pure",
+          "finish": "Polished",
+          "slug": "alpha-zero-pure",
+          "image": ""
+        },
+        {
+          "name": "Taj Mahal",
+          "finish": "Polished",
+          "slug": "taj-mahal",
+          "image": "/images/stones/taj-mahal.webp",
+          "thumbnail": "/images/stones/taj-mahal-thumb.webp",
+          "gallery": [
+            "/images/stones/gallery/taj-mahal-1.webp",
+            "/images/stones/gallery/taj-mahal-2.webp",
+            "/images/stones/gallery/taj-mahal-3.webp",
+            "/images/stones/gallery/taj-mahal-4.webp",
+            "/images/stones/gallery/taj-mahal-5.webp",
+            "/images/stones/gallery/taj-mahal-6.webp",
+            "/images/stones/gallery/taj-mahal-7.webp",
+            "/images/stones/gallery/taj-mahal-8.webp",
+            "/images/stones/gallery/taj-mahal-9.webp",
+            "/images/stones/gallery/taj-mahal-10.webp",
+            "/images/stones/gallery/taj-mahal-11.webp",
+            "/images/stones/gallery/taj-mahal-12.webp",
+            "/images/stones/gallery/taj-mahal-13.webp",
+            "/images/stones/gallery/taj-mahal-14.webp",
+            "/images/stones/gallery/taj-mahal-15.webp"
+          ]
+        }
       ]
     }
   ]
