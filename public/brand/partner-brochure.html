@@ -187,57 +187,81 @@
   .page-back {
     background: var(--cream);
     color: var(--black);
-    padding: 18mm;
     display: flex;
     flex-direction: column;
   }
 
+  /* ── Back: Header ── */
   .back-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
+    padding: 10mm 18mm;
   }
-  .back-header img { width: 120px; display: block; }
+  .back-header img { width: 110px; display: block; }
   .back-header-label {
     font-family: 'Degular', sans-serif;
-    font-weight: 400;
+    font-weight: 600;
     font-size: 9px;
     text-transform: uppercase;
     color: var(--olive);
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
   }
 
+  /* ── Back: Hero image strip ── */
+  .back-hero-strip {
+    width: 100%;
+    height: 55mm;
+    overflow: hidden;
+    display: flex;
+    gap: 2px;
+  }
+  .back-hero-strip img {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ── Back: Heading section ── */
+  .back-heading-section {
+    padding: 8mm 18mm 6mm;
+  }
   .back-main-heading {
-    margin-top: 25mm;
     font-family: 'Concrette S', serif;
     font-weight: 700;
-    font-size: 30px;
+    font-size: 28px;
     color: var(--black);
-    line-height: 1.2;
+    line-height: 1.15;
+    margin-bottom: 5px;
   }
   .back-subheading {
-    margin-top: 6px;
     font-family: 'Concrette S', serif;
     font-weight: 400;
-    font-size: 16px;
+    font-size: 15px;
     color: var(--black);
-    opacity: 0.6;
+    opacity: 0.55;
     line-height: 1.4;
-    margin-bottom: 18px;
   }
 
+  /* ── Back: Benefits ── */
   .back-benefits {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 15mm;
-    margin-bottom: 18px;
+    gap: 5mm;
+    padding: 0 18mm 6mm;
+  }
+  .back-benefit {
+    background: var(--white);
+    padding: 12px 14px;
   }
   .back-benefit-title {
     font-family: 'Concrette S', serif;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 13px;
     color: var(--black);
     margin-bottom: 8px;
+    line-height: 1.2;
   }
   .back-benefit-list {
     list-style: none;
@@ -246,92 +270,41 @@
   .back-benefit-list li {
     font-family: 'Degular', sans-serif;
     font-weight: 400;
-    font-size: 11px;
+    font-size: 10px;
     color: var(--black);
-    line-height: 1.5;
-    margin-bottom: 6px;
+    line-height: 1.4;
+    margin-bottom: 5px;
     padding-left: 10px;
     position: relative;
   }
+  .back-benefit-list li:last-child { margin-bottom: 0; }
   .back-benefit-list li::before {
-    content: '\2022';
+    content: '';
     position: absolute;
     left: 0;
-    color: var(--olive);
+    top: 5px;
+    width: 4px;
+    height: 4px;
+    background: var(--olive);
+    border-radius: 50%;
   }
 
-  .back-collections-divider {
-    border: none;
-    border-top: 1px solid var(--olive);
-    margin-bottom: 14px;
-  }
-  .back-collections-heading {
-    font-family: 'Concrette S', serif;
-    font-weight: 700;
-    font-size: 20px;
-    color: var(--black);
-    margin-bottom: 12px;
-  }
-  .back-collections-row {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .back-collection-num {
-    font-family: 'Concrette S', serif;
-    font-weight: 700;
-    font-size: 11px;
-    color: var(--olive);
-  }
-  .back-collection-name {
-    font-family: 'Concrette S', serif;
-    font-weight: 700;
-    font-size: 11px;
-    color: var(--black);
-    margin-bottom: 3px;
-  }
-  .back-collection-desc {
-    font-family: 'Degular', sans-serif;
-    font-weight: 400;
-    font-size: 9px;
-    color: var(--black);
-    opacity: 0.6;
-    line-height: 1.4;
-  }
-
-  .back-certs {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 16px;
-  }
-  .back-cert {
-    font-family: 'Degular', sans-serif;
-    font-weight: 600;
-    font-size: 8px;
-    color: var(--olive);
-    border: 1px solid var(--olive);
-    border-radius: 20px;
-    padding: 4px 10px;
-    white-space: nowrap;
-  }
-
+  /* ── Back: Quote strip ── */
   .back-quote {
     background: var(--olive);
     color: var(--white);
-    padding: 16px 20px;
-    margin-left: -18mm;
-    margin-right: -18mm;
-    margin-bottom: 16px;
+    padding: 12px 18mm;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
   }
   .back-quote-text {
     font-family: 'Concrette S', serif;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 12px;
     color: var(--white);
     line-height: 1.5;
-    margin-bottom: 6px;
+    flex: 1;
   }
   .back-quote-attr {
     font-family: 'Degular', sans-serif;
@@ -341,29 +314,144 @@
     color: var(--white);
     opacity: 0.5;
     letter-spacing: 1px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
-  .back-cta { margin-top: auto; }
+  /* ── Back: Collections ── */
+  .back-collections-section {
+    padding: 6mm 18mm;
+  }
+  .back-collections-heading {
+    font-family: 'Concrette S', serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--black);
+    margin-bottom: 8px;
+  }
+  .back-collections-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5mm;
+  }
+  .back-collection-num {
+    font-family: 'Degular', sans-serif;
+    font-weight: 600;
+    font-size: 8px;
+    color: var(--olive);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .back-collection-name {
+    font-family: 'Concrette S', serif;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--black);
+    margin-bottom: 3px;
+    line-height: 1.2;
+  }
+  .back-collection-desc {
+    font-family: 'Degular', sans-serif;
+    font-weight: 400;
+    font-size: 8.5px;
+    color: var(--black);
+    opacity: 0.55;
+    line-height: 1.35;
+  }
+
+  /* ── Back: Certifications ── */
+  .back-certs-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid rgba(86,77,34,0.15);
+    border-bottom: 1px solid rgba(86,77,34,0.15);
+    margin: 0 18mm;
+    padding: 8px 0;
+  }
+  .back-certs-label {
+    font-family: 'Degular', sans-serif;
+    font-weight: 600;
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--olive);
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+  .back-certs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .back-cert {
+    font-family: 'Degular', sans-serif;
+    font-weight: 600;
+    font-size: 8px;
+    color: var(--olive);
+    border: 1px solid rgba(86,77,34,0.3);
+    border-radius: 2px;
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+
+  /* ── Back: Lifestyle image ── */
+  .back-lifestyle {
+    flex: 1;
+    min-height: 30mm;
+    margin: 0 18mm;
+    overflow: hidden;
+    position: relative;
+  }
+  .back-lifestyle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .back-lifestyle-caption {
+    position: absolute;
+    bottom: 8px;
+    left: 12px;
+    font-family: 'Concrette S', serif;
+    font-size: 10px;
+    color: var(--white);
+    line-height: 1.3;
+  }
+  .back-lifestyle-caption span { font-weight: 700; }
+
+  /* ── Back: CTA footer ── */
+  .back-cta {
+    padding: 6mm 18mm 10mm;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .back-cta-left {}
   .back-cta-heading {
     font-family: 'Concrette S', serif;
     font-weight: 700;
     font-size: 16px;
     color: var(--black);
-    margin-bottom: 6px;
+    margin-bottom: 4px;
+    line-height: 1.2;
   }
   .back-cta-contact {
     font-family: 'Degular', sans-serif;
     font-weight: 400;
     font-size: 11px;
     color: var(--black);
-    margin-bottom: 4px;
   }
   .back-cta-legal {
     font-family: 'Degular', sans-serif;
     font-weight: 400;
     font-size: 9px;
     color: var(--black);
-    opacity: 0.4;
+    opacity: 0.35;
+    text-align: right;
+    white-space: nowrap;
   }
 </style>
 </head>
@@ -444,8 +532,14 @@
     <span class="back-header-label">Partner Information</span>
   </div>
 
-  <h1 class="back-main-heading">Why Partner with Alpha Surfaces?</h1>
-  <p class="back-subheading">Everything your customers want. Everything you need to grow.</p>
+  <div class="back-hero-strip">
+    <img src="../images/hero.jpg" alt="Alpha Surfaces premium kitchen benchtop">
+  </div>
+
+  <div class="back-heading-section">
+    <h1 class="back-main-heading">Why Partner with Alpha Surfaces?</h1>
+    <p class="back-subheading">Everything your customers want. Everything you need to grow.</p>
+  </div>
 
   <div class="back-benefits">
     <div class="back-benefit">
@@ -474,54 +568,64 @@
     </div>
   </div>
 
-  <hr class="back-collections-divider">
-
-  <div class="back-collections-heading">Our Collections</div>
-  <div class="back-collections-row">
-    <div>
-      <div class="back-collection-num">001</div>
-      <div class="back-collection-name">Calacatta &amp; Statuario</div>
-      <div class="back-collection-desc">Classic white marble aesthetics. Timeless, elegant, enduringly popular.</div>
-    </div>
-    <div>
-      <div class="back-collection-num">002</div>
-      <div class="back-collection-name">Prairie &amp; Sage</div>
-      <div class="back-collection-desc">Earthy, warm tones inspired by Australian landscapes. Perfect for contemporary homes.</div>
-    </div>
-    <div>
-      <div class="back-collection-num">003</div>
-      <div class="back-collection-name">Soapstone &amp; Verde</div>
-      <div class="back-collection-desc">Deep, rich surfaces with natural veining. Dramatic and sophisticated.</div>
-    </div>
-    <div>
-      <div class="back-collection-num">004</div>
-      <div class="back-collection-name">Dramatic &amp; Noir</div>
-      <div class="back-collection-desc">Bold blacks and deep charcoals. The choice for statement kitchens.</div>
-    </div>
-    <div>
-      <div class="back-collection-num">005</div>
-      <div class="back-collection-name">Urban &amp; Minimal</div>
-      <div class="back-collection-desc">Concrete-inspired, textural surfaces. Modern, industrial, and versatile.</div>
-    </div>
-  </div>
-
-  <div class="back-certs">
-    <span class="back-cert">&check; Zero Crystalline Silica</span>
-    <span class="back-cert">&check; NSF Certified</span>
-    <span class="back-cert">&check; GreenGuard Gold</span>
-    <span class="back-cert">&check; ACCC Compliant</span>
-    <span class="back-cert">&check; AS/NZS Standards Met</span>
-  </div>
-
   <div class="back-quote">
     <div class="back-quote-text">&ldquo;We built Alpha Surfaces because the industry needed a surface that was as beautiful as it was responsible.&rdquo;</div>
     <div class="back-quote-attr">Belinda Kelaher &mdash; Managing Director</div>
   </div>
 
+  <div class="back-collections-section">
+    <div class="back-collections-heading">Our Collections</div>
+    <div class="back-collections-row">
+      <div>
+        <div class="back-collection-num">Collection 01</div>
+        <div class="back-collection-name">Calacatta &amp; Statuario</div>
+        <div class="back-collection-desc">Classic white marble aesthetics. Timeless, elegant, enduringly popular.</div>
+      </div>
+      <div>
+        <div class="back-collection-num">Collection 02</div>
+        <div class="back-collection-name">Prairie &amp; Sage</div>
+        <div class="back-collection-desc">Earthy, warm tones inspired by Australian landscapes. Perfect for contemporary homes.</div>
+      </div>
+      <div>
+        <div class="back-collection-num">Collection 03</div>
+        <div class="back-collection-name">Soapstone &amp; Verde</div>
+        <div class="back-collection-desc">Deep, rich surfaces with natural veining. Dramatic and sophisticated.</div>
+      </div>
+      <div>
+        <div class="back-collection-num">Collection 04</div>
+        <div class="back-collection-name">Dramatic &amp; Noir</div>
+        <div class="back-collection-desc">Bold blacks and deep charcoals. The choice for statement kitchens.</div>
+      </div>
+      <div>
+        <div class="back-collection-num">Collection 05</div>
+        <div class="back-collection-name">Urban &amp; Minimal</div>
+        <div class="back-collection-desc">Concrete-inspired, textural surfaces. Modern, industrial, and versatile.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="back-certs-section">
+    <span class="back-certs-label">Certified</span>
+    <div class="back-certs">
+      <span class="back-cert">Zero Crystalline Silica</span>
+      <span class="back-cert">NSF Certified</span>
+      <span class="back-cert">GreenGuard Gold</span>
+      <span class="back-cert">ACCC Compliant</span>
+      <span class="back-cert">AS/NZS Standards Met</span>
+    </div>
+  </div>
+
+  <div class="back-lifestyle">
+    <img src="../images/about.jpg" alt="Premium kitchen featuring Alpha Surfaces benchtop">
+    <div class="back-lifestyle-caption"><span>Carrara</span><br>Collection 02</div>
+  </div>
+
   <div class="back-cta">
-    <div class="back-cta-heading">Ready to become an Alpha Surfaces partner?</div>
-    <div class="back-cta-contact">Contact: belinda@alphasurfaces.com.au &middot; alphasurfaces.com.au &middot; 07 5486 3112</div>
-    <div class="back-cta-legal">&copy; 2025 Alpha Surfaces Pty Ltd &middot; 13 Enterprise St, Kunda Park QLD 4556</div>
+    <div class="back-cta-left">
+      <div class="back-cta-heading">Ready to become an Alpha Surfaces partner?</div>
+      <div class="back-cta-contact">belinda@alphasurfaces.com.au &middot; alphasurfaces.com.au &middot; 07 5486 3112</div>
+    </div>
+    <div class="back-cta-legal">&copy; 2025 Alpha Surfaces Pty Ltd<br>13 Enterprise St, Kunda Park QLD 4556</div>
   </div>
 
 </div>
