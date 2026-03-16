@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title id="page-title">Alpha Surfaces × Partner — Partner Program</title>
+<style>
+/* --- FONTS --- */
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+
+/* --- RESET & BASE --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --olive: #564d22;
+  --cream: #f3f1e6;
+  --white: #ffffff;
+  --black: #000000;
+  --red: #f56c6c;
+  --gray: #cccccc;
+  --border: rgba(0,0,0,0.1);
+  /* Partner accent — override this per partner */
+  --partner-accent: #564d22;
+}
+html { scroll-behavior: smooth; }
+body { background: #f5f5f5; color: var(--black); font-family: 'Degular', sans-serif; font-weight: 400; line-height: 1.2; overflow-x: hidden; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* --- ACCENT STRIP --- */
+.accent-strip { height: 4px; background: var(--partner-accent); width: 100%; flex-shrink: 0; }
+
+/* --- NAV --- */
+.nav { position: sticky; top: 0; z-index: 100; background: var(--olive); display: flex; align-items: center; justify-content: space-between; padding: 18px 90px; }
+.nav-logos { display: flex; align-items: center; gap: 20px; padding-left: 35px; }
+.nav-logos a { display: flex; align-items: center; }
+.nav-alpha-logo { height: 75px; width: auto; }
+.nav-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+.nav-partner-logo { height: 36px; width: auto; max-width: 140px; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.7; }
+.nav-menu { display: flex; align-items: center; gap: 85px; }
+.nav-menu a { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 20px; color: var(--white); text-decoration: none; letter-spacing: 0.6px; text-transform: uppercase; }
+.nav-menu a:hover { opacity: 0.8; }
+.nav-hamburger { display: none; }
+
+/* --- HERO --- */
+.hero { position: relative; width: 100%; height: calc(100vh - 115px); min-height: 600px; max-height: 900px; overflow: hidden; }
+.hero > img { width: 100%; height: 100%; object-fit: cover; }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.25) 50%, transparent 100%); }
+.hero-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 80px 90px; }
+.hero-lockup { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
+.hero-lockup-label { font-family: 'Degular', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+.hero-lockup-accent { width: 40px; height: 3px; background: var(--partner-accent); flex-shrink: 0; }
+.hero-region { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+.hero-content h1 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 56px; line-height: 1.1; color: var(--white); max-width: 800px; margin-bottom: 20px; }
+.hero-content p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 22px; line-height: 1.35; color: rgba(255,255,255,0.8); max-width: 600px; }
+
+/* --- STATEMENT --- */
+.statement { background: var(--olive); display: flex; flex-direction: column; align-items: center; padding: 150px 171px 0; min-height: 661px; position: relative; }
+.statement p { font-family: 'Concrette S', serif; font-weight: 500; font-size: 42px; line-height: 1.2; color: var(--white); max-width: 1100px; }
+.statement .arrow { margin-top: auto; margin-bottom: 80px; width: 62px; height: 70px; }
+.statement .arrow svg { width: 100%; height: 100%; }
+
+/* --- VALUE PROPOSITION --- */
+.value { background: var(--cream); padding: 120px 161px; }
+.value-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--olive); margin-bottom: 16px; }
+.value-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 42px; line-height: 1.15; color: var(--black); max-width: 700px; margin-bottom: 80px; }
+.value-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; }
+.value-card { display: flex; flex-direction: column; gap: 16px; }
+.value-card-num { font-family: 'Concrette S', serif; font-weight: 700; font-size: 48px; line-height: 1; color: var(--partner-accent); opacity: 0.25; }
+.value-card h3 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; line-height: 1.2; color: var(--black); }
+.value-card p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 18px; line-height: 1.4; color: var(--black); opacity: 0.75; }
+
+/* --- COLLECTIONS SHOWCASE --- */
+.showcase { background: var(--white); padding: 120px 90px; }
+.showcase-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--olive); margin-bottom: 16px; }
+.showcase-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 42px; line-height: 1.15; color: var(--black); margin-bottom: 60px; }
+.showcase-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+.showcase-card { position: relative; overflow: hidden; }
+.showcase-card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; transition: transform 0.6s ease; }
+.showcase-card:hover img { transform: scale(1.04); }
+.showcase-card-info { padding: 16px 0; }
+.showcase-card-info .sc-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 16px; color: var(--black); }
+.showcase-card-info .sc-sub { font-family: 'Concrette S', serif; font-weight: 400; font-size: 14px; color: var(--black); opacity: 0.6; }
+
+/* --- ABOUT PARTNER --- */
+.about-partner { background: var(--cream); padding: 100px 90px; border-top: 3px solid var(--partner-accent); }
+.about-partner-inner { display: flex; gap: 80px; align-items: flex-start; }
+.about-partner-brand { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 24px; align-items: flex-start; }
+.about-partner-logo { max-width: 220px; max-height: 80px; object-fit: contain; }
+.about-partner-link { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--olive); text-decoration: none; border-bottom: 1px solid var(--partner-accent); padding-bottom: 2px; }
+.about-partner-link:hover { color: var(--partner-accent); }
+.about-partner-text { flex: 1; }
+.about-partner-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 30px; color: var(--black); margin-bottom: 20px; line-height: 1.2; }
+.about-partner-body { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px; line-height: 1.4; color: var(--black); opacity: 0.75; }
+.about-partner-stats { display: flex; gap: 40px; margin-top: 32px; }
+.about-partner-stat { display: flex; flex-direction: column; gap: 4px; }
+.about-partner-stat-value { font-family: 'Concrette S', serif; font-weight: 700; font-size: 28px; color: var(--partner-accent); line-height: 1; }
+.about-partner-stat-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--black); opacity: 0.5; }
+
+/* --- CONTACT --- */
+.contact { background: var(--white); padding: 120px 90px 80px; border-top: 1px solid var(--border); }
+.contact-inner { display: flex; gap: 120px; }
+.contact-left { width: 420px; flex-shrink: 0; display: flex; flex-direction: column; gap: 48px; }
+.contact-heading { font-size: 30px; color: var(--black); }
+.contact-heading .ch-bold { font-family: 'Concrette S', serif; font-weight: 700; line-height: 52px; display: block; }
+.contact-heading .ch-regular { font-family: 'Concrette S', serif; font-weight: 400; line-height: 1.2; display: block; max-width: 357px; }
+.contact-person { display: flex; flex-direction: column; gap: 8px; }
+.contact-person .cp-name { font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--black); }
+.contact-person .cp-role { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 16px; color: var(--black); opacity: 0.6; text-transform: uppercase; }
+.contact-details { display: flex; flex-direction: column; gap: 6px; }
+.contact-details a { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px; color: var(--black); text-decoration: underline; }
+.contact-details a:hover { color: var(--olive); }
+
+/* --- FORM --- */
+.contact-form { flex: 1; max-width: 538px; display: flex; flex-direction: column; gap: 45px; }
+.form-group { flex: 1; display: flex; flex-direction: column; gap: 11px; }
+.form-label { display: flex; gap: 8px; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); }
+.form-label .required { color: var(--red); }
+.form-input { border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 4px 0; outline: none; width: 100%; }
+.form-input:focus { border-bottom-color: var(--partner-accent); }
+.form-select-wrap { display: flex; flex-direction: column; gap: 11px; }
+.form-select-label { display: flex; flex-direction: column; gap: 8px; }
+.form-select { border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--gray); padding: 4px 0; outline: none; width: 100%; appearance: none; -webkit-appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right center; background-size: 12px 6px; }
+.form-select:valid { color: var(--black); }
+.form-submit-row { display: flex; justify-content: flex-end; }
+.btn-submit { background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 8px 44px; border-radius: 12px; border: none; cursor: pointer; width: 189px; transition: background 0.2s; }
+.btn-submit:hover { background: var(--partner-accent); }
+
+/* --- FOOTER --- */
+.footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
+.footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
+
+/* --- PRINT --- */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { background: none; }
+}
+
+/* --- MOBILE --- */
+@media (max-width: 1024px) {
+  .nav { padding: 24px 21px; }
+  .nav-logos { padding-left: 0; gap: 12px; }
+  .nav-alpha-logo { height: 54px; }
+  .nav-partner-logo { height: 24px; max-width: 100px; }
+  .nav-divider { height: 28px; }
+  .nav-menu { display: none; }
+  .nav-hamburger { display: block; cursor: pointer; background: none; border: none; padding: 0; }
+  .nav-hamburger span { display: block; width: 28px; height: 2px; background: var(--white); margin-bottom: 6px; }
+  .nav-hamburger span:last-child { margin-bottom: 0; }
+
+  .hero { height: 60vh; min-height: 400px; }
+  .hero-content { padding: 40px 24px; }
+  .hero-content h1 { font-size: 32px; }
+  .hero-content p { font-size: 18px; }
+
+  .statement { padding: 44px 24px 88px; min-height: auto; gap: 124px; }
+  .statement p { font-weight: 400; font-size: 24px; line-height: 1.15; }
+  .statement .arrow { width: 42px; height: 22px; margin-bottom: 0; }
+
+  .value { padding: 60px 24px; }
+  .value-heading { font-size: 30px; margin-bottom: 48px; }
+  .value-grid { grid-template-columns: 1fr; gap: 48px; }
+
+  .showcase { padding: 60px 24px; }
+  .showcase-heading { font-size: 30px; margin-bottom: 40px; }
+  .showcase-grid { grid-template-columns: repeat(2, 1fr); gap: 3px; }
+  .showcase-grid .showcase-card:last-child { grid-column: span 2; }
+  .showcase-grid .showcase-card:last-child img { aspect-ratio: 16/9; }
+
+  .about-partner { padding: 60px 24px; }
+  .about-partner-inner { flex-direction: column; gap: 40px; }
+  .about-partner-brand { width: 100%; flex-direction: row; align-items: center; gap: 20px; }
+  .about-partner-logo { max-width: 160px; }
+  .about-partner-heading { font-size: 24px; }
+  .about-partner-body { font-size: 18px; }
+  .about-partner-stats { gap: 24px; }
+  .about-partner-stat-value { font-size: 22px; }
+
+  .contact { padding: 60px 24px; }
+  .contact-inner { flex-direction: column; gap: 60px; }
+  .contact-left { width: 100%; }
+  .contact-form { max-width: 100%; }
+  .btn-submit { width: 100%; }
+
+  .footer { padding: 30px 24px; }
+  .footer p { font-size: 12px; letter-spacing: 0.36px; }
+}
+</style>
+</head>
+<body>
+
+<script>
+/*
+ * ═══════════════════════════════════════════════════════════════
+ * PARTNER CONFIG — Change ONLY this block to create a new page.
+ * Duplicate this file, update the config, done.
+ * ═══════════════════════════════════════════════════════════════
+ */
+var PARTNER = {
+  // Partner company name (used in headings, nav, title)
+  name: "Freedom Kitchens",
+
+  // URL slug — must match the filename (e.g. freedom-kitchens.html)
+  slug: "freedom-kitchens",
+
+  // Partner logo filename in ../brand/logos/ (e.g. freedom-kitchens.svg)
+  // See available files: align-kitchens.svg, banks-benchtops.png,
+  // craftbuilt-kitchens.png, damco-kitchens.png, designer-stone-qld.png,
+  // freedom-kitchens.svg, hacker-australia.webp, ikea-kitchens.svg,
+  // imperial-kitchens.png, kaboodle.svg, kinsman-kitchens.svg,
+  // kitchenu.png, mccoll-cabinetmakers.png, nv-stone.png,
+  // qld-kitchen-centre.png, rods-kitchens.webp, wallspan.svg
+  logo: "freedom-kitchens.svg",
+
+  // Partner's brand accent colour — used on top strip, number highlights,
+  // form focus, submit hover, about-partner border, accent line in hero
+  accent: "#E41937",
+
+  // Partner's website URL
+  website: "https://freedomkitchens.com.au",
+
+  // City/region displayed in hero for localisation
+  region: "National — 15+ showrooms across Australia",
+
+  // Hero headline and subtitle
+  heroHeadline: "Alpha Surfaces × Freedom Kitchens",
+  heroSubtitle: "Delivering premium Australian surfaces across 15+ showrooms nationally — a partnership built on 30+ years of kitchen design excellence.",
+
+  // Partnership manifesto statement (olive block)
+  statement: "Together, we're bringing an unmatched surface experience to Australian homes — combining Alpha Surfaces' cutting-edge mineral stone technology with Freedom Kitchens' three decades of design leadership in kitchens, wardrobes, and laundries across the country.",
+
+  // Value proposition section
+  valueHeading: "Why Freedom Kitchens partners with Alpha Surfaces.",
+  benefits: [
+    { title: "National Showroom Network", text: "Alpha Surfaces displayed across Freedom Kitchens' 15+ showrooms nationwide, giving customers hands-on access to our full premium collection alongside expert kitchen design consultation." },
+    { title: "Design Integration", text: "Seamless specification of Alpha Surfaces benchtops within Freedom Kitchens' end-to-end design process — from 3D renders to final installation across kitchens, wardrobes, and laundries." },
+    { title: "Co-Branded Campaigns", text: "Joint marketing initiatives and in-store promotions that position Alpha Surfaces as the premium benchtop choice for Freedom Kitchens customers nationally." }
+  ],
+
+  // About partner section — "their" section
+  aboutHeading: "About Freedom Kitchens",
+  aboutText: "Freedom Kitchens has been designing, manufacturing, and installing premium kitchens, wardrobes, and laundries for over 30 years. With 15+ showrooms across Australia, they've built a reputation for design excellence, quality craftsmanship, and seamless project delivery from concept to completion.",
+  aboutStats: [
+    { value: "30+", label: "Years" },
+    { value: "15+", label: "Showrooms" },
+    { value: "National", label: "Coverage" }
+  ],
+
+  // Store location options for the contact form
+  locations: [
+    { value: "sydney-north", label: "Sydney North" },
+    { value: "sydney-south", label: "Sydney South" },
+    { value: "sydney-west", label: "Sydney West" },
+    { value: "melbourne", label: "Melbourne" },
+    { value: "brisbane", label: "Brisbane" },
+    { value: "perth", label: "Perth" },
+    { value: "adelaide", label: "Adelaide" },
+    { value: "other", label: "Other" }
+  ]
+};
+</script>
+
+<!-- ACCENT STRIP -->
+<div class="accent-strip"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logos" id="nav-logos">
+    <a href="/">
+      <img class="nav-alpha-logo" src="../logos/01 Brandmark/Inverse_white/Alpha Surfaces_Brandmark_Inverse.png" alt="Alpha Surfaces">
+    </a>
+    <!-- Partner logo inserted by JS -->
+  </div>
+  <div class="nav-menu">
+    <a href="#partnership">PARTNERSHIP</a>
+    <a href="#collections">COLLECTIONS</a>
+    <a href="#contact">CONTACT</a>
+  </div>
+  <button class="nav-hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <img src="../images/hero.jpg" alt="" id="hero-img">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-lockup">
+      <span class="hero-lockup-label">Partnering with</span>
+      <span class="hero-lockup-accent"></span>
+      <span class="hero-lockup-label" id="hero-partner-name"></span>
+    </div>
+    <h1 id="hero-headline"></h1>
+    <p id="hero-subtitle"></p>
+    <p class="hero-region" id="hero-region" style="margin-top: 16px;"></p>
+  </div>
+</section>
+
+<!-- PARTNERSHIP STATEMENT -->
+<section class="statement" id="partnership">
+  <p id="statement-text"></p>
+  <div class="arrow">
+    <svg viewBox="0 0 62 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M31 0V65M31 65L5 40M31 65L57 40" stroke="white" stroke-width="2"/>
+    </svg>
+  </div>
+</section>
+
+<!-- VALUE PROPOSITION -->
+<section class="value">
+  <p class="value-label">Partnership Benefits</p>
+  <h2 class="value-heading" id="value-heading"></h2>
+  <div class="value-grid" id="value-grid"></div>
+</section>
+
+<!-- COLLECTIONS SHOWCASE -->
+<section class="showcase" id="collections">
+  <p class="showcase-label">Featured Collections</p>
+  <h2 class="showcase-heading" id="showcase-heading"></h2>
+  <div class="showcase-grid">
+    <div class="showcase-card">
+      <img src="../images/collection_221.jpg" alt="Calacatta Collection">
+      <div class="showcase-card-info"><span class="sc-title">Calacatta</span><br><span class="sc-sub">Collection 01</span></div>
+    </div>
+    <div class="showcase-card">
+      <img src="../images/collection_228.jpg" alt="Carrara Collection">
+      <div class="showcase-card-info"><span class="sc-title">Carrara</span><br><span class="sc-sub">Collection 02</span></div>
+    </div>
+    <div class="showcase-card">
+      <img src="../images/collection_235.jpg" alt="Concrete Collection">
+      <div class="showcase-card-info"><span class="sc-title">Concrete</span><br><span class="sc-sub">Collection 03</span></div>
+    </div>
+    <div class="showcase-card">
+      <img src="../images/collection_242.jpg" alt="Statuario Gold Collection">
+      <div class="showcase-card-info"><span class="sc-title">Statuario Gold</span><br><span class="sc-sub">Collection 04</span></div>
+    </div>
+    <div class="showcase-card">
+      <img src="../images/collection_249.jpg" alt="Autumn Gold Collection">
+      <div class="showcase-card-info"><span class="sc-title">Autumn Gold</span><br><span class="sc-sub">Collection 05</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT PARTNER -->
+<section class="about-partner" id="about-partner">
+  <div class="about-partner-inner">
+    <div class="about-partner-brand" id="about-partner-brand">
+      <!-- Logo and link inserted by JS -->
+    </div>
+    <div class="about-partner-text">
+      <h2 class="about-partner-heading" id="about-heading"></h2>
+      <p class="about-partner-body" id="about-body"></p>
+      <div class="about-partner-stats" id="about-stats"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT / CTA -->
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div class="contact-left">
+      <div class="contact-heading">
+        <span class="ch-bold">Get in touch.</span>
+        <span class="ch-regular">For partnership enquiries and store support.</span>
+      </div>
+      <div class="contact-person">
+        <span class="cp-name">Belinda Kelaher</span>
+        <span class="cp-role">Managing Director, Alpha Surfaces</span>
+      </div>
+      <div class="contact-details">
+        <a href="tel:0754863112">07 5486 3112</a>
+        <a href="mailto:belinda@alphasurfaces.com.au">belinda@alphasurfaces.com.au</a>
+      </div>
+    </div>
+    <form class="contact-form" action="#" method="POST">
+      <div class="form-group">
+        <span class="form-label">Name <span class="required">*</span></span>
+        <input type="text" class="form-input" name="name" required>
+      </div>
+      <div class="form-group">
+        <span class="form-label">Phone <span class="required">*</span></span>
+        <input type="tel" class="form-input" name="phone" required>
+      </div>
+      <div class="form-group">
+        <span class="form-label">Email <span class="required">*</span></span>
+        <input type="email" class="form-input" name="email" required>
+      </div>
+      <div class="form-select-wrap">
+        <div class="form-select-label">
+          <span class="form-label">Store Location <span class="required">*</span></span>
+          <select class="form-select" name="store_location" id="store-select" required>
+            <option value="" disabled selected>- Select -</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-submit-row">
+        <button type="submit" class="btn-submit">Submit</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>Copyright &copy; 2024 Alpha Surfaces – ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+ * TEMPLATE ENGINE — Reads PARTNER config and populates the page.
+ * Do not edit below this line unless changing the template itself.
+ * ═══════════════════════════════════════════════════════════════ */
+(function() {
+  var P = PARTNER;
+
+  // Set accent colour
+  document.documentElement.style.setProperty('--partner-accent', P.accent);
+
+  // Title
+  document.getElementById('page-title').textContent = 'Alpha Surfaces \u00D7 ' + P.name + ' \u2014 Partner Program';
+
+  // Nav — insert partner logo
+  var navLogos = document.getElementById('nav-logos');
+  if (P.logo) {
+    var divider = document.createElement('div');
+    divider.className = 'nav-divider';
+    navLogos.appendChild(divider);
+    var pLogo = document.createElement('img');
+    pLogo.className = 'nav-partner-logo';
+    pLogo.src = '../brand/logos/' + P.logo;
+    pLogo.alt = P.name;
+    navLogos.appendChild(pLogo);
+  }
+
+  // Hero
+  document.getElementById('hero-img').alt = 'Alpha Surfaces \u00D7 ' + P.name;
+  document.getElementById('hero-partner-name').textContent = P.name;
+  document.getElementById('hero-headline').textContent = P.heroHeadline;
+  document.getElementById('hero-subtitle').textContent = P.heroSubtitle;
+  document.getElementById('hero-region').textContent = P.region;
+
+  // Statement
+  document.getElementById('statement-text').textContent = P.statement;
+
+  // Value proposition
+  document.getElementById('value-heading').textContent = P.valueHeading;
+  var grid = document.getElementById('value-grid');
+  P.benefits.forEach(function(b, i) {
+    var card = document.createElement('div');
+    card.className = 'value-card';
+    card.innerHTML =
+      '<span class="value-card-num">0' + (i + 1) + '</span>' +
+      '<h3>' + b.title + '</h3>' +
+      '<p>' + b.text + '</p>';
+    grid.appendChild(card);
+  });
+
+  // Showcase heading
+  document.getElementById('showcase-heading').textContent = 'Available at ' + P.name + '.';
+
+  // About partner
+  var aboutBrand = document.getElementById('about-partner-brand');
+  if (P.logo) {
+    var aboutLogo = document.createElement('img');
+    aboutLogo.className = 'about-partner-logo';
+    aboutLogo.src = '../brand/logos/' + P.logo;
+    aboutLogo.alt = P.name;
+    aboutBrand.appendChild(aboutLogo);
+  }
+  var aboutLink = document.createElement('a');
+  aboutLink.className = 'about-partner-link';
+  aboutLink.href = P.website;
+  aboutLink.target = '_blank';
+  aboutLink.textContent = 'Visit ' + P.name + ' \u2192';
+  aboutBrand.appendChild(aboutLink);
+
+  document.getElementById('about-heading').textContent = P.aboutHeading;
+  document.getElementById('about-body').textContent = P.aboutText;
+
+  var statsEl = document.getElementById('about-stats');
+  if (P.aboutStats && P.aboutStats.length) {
+    P.aboutStats.forEach(function(s) {
+      var stat = document.createElement('div');
+      stat.className = 'about-partner-stat';
+      stat.innerHTML =
+        '<span class="about-partner-stat-value">' + s.value + '</span>' +
+        '<span class="about-partner-stat-label">' + s.label + '</span>';
+      statsEl.appendChild(stat);
+    });
+  }
+
+  // Store locations
+  var select = document.getElementById('store-select');
+  P.locations.forEach(function(loc) {
+    var opt = document.createElement('option');
+    opt.value = loc.value;
+    opt.textContent = loc.label;
+    select.appendChild(opt);
+  });
+})();
+</script>
+</body>
+</html>
