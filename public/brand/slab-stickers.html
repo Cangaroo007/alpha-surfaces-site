@@ -75,7 +75,7 @@
     }
 
     .sticker-top-bar {
-      height: 8mm;
+      height: 11mm;
       background: var(--olive);
       display: flex;
       align-items: center;
@@ -84,13 +84,10 @@
       flex-shrink: 0;
     }
 
-    .sticker-top-bar .brand-name {
-      font-family: 'Degular', sans-serif;
-      font-weight: 600;
-      font-size: 7px;
-      text-transform: uppercase;
-      color: var(--white);
-      letter-spacing: 1px;
+    .sticker-top-bar .brand-logo {
+      height: 7mm;
+      width: auto;
+      display: block;
     }
 
     .sticker-top-bar .silica-free {
@@ -294,7 +291,7 @@
       sticker.className = 'sticker';
       sticker.innerHTML = `
         <div class="sticker-top-bar">
-          <span class="brand-name">Alpha Surfaces</span>
+          <img class="brand-logo" src="../logos/01 Brandmark/Inverse_white/Alpha Surfaces_Brandmark_Inverse.png" alt="Alpha Surfaces">
           <span class="silica-free">Silica Free</span>
         </div>
         <div class="sticker-body">
