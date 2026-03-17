@@ -1,0 +1,142 @@
+/* ═══════════════════════════════════════════════════════════════
+   ALPHA SURFACES — Shared Animation Styles
+   Pure CSS animations + Intersection Observer hooks
+   ═══════════════════════════════════════════════════════════════ */
+
+/* --- 1. SCROLL REVEAL --- */
+.anim-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.anim-reveal.anim-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered children — set via JS with --anim-delay */
+.anim-stagger > .anim-reveal {
+  transition-delay: var(--anim-delay, 0s);
+}
+
+/* --- 2. PARALLAX HERO --- */
+.anim-parallax-hero {
+  will-change: transform;
+}
+
+/* --- 3. STONE CARD HOVER --- */
+.anim-card {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.anim-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+}
+.anim-card .stone-card-image img,
+.anim-card .showcase-card img,
+.anim-card .col-card img {
+  transition: transform 0.35s ease;
+}
+.anim-card:hover .stone-card-image img,
+.anim-card:hover .showcase-card img,
+.anim-card:hover .col-card img {
+  transform: scale(1.08);
+}
+.anim-card .stone-card-name,
+.anim-card .sc-title {
+  transition: transform 0.35s ease;
+  display: inline-block;
+}
+.anim-card:hover .stone-card-name,
+.anim-card:hover .sc-title {
+  transform: translateY(-3px);
+}
+
+/* --- 4. NAV SCROLL BEHAVIOUR --- */
+.nav {
+  transition: height 0.3s ease, padding 0.3s ease, backdrop-filter 0.3s ease, background-color 0.3s ease;
+}
+.nav.nav-scrolled {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background-color: rgba(86, 77, 34, 0.95);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.nav.nav-scrolled .nav-logo img,
+.nav.nav-scrolled .nav-alpha-logo {
+  transition: height 0.3s ease;
+  height: 56px;
+}
+.nav.nav-scrolled .nav-left img,
+.nav.nav-scrolled .nav-logos img.nav-alpha-logo {
+  height: 56px;
+}
+
+/* --- 5. IMAGE PARALLAX (stone detail swatch) --- */
+.anim-parallax-swatch {
+  will-change: transform;
+  overflow: hidden;
+}
+.anim-parallax-swatch img {
+  will-change: transform;
+}
+
+/* --- 7. HORIZONTAL COLLECTION SCROLL (mobile) --- */
+@media (max-width: 768px) {
+  .anim-hscroll {
+    display: flex !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 16px !important;
+    padding-bottom: 8px;
+    grid-template-columns: none !important;
+  }
+  .anim-hscroll > * {
+    flex: 0 0 70%;
+    scroll-snap-align: start;
+    min-width: 200px;
+  }
+  /* Scroll hint fade on right edge */
+  .anim-hscroll-wrap {
+    position: relative;
+  }
+  .anim-hscroll-wrap::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 8px;
+    width: 40px;
+    background: linear-gradient(to right, transparent, rgba(42,36,6,0.3));
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .anim-hscroll-wrap.scrolled-end::after {
+    opacity: 0;
+  }
+}
+
+/* --- REDUCED MOTION --- */
+@media (prefers-reduced-motion: reduce) {
+  .anim-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .anim-parallax-hero,
+  .anim-parallax-swatch img {
+    transform: none !important;
+  }
+  .nav {
+    transition: none !important;
+  }
+  .anim-card {
+    transition: none !important;
+  }
+  .anim-card:hover {
+    transform: none !important;
+  }
+}
