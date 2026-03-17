@@ -1,17 +1,44 @@
 /* ═══════════════════════════════════════════════════════════════
-   ALPHA SURFACES — Shared Animation Styles
-   Pure CSS animations + Intersection Observer hooks
+   ALPHA SURFACES — Shared Animation Styles v2
+   Increased impact — editorial energy, refined not gimmicky
    ═══════════════════════════════════════════════════════════════ */
 
 /* --- 1. SCROLL REVEAL --- */
 .anim-reveal {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transform: translateY(48px);
+  filter: blur(4px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out, filter 0.8s ease-out;
 }
 .anim-reveal.anim-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) translateX(0);
+  filter: blur(0);
+}
+
+/* Headings reveal with X offset */
+.anim-reveal-heading {
+  opacity: 0;
+  transform: translateX(-16px) translateY(24px);
+  filter: blur(4px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out, filter 0.8s ease-out;
+}
+.anim-reveal-heading.anim-visible {
+  opacity: 1;
+  transform: translateX(0) translateY(0);
+  filter: blur(0);
+}
+
+/* Section labels slide from left with delay */
+.anim-reveal-label {
+  opacity: 0;
+  transform: translateX(-24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition-delay: 0s;
+}
+.anim-reveal-label.anim-visible {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* Staggered children — set via JS with --anim-delay */
@@ -27,10 +54,30 @@
 /* --- 3. STONE CARD HOVER --- */
 .anim-card {
   transition: transform 0.35s ease, box-shadow 0.35s ease;
+  cursor: pointer;
+  position: relative;
 }
 .anim-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.15);
+}
+/* Olive overlay on hover */
+.anim-card .stone-card-image,
+.anim-card .showcase-card-image {
+  position: relative;
+  overflow: hidden;
+}
+.anim-card .stone-card-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(86, 77, 34, 0);
+  transition: background 0.35s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.anim-card:hover .stone-card-image::after {
+  background: rgba(86, 77, 34, 0.08);
 }
 .anim-card .stone-card-image img,
 .anim-card .showcase-card img,
@@ -40,40 +87,70 @@
 .anim-card:hover .stone-card-image img,
 .anim-card:hover .showcase-card img,
 .anim-card:hover .col-card img {
-  transform: scale(1.08);
+  transform: scale(1.12);
 }
 .anim-card .stone-card-name,
 .anim-card .sc-title {
-  transition: transform 0.35s ease;
+  transition: transform 0.35s ease, color 0.35s ease;
   display: inline-block;
 }
 .anim-card:hover .stone-card-name,
 .anim-card:hover .sc-title {
   transform: translateY(-3px);
+  color: #564d22;
+}
+/* Keep white name colour on dark backgrounds */
+.collection-section .anim-card:hover .stone-card-name {
+  color: #ffffff;
 }
 
-/* --- 4. NAV SCROLL BEHAVIOUR --- */
+/* --- 4. SECTION TRANSITIONS --- */
+.anim-section {
+  transform: scale(0.98);
+  transition: transform 0.9s ease-out;
+}
+.anim-section.anim-visible {
+  transform: scale(1);
+}
+
+/* --- 5. IMAGE REVEAL (clip-path wipe) --- */
+.anim-img-reveal {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.9s cubic-bezier(0.77, 0, 0.175, 1);
+}
+.anim-img-reveal.anim-visible {
+  clip-path: inset(0 0% 0 0);
+}
+
+/* --- 6. NAV SCROLL BEHAVIOUR --- */
 .nav {
-  transition: height 0.3s ease, padding 0.3s ease, backdrop-filter 0.3s ease, background-color 0.3s ease;
+  transition: padding 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-bottom: 1px solid transparent;
 }
 .nav.nav-scrolled {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   background-color: rgba(86, 77, 34, 0.95);
   padding-top: 10px;
   padding-bottom: 10px;
+  border-bottom-color: rgba(86, 77, 34, 0.3);
+}
+.nav .nav-logo img,
+.nav .nav-alpha-logo,
+.nav .nav-left img {
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .nav.nav-scrolled .nav-logo img,
-.nav.nav-scrolled .nav-alpha-logo {
-  transition: height 0.3s ease;
-  height: 56px;
-}
+.nav.nav-scrolled .nav-alpha-logo,
 .nav.nav-scrolled .nav-left img,
 .nav.nav-scrolled .nav-logos img.nav-alpha-logo {
   height: 56px;
 }
 
-/* --- 5. IMAGE PARALLAX (stone detail swatch) --- */
+/* --- 7. IMAGE PARALLAX (stone detail swatch) --- */
 .anim-parallax-swatch {
   will-change: transform;
   overflow: hidden;
@@ -82,7 +159,7 @@
   will-change: transform;
 }
 
-/* --- 7. HORIZONTAL COLLECTION SCROLL (mobile) --- */
+/* --- 8. HORIZONTAL COLLECTION SCROLL (mobile) --- */
 @media (max-width: 768px) {
   .anim-hscroll {
     display: flex !important;
@@ -99,7 +176,6 @@
     scroll-snap-align: start;
     min-width: 200px;
   }
-  /* Scroll hint fade on right edge */
   .anim-hscroll-wrap {
     position: relative;
   }
@@ -121,9 +197,15 @@
 
 /* --- REDUCED MOTION --- */
 @media (prefers-reduced-motion: reduce) {
-  .anim-reveal {
+  .anim-reveal,
+  .anim-reveal-heading,
+  .anim-reveal-label,
+  .anim-section,
+  .anim-img-reveal {
     opacity: 1 !important;
     transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
     transition: none !important;
   }
   .anim-parallax-hero,
@@ -138,5 +220,9 @@
   }
   .anim-card:hover {
     transform: none !important;
+    box-shadow: none !important;
+  }
+  .anim-card .stone-card-image::after {
+    display: none !important;
   }
 }
