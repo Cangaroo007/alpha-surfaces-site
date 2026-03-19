@@ -48,11 +48,11 @@
 
   if (!trigger || !megaMenu || !hamburger || !mobileMenu) return;
 
-  // COLLECTIONS click toggles mega menu (prevents navigation)
-  trigger.addEventListener('click', function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleMegaMenu();
+  // COLLECTIONS click: navigate to /collections.html
+  // Hover opens mega menu; click navigates
+  trigger.addEventListener('click', function () {
+    closeMegaMenu();
+    // Let the default href="/collections.html" navigate
   });
 
   // Hover open on desktop
@@ -144,7 +144,8 @@
     var html = '<div class="mega-menu-inner">';
     collections.forEach(function (col) {
       html += '<div class="mega-menu-col">';
-      html += '<div class="mega-menu-col-heading">' + esc(col.name) + '</div>';
+      var anchor = col.id === 'original-alpha-zero' ? 'alpha-zero' : col.id;
+      html += '<a href="/collections.html#' + anchor + '" class="mega-menu-col-heading">' + esc(col.name) + '</a>';
       if (col.id === 'collection-03') {
         var reg = [], out = [];
         col.stones.forEach(function (s) {
@@ -163,11 +164,12 @@
   }
 
   function buildMobileMenu(collections) {
-    var html = '<button class="mobile-collections-trigger" id="mobile-collections-trigger">COLLECTIONS <span class="toggle-icon">+</span></button>';
+    var html = '<div class="mobile-collections-row"><a href="/collections.html" class="mobile-menu-link" style="flex:1;" data-close-mobile>COLLECTIONS</a><button class="mobile-collections-toggle-btn" id="mobile-collections-trigger" style="background:none;border:none;padding:8px 12px;cursor:pointer;"><span class="toggle-icon" style="color:#fff;font-size:20px;">+</span></button></div>';
     html += '<div class="mobile-collections-panel" id="mobile-collections-panel">';
     collections.forEach(function (col) {
       html += '<div class="mobile-collection-group">';
-      html += '<button class="mobile-collection-header" data-collection="' + col.id + '"><span class="mobile-collection-name">' + esc(col.name) + '</span><span class="mobile-collection-toggle">+</span></button>';
+      var mAnchor = col.id === 'original-alpha-zero' ? 'alpha-zero' : col.id;
+      html += '<div class="mobile-collection-header" data-collection="' + col.id + '"><a href="/collections.html#' + mAnchor + '" class="mobile-collection-name" data-close-mobile>' + esc(col.name) + '</a><button class="mobile-collection-toggle-btn" style="background:none;border:none;padding:4px 8px;cursor:pointer;"><span class="mobile-collection-toggle" style="color:#fff;">+</span></button></div>';
       html += '<div class="mobile-collection-stones" data-panel="' + col.id + '">';
       if (col.id === 'collection-03') {
         var reg = [], out = [];
@@ -201,10 +203,14 @@
         if (icon) icon.textContent = cp.classList.contains('open') ? '\u2013' : '+';
       });
     }
-    var headers = mobileMenu.querySelectorAll('.mobile-collection-header');
-    for (var h = 0; h < headers.length; h++) {
-      headers[h].addEventListener('click', function () {
-        var panel = mobileMenu.querySelector('[data-panel="' + this.getAttribute('data-collection') + '"]');
+    var toggleBtns = mobileMenu.querySelectorAll('.mobile-collection-toggle-btn');
+    for (var h = 0; h < toggleBtns.length; h++) {
+      toggleBtns[h].addEventListener('click', function (e) {
+        e.stopPropagation();
+        var header = this.closest('.mobile-collection-header');
+        if (!header) return;
+        var colId = header.getAttribute('data-collection');
+        var panel = mobileMenu.querySelector('[data-panel="' + colId + '"]');
         var tog = this.querySelector('.mobile-collection-toggle');
         if (panel) {
           panel.classList.toggle('open');
