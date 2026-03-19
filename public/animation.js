@@ -79,34 +79,37 @@
     // Collect all animated elements
     var allAnimated = document.querySelectorAll('.anim-reveal, .anim-reveal-heading, .anim-reveal-label, .anim-img-reveal');
 
-    // Above-fold elements get staggered delays starting at 600ms
-    var aboveFoldIndex = 0;
+    // Separate above-fold from below-fold
+    var aboveFold = [];
+    var belowFold = [];
     allAnimated.forEach(function(el) {
       if (isAboveFold(el)) {
-        var delay = 600 + (aboveFoldIndex * 150);
-        el.setAttribute('data-anim-delay', delay);
-        aboveFoldIndex++;
+        aboveFold.push(el);
+      } else {
+        belowFold.push(el);
       }
     });
 
-    // Observe — elements below fold animate on scroll, above fold use staggered timeout
+    // Above-fold: reveal with staggered delays after 800ms (no observer)
+    aboveFold.forEach(function(el, idx) {
+      el.classList.add('anim-above-fold');
+      el.style.setProperty('--above-fold-delay', (idx * 0.15) + 's');
+      setTimeout(function() {
+        el.classList.add('anim-visible');
+      }, 800 + (idx * 150));
+    });
+
+    // Below-fold: only reveal when scrolled to (20% visible, 80px from bottom)
     var io = new IntersectionObserver(function(entries) {
       entries.forEach(function(e) {
         if (e.isIntersecting) {
-          var delay = e.target.getAttribute('data-anim-delay');
-          if (delay) {
-            setTimeout(function() {
-              e.target.classList.add('anim-visible');
-            }, parseInt(delay, 10));
-          } else {
-            e.target.classList.add('anim-visible');
-          }
+          e.target.classList.add('anim-visible');
           io.unobserve(e.target);
         }
       });
-    }, { threshold: 0.15, rootMargin: '0px' });
+    }, { threshold: 0.2, rootMargin: '0px 0px -80px 0px' });
 
-    allAnimated.forEach(function(el) { io.observe(el); });
+    belowFold.forEach(function(el) { io.observe(el); });
   }
 
   /* ─── 2. PARALLAX HERO ─── */
