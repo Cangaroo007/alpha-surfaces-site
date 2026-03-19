@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order A Sample | Alpha Surfaces</title>
+<style>
+/* --- FONTS --- */
+@font-face { font-family: 'Concrette S'; src: url('fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --olive: #564d22; --cream: #f3f1e6; --white: #ffffff; --black: #000000; --red: #f56c6c; --gray: #cccccc; --border: rgba(0,0,0,0.1); }
+html { scroll-behavior: smooth; }
+body { background: #f5f5f5; color: var(--black); font-family: 'Degular', sans-serif; font-weight: 400; line-height: 1.2; overflow-x: hidden; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* NAV */
+.nav { position: sticky; top: 0; z-index: 100; background: var(--olive); display: flex; align-items: center; justify-content: space-between; padding: 18px 90px; }
+.nav-logo { display: flex; align-items: center; padding-left: 35px; }
+.nav-logo img { height: 75px; width: auto; }
+.nav-menu { display: flex; align-items: center; gap: 85px; }
+.nav-menu a { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 20px; color: var(--white); text-decoration: none; letter-spacing: 0.6px; text-transform: uppercase; }
+.nav-menu a:hover { opacity: 0.8; }
+.nav-hamburger { display: none; }
+
+/* ORDER SECTION */
+.order { background: var(--white); padding: 64px 44px; }
+.order-inner { display: flex; gap: 266px; }
+.order-left { width: 423px; flex-shrink: 0; }
+.order-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 30px; line-height: 52px; color: var(--black); margin-bottom: 5px; }
+.order-desc { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; line-height: 1.2; color: var(--black); max-width: 357px; }
+
+/* SELECTED STONE */
+.selected-stone { margin-top: 40px; display: none; }
+.selected-stone.active { display: block; }
+.selected-stone-label { font-family: 'Degular', sans-serif; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--olive); margin-bottom: 12px; }
+.selected-stone-card { display: flex; gap: 16px; align-items: center; background: var(--cream); border-radius: 12px; padding: 12px 16px; }
+.selected-stone-card img { width: 64px; height: 64px; object-fit: cover; border-radius: 4px; flex-shrink: 0; }
+.selected-stone-card .ssc-placeholder { width: 64px; height: 64px; background: #d9d9d9; border-radius: 4px; flex-shrink: 0; }
+.selected-stone-name { font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; color: var(--black); }
+.selected-stone-collection { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; color: var(--black); opacity: 0.5; }
+
+/* FORM */
+.order-form { flex: 1; max-width: 538px; display: flex; flex-direction: column; gap: 32px; }
+.form-row { display: flex; gap: 44px; }
+.form-input { background: var(--cream); border: none; border-radius: 12px; padding: 8px 24px; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); width: 100%; outline: none; }
+.form-input::placeholder { color: var(--black); opacity: 0.4; }
+.form-input:focus { box-shadow: 0 0 0 2px var(--olive); }
+.form-select-group { display: flex; flex-direction: column; gap: 8px; }
+.form-select-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); }
+.form-select-label .req { color: var(--red); }
+.form-select { background: var(--cream); border: none; border-radius: 12px; padding: 8px 24px; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); width: 100%; outline: none; appearance: none; -webkit-appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 24px center; background-size: 12px 6px; padding-right: 48px; }
+.form-textarea { background: var(--cream); border: none; border-radius: 12px; padding: 8px 24px 78px; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); width: 100%; outline: none; resize: vertical; min-height: 100px; }
+.form-textarea::placeholder { color: var(--black); opacity: 0.4; }
+.form-checkbox { display: flex; align-items: center; gap: 12px; }
+.form-checkbox input { width: 16px; height: 16px; accent-color: var(--olive); cursor: pointer; flex-shrink: 0; }
+.form-checkbox label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; color: var(--black); cursor: pointer; }
+.form-submit-row { display: flex; justify-content: flex-end; }
+.btn-submit { background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 8px 44px; border-radius: 12px; border: none; cursor: pointer; width: 189px; }
+.btn-submit:hover { opacity: 0.9; }
+
+/* ADDITIONAL STONES */
+.additional-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); margin-bottom: 12px; }
+.stones-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-height: 320px; overflow-y: auto; }
+.stone-option { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+.stone-option:hover { background: rgba(86,77,34,0.05); }
+.stone-option input { width: 14px; height: 14px; accent-color: var(--olive); cursor: pointer; flex-shrink: 0; }
+.stone-option img { width: 32px; height: 32px; object-fit: cover; border-radius: 2px; flex-shrink: 0; }
+.stone-option .so-placeholder { width: 32px; height: 32px; background: #d9d9d9; border-radius: 2px; flex-shrink: 0; }
+.stone-option span { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; color: var(--black); }
+
+/* FOOTER */
+.footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
+.footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
+
+@media (max-width: 1024px) {
+  .nav { padding: 24px 21px; }
+  .nav-logo { padding-left: 0; }
+  .nav-logo img { height: 54px; }
+  .nav-menu { display: none; }
+  .nav-hamburger { display: block; cursor: pointer; background: none; border: none; padding: 0; }
+  .nav-hamburger span { display: block; width: 28px; height: 2px; background: var(--white); margin-bottom: 6px; }
+  .nav-hamburger span:last-child { margin-bottom: 0; }
+  .order { padding: 44px 24px; }
+  .order-inner { flex-direction: column; gap: 48px; }
+  .order-left { width: 100%; }
+  .order-form { max-width: 100%; }
+  .form-row { gap: 24px; }
+  .btn-submit { width: 100%; }
+  .stones-picker { grid-template-columns: repeat(2, 1fr); }
+  .footer { padding: 30px 24px; }
+  .footer p { font-size: 12px; letter-spacing: 0.36px; }
+}
+</style>
+<link rel="stylesheet" href="animation.css?v=5">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="logos/01 Brandmark/Inverse_white/Alpha Surfaces_Brandmark_Inverse.png" alt="Alpha Surfaces">
+  </a>
+  <div class="nav-menu">
+    <a href="/collections.html">COLLECTIONS</a>
+    <a href="/#about">ABOUT</a>
+    <a href="/#contact">CONTACT</a>
+  </div>
+  <button class="nav-hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<section class="order">
+  <div class="order-inner">
+    <div class="order-left">
+      <h1 class="order-heading">Order a sample</h1>
+      <p class="order-desc">Complete your details here and we&#8217;ll send you up to three samples with each order. Please note we are unable to deliver to PO Box addresses.</p>
+      <div class="selected-stone" id="selected-stone">
+        <p class="selected-stone-label">Selected surface</p>
+        <div class="selected-stone-card" id="selected-stone-card"></div>
+      </div>
+    </div>
+    <form class="order-form" action="#" method="POST">
+      <div class="form-row">
+        <input type="text" class="form-input" name="first_name" placeholder="First Name *" required>
+        <input type="text" class="form-input" name="last_name" placeholder="Last Name *" required>
+      </div>
+      <input type="tel" class="form-input" name="phone" placeholder="Phone Number *" required>
+      <input type="email" class="form-input" name="email" placeholder="Email *" required>
+      <div class="form-select-group">
+        <span class="form-select-label">I am a</span>
+        <select class="form-select" name="role">
+          <option value="" disabled selected>- Select -</option>
+          <option value="homeowner">Homeowner</option>
+          <option value="designer">Designer / Architect</option>
+          <option value="builder">Builder</option>
+          <option value="fabricator">Fabricator</option>
+          <option value="developer">Developer</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <input type="text" class="form-input" name="unit" placeholder="Unit / House No. *" required>
+        <input type="text" class="form-input" name="street" placeholder="Street *" required>
+      </div>
+      <div class="form-row">
+        <input type="text" class="form-input" name="suburb" placeholder="Suburb *" required>
+        <input type="text" class="form-input" name="postcode" placeholder="Postcode *" required>
+      </div>
+      <div class="form-select-group">
+        <span class="form-select-label">State <span class="req">*</span></span>
+        <select class="form-select" name="state" required>
+          <option value="" disabled selected>- Select -</option>
+          <option value="QLD">QLD</option>
+          <option value="NSW">NSW</option>
+          <option value="VIC">VIC</option>
+          <option value="SA">SA</option>
+          <option value="WA">WA</option>
+          <option value="TAS">TAS</option>
+          <option value="NT">NT</option>
+          <option value="ACT">ACT</option>
+        </select>
+      </div>
+      <div class="form-select-group">
+        <span class="form-select-label">I would like samples of...</span>
+        <div class="stones-picker" id="stones-picker"></div>
+      </div>
+      <textarea class="form-textarea" name="message" placeholder="Message"></textarea>
+      <div class="form-checkbox">
+        <input type="checkbox" id="consent" name="consent">
+        <label for="consent">I agree to receive updates from Alpha Surfaces.</label>
+      </div>
+      <div class="form-submit-row">
+        <button type="submit" class="btn-submit">Submit Form</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Copyright &copy; 2024 Alpha Surfaces &#8211; ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+</footer>
+
+<script>
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var preselectedSlug = params.get('stone') || '';
+
+  fetch('/data/stones.json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var allStones = [];
+      var preselected = null;
+
+      data.collections.forEach(function(c) {
+        c.stones.forEach(function(s) {
+          allStones.push({ name: s.name, slug: s.slug, image: s.image || '', thumbnail: s.thumbnail || '', collection: c.name });
+          if (s.slug === preselectedSlug) preselected = { name: s.name, slug: s.slug, image: s.image || '', thumbnail: s.thumbnail || '', collection: c.name };
+        });
+      });
+
+      // Show pre-selected stone
+      if (preselected) {
+        var el = document.getElementById('selected-stone');
+        var card = document.getElementById('selected-stone-card');
+        var imgHtml = preselected.thumbnail
+          ? '<img src="' + preselected.thumbnail + '" alt="' + preselected.name + '">'
+          : '<div class="ssc-placeholder"></div>';
+        card.innerHTML = imgHtml +
+          '<div><div class="selected-stone-name">' + preselected.name + '</div>' +
+          '<div class="selected-stone-collection">' + preselected.collection + '</div></div>';
+        el.classList.add('active');
+      }
+
+      // Build stone picker checkboxes
+      var picker = document.getElementById('stones-picker');
+      allStones.forEach(function(s) {
+        var opt = document.createElement('label');
+        opt.className = 'stone-option';
+        var checked = s.slug === preselectedSlug ? ' checked' : '';
+        var imgHtml = s.thumbnail
+          ? '<img src="' + s.thumbnail + '" alt="' + s.name + '">'
+          : '<div class="so-placeholder"></div>';
+        opt.innerHTML =
+          '<input type="checkbox" name="samples" value="' + s.slug + '"' + checked + '>' +
+          imgHtml +
+          '<span>' + s.name + '</span>';
+        picker.appendChild(opt);
+      });
+    })
+    .catch(function(err) { console.error('Failed to load stones:', err); });
+})();
+</script>
+<script src="animation.js?v=5"></script>
+</body>
+</html>
