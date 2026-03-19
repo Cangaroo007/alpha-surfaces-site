@@ -1,6 +1,8 @@
 (function () {
   'use strict';
 
+  try {
+
   /* ── Path detection ── */
   var path = window.location.pathname;
   var segments = path.replace(/\/+$/, '').split('/').filter(Boolean);
@@ -321,4 +323,13 @@
     return div.innerHTML;
   }
 
+  } catch (err) {
+    console.error('Nav init error:', err);
+    // Fallback: inject minimal nav so page content still renders
+    var fb = document.getElementById('main-nav');
+    if (fb && !fb.innerHTML.trim()) {
+      var pfx = (window.location.pathname.indexOf('/surfaces/') !== -1 || window.location.pathname.indexOf('/partners/') !== -1) ? '../' : '';
+      fb.innerHTML = '<a href="/" style="display:flex;align-items:center;padding-left:35px;"><img src="' + pfx + 'logos/01 Brandmark/Inverse_white/Alpha Surfaces_Brandmark_Inverse.png" alt="Alpha Surfaces" style="height:75px;width:auto;"></a><div style="display:flex;gap:85px;align-items:center;"><a href="/collections.html" style="font-family:Degular,sans-serif;font-weight:500;font-size:20px;color:#fff;text-decoration:none;letter-spacing:0.6px;text-transform:uppercase;">COLLECTIONS</a><a href="/about.html" style="font-family:Degular,sans-serif;font-weight:500;font-size:20px;color:#fff;text-decoration:none;letter-spacing:0.6px;text-transform:uppercase;">ABOUT</a><a href="/#contact" style="font-family:Degular,sans-serif;font-weight:500;font-size:20px;color:#fff;text-decoration:none;letter-spacing:0.6px;text-transform:uppercase;">CONTACT</a></div>';
+    }
+  }
 })();
