@@ -177,6 +177,32 @@
     toggleMegaMenu();
   });
 
+  // Hover to open on desktop (with delay to prevent flickering)
+  var hoverTimeout;
+  trigger.addEventListener('mouseenter', function () {
+    if (window.innerWidth >= 1024) {
+      clearTimeout(hoverTimeout);
+      megaMenu.classList.add('open');
+    }
+  });
+  megaMenu.addEventListener('mouseenter', function () {
+    if (window.innerWidth >= 1024) {
+      clearTimeout(hoverTimeout);
+    }
+  });
+  trigger.addEventListener('mouseleave', function () {
+    if (window.innerWidth >= 1024) {
+      hoverTimeout = setTimeout(function () {
+        if (!megaMenu.matches(':hover')) closeMegaMenu();
+      }, 200);
+    }
+  });
+  megaMenu.addEventListener('mouseleave', function () {
+    if (window.innerWidth >= 1024) {
+      hoverTimeout = setTimeout(closeMegaMenu, 200);
+    }
+  });
+
   // Close on click outside
   document.addEventListener('click', function (e) {
     if (megaMenu.classList.contains('open') &&
