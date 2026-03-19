@@ -83,19 +83,19 @@
         });
         html += '<ul>';
         regular.forEach(function (s) {
-          html += '<li><a href="/surfaces/' + s.slug + '.html">' + escHtml(s.name) + '</a></li>';
+          html += '<li><a href="/surfaces/' + s.slug + '">' + escHtml(s.name) + '</a></li>';
         });
         html += '</ul>';
         html += '<div class="mega-menu-col-subheading">Indoor-Outdoor</div>';
         html += '<ul>';
         outdoor.forEach(function (s) {
-          html += '<li><a href="/surfaces/' + s.slug + '.html">' + escHtml(s.name) + '</a></li>';
+          html += '<li><a href="/surfaces/' + s.slug + '">' + escHtml(s.name) + '</a></li>';
         });
         html += '</ul>';
       } else {
         html += '<ul>';
         col.stones.forEach(function (s) {
-          html += '<li><a href="/surfaces/' + s.slug + '.html">' + escHtml(s.name) + '</a></li>';
+          html += '<li><a href="/surfaces/' + s.slug + '">' + escHtml(s.name) + '</a></li>';
         });
         html += '</ul>';
       }
@@ -135,21 +135,21 @@
         });
         html += '<ul>';
         regular.forEach(function (s) {
-          html += '<li><a href="/surfaces/' + s.slug + '.html">' + escHtml(s.name) + '</a></li>';
+          html += '<li><a href="/surfaces/' + s.slug + '">' + escHtml(s.name) + '</a></li>';
         });
         html += '</ul>';
         if (outdoor.length > 0) {
           html += '<div class="mega-menu-col-subheading" style="color:var(--white);opacity:0.6;margin-left:0;padding-left:0;">Indoor-Outdoor</div>';
           html += '<ul>';
           outdoor.forEach(function (s) {
-            html += '<li><a href="/surfaces/' + s.slug + '.html">' + escHtml(s.name) + '</a></li>';
+            html += '<li><a href="/surfaces/' + s.slug + '">' + escHtml(s.name) + '</a></li>';
           });
           html += '</ul>';
         }
       } else {
         html += '<ul>';
         col.stones.forEach(function (s) {
-          html += '<li><a href="/surfaces/' + s.slug + '.html">' + escHtml(s.name) + '</a></li>';
+          html += '<li><a href="/surfaces/' + s.slug + '">' + escHtml(s.name) + '</a></li>';
         });
         html += '</ul>';
       }
