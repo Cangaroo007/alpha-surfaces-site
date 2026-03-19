@@ -109,6 +109,16 @@
   color: var(--black);
   margin-bottom: 16px;
   line-height: 1.2;
+  text-decoration: none;
+  display: block;
+}
+.mega-menu-col-heading:hover {
+  opacity: 0.6;
+}
+.mobile-collections-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
 }
 
 .mega-menu-col-subheading {
