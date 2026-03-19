@@ -248,12 +248,16 @@ img { display: block; max-width: 100%; }
 
 
 <!-- INSTAGRAM -->
-<section class="instagram-section" style="background:#2a2406;padding:60px 90px;text-align:center;">
-  <p style="font-family:'Degular',sans-serif;font-weight:400;font-size:14px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.5);margin-bottom:8px;">@alphasurfaces</p>
-  <h2 style="font-family:'Concrette S',serif;font-weight:700;font-size:30px;color:#fff;margin-bottom:32px;">Follow us on Instagram</h2>
-  <a href="https://instagram.com/alphasurfaces" target="_blank" style="display:block;border-radius:4px;overflow:hidden;">
-    <img src="images/instagram-grid.png" alt="Alpha Surfaces Instagram feed" style="width:100%;display:block;">
-  </a>
+<section style="background:var(--cream,#f3f1e6);padding:30px 40px;">
+  <div style="max-width:900px;margin:0 auto;display:flex;align-items:center;gap:24px;">
+    <a href="https://instagram.com/alphasurfaces" target="_blank" style="flex-shrink:0;display:block;border-radius:4px;overflow:hidden;">
+      <img src="images/instagram-grid.png" alt="Alpha Surfaces Instagram" style="height:180px;width:auto;max-width:320px;object-fit:cover;display:block;border-radius:4px;">
+    </a>
+    <div>
+      <p style="font-family:'Degular',sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.25em;color:#564d22;margin-bottom:8px;">@alphasurfaces</p>
+      <p style="font-family:'Concrette S',serif;font-weight:400;font-size:18px;color:#000;line-height:1.3;">Follow us on Instagram</p>
+    </div>
+  </div>
 </section>
 
 <!-- FOOTER -->
@@ -351,42 +355,45 @@ img { display: block; max-width: 100%; }
       });
 
       // Deep link: auto-open collection from URL hash
-      (function handleDeepLink() {
-        var rawHash = window.location.hash;
-        var hash = rawHash ? rawHash.replace(/^#/, '') : '';
+      function openCollectionByHash() {
+        var hash = (window.location.hash || '').replace(/^#/, '');
         var groups = container.querySelectorAll('.collection-group');
+        if (!groups.length) return;
 
-        // Default: open first collection
-        if (groups.length > 0) groups[0].classList.add('open');
+        // Close all first
+        for (var i = 0; i < groups.length; i++) groups[i].classList.remove('open');
 
-        if (!hash) return;
+        if (!hash) {
+          // No hash: open first
+          groups[0].classList.add('open');
+          return;
+        }
 
-        // Find target by matching the hash directly against element IDs
-        var target = null;
-        for (var g = 0; g < groups.length; g++) {
-          var gid = groups[g].id;
-          // Match: #collection-05 → id="collection-05"
-          // Match: #alpha-zero → id="original-alpha-zero"
-          if (gid === hash || (hash === 'alpha-zero' && gid === 'original-alpha-zero')) {
-            target = groups[g];
+        // Find matching group
+        var found = false;
+        for (var j = 0; j < groups.length; j++) {
+          var id = groups[j].id;
+          if (id === hash || (hash === 'alpha-zero' && id === 'original-alpha-zero')) {
+            groups[j].classList.add('open');
+            found = true;
+            // Scroll to it
+            setTimeout(function() {
+              var el = groups[j];
+              var top = el.getBoundingClientRect().top + window.pageYOffset - 120;
+              window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+            }, 600);
             break;
           }
         }
 
-        if (!target) return;
+        // Fallback: open first if hash didn't match
+        if (!found) groups[0].classList.add('open');
+      }
 
-        // Close all, open target
-        for (var c = 0; c < groups.length; c++) {
-          groups[c].classList.remove('open');
-        }
-        target.classList.add('open');
+      openCollectionByHash();
 
-        // Scroll to target after content renders
-        setTimeout(function() {
-          var y = target.getBoundingClientRect().top + window.pageYOffset - 120;
-          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-        }, 600);
-      })();
+      // Also handle hash changes (e.g. clicking mega menu while already on collections page)
+      window.addEventListener('hashchange', openCollectionByHash);
 
       // Reveal animation
       const revealEls = document.querySelectorAll('.reveal');
