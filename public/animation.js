@@ -266,21 +266,30 @@
 
   /* ─── INIT ─── */
   function initAnimations() {
-    // Wait for dynamic content (stones.json)
+    // Immediate: nav scroll and parallax
+    initNavScroll();
+    initParallax();
+    initSwatchParallax();
+
+    // Wait for dynamic content (stones.json), then tag elements
     setTimeout(function() {
       initReveal();
       initCardHover();
       initSectionTransitions();
       initCountUp();
       initHScroll();
-    }, 400);
 
-    initNavScroll();
-    initParallax();
-    initSwatchParallax();
+      // CRITICAL: Add transitions AFTER elements are tagged and painted in hidden state.
+      // Without this double-rAF, browsers batch the opacity:0 + transition + opacity:1
+      // into a single frame and the animation is never visible.
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          document.documentElement.classList.add('anim-ready');
+        });
+      });
+    }, 400);
   }
 
-  // 100ms delay ensures elements paint in hidden state before observer starts
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       setTimeout(initAnimations, 100);
