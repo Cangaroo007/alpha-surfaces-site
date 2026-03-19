@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   ALPHA SURFACES — Shared Animation Controller v2
-   Increased impact — editorial energy, refined not gimmicky
+   ALPHA SURFACES — Shared Animation Controller v3
+   Fixed element targeting — explicit broad selectors
    ═══════════════════════════════════════════════════════════════ */
 
 (function() {
@@ -8,68 +8,79 @@
 
   var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ─── 1. SCROLL REVEAL (increased drama) ─── */
+  function tag(el, cls) {
+    if (!el || el.classList.contains(cls)) return;
+    el.classList.add(cls);
+  }
+
+  /* ─── 1. SCROLL REVEAL ─── */
   function initReveal() {
-    // General reveal elements
-    var selectors = [
-      'section > *:not(img):not(.hero-overlay):not(.hero-content)',
-      '.intro-container > *',
-      '.about-inner > *',
-      '.about-top, .about-bottom',
-      '.value-card',
-      '.showcase-card',
-      '.gallery-left, .gallery-right',
-      '.contact-left, .contact-form',
-      '.quality-text, .quality-img-wrap',
-      '.collection-group',
-      '.location-card',
-      '.intro-heading, .intro-body, .intro-bottom',
-      '.back-benefit',
-      '.contact-heading, .contact-person, .contact-details',
-      '.statement p',
-      '.about-partner-inner'
-    ];
+    // Broad explicit targeting — tag all major content elements
+    var revealSelectors = [
+      // Sections and their direct children
+      '.statement > *',
+      '.about > *, .about-inner, .about-top, .about-bottom, .about-quote, .about-author, .about-body',
+      '.gallery > *, .gallery-grid, .gallery-left, .gallery-right, .gallery-left-inner, .gallery-right-inner',
+      '.contact > *, .contact-inner, .contact-left, .contact-form',
+      '.locations > *, .locations-columns',
+      '.intro > *, .intro-inner, .intro-top, .intro-bottom',
+      '.quality > *, .quality-inner, .quality-text, .quality-img-wrap',
+      // Cards
+      '.stone-card, .col-card, .value-card, .showcase-card, .location-card, .back-benefit',
+      // Partner pages
+      '.about-partner-inner, .about-partner-brand, .about-partner-text',
+      // Contact elements
+      '.contact-heading, .contact-person, .contact-details, .contact-links, .contact-block',
+      // Generic content blocks
+      '.collection-group, .collection-header, .collection-desc',
+      '.btn-order, .btn-contact, .btn-submit',
+      // Collection page intro
+      '.intro-heading, .intro-body, .intro-shield, .intro-advantage',
+      // Misc
+      '.resources-section, .hero-caption'
+    ].join(', ');
 
-    var elements = document.querySelectorAll(selectors.join(', '));
-    elements.forEach(function(el) {
-      if (el.classList.contains('anim-reveal') || el.classList.contains('anim-reveal-heading')) return;
+    document.querySelectorAll(revealSelectors).forEach(function(el) {
       if (el.closest('nav') || el.closest('footer')) return;
-      if (el.closest('.hero') && !el.classList.contains('hero-content')) return;
-      el.classList.add('anim-reveal');
+      tag(el, 'anim-reveal');
     });
 
-    // Headings get special X+Y reveal
-    var headingSelectors = 'h1, h2, .page-hero h1, .value-heading, .showcase-heading, .collections-heading, .contact-heading .ch-bold, .about-partner-heading, .quality-heading';
-    document.querySelectorAll(headingSelectors).forEach(function(el) {
-      if (el.classList.contains('anim-reveal-heading')) return;
-      if (el.closest('nav') || el.closest('footer')) return;
-      // Remove generic reveal if applied, use heading reveal instead
+    // Headings — X+Y reveal
+    document.querySelectorAll('h1, h2, h3').forEach(function(el) {
+      if (el.closest('nav') || el.closest('footer') || el.closest('.hero')) return;
       el.classList.remove('anim-reveal');
-      el.classList.add('anim-reveal-heading');
+      tag(el, 'anim-reveal-heading');
+    });
+    // Also tag specific heading-like elements
+    document.querySelectorAll('.value-heading, .showcase-heading, .locations-title, .resources-title, .collections-heading, .quality-heading, .about-partner-heading, .ch-bold, .back-main-heading').forEach(function(el) {
+      el.classList.remove('anim-reveal');
+      tag(el, 'anim-reveal-heading');
     });
 
-    // Section labels slide from left with 200ms delay
-    var labelSelectors = '.value-label, .showcase-label, .page-hero-label, .collection-label';
-    document.querySelectorAll(labelSelectors).forEach(function(el) {
-      if (el.classList.contains('anim-reveal-label')) return;
+    // Section labels — slide from left
+    document.querySelectorAll('.value-label, .showcase-label, .page-hero-label, .collection-label, .back-header-label, .resources-label').forEach(function(el) {
       el.classList.remove('anim-reveal');
-      el.classList.add('anim-reveal-label');
+      tag(el, 'anim-reveal-label');
     });
 
     // Stagger grid children at 120ms
-    document.querySelectorAll('.value-grid, .showcase-grid, .stones-grid, .location-cards, .back-benefits').forEach(function(grid) {
+    document.querySelectorAll('.value-grid, .showcase-grid, .stones-grid, .location-cards, .back-benefits, .gallery-grid, .back-collections-row').forEach(function(grid) {
       grid.classList.add('anim-stagger');
       var children = grid.children;
       for (var i = 0; i < children.length; i++) {
-        if (!children[i].classList.contains('anim-reveal')) {
-          children[i].classList.add('anim-reveal');
-        }
+        tag(children[i], 'anim-reveal');
         children[i].style.setProperty('--anim-delay', (i * 0.12) + 's');
       }
     });
 
-    // Observe all animated elements
-    var allAnimated = document.querySelectorAll('.anim-reveal, .anim-reveal-heading, .anim-reveal-label');
+    // Images in content areas — clip-path wipe
+    document.querySelectorAll('.gallery-left-inner img, .gallery-right-inner img, .quality-img-wrap img, .intro-swatch img, .full-swatch img, .showcase-card img, .about-img, .swatch img').forEach(function(img) {
+      if (img.classList.contains('anim-parallax-hero')) return;
+      tag(img, 'anim-img-reveal');
+    });
+
+    // Observe everything
+    var allAnimated = document.querySelectorAll('.anim-reveal, .anim-reveal-heading, .anim-reveal-label, .anim-img-reveal');
     var io = new IntersectionObserver(function(entries) {
       entries.forEach(function(e) {
         if (e.isIntersecting) {
@@ -82,7 +93,7 @@
     allAnimated.forEach(function(el) { io.observe(el); });
   }
 
-  /* ─── 2. PARALLAX HERO (increased depth) ─── */
+  /* ─── 2. PARALLAX HERO ─── */
   function initParallax() {
     if (prefersReduced) return;
     if (window.innerWidth < 768) return;
@@ -94,7 +105,6 @@
     var heroSection = heroImg.closest('.hero') || heroImg.parentElement;
     var heroHeight = heroSection ? heroSection.offsetHeight : 900;
 
-    // Start at 1.08 scale, settle toward 1.0 as you scroll
     heroImg.style.transform = 'scale(1.08)';
 
     var ticking = false;
@@ -114,21 +124,17 @@
     }, { passive: true });
   }
 
-  /* ─── 3. STONE CARD HOVER (more presence) ─── */
+  /* ─── 3. STONE CARD HOVER ─── */
   function initCardHover() {
-    var cards = document.querySelectorAll('.stone-card, .showcase-card, .col-card');
-    cards.forEach(function(card) {
+    document.querySelectorAll('.stone-card, .showcase-card, .col-card').forEach(function(card) {
       card.classList.add('anim-card');
     });
   }
 
   /* ─── 4. SECTION TRANSITIONS (scale 0.98 → 1.0) ─── */
   function initSectionTransitions() {
-    var sectionSelectors = '.statement, .about, .gallery, .value, .showcase, .contact, .collections-section, .quality, .about-partner';
-    var sections = document.querySelectorAll(sectionSelectors);
-
-    sections.forEach(function(el) {
-      el.classList.add('anim-section');
+    document.querySelectorAll('.statement, .about, .gallery, .value, .showcase, .contact, .locations, .collections-section, .quality, .about-partner, .intro, .swatch, .full-swatch').forEach(function(el) {
+      tag(el, 'anim-section');
     });
 
     var io = new IntersectionObserver(function(entries) {
@@ -140,46 +146,19 @@
       });
     }, { threshold: 0.05 });
 
-    sections.forEach(function(el) { io.observe(el); });
+    document.querySelectorAll('.anim-section').forEach(function(el) { io.observe(el); });
   }
 
-  /* ─── 5. IMAGE REVEAL (clip-path wipe) ─── */
-  function initImageReveal() {
-    var imgSelectors = '.hero > img, .hero .hero-video, .stone-card-image img, .showcase-card img, .gallery-grid img, .intro-swatch img, .full-swatch img, .quality-img-wrap img';
-    var images = document.querySelectorAll(imgSelectors);
-
-    images.forEach(function(img) {
-      // Don't apply to parallax hero (it has its own animation)
-      if (img.classList.contains('anim-parallax-hero')) return;
-      img.classList.add('anim-img-reveal');
-    });
-
-    var io = new IntersectionObserver(function(entries) {
-      entries.forEach(function(e) {
-        if (e.isIntersecting) {
-          e.target.classList.add('anim-visible');
-          io.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.1 });
-
-    images.forEach(function(img) {
-      if (img.classList.contains('anim-img-reveal')) io.observe(img);
-    });
-  }
-
-  /* ─── 6. NAV SCROLL BEHAVIOUR (more responsive) ─── */
+  /* ─── 5. NAV SCROLL BEHAVIOUR ─── */
   function initNavScroll() {
     var nav = document.querySelector('.nav');
     if (!nav) return;
 
-    var scrollThreshold = 80;
     var ticking = false;
-
     window.addEventListener('scroll', function() {
       if (!ticking) {
         requestAnimationFrame(function() {
-          if (window.pageYOffset > scrollThreshold) {
+          if (window.pageYOffset > 80) {
             nav.classList.add('nav-scrolled');
           } else {
             nav.classList.remove('nav-scrolled');
@@ -191,14 +170,13 @@
     }, { passive: true });
   }
 
-  /* ─── 7. IMAGE PARALLAX (stone detail swatch) ─── */
+  /* ─── 6. SWATCH PARALLAX (stone detail pages) ─── */
   function initSwatchParallax() {
     if (prefersReduced) return;
     if (window.innerWidth < 768) return;
 
     var swatch = document.querySelector('.full-swatch');
     if (!swatch) return;
-
     var swatchImg = swatch.querySelector('img');
     if (!swatchImg) return;
 
@@ -223,7 +201,7 @@
     }, { passive: true });
   }
 
-  /* ─── 8. COUNT-UP ANIMATION (more theatrical) ─── */
+  /* ─── 7. COUNT-UP STATS ─── */
   function initCountUp() {
     var statValues = document.querySelectorAll('.hero-stat-value, .front-stat-number');
     if (statValues.length === 0) return;
@@ -232,13 +210,10 @@
       var text = el.textContent.trim();
       var match = text.match(/^(\d+)(.*)/);
       if (!match) return;
-
-      var targetNum = parseInt(match[1], 10);
-      var suffix = match[2];
-      el.setAttribute('data-count-target', targetNum);
-      el.setAttribute('data-count-suffix', suffix);
+      el.setAttribute('data-count-target', parseInt(match[1], 10));
+      el.setAttribute('data-count-suffix', match[2]);
       el.setAttribute('data-count-index', idx);
-      el.textContent = '0' + suffix;
+      el.textContent = '0' + match[2];
     });
 
     var io = new IntersectionObserver(function(entries) {
@@ -249,35 +224,23 @@
         var target = parseInt(e.target.getAttribute('data-count-target'), 10);
         var suffix = e.target.getAttribute('data-count-suffix') || '';
         var index = parseInt(e.target.getAttribute('data-count-index') || '0', 10);
-        var duration = 1500;
-
-        // Staggered start: 400ms base delay + 200ms per stat
-        var startDelay = 400 + (index * 200);
+        var delay = 400 + (index * 200);
 
         setTimeout(function() {
           var start = performance.now();
-
+          var duration = 1500;
           function step(now) {
             var elapsed = now - start;
             var progress = Math.min(elapsed / duration, 1);
-            // Spring-like overshoot: overshoots to ~108% then settles
-            var eased;
-            if (progress < 0.7) {
-              // Ease to 108%
-              var p = progress / 0.7;
-              eased = 1.08 * (1 - Math.pow(1 - p, 3));
-            } else {
-              // Settle from 108% to 100%
-              var p2 = (progress - 0.7) / 0.3;
-              eased = 1.08 - (0.08 * p2);
-            }
-            var current = Math.round(eased * target);
-            e.target.textContent = current + suffix;
+            var eased = progress < 0.7
+              ? 1.08 * (1 - Math.pow(1 - progress / 0.7, 3))
+              : 1.08 - (0.08 * ((progress - 0.7) / 0.3));
+            e.target.textContent = Math.round(eased * target) + suffix;
             if (progress < 1) requestAnimationFrame(step);
-            else e.target.textContent = target + suffix; // Ensure exact final value
+            else e.target.textContent = target + suffix;
           }
           requestAnimationFrame(step);
-        }, startDelay);
+        }, delay);
       });
     }, { threshold: 0.5 });
 
@@ -286,41 +249,34 @@
     });
   }
 
-  /* ─── 9. HORIZONTAL COLLECTION SCROLL (mobile) ─── */
+  /* ─── 8. HORIZONTAL SCROLL (mobile collections) ─── */
   function initHScroll() {
     if (window.innerWidth >= 768) return;
-
-    var grids = document.querySelectorAll('.stones-grid');
-    grids.forEach(function(grid) {
+    document.querySelectorAll('.stones-grid').forEach(function(grid) {
       grid.classList.add('anim-hscroll');
-
       var parent = grid.parentElement;
       if (parent && !parent.classList.contains('anim-hscroll-wrap')) {
         parent.classList.add('anim-hscroll-wrap');
       }
-
       grid.addEventListener('scroll', function() {
         var atEnd = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 10;
-        if (parent) {
-          parent.classList.toggle('scrolled-end', atEnd);
-        }
+        if (parent) parent.classList.toggle('scrolled-end', atEnd);
       }, { passive: true });
     });
   }
 
   /* ─── INIT ─── */
   function init() {
-    // Wait a tick so dynamically generated content (stones.json) is ready
+    // Delay to let dynamic content (stones.json) render
     setTimeout(function() {
       initReveal();
       initCardHover();
       initSectionTransitions();
-      initImageReveal();
       initCountUp();
       initHScroll();
-    }, 300);
+    }, 400);
 
-    // These can run immediately
+    // Immediate — no DOM dependency
     initNavScroll();
     initParallax();
     initSwatchParallax();
