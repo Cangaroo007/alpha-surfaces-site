@@ -76,7 +76,9 @@
           "name": "Noosa",
           "finish": "Polished",
           "slug": "noosa",
-          "image": ""
+          "image": "/images/stones/noosa.webp",
+          "thumbnail": "/images/stones/noosa-thumb.webp",
+          "swatch": "/images/stones/noosa.webp"
         },
         {
           "name": "Fraser",
@@ -136,25 +138,33 @@
           "name": "Shell",
           "finish": "Polished",
           "slug": "shell",
-          "image": ""
+          "image": "/images/stones/shell.webp",
+          "thumbnail": "/images/stones/shell-thumb.webp",
+          "swatch": "/images/stones/shell.webp"
         },
         {
           "name": "Oyster Grey",
           "finish": "Polished",
           "slug": "oyster-grey",
-          "image": ""
+          "image": "/images/stones/oyster-grey.webp",
+          "thumbnail": "/images/stones/oyster-grey-thumb.webp",
+          "swatch": "/images/stones/oyster-grey.webp"
         },
         {
           "name": "Earthy Concrete",
           "finish": "Polished",
           "slug": "earthy-concrete",
-          "image": ""
+          "image": "/images/stones/earthy-concrete.webp",
+          "thumbnail": "/images/stones/earthy-concrete-thumb.webp",
+          "swatch": "/images/stones/earthy-concrete.webp"
         },
         {
           "name": "Ash",
           "finish": "Polished",
           "slug": "ash",
-          "image": ""
+          "image": "/images/stones/ash.webp",
+          "thumbnail": "/images/stones/ash-thumb.webp",
+          "swatch": "/images/stones/ash.webp"
         }
       ]
     },
@@ -202,7 +212,9 @@
           "name": "Pearl",
           "finish": "Polished",
           "slug": "pearl",
-          "image": ""
+          "image": "/images/stones/pearl.webp",
+          "thumbnail": "/images/stones/pearl-thumb.webp",
+          "swatch": "/images/stones/pearl.webp"
         },
         {
           "name": "Crystal",
@@ -216,7 +228,9 @@
           "name": "Arctic",
           "finish": "Polished",
           "slug": "arctic",
-          "image": ""
+          "image": "/images/stones/arctic.webp",
+          "thumbnail": "/images/stones/arctic-thumb.webp",
+          "swatch": "/images/stones/arctic.webp"
         },
         {
           "name": "Whitehaven",
@@ -264,7 +278,9 @@
           "name": "Cabarita",
           "finish": "Matte",
           "slug": "cabarita",
-          "image": ""
+          "image": "/images/stones/cabarita.webp",
+          "thumbnail": "/images/stones/cabarita-thumb.webp",
+          "swatch": "/images/stones/cabarita.webp"
         },
         {
           "name": "Broome",
@@ -293,7 +309,9 @@
           "name": "Graphite",
           "finish": "Polished",
           "slug": "graphite",
-          "image": ""
+          "image": "/images/stones/graphite.webp",
+          "thumbnail": "/images/stones/graphite-thumb.webp",
+          "swatch": "/images/stones/graphite.webp"
         },
         {
           "name": "Davinci Oro",
@@ -385,7 +403,9 @@
           "name": "Glacier",
           "finish": "Polished",
           "slug": "glacier",
-          "image": ""
+          "image": "/images/stones/glacier.webp",
+          "thumbnail": "/images/stones/glacier-thumb.webp",
+          "swatch": "/images/stones/glacier.webp"
         },
         {
           "name": "Metallic Grey",
@@ -414,7 +434,9 @@
           "name": "Torquay",
           "finish": "Soft Touch",
           "slug": "torquay",
-          "image": ""
+          "image": "/images/stones/torquay.webp",
+          "thumbnail": "/images/stones/torquay-thumb.webp",
+          "swatch": "/images/stones/torquay.webp"
         },
         {
           "name": "Autumn Gold",
