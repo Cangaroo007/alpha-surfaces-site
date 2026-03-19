@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oyster Grey | Alpha Surfaces</title>
+<style>
+/* --- FONTS --- */
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-SemiBold.woff2') format('woff2'), url('../fonts/Web/ConcretteS-SemiBold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+
+/* --- RESET & BASE --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --olive: #564d22;
+  --olive-deep: #2a2406;
+  --cream: #f3f1e6;
+  --white: #ffffff;
+  --black: #000000;
+  --red: #f56c6c;
+  --gray: #cccccc;
+  --border: rgba(0,0,0,0.1);
+}
+html { scroll-behavior: smooth; }
+body { background: #f5f5f5; color: var(--black); font-family: 'Degular', sans-serif; font-weight: 400; line-height: 1.2; overflow-x: hidden; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* --- NAV --- */
+.nav { position: sticky; top: 0; z-index: 100; background: var(--olive); display: flex; align-items: center; justify-content: space-between; padding: 18px 90px; }
+.nav-logo { display: flex; align-items: center; padding-left: 35px; }
+.nav-logo img { height: 75px; width: auto; }
+.nav-menu { display: flex; align-items: center; gap: 85px; }
+.nav-menu a { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 20px; color: var(--white); text-decoration: none; letter-spacing: 0.6px; text-transform: uppercase; }
+.nav-menu a:hover { opacity: 0.8; }
+.nav-hamburger { display: none; }
+
+/* --- INTRO --- */
+.intro { background: var(--white); display: flex; gap: 60px; align-items: center; justify-content: center; padding: 120px; overflow: hidden; }
+.intro-text { flex: 1; min-width: 0; }
+.intro-container { display: flex; flex-direction: column; gap: 36px; max-width: 560px; }
+.intro-title-row { display: flex; align-items: center; justify-content: space-between; }
+.intro-stone-name { font-family: 'Concrette S', serif; font-weight: 600; font-size: 30px; line-height: 1.2; color: var(--black); }
+.intro-badge { width: 44px; height: 44px; flex-shrink: 0; object-fit: contain; }
+.intro-meta { display: flex; flex-direction: column; gap: 12px; line-height: 1.2; color: var(--black); margin-top: 16px; }
+.intro-collection { font-family: 'Concrette S', serif; font-weight: 600; font-size: 18px; }
+.intro-tagline { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; }
+.intro-description { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; line-height: 1.5; color: var(--black); opacity: 0.75; }
+.intro-specs { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; line-height: 1.4; color: var(--black); }
+.intro-shield { display: flex; flex-direction: column; gap: 24px; }
+.intro-shield-icon { width: 58px; height: 68px; object-fit: contain; }
+.intro-shield-text { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 16px; line-height: 1.2; color: var(--black); max-width: 361px; }
+.intro-cta { padding-top: 40px; }
+.btn-order { display: inline-flex; align-items: center; justify-content: center; background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 8px 44px; border-radius: 12px; text-decoration: none; width: 207px; }
+.btn-order:hover { opacity: 0.9; }
+.intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+.intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
+.intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+
+/* --- FULL SWATCH --- */
+.full-swatch { width: 100%; height: 715px; overflow: hidden; }
+.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
+.full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+
+/* --- GALLERY --- */
+.gallery-section { background: var(--cream); padding: 60px 32px; }
+.gallery-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--black); margin-bottom: 32px; }
+.gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.gallery-grid img { width: 100%; aspect-ratio: 4/3; object-fit: cover; cursor: pointer; transition: transform 0.4s ease; }
+.gallery-grid img:hover { transform: scale(1.02); }
+
+/* --- COLLECTION SECTION --- */
+.collection-section { background: var(--olive-deep); padding: 44px 32px; }
+.collection-title-row { display: flex; align-items: center; gap: 16px; margin-bottom: 5px; }
+.collection-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 30px; color: var(--white); }
+.collection-desc { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px; line-height: 1.2; color: var(--white); margin-bottom: 48px; }
+
+/* --- STONE GRID --- */
+.stones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 54px 54px; }
+.stone-card { text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; }
+.stone-card-image { position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #1a1a0a; }
+.stone-card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+.stone-card:hover .stone-card-image img { transform: scale(1.04); }
+.stone-card-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 18px; color: rgba(255,255,255,0.25); font-style: italic; }
+.stone-card-info { display: flex; flex-direction: column; gap: 8px; line-height: 1.2; color: var(--white); }
+.stone-card-name { font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; }
+.stone-card-finish { font-family: 'Concrette S', serif; font-weight: 400; font-size: 12px; }
+.stone-card.active .stone-card-image { outline: 2px solid var(--white); outline-offset: -2px; }
+
+/* --- FOOTER --- */
+.footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
+.footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
+
+/* --- MOBILE --- */
+@media (max-width: 1024px) {
+  .nav { padding: 24px 21px; }
+  .nav-logo { padding-left: 0; }
+  .nav-logo img { height: 54px; }
+  .nav-menu { display: none; }
+  .nav-hamburger { display: block; cursor: pointer; background: none; border: none; padding: 0; }
+  .nav-hamburger span { display: block; width: 28px; height: 2px; background: var(--white); margin-bottom: 6px; }
+  .nav-hamburger span:last-child { margin-bottom: 0; }
+
+  .intro { flex-direction: column-reverse; padding: 0; gap: 0; }
+  .intro-swatch { width: 100%; }
+  .intro-swatch img, .intro-swatch-placeholder { min-height: 347px; height: 347px; }
+  .intro-text { width: 100%; padding: 24px 24px 44px; }
+  .intro-container { max-width: 100%; }
+
+  .full-swatch { height: 200px; }
+
+  .gallery-section { padding: 40px 24px; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+  .collection-section { padding: 44px 32px; }
+  .stones-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  .stone-card-name { font-size: 16px; }
+  .stone-card-finish { font-size: 11px; }
+
+  .footer { padding: 30px 24px; }
+  .footer p { font-size: 12px; letter-spacing: 0.36px; }
+}
+</style>
+<link rel="stylesheet" href="../animation.css?v=5">
+</head>
+<body data-slug="oyster-grey">
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="../logos/01 Brandmark/Inverse_white/Alpha Surfaces_Brandmark_Inverse.png" alt="Alpha Surfaces">
+  </a>
+  <div class="nav-menu">
+    <a href="/collections.html">COLLECTIONS</a>
+    <a href="/#about">ABOUT</a>
+    <a href="/#contact">CONTACT</a>
+  </div>
+  <button class="nav-hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- INTRO — populated dynamically -->
+<section class="intro" id="intro"></section>
+
+<!-- FULL SWATCH — populated dynamically -->
+<section class="full-swatch" id="full-swatch"></section>
+
+<!-- GALLERY — populated dynamically (only if gallery images exist) -->
+<section class="gallery-section" id="gallery-section" style="display:none;"></section>
+
+<!-- COLLECTION GRID -->
+<section class="collection-section" id="collection-stones"></section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>Copyright &copy; 2024 Alpha Surfaces &#8211; ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+</footer>
+
+<script>
+(function() {
+  var slug = document.body.getAttribute('data-slug');
+
+  fetch('../data/stones.json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var stone = null;
+      var collection = null;
+      var collectionIndex = -1;
+
+      for (var ci = 0; ci < data.collections.length; ci++) {
+        var c = data.collections[ci];
+        for (var si = 0; si < c.stones.length; si++) {
+          if (c.stones[si].slug === slug) {
+            stone = c.stones[si];
+            collection = c;
+            collectionIndex = ci;
+            break;
+          }
+        }
+        if (stone) break;
+      }
+
+      if (!stone) return;
+
+      // --- Title ---
+      document.title = stone.name + ' | Alpha Surfaces';
+
+      // --- Build collection label ---
+      var cLabel = collection.name;
+
+      // --- INTRO SECTION ---
+      var intro = document.getElementById('intro');
+      var hasImage = stone.image && stone.image.length > 0;
+
+      var textHTML = '<div class="intro-text"><div class="intro-container">';
+      textHTML += '<div><div class="intro-title-row">';
+      textHTML += '<h1 class="intro-stone-name">' + stone.name + '</h1>';
+      if (stone.indoor_outdoor) {
+        textHTML += '<img class="intro-badge" src="../logos/04_Indoor-Outdoor range icon/RGB_digital/Alpha Surfaces_Indoor-Outdoor Range Icon_RGB.png" alt="Indoor-Outdoor">';
+      }
+      textHTML += '</div>';
+      textHTML += '<div class="intro-meta">';
+      textHTML += '<p class="intro-collection">' + cLabel;
+      if (stone.indoor_outdoor) textHTML += ' \u2013 Indoor-Outdoor range';
+      textHTML += '</p>';
+      if (stone.tagline) {
+        textHTML += '<p class="intro-tagline">' + stone.tagline + '</p>';
+      }
+      textHTML += '</div></div>';
+
+      if (stone.description) {
+        textHTML += '<p class="intro-description">' + stone.description + '</p>';
+      }
+
+      // Specs
+      var finish = stone.finish || 'Polished';
+      var w = stone.slab_width || 3200;
+      var h = stone.slab_height || 1600;
+      var t = stone.thickness || 20;
+      var wt = stone.weight || 236;
+      var warranty = stone.warranty || '15-Year Limited Warranty';
+      textHTML += '<div class="intro-specs">';
+      textHTML += finish + ' finish';
+      if (stone.uv_stable) textHTML += '  |  UV stable';
+      textHTML += '<br>';
+      textHTML += 'Nominal slab size ' + w + ' x ' + h + 'mm<br>';
+      textHTML += 'Slab thickness ' + t + 'mm<br>';
+      textHTML += 'Weight ' + wt + 'kg &nbsp;|&nbsp; ' + warranty;
+      textHTML += '</div>';
+
+      // AlphaShield
+      textHTML += '<div class="intro-shield">';
+      textHTML += '<div><img class="intro-shield-icon" src="../logos/03 Alpha Shield/RGB_digital/Alpha Surfaces_Alpha Shield_RGB.png" alt="AlphaShield"></div>';
+      textHTML += '<p class="intro-shield-text">Exclusive AlphaShield\u2122 protectant guards against everyday wear and tear for long-term durability \u2013 with Lifetime Stain Resistance Guarantee.</p>';
+      textHTML += '</div>';
+
+      // CTA
+      textHTML += '<div class="intro-cta"><a href="/#contact" class="btn-order">Order A Sample</a></div>';
+
+      // Disclaimer
+      textHTML += '<p class="intro-disclaimer">Disclaimer: Alpha Surfaces\u2019 website images are indicative only and colours can vary depending on the device on which they are viewed and user screen settings. We make every effort to represent our surfaces as accurately as possible.</p>';
+
+      textHTML += '</div></div>';
+
+      // Swatch column
+      var swatchHTML = '<div class="intro-swatch">';
+      if (hasImage) {
+        swatchHTML += '<img src="' + stone.image + '" alt="' + stone.name + ' surface">';
+      } else {
+        swatchHTML += '<div class="intro-swatch-placeholder">' + stone.name + '</div>';
+      }
+      swatchHTML += '</div>';
+
+      intro.innerHTML = textHTML + swatchHTML;
+
+      // --- FULL SWATCH ---
+      var fullSwatch = document.getElementById('full-swatch');
+      var galleryImages = stone.gallery || [];
+      if (galleryImages.length > 0) {
+        fullSwatch.innerHTML = '<img src="' + galleryImages[0] + '" alt="' + stone.name + ' lifestyle">';
+      } else if (hasImage) {
+        fullSwatch.innerHTML = '<img src="' + stone.image + '" alt="' + stone.name + ' surface">';
+      } else {
+        fullSwatch.innerHTML = '<div class="full-swatch-placeholder">' + stone.name + '</div>';
+      }
+
+      // --- GALLERY ---
+      if (galleryImages.length > 1) {
+        var gallerySection = document.getElementById('gallery-section');
+        gallerySection.style.display = '';
+        var galleryHTML = '<h2 class="gallery-heading">' + stone.name + ' Gallery</h2>';
+        galleryHTML += '<div class="gallery-grid">';
+        for (var gi = 0; gi < galleryImages.length; gi++) {
+          galleryHTML += '<img src="' + galleryImages[gi] + '" alt="' + stone.name + ' - image ' + (gi + 1) + '" loading="lazy">';
+        }
+        galleryHTML += '</div>';
+        gallerySection.innerHTML = galleryHTML;
+      }
+
+      // --- COLLECTION GRID ---
+      var section = document.getElementById('collection-stones');
+
+      var titleRow = document.createElement('div');
+      titleRow.className = 'collection-title-row';
+      var titleEl = document.createElement('span');
+      titleEl.className = 'collection-title';
+      titleEl.textContent = collection.name;
+      titleRow.appendChild(titleEl);
+      section.appendChild(titleRow);
+
+      var desc = document.createElement('p');
+      desc.className = 'collection-desc';
+      desc.textContent = collection.subtitle;
+      section.appendChild(desc);
+
+      var grid = document.createElement('div');
+      grid.className = 'stones-grid';
+
+      collection.stones.forEach(function(s) {
+        var card = document.createElement('a');
+        card.className = 'stone-card';
+        card.href = '/surfaces/' + s.slug;
+        if (s.slug === slug) card.classList.add('active');
+
+        var imgWrap = document.createElement('div');
+        imgWrap.className = 'stone-card-image';
+        if (s.image) {
+          var img = document.createElement('img');
+          img.src = s.image;
+          img.alt = s.name;
+          img.loading = 'lazy';
+          imgWrap.appendChild(img);
+        } else {
+          var ph = document.createElement('div');
+          ph.className = 'stone-card-placeholder';
+          ph.textContent = s.name;
+          imgWrap.appendChild(ph);
+        }
+        card.appendChild(imgWrap);
+
+        var info = document.createElement('div');
+        info.className = 'stone-card-info';
+        info.innerHTML =
+          '<div class="stone-card-name">' + s.name + '</div>' +
+          '<div class="stone-card-finish">' + collection.name + '  |  ' + s.finish + ' Finish</div>';
+        card.appendChild(info);
+
+        grid.appendChild(card);
+      });
+
+      section.appendChild(grid);
+    }).catch(function(err) { console.error('Failed to load stones.json:', err); });
+})();
+</script>
+<script src="../animation.js?v=5"></script>
+</body>
+</html>

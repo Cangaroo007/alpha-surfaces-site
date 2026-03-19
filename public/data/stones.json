@@ -131,6 +131,30 @@
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
           "silica_free": true
+        },
+        {
+          "name": "Shell",
+          "finish": "Polished",
+          "slug": "shell",
+          "image": ""
+        },
+        {
+          "name": "Oyster Grey",
+          "finish": "Polished",
+          "slug": "oyster-grey",
+          "image": ""
+        },
+        {
+          "name": "Earthy Concrete",
+          "finish": "Polished",
+          "slug": "earthy-concrete",
+          "image": ""
+        },
+        {
+          "name": "Ash",
+          "finish": "Polished",
+          "slug": "ash",
+          "image": ""
         }
       ]
     },
@@ -219,6 +243,36 @@
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
           "silica_free": true
+        },
+        {
+          "name": "Salt Stone",
+          "finish": "Polished",
+          "slug": "salt-stone",
+          "image": "/images/stones/salt-stone.webp",
+          "thumbnail": "/images/stones/salt-stone-thumb.webp",
+          "swatch": "/images/stones/salt-stone.webp"
+        },
+        {
+          "name": "Desert Dune",
+          "finish": "Polished",
+          "slug": "desert-dune",
+          "image": "/images/stones/desert-dune.webp",
+          "thumbnail": "/images/stones/desert-dune-thumb.webp",
+          "swatch": "/images/stones/desert-dune.webp"
+        },
+        {
+          "name": "Cabarita",
+          "finish": "Matte",
+          "slug": "cabarita",
+          "image": ""
+        },
+        {
+          "name": "Broome",
+          "finish": "Matte",
+          "slug": "broome",
+          "image": "/images/stones/broome.webp",
+          "thumbnail": "/images/stones/broome-thumb.webp",
+          "swatch": "/images/stones/broome.webp"
         }
       ]
     },
@@ -310,6 +364,36 @@
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
           "silica_free": true
+        },
+        {
+          "name": "White Cloud",
+          "finish": "Polished",
+          "slug": "white-cloud",
+          "image": "/images/stones/white-cloud.webp",
+          "thumbnail": "/images/stones/white-cloud-thumb.webp",
+          "swatch": "/images/stones/white-cloud.webp"
+        },
+        {
+          "name": "Eternity",
+          "finish": "Polished",
+          "slug": "eternity",
+          "image": "/images/stones/eternity.webp",
+          "thumbnail": "/images/stones/eternity-thumb.webp",
+          "swatch": "/images/stones/eternity.webp"
+        },
+        {
+          "name": "Glacier",
+          "finish": "Polished",
+          "slug": "glacier",
+          "image": ""
+        },
+        {
+          "name": "Metallic Grey",
+          "finish": "Polished",
+          "slug": "metallic-grey",
+          "image": "/images/stones/metallic-grey.webp",
+          "thumbnail": "/images/stones/metallic-grey-thumb.webp",
+          "swatch": "/images/stones/metallic-grey.webp"
         }
       ]
     },
@@ -367,6 +451,14 @@
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
           "silica_free": true
+        },
+        {
+          "name": "Arabescato",
+          "finish": "Polished",
+          "slug": "arabescato",
+          "image": "/images/stones/arabescato.webp",
+          "thumbnail": "/images/stones/arabescato-thumb.webp",
+          "swatch": "/images/stones/arabescato.webp"
         }
       ]
     },
@@ -421,6 +513,42 @@
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
           "silica_free": true
+        },
+        {
+          "name": "Calacatta Oro",
+          "finish": "Polished",
+          "slug": "calacatta-oro",
+          "image": "/images/stones/calacatta-oro.webp",
+          "thumbnail": "/images/stones/calacatta-oro-thumb.webp",
+          "swatch": "/images/stones/calacatta-oro.webp"
+        },
+        {
+          "name": "Grande Glacier",
+          "finish": "Polished",
+          "slug": "grande-glacier",
+          "image": "/images/stones/grande-glacier.webp",
+          "thumbnail": "/images/stones/grande-glacier-thumb.webp",
+          "swatch": "/images/stones/grande-glacier.webp"
+        },
+        {
+          "name": "Basaltina",
+          "finish": "Polished",
+          "slug": "basaltina",
+          "image": "/images/stones/basaltina.webp",
+          "thumbnail": "/images/stones/basaltina-thumb.webp",
+          "swatch": "/images/stones/basaltina.webp"
+        },
+        {
+          "name": "Serena",
+          "finish": "Polished",
+          "slug": "serena",
+          "image": ""
+        },
+        {
+          "name": "Glacier Grey",
+          "finish": "Polished",
+          "slug": "glacier-grey",
+          "image": ""
         }
       ]
     }
