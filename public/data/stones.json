@@ -82,13 +82,17 @@
           "name": "Fraser",
           "finish": "Polished",
           "slug": "fraser",
-          "image": ""
+          "image": "/images/stones/fraser.webp",
+          "thumbnail": "/images/stones/fraser-thumb.webp",
+          "swatch": "/images/stones/fraser.webp"
         },
         {
           "name": "Bondi",
           "finish": "Polished",
           "slug": "bondi",
-          "image": ""
+          "image": "/images/stones/bondi.webp",
+          "thumbnail": "/images/stones/bondi-thumb.webp",
+          "swatch": "/images/stones/bondi.webp"
         },
         {
           "name": "Santorini Gold",
@@ -106,7 +110,9 @@
           "name": "Silver Travertine",
           "finish": "Soft Touch",
           "slug": "silver-travertine",
-          "image": ""
+          "image": "/images/stones/silver-travertine.webp",
+          "thumbnail": "/images/stones/silver-travertine-thumb.webp",
+          "swatch": "/images/stones/silver-travertine.webp"
         },
         {
           "name": "Carrara",
@@ -178,7 +184,9 @@
           "name": "Crystal",
           "finish": "Polished",
           "slug": "crystal",
-          "image": ""
+          "image": "/images/stones/crystal.webp",
+          "thumbnail": "/images/stones/crystal-thumb.webp",
+          "swatch": "/images/stones/crystal.webp"
         },
         {
           "name": "Arctic",
@@ -223,7 +231,9 @@
           "name": "Carbon",
           "finish": "Polished",
           "slug": "carbon",
-          "image": ""
+          "image": "/images/stones/carbon.webp",
+          "thumbnail": "/images/stones/carbon-thumb.webp",
+          "swatch": "/images/stones/carbon.webp"
         },
         {
           "name": "Graphite",
@@ -235,7 +245,9 @@
           "name": "Davinci Oro",
           "finish": "Polished",
           "slug": "davinci-oro",
-          "image": ""
+          "image": "/images/stones/davinci-oro.webp",
+          "thumbnail": "/images/stones/davinci-oro-thumb.webp",
+          "swatch": "/images/stones/davinci-oro.webp"
         },
         {
           "name": "Davinci Gris",
@@ -259,7 +271,9 @@
           "name": "Brilliance",
           "finish": "Polished",
           "slug": "brilliance",
-          "image": ""
+          "image": "/images/stones/brilliance.webp",
+          "thumbnail": "/images/stones/brilliance-thumb.webp",
+          "swatch": "/images/stones/brilliance.webp"
         },
         {
           "name": "Opal Mist",
@@ -308,7 +322,9 @@
           "name": "Jewel",
           "finish": "Polished",
           "slug": "jewel",
-          "image": ""
+          "image": "/images/stones/jewel.webp",
+          "thumbnail": "/images/stones/jewel-thumb.webp",
+          "swatch": "/images/stones/jewel.webp"
         },
         {
           "name": "Torquay",
