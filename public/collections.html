@@ -344,16 +344,39 @@ img { display: block; max-width: 100%; }
         group.appendChild(content);
         container.appendChild(group);
 
-        // Open first collection by default
-        if (i === 0) {
-          group.classList.add('open');
-        }
-
         // Click to toggle
         header.addEventListener('click', function() {
           group.classList.toggle('open');
         });
       });
+
+      // Deep link: auto-open collection from URL hash
+      var hash = window.location.hash.replace('#', '');
+      if (hash) {
+        // Map alpha-zero to original-alpha-zero
+        var targetId = hash === 'alpha-zero' ? 'original-alpha-zero' : hash;
+        var target = document.getElementById(targetId);
+        if (target && target.classList.contains('collection-group')) {
+          // Close all
+          document.querySelectorAll('.collection-group.open').forEach(function(g) {
+            g.classList.remove('open');
+          });
+          // Open target
+          target.classList.add('open');
+          // Scroll after a short delay
+          setTimeout(function() {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 200);
+        } else {
+          // No hash match — open first collection
+          var first = container.querySelector('.collection-group');
+          if (first) first.classList.add('open');
+        }
+      } else {
+        // No hash — open first collection by default
+        var first = container.querySelector('.collection-group');
+        if (first) first.classList.add('open');
+      }
 
       // Reveal animation
       const revealEls = document.querySelectorAll('.reveal');
