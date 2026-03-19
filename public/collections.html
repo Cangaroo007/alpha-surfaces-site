@@ -351,43 +351,42 @@ img { display: block; max-width: 100%; }
       });
 
       // Deep link: auto-open collection from URL hash
-      var rawHash = window.location.hash;
-      var hash = rawHash ? rawHash.replace(/^#/, '') : '';
+      (function handleDeepLink() {
+        var rawHash = window.location.hash;
+        var hash = rawHash ? rawHash.replace(/^#/, '') : '';
+        var groups = container.querySelectorAll('.collection-group');
 
-      // Open first by default, then override if hash matches
-      var firstGroup = container.querySelector('.collection-group');
-      if (firstGroup) firstGroup.classList.add('open');
+        // Default: open first collection
+        if (groups.length > 0) groups[0].classList.add('open');
 
-      if (hash) {
-        // Map anchor to element ID
-        var idMap = {
-          'collection-01': 'collection-01',
-          'collection-02': 'collection-02',
-          'collection-03': 'collection-03',
-          'collection-04': 'collection-04',
-          'collection-05': 'collection-05',
-          'alpha-zero': 'original-alpha-zero'
-        };
-        var targetId = idMap[hash] || hash;
-        var target = document.getElementById(targetId);
+        if (!hash) return;
 
-        if (target && target.classList.contains('collection-group')) {
-          // Close all, open target
-          var allGroups = document.querySelectorAll('.collection-group');
-          for (var g = 0; g < allGroups.length; g++) {
-            allGroups[g].classList.remove('open');
+        // Find target by matching the hash directly against element IDs
+        var target = null;
+        for (var g = 0; g < groups.length; g++) {
+          var gid = groups[g].id;
+          // Match: #collection-05 → id="collection-05"
+          // Match: #alpha-zero → id="original-alpha-zero"
+          if (gid === hash || (hash === 'alpha-zero' && gid === 'original-alpha-zero')) {
+            target = groups[g];
+            break;
           }
-          target.classList.add('open');
-
-          // Scroll after DOM paint
-          setTimeout(function() {
-            var navHeight = 111;
-            var rect = target.getBoundingClientRect();
-            var scrollTo = window.pageYOffset + rect.top - navHeight;
-            window.scrollTo({ top: scrollTo, behavior: 'smooth' });
-          }, 400);
         }
-      }
+
+        if (!target) return;
+
+        // Close all, open target
+        for (var c = 0; c < groups.length; c++) {
+          groups[c].classList.remove('open');
+        }
+        target.classList.add('open');
+
+        // Scroll to target after content renders
+        setTimeout(function() {
+          var y = target.getBoundingClientRect().top + window.pageYOffset - 120;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        }, 600);
+      })();
 
       // Reveal animation
       const revealEls = document.querySelectorAll('.reveal');
