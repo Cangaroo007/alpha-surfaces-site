@@ -194,13 +194,6 @@ img { display: block; max-width: 100%; }
 
       // --- Build collection label ---
       var cLabel = collection.name;
-      var cid = collection.id;
-      if (cid.indexOf('collection-0') === 0) {
-        var num = cid.replace('collection-0', '');
-        cLabel = 'Collection 0' + num + ' \u2013 ' + collection.name;
-      } else if (cid === 'original-alpha-zero') {
-        cLabel = 'Original Alpha Zero \u2013 The Signature Range';
-      }
 
       // --- INTRO SECTION ---
       var intro = document.getElementById('intro');
