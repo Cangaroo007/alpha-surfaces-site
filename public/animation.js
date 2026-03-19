@@ -79,11 +79,11 @@
     // Collect all animated elements
     var allAnimated = document.querySelectorAll('.anim-reveal, .anim-reveal-heading, .anim-reveal-label, .anim-img-reveal');
 
-    // Above-fold elements get staggered delays starting at 300ms
+    // Above-fold elements get staggered delays starting at 600ms
     var aboveFoldIndex = 0;
     allAnimated.forEach(function(el) {
       if (isAboveFold(el)) {
-        var delay = 300 + (aboveFoldIndex * 150);
+        var delay = 600 + (aboveFoldIndex * 150);
         el.setAttribute('data-anim-delay', delay);
         aboveFoldIndex++;
       }
@@ -104,7 +104,7 @@
           io.unobserve(e.target);
         }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.15, rootMargin: '0px' });
 
     allAnimated.forEach(function(el) { io.observe(el); });
   }
