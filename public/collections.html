@@ -351,31 +351,42 @@ img { display: block; max-width: 100%; }
       });
 
       // Deep link: auto-open collection from URL hash
-      var hash = window.location.hash.replace('#', '');
+      var rawHash = window.location.hash;
+      var hash = rawHash ? rawHash.replace(/^#/, '') : '';
+
+      // Open first by default, then override if hash matches
+      var firstGroup = container.querySelector('.collection-group');
+      if (firstGroup) firstGroup.classList.add('open');
+
       if (hash) {
-        // Map alpha-zero to original-alpha-zero
-        var targetId = hash === 'alpha-zero' ? 'original-alpha-zero' : hash;
+        // Map anchor to element ID
+        var idMap = {
+          'collection-01': 'collection-01',
+          'collection-02': 'collection-02',
+          'collection-03': 'collection-03',
+          'collection-04': 'collection-04',
+          'collection-05': 'collection-05',
+          'alpha-zero': 'original-alpha-zero'
+        };
+        var targetId = idMap[hash] || hash;
         var target = document.getElementById(targetId);
+
         if (target && target.classList.contains('collection-group')) {
-          // Close all
-          document.querySelectorAll('.collection-group.open').forEach(function(g) {
-            g.classList.remove('open');
-          });
-          // Open target
+          // Close all, open target
+          var allGroups = document.querySelectorAll('.collection-group');
+          for (var g = 0; g < allGroups.length; g++) {
+            allGroups[g].classList.remove('open');
+          }
           target.classList.add('open');
-          // Scroll after a short delay
+
+          // Scroll after DOM paint
           setTimeout(function() {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 200);
-        } else {
-          // No hash match — open first collection
-          var first = container.querySelector('.collection-group');
-          if (first) first.classList.add('open');
+            var navHeight = 111;
+            var rect = target.getBoundingClientRect();
+            var scrollTo = window.pageYOffset + rect.top - navHeight;
+            window.scrollTo({ top: scrollTo, behavior: 'smooth' });
+          }, 400);
         }
-      } else {
-        // No hash — open first collection by default
-        var first = container.querySelector('.collection-group');
-        if (first) first.classList.add('open');
       }
 
       // Reveal animation
