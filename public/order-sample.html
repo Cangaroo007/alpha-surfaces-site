@@ -21,14 +21,6 @@ a { color: inherit; }
 img { display: block; max-width: 100%; }
 
 /* NAV */
-.nav { position: sticky; top: 0; z-index: 100; background: var(--olive); display: flex; align-items: center; justify-content: space-between; padding: 18px 90px; }
-.nav-logo { display: flex; align-items: center; padding-left: 35px; }
-.nav-logo img { height: 75px; width: auto; }
-.nav-menu { display: flex; align-items: center; gap: 85px; }
-.nav-menu a { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 20px; color: var(--white); text-decoration: none; letter-spacing: 0.6px; text-transform: uppercase; }
-.nav-menu a:hover { opacity: 0.8; }
-.nav-hamburger { display: none; }
-
 /* ORDER SECTION */
 .order { background: var(--white); padding: 64px 44px; }
 .order-inner { display: flex; gap: 266px; }
@@ -80,13 +72,6 @@ img { display: block; max-width: 100%; }
 .footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
 
 @media (max-width: 1024px) {
-  .nav { padding: 24px 21px; }
-  .nav-logo { padding-left: 0; }
-  .nav-logo img { height: 54px; }
-  .nav-menu { display: none; }
-  .nav-hamburger { display: block; cursor: pointer; background: none; border: none; padding: 0; }
-  .nav-hamburger span { display: block; width: 28px; height: 2px; background: var(--white); margin-bottom: 6px; }
-  .nav-hamburger span:last-child { margin-bottom: 0; }
   .order { padding: 44px 24px; }
   .order-inner { flex-direction: column; gap: 48px; }
   .order-left { width: 100%; }
@@ -99,22 +84,11 @@ img { display: block; max-width: 100%; }
 }
 </style>
 <link rel="stylesheet" href="animation.css?v=5">
+<link rel="stylesheet" href="nav.css?v=1">
 </head>
 <body>
 
-<nav class="nav">
-  <a href="/" class="nav-logo">
-    <img src="logos/01 Brandmark/Inverse_white/Alpha Surfaces_Brandmark_Inverse.png" alt="Alpha Surfaces">
-  </a>
-  <div class="nav-menu">
-    <a href="/collections.html">COLLECTIONS</a>
-    <a href="/#about">ABOUT</a>
-    <a href="/#contact">CONTACT</a>
-  </div>
-  <button class="nav-hamburger" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
+<nav class="nav" id="main-nav"></nav>
 
 <section class="order">
   <div class="order-inner">
@@ -238,5 +212,6 @@ img { display: block; max-width: 100%; }
 })();
 </script>
 <script src="animation.js?v=5"></script>
+<script src="nav.js?v=1"></script>
 </body>
 </html>

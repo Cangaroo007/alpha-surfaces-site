@@ -1,0 +1,333 @@
+/* =============================================
+   SHARED NAV — Mega Menu + Mobile Menu
+   ============================================= */
+
+/* --- NAV BAR --- */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--olive);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 90px;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  padding-left: 35px;
+}
+
+.nav-logo img {
+  height: 75px;
+  width: auto;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 85px;
+}
+
+.nav-link {
+  font-family: 'Degular', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--white);
+  text-decoration: none;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.nav-link:hover {
+  opacity: 0.8;
+}
+
+.nav-hamburger {
+  display: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.nav-hamburger span {
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: var(--white);
+  margin-bottom: 6px;
+}
+
+.nav-hamburger span:last-child {
+  margin-bottom: 0;
+}
+
+/* --- MEGA MENU DROPDOWN --- */
+.mega-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--white);
+  padding: 0 60px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+  z-index: 99;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.mega-menu.open {
+  max-height: 600px;
+  opacity: 1;
+  padding: 60px;
+  overflow: visible;
+}
+
+.mega-menu-inner {
+  display: flex;
+  gap: 80px;
+}
+
+.mega-menu-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.mega-menu-col-heading {
+  font-family: 'Degular', sans-serif;
+  font-weight: 600;
+  font-size: 18.333px;
+  color: var(--black);
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.mega-menu-col-subheading {
+  font-family: 'Degular', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--black);
+  margin-top: 12px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  opacity: 0.6;
+}
+
+.mega-menu-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mega-menu-col ul li {
+  line-height: 32px;
+}
+
+.mega-menu-col ul li a {
+  font-family: 'Degular', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--black);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.mega-menu-col ul li a:hover {
+  opacity: 0.6;
+}
+
+/* --- MOBILE MENU OVERLAY --- */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--olive);
+  z-index: 98;
+  display: flex;
+  flex-direction: column;
+  padding: 120px 40px 40px;
+  overflow-y: auto;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.mobile-menu.open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-menu-link {
+  font-family: 'Degular', sans-serif;
+  font-weight: 500;
+  font-size: 40px;
+  color: var(--white);
+  text-decoration: none;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  display: block;
+  padding: 12px 0;
+}
+
+.mobile-menu-link:hover {
+  opacity: 0.8;
+}
+
+/* Mobile accordion trigger */
+.mobile-collections-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Degular', sans-serif;
+  font-weight: 500;
+  font-size: 40px;
+  color: var(--white);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 12px 0;
+  text-align: left;
+}
+
+.mobile-collections-trigger:hover {
+  opacity: 0.8;
+}
+
+.mobile-collections-trigger .toggle-icon {
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+/* Mobile sub-collections container */
+.mobile-collections-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.mobile-collections-panel.open {
+  max-height: 2000px;
+}
+
+/* Individual collection accordion */
+.mobile-collection-group {
+  padding-left: 20px;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 8px;
+}
+
+.mobile-collection-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 8px 0;
+}
+
+.mobile-collection-name {
+  font-family: 'Degular', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  color: var(--white);
+  letter-spacing: 0.6px;
+}
+
+.mobile-collection-toggle {
+  font-family: 'Degular', sans-serif;
+  font-weight: 300;
+  font-size: 24px;
+  color: var(--white);
+  opacity: 0.6;
+  transition: transform 0.3s ease;
+}
+
+.mobile-collection-stones {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.mobile-collection-stones.open {
+  max-height: 1000px;
+}
+
+.mobile-collection-stones ul {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0 12px 0;
+}
+
+.mobile-collection-stones ul li {
+  line-height: 30px;
+}
+
+.mobile-collection-stones ul li a {
+  font-family: 'Degular', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--white);
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.mobile-collection-stones ul li a:hover {
+  opacity: 1;
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 1024px) {
+  .nav {
+    padding: 24px 21px;
+  }
+
+  .nav-logo {
+    padding-left: 0;
+  }
+
+  .nav-logo img {
+    height: 54px;
+  }
+
+  .nav-menu {
+    display: none;
+  }
+
+  .nav-hamburger {
+    display: block;
+    z-index: 101;
+  }
+
+  .mega-menu {
+    display: none;
+  }
+}
+
+@media (min-width: 1025px) {
+  .mobile-menu {
+    display: none !important;
+  }
+}
