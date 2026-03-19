@@ -33,7 +33,7 @@
     </a>\
     <div class="nav-menu" id="nav-menu">\
       <a href="#" class="nav-link nav-collections-trigger" id="collections-trigger">COLLECTIONS</a>\
-      <a href="/#about" class="nav-link">ABOUT</a>\
+      <a href="/about.html" class="nav-link">ABOUT</a>\
       <a href="/#contact" class="nav-link">CONTACT</a>\
     </div>\
     <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">\
@@ -161,7 +161,7 @@
     html += '</div>';
 
     // Other links
-    html += '<a href="/#about" class="mobile-menu-link" data-close-mobile>ABOUT</a>';
+    html += '<a href="/about.html" class="mobile-menu-link" data-close-mobile>ABOUT</a>';
     html += '<a href="/#contact" class="mobile-menu-link" data-close-mobile>CONTACT</a>';
 
     mobileMenu.innerHTML = html;
