@@ -2,8 +2,8 @@
   "collections": [
     {
       "id": "collection-01",
-      "name": "Calacatta & Statuario",
-      "subtitle": "Calacatta & Statuario",
+      "name": "Collection 01",
+      "subtitle": "Our entry-level price point offers classic neutrals with textures ranging from fine particles to subtle grains.",
       "stones": [
         {
           "name": "Calacatta Leggera",
@@ -69,8 +69,8 @@
     },
     {
       "id": "collection-02",
-      "name": "Prairie & Sage",
-      "subtitle": "Prairie & Sage",
+      "name": "Collection 02",
+      "subtitle": "Earthy, warm tones inspired by Australian landscapes. Perfect for contemporary homes.",
       "stones": [
         {
           "name": "Noosa",
@@ -130,8 +130,8 @@
     },
     {
       "id": "collection-03",
-      "name": "Soapstone & Verde",
-      "subtitle": "Soapstone & Verde",
+      "name": "Collection 03",
+      "subtitle": "Deep, rich surfaces with natural veining. Dramatic and sophisticated.",
       "stones": [
         {
           "name": "Patagonia",
@@ -216,8 +216,8 @@
     },
     {
       "id": "collection-04",
-      "name": "Dramatic & Noir",
-      "subtitle": "Dramatic & Noir",
+      "name": "Collection 04",
+      "subtitle": "Bold blacks and deep charcoals. The choice for statement kitchens.",
       "stones": [
         {
           "name": "Carbon",
@@ -301,8 +301,8 @@
     },
     {
       "id": "collection-05",
-      "name": "Urban & Minimal",
-      "subtitle": "Urban & Minimal",
+      "name": "Collection 05",
+      "subtitle": "Concrete-inspired, textural surfaces. Modern, industrial, and versatile.",
       "stones": [
         {
           "name": "Jewel",
