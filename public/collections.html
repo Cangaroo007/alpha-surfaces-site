@@ -401,52 +401,71 @@ img { display: block; max-width: 100%; }
 </script>
 <script>
 (function() {
-  var slides = document.querySelectorAll('.hero-slide');
-  var dotsContainer = document.getElementById('hero-dots');
-  if (!slides.length) return;
+  // Wait for DOM + images to be ready
+  function initSlideshow() {
+    var slides = document.querySelectorAll('.hero-slide');
+    var dotsContainer = document.getElementById('hero-dots');
+    if (!slides.length || !dotsContainer) {
+      console.warn('Slideshow: no slides or dots container found');
+      return;
+    }
 
-  var current = 0;
-  var total = slides.length;
-  var interval = null;
-  var paused = false;
+    var current = 0;
+    var total = slides.length;
+    var timer = null;
+    var paused = false;
 
-  // Build dots
-  for (var i = 0; i < total; i++) {
-    var dot = document.createElement('button');
-    dot.className = 'hero-dot' + (i === 0 ? ' active' : '');
-    dot.setAttribute('data-index', i);
-    dot.setAttribute('aria-label', 'Slide ' + (i + 1));
-    dot.addEventListener('click', function() {
-      goTo(parseInt(this.getAttribute('data-index'), 10));
-      resetTimer();
-    });
-    dotsContainer.appendChild(dot);
+    // Build dots
+    for (var i = 0; i < total; i++) {
+      var dot = document.createElement('button');
+      dot.className = 'hero-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('data-index', String(i));
+      dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+      dot.addEventListener('click', function() {
+        goTo(parseInt(this.getAttribute('data-index'), 10));
+        restartTimer();
+      });
+      dotsContainer.appendChild(dot);
+    }
+
+    var dots = dotsContainer.querySelectorAll('.hero-dot');
+
+    function goTo(idx) {
+      if (slides[current]) slides[current].classList.remove('active');
+      if (dots[current]) dots[current].classList.remove('active');
+      current = ((idx % total) + total) % total; // safe modulo
+      if (slides[current]) slides[current].classList.add('active');
+      if (dots[current]) dots[current].classList.add('active');
+    }
+
+    function advance() {
+      if (!paused) goTo(current + 1);
+    }
+
+    function restartTimer() {
+      if (timer) clearInterval(timer);
+      timer = setInterval(advance, 4000);
+    }
+
+    // Pause on hover
+    var hero = document.getElementById('hero-slideshow');
+    if (hero) {
+      hero.addEventListener('mouseenter', function() { paused = true; });
+      hero.addEventListener('mouseleave', function() { paused = false; });
+    }
+
+    // Start cycling after 500ms
+    setTimeout(function() {
+      restartTimer();
+    }, 500);
   }
 
-  var dots = dotsContainer.querySelectorAll('.hero-dot');
-
-  function goTo(idx) {
-    slides[current].classList.remove('active');
-    dots[current].classList.remove('active');
-    current = idx % total;
-    slides[current].classList.add('active');
-    dots[current].classList.add('active');
+  // Init after a short delay to ensure page is rendered
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSlideshow);
+  } else {
+    initSlideshow();
   }
-
-  function next() { if (!paused) goTo(current + 1); }
-
-  function resetTimer() {
-    clearInterval(interval);
-    interval = setInterval(next, 4000);
-  }
-
-  // Pause on hover
-  var hero = document.getElementById('hero-slideshow');
-  hero.addEventListener('mouseenter', function() { paused = true; });
-  hero.addEventListener('mouseleave', function() { paused = false; });
-
-  // Start
-  interval = setInterval(next, 4000);
 })();
 </script>
 <script src="animation.js?v=7"></script>
