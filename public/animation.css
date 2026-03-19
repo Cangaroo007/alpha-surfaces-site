@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   ALPHA SURFACES — Shared Animation Styles v2
-   Increased impact — editorial energy, refined not gimmicky
+   ALPHA SURFACES — Shared Animation Styles v4
+   Fix: no transition on hidden state — transition only on reveal
    ═══════════════════════════════════════════════════════════════ */
 
 /* --- 1. SCROLL REVEAL --- */
@@ -8,12 +8,13 @@
   opacity: 0;
   transform: translateY(48px);
   filter: blur(4px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out, filter 0.8s ease-out;
+  transition: none;
 }
 .anim-reveal.anim-visible {
   opacity: 1;
   transform: translateY(0) translateX(0);
   filter: blur(0);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out, filter 0.8s ease-out;
 }
 
 /* Headings reveal with X offset */
@@ -21,28 +22,29 @@
   opacity: 0;
   transform: translateX(-16px) translateY(24px);
   filter: blur(4px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out, filter 0.8s ease-out;
+  transition: none;
 }
 .anim-reveal-heading.anim-visible {
   opacity: 1;
   transform: translateX(0) translateY(0);
   filter: blur(0);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out, filter 0.8s ease-out;
 }
 
-/* Section labels slide from left with delay */
+/* Section labels slide from left */
 .anim-reveal-label {
   opacity: 0;
   transform: translateX(-24px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-  transition-delay: 0s;
+  transition: none;
 }
 .anim-reveal-label.anim-visible {
   opacity: 1;
   transform: translateX(0);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
-/* Staggered children — set via JS with --anim-delay */
-.anim-stagger > .anim-reveal {
+/* Staggered children — delay set via JS with --anim-delay */
+.anim-stagger > .anim-reveal.anim-visible {
   transition-delay: var(--anim-delay, 0s);
 }
 
@@ -61,7 +63,6 @@
   transform: translateY(-8px);
   box-shadow: 0 20px 48px rgba(0,0,0,0.15);
 }
-/* Olive overlay on hover */
 .anim-card .stone-card-image,
 .anim-card .showcase-card-image {
   position: relative;
@@ -99,7 +100,6 @@
   transform: translateY(-3px);
   color: #564d22;
 }
-/* Keep white name colour on dark backgrounds */
 .collection-section .anim-card:hover .stone-card-name {
   color: #ffffff;
 }
@@ -107,19 +107,21 @@
 /* --- 4. SECTION TRANSITIONS --- */
 .anim-section {
   transform: scale(0.98);
-  transition: transform 0.9s ease-out;
+  transition: none;
 }
 .anim-section.anim-visible {
   transform: scale(1);
+  transition: transform 0.9s ease-out;
 }
 
 /* --- 5. IMAGE REVEAL (clip-path wipe) --- */
 .anim-img-reveal {
   clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.9s cubic-bezier(0.77, 0, 0.175, 1);
+  transition: none;
 }
 .anim-img-reveal.anim-visible {
   clip-path: inset(0 0% 0 0);
+  transition: clip-path 0.9s cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 /* --- 6. NAV SCROLL BEHAVIOUR --- */
@@ -192,6 +194,20 @@
   }
   .anim-hscroll-wrap.scrolled-end::after {
     opacity: 0;
+  }
+}
+
+/* --- NO-JS FALLBACK --- */
+@media (scripting: none) {
+  .anim-reveal,
+  .anim-reveal-heading,
+  .anim-reveal-label,
+  .anim-section,
+  .anim-img-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
   }
 }
 
