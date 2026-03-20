@@ -27,7 +27,7 @@
           "description": "Calacatta Leggera brings the timeless elegance of Italian marble to Australian homes. Soft white ground with gentle grey veining and warm undertones \u2014 refined without being imposing.",
           "indoor_outdoor": false,
           "uv_stable": false,
-          "swatch": "/images/stones/calacatta-leggera.webp",
+          "swatch": "/images/stones/calacatta-leggera-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
           "thickness": 20,
@@ -86,7 +86,7 @@
           "slug": "fraser",
           "image": "/images/stones/fraser.webp",
           "thumbnail": "/images/stones/fraser-thumb.webp",
-          "swatch": "/images/stones/fraser.webp"
+          "swatch": "/images/stones/fraser-swatch.webp"
         },
         {
           "name": "Bondi",
@@ -94,7 +94,7 @@
           "slug": "bondi",
           "image": "/images/stones/bondi.webp",
           "thumbnail": "/images/stones/bondi-thumb.webp",
-          "swatch": "/images/stones/bondi.webp"
+          "swatch": "/images/stones/bondi-swatch.webp"
         },
         {
           "name": "Santorini Gold",
@@ -126,7 +126,7 @@
           "description": "Carrara is the benchmark of understated luxury. A crisp white surface with subtle grey veining that works effortlessly across contemporary and classic kitchen styles.",
           "indoor_outdoor": false,
           "uv_stable": false,
-          "swatch": "/images/stones/carrara.webp",
+          "swatch": "/images/stones/carrara-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
           "thickness": 20,
@@ -140,7 +140,7 @@
           "slug": "shell",
           "image": "/images/stones/shell.webp",
           "thumbnail": "/images/stones/shell-thumb.webp",
-          "swatch": "/images/stones/shell.webp"
+          "swatch": "/images/stones/shell-swatch.webp"
         },
         {
           "name": "Oyster Grey",
@@ -148,7 +148,7 @@
           "slug": "oyster-grey",
           "image": "/images/stones/oyster-grey.webp",
           "thumbnail": "/images/stones/oyster-grey-thumb.webp",
-          "swatch": "/images/stones/oyster-grey.webp"
+          "swatch": "/images/stones/oyster-grey-swatch.webp"
         },
         {
           "name": "Earthy Concrete",
@@ -156,7 +156,7 @@
           "slug": "earthy-concrete",
           "image": "/images/stones/earthy-concrete.webp",
           "thumbnail": "/images/stones/earthy-concrete-thumb.webp",
-          "swatch": "/images/stones/earthy-concrete.webp"
+          "swatch": "/images/stones/earthy-concrete-swatch.webp"
         },
         {
           "name": "Ash",
@@ -164,7 +164,7 @@
           "slug": "ash",
           "image": "/images/stones/ash.webp",
           "thumbnail": "/images/stones/ash-thumb.webp",
-          "swatch": "/images/stones/ash.webp"
+          "swatch": "/images/stones/ash-swatch.webp"
         }
       ]
     },
@@ -214,7 +214,7 @@
           "slug": "pearl",
           "image": "/images/stones/pearl.webp",
           "thumbnail": "/images/stones/pearl-thumb.webp",
-          "swatch": "/images/stones/pearl.webp"
+          "swatch": "/images/stones/pearl-swatch.webp"
         },
         {
           "name": "Crystal",
@@ -222,7 +222,7 @@
           "slug": "crystal",
           "image": "/images/stones/crystal.webp",
           "thumbnail": "/images/stones/crystal-thumb.webp",
-          "swatch": "/images/stones/crystal.webp"
+          "swatch": "/images/stones/crystal-swatch.webp"
         },
         {
           "name": "Arctic",
@@ -230,7 +230,7 @@
           "slug": "arctic",
           "image": "/images/stones/arctic.webp",
           "thumbnail": "/images/stones/arctic-thumb.webp",
-          "swatch": "/images/stones/arctic.webp"
+          "swatch": "/images/stones/arctic-swatch.webp"
         },
         {
           "name": "Whitehaven",
@@ -250,7 +250,7 @@
           "description": "Inspired by the pristine shores of the Whitsundays, Whitehaven delivers a warm white surface with gentle movement. UV-stable and built for indoor-outdoor living.",
           "indoor_outdoor": true,
           "uv_stable": true,
-          "swatch": "/images/stones/whitehaven.webp",
+          "swatch": "/images/stones/whitehaven-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
           "thickness": 20,
@@ -264,7 +264,7 @@
           "slug": "salt-stone",
           "image": "/images/stones/salt-stone.webp",
           "thumbnail": "/images/stones/salt-stone-thumb.webp",
-          "swatch": "/images/stones/salt-stone.webp"
+          "swatch": "/images/stones/salt-stone-swatch.webp"
         },
         {
           "name": "Desert Dune",
@@ -272,7 +272,7 @@
           "slug": "desert-dune",
           "image": "/images/stones/desert-dune.webp",
           "thumbnail": "/images/stones/desert-dune-thumb.webp",
-          "swatch": "/images/stones/desert-dune.webp"
+          "swatch": "/images/stones/desert-dune-swatch.webp"
         },
         {
           "name": "Cabarita",
@@ -280,7 +280,7 @@
           "slug": "cabarita",
           "image": "/images/stones/cabarita.webp",
           "thumbnail": "/images/stones/cabarita-thumb.webp",
-          "swatch": "/images/stones/cabarita.webp"
+          "swatch": "/images/stones/cabarita-swatch.webp"
         },
         {
           "name": "Broome",
@@ -288,7 +288,7 @@
           "slug": "broome",
           "image": "/images/stones/broome.webp",
           "thumbnail": "/images/stones/broome-thumb.webp",
-          "swatch": "/images/stones/broome.webp"
+          "swatch": "/images/stones/broome-swatch.webp"
         }
       ]
     },
@@ -311,7 +311,7 @@
           "slug": "graphite",
           "image": "/images/stones/graphite.webp",
           "thumbnail": "/images/stones/graphite-thumb.webp",
-          "swatch": "/images/stones/graphite.webp"
+          "swatch": "/images/stones/graphite-swatch.webp"
         },
         {
           "name": "Davinci Oro",
@@ -319,7 +319,7 @@
           "slug": "davinci-oro",
           "image": "/images/stones/davinci-oro.webp",
           "thumbnail": "/images/stones/davinci-oro-thumb.webp",
-          "swatch": "/images/stones/davinci-oro.webp"
+          "swatch": "/images/stones/davinci-oro-swatch.webp"
         },
         {
           "name": "Davinci Gris",
@@ -331,7 +331,7 @@
           "description": "Davinci Gris captures the depth and warmth of natural grey stone. Rich mineral movement through a sophisticated grey ground \u2014 perfect for contemporary interiors.",
           "indoor_outdoor": false,
           "uv_stable": false,
-          "swatch": "/images/stones/davinci-gris.webp",
+          "swatch": "/images/stones/davinci-gris-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
           "thickness": 20,
@@ -345,7 +345,7 @@
           "slug": "brilliance",
           "image": "/images/stones/brilliance.webp",
           "thumbnail": "/images/stones/brilliance-thumb.webp",
-          "swatch": "/images/stones/brilliance.webp"
+          "swatch": "/images/stones/brilliance-swatch.webp"
         },
         {
           "name": "Opal Mist",
@@ -357,7 +357,7 @@
           "description": "Opal Mist is a dream surface \u2014 delicately translucent white with a soft, almost atmospheric quality. Brings light and calm to any space.",
           "indoor_outdoor": false,
           "uv_stable": false,
-          "swatch": "/images/stones/opal-mist.webp",
+          "swatch": "/images/stones/opal-mist-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
           "thickness": 20,
@@ -375,7 +375,7 @@
           "description": "Statuario Gold makes a statement. Dramatic gold and warm grey veining sweeps across a bright white ground \u2014 one of Alpha\u2019s most sought-after surfaces.",
           "indoor_outdoor": false,
           "uv_stable": false,
-          "swatch": "/images/stones/statuario-gold.webp",
+          "swatch": "/images/stones/statuario-gold-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
           "thickness": 20,
@@ -389,7 +389,7 @@
           "slug": "white-cloud",
           "image": "/images/stones/white-cloud.webp",
           "thumbnail": "/images/stones/white-cloud-thumb.webp",
-          "swatch": "/images/stones/white-cloud.webp"
+          "swatch": "/images/stones/white-cloud-swatch.webp"
         },
         {
           "name": "Eternity",
@@ -397,7 +397,7 @@
           "slug": "eternity",
           "image": "/images/stones/eternity.webp",
           "thumbnail": "/images/stones/eternity-thumb.webp",
-          "swatch": "/images/stones/eternity.webp"
+          "swatch": "/images/stones/eternity-swatch.webp"
         },
         {
           "name": "Glacier",
@@ -405,7 +405,7 @@
           "slug": "glacier",
           "image": "/images/stones/glacier.webp",
           "thumbnail": "/images/stones/glacier-thumb.webp",
-          "swatch": "/images/stones/glacier.webp"
+          "swatch": "/images/stones/glacier-swatch.webp"
         },
         {
           "name": "Metallic Grey",
@@ -413,7 +413,7 @@
           "slug": "metallic-grey",
           "image": "/images/stones/metallic-grey.webp",
           "thumbnail": "/images/stones/metallic-grey-thumb.webp",
-          "swatch": "/images/stones/metallic-grey.webp"
+          "swatch": "/images/stones/metallic-grey-swatch.webp"
         }
       ]
     },
@@ -428,7 +428,7 @@
           "slug": "jewel",
           "image": "/images/stones/jewel.webp",
           "thumbnail": "/images/stones/jewel-thumb.webp",
-          "swatch": "/images/stones/jewel.webp"
+          "swatch": "/images/stones/jewel-swatch.webp"
         },
         {
           "name": "Torquay",
@@ -436,7 +436,7 @@
           "slug": "torquay",
           "image": "/images/stones/torquay.webp",
           "thumbnail": "/images/stones/torquay-thumb.webp",
-          "swatch": "/images/stones/torquay.webp"
+          "swatch": "/images/stones/torquay-swatch.webp"
         },
         {
           "name": "Autumn Gold",
@@ -448,7 +448,7 @@
           "description": "Autumn Gold radiates warmth. Deep amber and honey tones move through a soft ground \u2014 a surface that brings genuine character and presence to any benchtop.",
           "indoor_outdoor": false,
           "uv_stable": false,
-          "swatch": "/images/stones/autumn-gold.webp",
+          "swatch": "/images/stones/autumn-gold-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
           "thickness": 20,
@@ -466,7 +466,7 @@
           "description": "Calacatta Viola is unlike anything else in the range. Pure white ground with distinctive violet and purple veining \u2014 bold, beautiful, and completely unique.",
           "indoor_outdoor": false,
           "uv_stable": false,
-          "swatch": "/images/stones/calacatta-viola.webp",
+          "swatch": "/images/stones/calacatta-viola-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
           "thickness": 20,
@@ -480,7 +480,7 @@
           "slug": "arabescato",
           "image": "/images/stones/arabescato.webp",
           "thumbnail": "/images/stones/arabescato-thumb.webp",
-          "swatch": "/images/stones/arabescato.webp"
+          "swatch": "/images/stones/arabescato-swatch.webp"
         }
       ]
     },
