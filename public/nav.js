@@ -66,7 +66,6 @@
     dHtml += '<div class="mega-menu-col">';
     dHtml += '<a href="/collections.html#' + anchor + '" class="mega-menu-col-heading">';
     dHtml += '<span class="mm-col-num">' + col.label + '</span>';
-    if (col.name) dHtml += '<span class="mm-col-name">' + col.name + '</span>';
     dHtml += '</a>';
     dHtml += '<ul>';
     col.stones.forEach(function(s) {
