@@ -9,231 +9,179 @@
     var dir = segments[segments.length - 2];
     if (dir === 'surfaces' || dir === 'partners' || dir === 'brand') depth = 1;
   } else if (segments.length === 1) {
-    var seg = segments[0];
-    if (seg === 'surfaces' || seg === 'partners' || seg === 'brand') depth = 1;
+    var s0 = segments[0];
+    if (s0 === 'surfaces' || s0 === 'partners' || s0 === 'brand') depth = 1;
   }
-
   var prefix = depth > 0 ? '../' : '';
   var logoSrc = prefix + 'logos/01 Brandmark/Inverse_white/Alpha Surfaces_Brandmark_Inverse.png';
-  var dataUrl = prefix + 'data/stones.json';
+
+  /* ── Hardcoded collection/stone data ── */
+  var COLLECTIONS = [
+    { id: 'collection-01', label: 'Collection 01', name: 'Calacatta & Statuario',
+      stones: ['Brilliance','Crystal','Jewel','Graphite','Bondi','Fraser'] },
+    { id: 'collection-02', label: 'Collection 02', name: 'Prairie & Sage',
+      stones: ['Arctic','Pearl','Ash','Shell','Carrara','Oyster Grey','Earthy Concrete'] },
+    { id: 'collection-03', label: 'Collection 03', name: 'Soapstone & Verde',
+      stones: ['Salt Stone','Davinci Gris','Davinci Oro','Desert Dune'],
+      indoorOutdoor: ['Broome','Cabarita','Torquay','Whitehaven'] },
+    { id: 'collection-04', label: 'Collection 04', name: 'Dramatic & Noir',
+      stones: ['Opal Mist','Calacatta Leggera','Metallic Grey','Statuario Gold','Eternity','White Cloud','Glacier'] },
+    { id: 'collection-05', label: 'Collection 05', name: 'Urban & Minimal',
+      stones: ['Calacatta Viola','Arabescato','Autumn Gold'] },
+    { id: 'original-alpha-zero', label: 'Original Alpha Zero', name: '',
+      stones: ['Carbon','Venatino','Noosa','Glacier Grey','Infinity Gris','Calacatta Oro','Acropolis','Serena','Basaltina','Silver Trav','Biscotti','Grande Glacier','Taj Mahal','Patagonia','Calacatta Borghini'] }
+  ];
+
+  function slug(name) { return name.toLowerCase().replace(/\s+/g, '-'); }
 
   /* ══════════════════════════════════════════════════
-     PHASE 1 — Render nav immediately (synchronous)
+     PHASE 1 — Render nav bar immediately
      ══════════════════════════════════════════════════ */
   var navEl = document.getElementById('main-nav');
   if (!navEl) return;
 
   navEl.innerHTML =
-    '<a href="/" class="nav-logo">' +
-      '<img src="' + logoSrc + '" alt="Alpha Surfaces">' +
-    '</a>' +
+    '<a href="/" class="nav-logo"><img src="' + logoSrc + '" alt="Alpha Surfaces"></a>' +
     '<div class="nav-menu" id="nav-menu">' +
       '<a href="/collections.html" class="nav-link nav-collections-trigger" id="collections-trigger">COLLECTIONS</a>' +
       '<a href="/about.html" class="nav-link">ABOUT</a>' +
       '<a href="/#contact" class="nav-link">CONTACT</a>' +
     '</div>' +
-    '<button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">' +
-      '<span></span><span></span><span></span>' +
-    '</button>' +
+    '<button class="nav-hamburger" id="nav-hamburger" aria-label="Menu"><span></span><span></span><span></span></button>' +
     '<div class="mega-menu" id="mega-menu"></div>' +
     '<div class="mobile-menu" id="mobile-menu"></div>';
 
   /* ══════════════════════════════════════════════════
-     PHASE 2 — Wire interactions (synchronous, safe)
+     PHASE 2 — Build mega menu content
      ══════════════════════════════════════════════════ */
-  var trigger = document.getElementById('collections-trigger');
   var megaMenu = document.getElementById('mega-menu');
-  var hamburger = document.getElementById('nav-hamburger');
   var mobileMenu = document.getElementById('mobile-menu');
+  var trigger = document.getElementById('collections-trigger');
+  var hamburger = document.getElementById('nav-hamburger');
 
-  if (!trigger || !megaMenu || !hamburger || !mobileMenu) return;
-
-  // COLLECTIONS click: navigate to /collections.html
-  // Hover opens mega menu; click navigates
-  trigger.addEventListener('click', function () {
-    closeMegaMenu();
-    // Let the default href="/collections.html" navigate
-  });
-
-  // Hover open on desktop
-  var hoverTimeout;
-  trigger.addEventListener('mouseenter', function () {
-    if (window.innerWidth >= 1024) {
-      clearTimeout(hoverTimeout);
-      megaMenu.classList.add('open');
+  // Desktop mega menu
+  var dHtml = '<div class="mega-menu-inner">';
+  COLLECTIONS.forEach(function(col, ci) {
+    var anchor = col.id === 'original-alpha-zero' ? 'alpha-zero' : col.id;
+    dHtml += '<div class="mega-menu-col">';
+    dHtml += '<a href="/collections.html#' + anchor + '" class="mega-menu-col-heading">';
+    dHtml += '<span class="mm-col-num">' + col.label + '</span>';
+    if (col.name) dHtml += '<span class="mm-col-name">' + col.name + '</span>';
+    dHtml += '</a>';
+    dHtml += '<ul>';
+    col.stones.forEach(function(s) {
+      dHtml += '<li><a href="/surfaces/' + slug(s) + '">' + s + '</a></li>';
+    });
+    dHtml += '</ul>';
+    if (col.indoorOutdoor) {
+      dHtml += '<div class="mm-indoor-outdoor-label">Indoor-Outdoor</div>';
+      dHtml += '<ul>';
+      col.indoorOutdoor.forEach(function(s) {
+        dHtml += '<li><a href="/surfaces/' + slug(s) + '">' + s + '</a></li>';
+      });
+      dHtml += '</ul>';
     }
+    dHtml += '</div>';
+    if (ci < COLLECTIONS.length - 1) dHtml += '<div class="mega-menu-divider"></div>';
   });
-  megaMenu.addEventListener('mouseenter', function () {
-    if (window.innerWidth >= 1024) clearTimeout(hoverTimeout);
-  });
-  trigger.addEventListener('mouseleave', function () {
-    if (window.innerWidth >= 1024) {
-      hoverTimeout = setTimeout(function () {
-        if (!megaMenu.matches(':hover')) closeMegaMenu();
-      }, 200);
+  dHtml += '</div>';
+  megaMenu.innerHTML = dHtml;
+
+  // Mobile menu
+  var mHtml = '<div class="mobile-collections-row">' +
+    '<a href="/collections.html" class="mobile-menu-link" style="flex:1;">COLLECTIONS</a>' +
+    '<button class="mobile-toggle-btn" id="mobile-coll-toggle"><span class="toggle-icon">+</span></button></div>' +
+    '<div class="mobile-collections-panel" id="mobile-coll-panel">';
+  COLLECTIONS.forEach(function(col) {
+    var anchor = col.id === 'original-alpha-zero' ? 'alpha-zero' : col.id;
+    mHtml += '<div class="mobile-coll-group">';
+    mHtml += '<div class="mobile-coll-header">';
+    mHtml += '<a href="/collections.html#' + anchor + '" class="mobile-coll-name">' + col.label + '</a>';
+    mHtml += '<button class="mobile-toggle-btn" data-coll="' + col.id + '"><span class="toggle-icon">+</span></button>';
+    mHtml += '</div>';
+    mHtml += '<div class="mobile-coll-stones" data-panel="' + col.id + '"><ul>';
+    col.stones.forEach(function(s) {
+      mHtml += '<li><a href="/surfaces/' + slug(s) + '">' + s + '</a></li>';
+    });
+    if (col.indoorOutdoor) {
+      mHtml += '</ul><div class="mm-indoor-outdoor-label" style="color:rgba(255,255,255,0.5);">Indoor-Outdoor</div><ul>';
+      col.indoorOutdoor.forEach(function(s) {
+        mHtml += '<li><a href="/surfaces/' + slug(s) + '">' + s + '</a></li>';
+      });
     }
+    mHtml += '</ul></div></div>';
   });
-  megaMenu.addEventListener('mouseleave', function () {
-    if (window.innerWidth >= 1024) hoverTimeout = setTimeout(closeMegaMenu, 200);
-  });
-
-  // Close on click outside
-  document.addEventListener('click', function (e) {
-    if (megaMenu.classList.contains('open') && !megaMenu.contains(e.target) && !trigger.contains(e.target)) {
-      closeMegaMenu();
-    }
-  });
-
-  // Close on Escape
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') { closeMegaMenu(); closeMobileMenu(); }
-  });
-
-  // Close mega when clicking ABOUT or CONTACT
-  var navLinks = document.querySelectorAll('#nav-menu .nav-link:not(.nav-collections-trigger)');
-  for (var i = 0; i < navLinks.length; i++) {
-    navLinks[i].addEventListener('click', closeMegaMenu);
-  }
-
-  // Hamburger
-  hamburger.addEventListener('click', function (e) {
-    e.stopPropagation();
-    toggleMobileMenu();
-  });
-
-  function toggleMegaMenu() {
-    megaMenu.classList.toggle('open');
-  }
-  function closeMegaMenu() {
-    megaMenu.classList.remove('open');
-  }
-  function toggleMobileMenu() {
-    if (mobileMenu.classList.contains('open')) {
-      closeMobileMenu();
-    } else {
-      mobileMenu.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-  }
-  function closeMobileMenu() {
-    mobileMenu.classList.remove('open');
-    document.body.style.overflow = '';
-  }
+  mHtml += '</div>';
+  mHtml += '<a href="/about.html" class="mobile-menu-link">ABOUT</a>';
+  mHtml += '<a href="/#contact" class="mobile-menu-link">CONTACT</a>';
+  mobileMenu.innerHTML = mHtml;
 
   /* ══════════════════════════════════════════════════
-     PHASE 3 — Load collection data (async, independent)
-     Failure here does NOT break page rendering.
+     PHASE 3 — Interactions
      ══════════════════════════════════════════════════ */
-  var indoorOutdoorSlugs = ['broome', 'cabarita', 'torquay', 'whitehaven'];
 
-  fetch(dataUrl)
-    .then(function (res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    })
-    .then(function (data) {
-      buildMegaMenu(data.collections);
-      buildMobileMenu(data.collections);
-    })
-    .catch(function (err) {
-      console.warn('Nav: stones.json load failed —', err.message);
-      // Mega menu stays empty but nav still works
+  // Desktop: hover to open mega menu
+  var hoverTimer;
+  trigger.addEventListener('mouseenter', function() {
+    if (window.innerWidth >= 1024) { clearTimeout(hoverTimer); megaMenu.classList.add('open'); }
+  });
+  megaMenu.addEventListener('mouseenter', function() {
+    if (window.innerWidth >= 1024) clearTimeout(hoverTimer);
+  });
+  trigger.addEventListener('mouseleave', function() {
+    if (window.innerWidth >= 1024) hoverTimer = setTimeout(function() { if (!megaMenu.matches(':hover')) megaMenu.classList.remove('open'); }, 150);
+  });
+  megaMenu.addEventListener('mouseleave', function() {
+    if (window.innerWidth >= 1024) hoverTimer = setTimeout(function() { megaMenu.classList.remove('open'); }, 150);
+  });
+
+  // Click outside closes
+  document.addEventListener('click', function(e) {
+    if (megaMenu.classList.contains('open') && !megaMenu.contains(e.target) && !trigger.contains(e.target)) megaMenu.classList.remove('open');
+  });
+
+  // Escape closes everything
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { megaMenu.classList.remove('open'); closeMobile(); }
+  });
+
+  // Close mega on ABOUT/CONTACT click
+  var otherLinks = document.querySelectorAll('#nav-menu .nav-link:not(.nav-collections-trigger)');
+  for (var i = 0; i < otherLinks.length; i++) otherLinks[i].addEventListener('click', function() { megaMenu.classList.remove('open'); });
+
+  // Hamburger
+  hamburger.addEventListener('click', function(e) { e.stopPropagation(); toggleMobile(); });
+
+  function toggleMobile() {
+    if (mobileMenu.classList.contains('open')) closeMobile();
+    else { mobileMenu.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  }
+  function closeMobile() { mobileMenu.classList.remove('open'); document.body.style.overflow = ''; }
+
+  // Mobile accordion: top-level collections toggle
+  var collToggle = document.getElementById('mobile-coll-toggle');
+  var collPanel = document.getElementById('mobile-coll-panel');
+  if (collToggle && collPanel) {
+    collToggle.addEventListener('click', function() {
+      collPanel.classList.toggle('open');
+      collToggle.querySelector('.toggle-icon').textContent = collPanel.classList.contains('open') ? '\u2013' : '+';
     });
+  }
 
-  function buildMegaMenu(collections) {
-    var html = '<div class="mega-menu-inner">';
-    collections.forEach(function (col) {
-      html += '<div class="mega-menu-col">';
-      var anchor = col.id === 'original-alpha-zero' ? 'alpha-zero' : col.id;
-      html += '<a href="/collections.html#' + anchor + '" class="mega-menu-col-heading">' + esc(col.name) + '</a>';
-      if (col.id === 'collection-03') {
-        var reg = [], out = [];
-        col.stones.forEach(function (s) {
-          (indoorOutdoorSlugs.indexOf(s.slug) !== -1 ? out : reg).push(s);
-        });
-        html += stoneList(reg);
-        html += '<div class="mega-menu-col-subheading">Indoor-Outdoor</div>';
-        html += stoneList(out);
-      } else {
-        html += stoneList(col.stones);
+  // Mobile accordion: individual collection toggles
+  var collBtns = mobileMenu.querySelectorAll('.mobile-toggle-btn[data-coll]');
+  for (var b = 0; b < collBtns.length; b++) {
+    collBtns[b].addEventListener('click', function() {
+      var panel = mobileMenu.querySelector('[data-panel="' + this.getAttribute('data-coll') + '"]');
+      if (panel) {
+        panel.classList.toggle('open');
+        this.querySelector('.toggle-icon').textContent = panel.classList.contains('open') ? '\u2013' : '+';
       }
-      html += '</div>';
     });
-    html += '</div>';
-    megaMenu.innerHTML = html;
   }
 
-  function buildMobileMenu(collections) {
-    var html = '<div class="mobile-collections-row"><a href="/collections.html" class="mobile-menu-link" style="flex:1;" data-close-mobile>COLLECTIONS</a><button class="mobile-collections-toggle-btn" id="mobile-collections-trigger" style="background:none;border:none;padding:8px 12px;cursor:pointer;"><span class="toggle-icon" style="color:#fff;font-size:20px;">+</span></button></div>';
-    html += '<div class="mobile-collections-panel" id="mobile-collections-panel">';
-    collections.forEach(function (col) {
-      html += '<div class="mobile-collection-group">';
-      var mAnchor = col.id === 'original-alpha-zero' ? 'alpha-zero' : col.id;
-      html += '<div class="mobile-collection-header" data-collection="' + col.id + '"><a href="/collections.html#' + mAnchor + '" class="mobile-collection-name" data-close-mobile>' + esc(col.name) + '</a><button class="mobile-collection-toggle-btn" style="background:none;border:none;padding:4px 8px;cursor:pointer;"><span class="mobile-collection-toggle" style="color:#fff;">+</span></button></div>';
-      html += '<div class="mobile-collection-stones" data-panel="' + col.id + '">';
-      if (col.id === 'collection-03') {
-        var reg = [], out = [];
-        col.stones.forEach(function (s) {
-          (indoorOutdoorSlugs.indexOf(s.slug) !== -1 ? out : reg).push(s);
-        });
-        html += stoneList(reg);
-        if (out.length) {
-          html += '<div class="mega-menu-col-subheading" style="color:var(--white);opacity:0.6;">Indoor-Outdoor</div>';
-          html += stoneList(out);
-        }
-      } else {
-        html += stoneList(col.stones);
-      }
-      html += '</div></div>';
-    });
-    html += '</div>';
-    html += '<a href="/about.html" class="mobile-menu-link" data-close-mobile>ABOUT</a>';
-    html += '<a href="/#contact" class="mobile-menu-link" data-close-mobile>CONTACT</a>';
-    mobileMenu.innerHTML = html;
-    bindMobileAccordion();
-  }
-
-  function bindMobileAccordion() {
-    var ct = document.getElementById('mobile-collections-trigger');
-    var cp = document.getElementById('mobile-collections-panel');
-    if (ct && cp) {
-      ct.addEventListener('click', function () {
-        var icon = ct.querySelector('.toggle-icon');
-        cp.classList.toggle('open');
-        if (icon) icon.textContent = cp.classList.contains('open') ? '\u2013' : '+';
-      });
-    }
-    var toggleBtns = mobileMenu.querySelectorAll('.mobile-collection-toggle-btn');
-    for (var h = 0; h < toggleBtns.length; h++) {
-      toggleBtns[h].addEventListener('click', function (e) {
-        e.stopPropagation();
-        var header = this.closest('.mobile-collection-header');
-        if (!header) return;
-        var colId = header.getAttribute('data-collection');
-        var panel = mobileMenu.querySelector('[data-panel="' + colId + '"]');
-        var tog = this.querySelector('.mobile-collection-toggle');
-        if (panel) {
-          panel.classList.toggle('open');
-          if (tog) tog.textContent = panel.classList.contains('open') ? '\u2013' : '+';
-        }
-      });
-    }
-    var allClose = mobileMenu.querySelectorAll('[data-close-mobile], .mobile-collection-stones a');
-    for (var c = 0; c < allClose.length; c++) {
-      allClose[c].addEventListener('click', closeMobileMenu);
-    }
-  }
-
-  function stoneList(stones) {
-    var h = '<ul>';
-    stones.forEach(function (s) { h += '<li><a href="/surfaces/' + s.slug + '">' + esc(s.name) + '</a></li>'; });
-    return h + '</ul>';
-  }
-
-  function esc(str) {
-    var d = document.createElement('div');
-    d.appendChild(document.createTextNode(str));
-    return d.innerHTML;
-  }
+  // Close mobile on any stone/page link click
+  var allMobileLinks = mobileMenu.querySelectorAll('a');
+  for (var l = 0; l < allMobileLinks.length; l++) allMobileLinks[l].addEventListener('click', closeMobile);
 
 })();
