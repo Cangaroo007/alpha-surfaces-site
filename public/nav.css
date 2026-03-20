@@ -1,5 +1,5 @@
 /* =============================================
-   SHARED NAV — Mega Menu + Mobile Menu
+   SHARED NAV — Mega Menu v9
    ============================================= */
 
 /* --- NAV BAR --- */
@@ -7,48 +7,37 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--olive);
+  background: var(--olive, #564d22);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 18px 90px;
 }
-
 .nav-logo {
   display: flex;
   align-items: center;
   padding-left: 35px;
 }
-
 .nav-logo img {
   height: 75px;
   width: auto;
 }
-
 .nav-menu {
   display: flex;
   align-items: center;
   gap: 85px;
 }
-
 .nav-link {
   font-family: 'Degular', sans-serif;
   font-weight: 500;
   font-size: 20px;
-  color: var(--white);
+  color: var(--white, #fff);
   text-decoration: none;
   letter-spacing: 0.6px;
   text-transform: uppercase;
   cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
 }
-
-.nav-link:hover {
-  opacity: 0.8;
-}
-
+.nav-link:hover { opacity: 0.8; }
 .nav-hamburger {
   display: none;
   cursor: pointer;
@@ -56,18 +45,14 @@
   border: none;
   padding: 0;
 }
-
 .nav-hamburger span {
   display: block;
   width: 28px;
   height: 2px;
-  background: var(--white);
+  background: var(--white, #fff);
   margin-bottom: 6px;
 }
-
-.nav-hamburger span:last-child {
-  margin-bottom: 0;
-}
+.nav-hamburger span:last-child { margin-bottom: 0; }
 
 /* --- MEGA MENU DROPDOWN --- */
 .mega-menu {
@@ -75,269 +60,199 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: var(--white);
-  padding: 0 60px;
+  background: var(--white, #fff);
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+  transform: translateY(-8px);
+  transition: max-height 0.25s ease, opacity 0.25s ease, transform 0.25s ease, padding 0.25s ease;
   z-index: 99;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  padding: 0 60px;
 }
-
 .mega-menu.open {
-  max-height: 600px;
+  max-height: 700px;
   opacity: 1;
-  padding: 60px;
+  transform: translateY(0);
+  padding: 48px 60px;
   overflow: visible;
 }
-
 .mega-menu-inner {
   display: flex;
-  gap: 80px;
+  gap: 0;
+  align-items: flex-start;
 }
-
 .mega-menu-col {
   flex: 1;
   min-width: 0;
+  padding: 0 24px;
 }
-
+.mega-menu-col:first-child { padding-left: 0; }
+.mega-menu-col:last-child { padding-right: 0; }
+.mega-menu-divider {
+  width: 1px;
+  background: rgba(86,77,34,0.12);
+  align-self: stretch;
+  flex-shrink: 0;
+}
 .mega-menu-col-heading {
-  font-family: 'Degular', sans-serif;
-  font-weight: 600;
-  font-size: 18.333px;
-  color: var(--black);
-  margin-bottom: 18px;
-  line-height: 1.2;
-  text-decoration: none;
   display: block;
+  text-decoration: none;
+  margin-bottom: 14px;
 }
-.mega-menu-col-heading:hover {
-  opacity: 0.6;
+.mega-menu-col-heading:hover .mm-col-num,
+.mega-menu-col-heading:hover .mm-col-name { opacity: 0.6; }
+.mm-col-num {
+  display: block;
+  font-family: 'Concrette S', serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--olive, #564d22);
+  line-height: 1.3;
 }
-.mobile-collections-row {
-  display: flex;
-  align-items: center;
-  gap: 0;
-}
-
-.mega-menu-col-subheading {
+.mm-col-name {
+  display: block;
   font-family: 'Degular', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--black);
-  margin-top: 12px;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  opacity: 0.6;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--black, #000);
+  opacity: 0.4;
+  line-height: 1.3;
+  margin-top: 2px;
 }
-
 .mega-menu-col ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-
 .mega-menu-col ul li {
-  line-height: 32px;
+  line-height: 28px;
 }
-
 .mega-menu-col ul li a {
   font-family: 'Degular', sans-serif;
   font-weight: 400;
-  font-size: 18px;
-  color: var(--black);
+  font-size: 13px;
+  color: var(--black, #000);
   text-decoration: none;
-  transition: opacity 0.2s ease;
+  transition: color 0.15s;
 }
-
 .mega-menu-col ul li a:hover {
-  opacity: 0.6;
+  color: var(--olive, #564d22);
+}
+.mm-indoor-outdoor-label {
+  font-family: 'Degular', sans-serif;
+  font-weight: 600;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--olive, #564d22);
+  margin: 10px 0 6px;
+  opacity: 0.7;
 }
 
-/* --- MOBILE MENU OVERLAY --- */
+/* --- MOBILE MENU --- */
 .mobile-menu {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--olive);
+  background: var(--olive, #564d22);
   z-index: 98;
   display: flex;
   flex-direction: column;
-  padding: 120px 40px 40px;
+  padding: 120px 32px 40px;
   overflow-y: auto;
   transform: translateX(100%);
   opacity: 0;
   transition: transform 0.3s ease, opacity 0.3s ease;
   pointer-events: none;
 }
-
 .mobile-menu.open {
   transform: translateX(0);
   opacity: 1;
   pointer-events: auto;
 }
-
 .mobile-menu-link {
   font-family: 'Degular', sans-serif;
   font-weight: 500;
   font-size: 40px;
-  color: var(--white);
+  color: var(--white, #fff);
   text-decoration: none;
   letter-spacing: 1.2px;
   text-transform: uppercase;
   display: block;
-  padding: 12px 0;
+  padding: 8px 0;
 }
-
-.mobile-menu-link:hover {
-  opacity: 0.8;
-}
-
-/* Mobile accordion trigger */
-.mobile-collections-trigger {
+.mobile-menu-link:hover { opacity: 0.8; }
+.mobile-collections-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
+}
+.mobile-toggle-btn {
   background: none;
   border: none;
+  padding: 8px 12px;
   cursor: pointer;
-  font-family: 'Degular', sans-serif;
-  font-weight: 500;
-  font-size: 40px;
-  color: var(--white);
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  padding: 12px 0;
-  text-align: left;
+  color: rgba(255,255,255,0.5);
+  font-size: 20px;
 }
-
-.mobile-collections-trigger:hover {
-  opacity: 0.8;
-}
-
-.mobile-collections-trigger .toggle-icon {
-  font-size: 32px;
-  font-weight: 300;
-  line-height: 1;
-  transition: transform 0.3s ease;
-}
-
-/* Mobile sub-collections container */
 .mobile-collections-panel {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease;
 }
-
 .mobile-collections-panel.open {
-  max-height: 2000px;
+  max-height: 3000px;
 }
-
-/* Individual collection accordion */
-.mobile-collection-group {
-  padding-left: 20px;
-  border-left: 1px solid rgba(255, 255, 255, 0.15);
-  margin-bottom: 8px;
+.mobile-coll-group {
+  padding: 4px 0;
 }
-
-.mobile-collection-header {
+.mobile-coll-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  background: none;
-  border: none;
-  width: 100%;
-  text-align: left;
-  padding: 8px 0;
+  gap: 12px;
 }
-
-.mobile-collection-name {
+.mobile-coll-name {
+  flex: 1;
   font-family: 'Degular', sans-serif;
-  font-weight: 500;
-  font-size: 24px;
-  color: var(--white);
-  letter-spacing: 0.6px;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--white, #fff);
+  text-decoration: none;
 }
-
-.mobile-collection-toggle {
-  font-family: 'Degular', sans-serif;
-  font-weight: 300;
-  font-size: 24px;
-  color: var(--white);
-  opacity: 0.6;
-  transition: transform 0.3s ease;
-}
-
-.mobile-collection-stones {
+.mobile-coll-name:hover { opacity: 0.7; }
+.mobile-coll-stones {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease;
+  padding-left: 4px;
 }
-
-.mobile-collection-stones.open {
+.mobile-coll-stones.open {
   max-height: 1000px;
 }
-
-.mobile-collection-stones ul {
+.mobile-coll-stones ul {
   list-style: none;
+  padding: 0;
   margin: 0;
-  padding: 4px 0 12px 0;
 }
-
-.mobile-collection-stones ul li {
-  line-height: 30px;
-}
-
-.mobile-collection-stones ul li a {
+.mobile-coll-stones ul li a {
   font-family: 'Degular', sans-serif;
   font-weight: 400;
-  font-size: 18px;
-  color: var(--white);
+  font-size: 16px;
+  color: var(--white, #fff);
   text-decoration: none;
-  opacity: 0.85;
-  transition: opacity 0.2s ease;
+  line-height: 30px;
+  opacity: 0.7;
 }
+.mobile-coll-stones ul li a:hover { opacity: 1; }
 
-.mobile-collection-stones ul li a:hover {
-  opacity: 1;
-}
-
-/* --- MOBILE RESPONSIVE --- */
+/* --- RESPONSIVE --- */
 @media (max-width: 1024px) {
-  .nav {
-    padding: 24px 21px;
-  }
-
-  .nav-logo {
-    padding-left: 0;
-  }
-
-  .nav-logo img {
-    height: 54px;
-  }
-
-  .nav-menu {
-    display: none;
-  }
-
-  .nav-hamburger {
-    display: block;
-    z-index: 101;
-  }
-
-  .mega-menu {
-    display: none;
-  }
-}
-
-@media (min-width: 1025px) {
-  .mobile-menu {
-    display: none !important;
-  }
+  .nav { padding: 24px 21px; }
+  .nav-logo { padding-left: 0; }
+  .nav-logo img { height: 54px; }
+  .nav-menu { display: none; }
+  .nav-hamburger { display: block; }
+  .mega-menu { display: none; }
 }
