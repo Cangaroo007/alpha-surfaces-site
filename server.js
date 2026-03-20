@@ -1268,15 +1268,14 @@ app.get('/surfaces/:slug', (req, res) => {
     res.status(404).send(`<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Surface Not Found | Alpha Surfaces</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--olive:#5C5A1E;--cream:#F7F5F0;--charcoal:#2A2A28;--gold:#B8A472;--warm-gray:#9C9890;--white:#ffffff}
-body{background:var(--cream);color:var(--charcoal);font-family:'Outfit',sans-serif;margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center}
-h1{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:400;margin:0 0 12px}
-p{font-size:15px;color:var(--warm-gray);margin-bottom:32px}
-a{font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--white);background:var(--olive);padding:14px 28px;border-radius:1px;text-decoration:none}
-a:hover{background:#3D3B14}
-</style></head><body><div><h1>Surface Not Found</h1><p>The surface you're looking for doesn't exist.</p><a href="/collections">Return to Collections</a></div></body></html>`);
+:root{--olive:#564d22;--cream:#f3f1e6;--black:#000000;--white:#ffffff}
+body{background:var(--cream);color:var(--black);font-family:'Degular',sans-serif;margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center}
+h1{font-family:'Concrette S',serif;font-size:42px;font-weight:700;margin:0 0 12px}
+p{font-size:16px;color:var(--black);opacity:0.5;margin-bottom:32px}
+a{font-size:12px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--white);background:var(--olive);padding:12px 28px;border-radius:8px;text-decoration:none}
+a:hover{opacity:0.9}
+</style></head><body><div><h1>Surface Not Found</h1><p>The surface you're looking for doesn't exist.</p><a href="/collections.html">Return to Collections</a></div></body></html>`);
   }
 });
 
