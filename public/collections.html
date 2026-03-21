@@ -31,17 +31,9 @@ body { background: #f5f5f5; color: var(--black); font-family: 'Degular', sans-se
 a { color: inherit; }
 img { display: block; max-width: 100%; }
 
-/* --- HERO SLIDESHOW --- */
+/* --- HERO --- */
 .hero { position: relative; width: 100%; height: 838px; overflow: hidden; }
-.hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease; }
-.hero-slide.active { opacity: 1; }
-.hero-slide img { width: 100%; height: 100%; object-fit: cover; }
-.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 50%, transparent 100%); pointer-events: none; }
-.hero-label { position: absolute; top: 32px; left: 40px; font-family: 'Degular', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.6); }
-.hero-desc { position: absolute; bottom: 48px; left: 40px; right: 40px; max-width: 700px; font-family: 'Concrette S', serif; font-weight: 400; font-size: 22px; line-height: 1.35; color: var(--white); }
-.hero-dots { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 2; }
-.hero-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.35); border: none; cursor: pointer; transition: background 0.3s, transform 0.3s; padding: 0; }
-.hero-dot.active { background: var(--white); transform: scale(1.2); }
+.hero img { width: 100%; height: 100%; object-fit: cover; }
 
 /* --- INTRO --- */
 .intro { background: var(--cream); padding: 180px 161px 120px; overflow: hidden; }
@@ -157,39 +149,14 @@ img { display: block; max-width: 100%; }
 <!-- NAV -->
 <nav class="nav" id="main-nav"></nav>
 
-<!-- HERO SLIDESHOW -->
-<section class="hero" id="hero-slideshow">
-  <div class="hero-slide active" data-index="0">
-    <img src="images/stones/jewel.webp" alt="Collection 05 — Jewel">
-    <div class="hero-overlay"></div>
-    <span class="hero-label">Collection 05</span>
-    <p class="hero-desc">In the top-tier price point are visually striking veined surfaces with the enhanced realism of through-body veining.</p>
+<!-- HERO — Lifestyle kitchen photo -->
+<section class="hero">
+  <img src="images/collections-hero.webp" alt="Alpha Surfaces — Premium Australian benchtops">
+  <div class="hero-overlay" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.4) 0%,transparent 50%);pointer-events:none;"></div>
+  <div style="position:absolute;bottom:32px;left:40px;z-index:1;">
+    <p style="font-family:'Concrette S',serif;font-weight:700;font-size:14px;color:#fff;margin:0;">Autumn Gold</p>
+    <p style="font-family:'Concrette S',serif;font-weight:400;font-size:12px;color:rgba(255,255,255,0.7);margin:0;">Collection 05</p>
   </div>
-  <div class="hero-slide" data-index="1">
-    <img src="images/stones/carbon.webp" alt="Collection 04 — Carbon">
-    <div class="hero-overlay"></div>
-    <span class="hero-label">Collection 04</span>
-    <p class="hero-desc">This upper mid-tier price category is defined by authentic natural-stone recreations with bolder veining and luxe layered textures.</p>
-  </div>
-  <div class="hero-slide" data-index="2">
-    <img src="images/stones/patagonia.webp" alt="Collection 03 — Patagonia">
-    <div class="hero-overlay"></div>
-    <span class="hero-label">Collection 03</span>
-    <p class="hero-desc">The mid-tier range houses sophisticated stone styles with subtle veining and textures and also includes our Indoor-Outdoor range of 4 surfaces.</p>
-  </div>
-  <div class="hero-slide" data-index="3">
-    <img src="images/stones/noosa.webp" alt="Collection 02 — Noosa">
-    <div class="hero-overlay"></div>
-    <span class="hero-label">Collection 02</span>
-    <p class="hero-desc">In this price point, find our most sought-after surfaces, from pure white to gently patterned, organic neutrals.</p>
-  </div>
-  <div class="hero-slide" data-index="4">
-    <img src="images/stones/calacatta-leggera.webp" alt="Collection 01 — Calacatta Leggera">
-    <div class="hero-overlay"></div>
-    <span class="hero-label">Collection 01</span>
-    <p class="hero-desc">Our entry-level price point offers classic neutrals with textures ranging from fine particles to subtle grains.</p>
-  </div>
-  <div class="hero-dots" id="hero-dots"></div>
 </section>
 
 <!-- INTRO -->
@@ -454,75 +421,6 @@ img { display: block; max-width: 100%; }
       }, { threshold: 0.1 });
       revealEls.forEach(el => io.observe(el));
     });
-</script>
-<script>
-(function() {
-  // Wait for DOM + images to be ready
-  function initSlideshow() {
-    var slides = document.querySelectorAll('.hero-slide');
-    var dotsContainer = document.getElementById('hero-dots');
-    if (!slides.length || !dotsContainer) {
-      console.warn('Slideshow: no slides or dots container found');
-      return;
-    }
-
-    var current = 0;
-    var total = slides.length;
-    var timer = null;
-    var paused = false;
-
-    // Build dots
-    for (var i = 0; i < total; i++) {
-      var dot = document.createElement('button');
-      dot.className = 'hero-dot' + (i === 0 ? ' active' : '');
-      dot.setAttribute('data-index', String(i));
-      dot.setAttribute('aria-label', 'Slide ' + (i + 1));
-      dot.addEventListener('click', function() {
-        goTo(parseInt(this.getAttribute('data-index'), 10));
-        restartTimer();
-      });
-      dotsContainer.appendChild(dot);
-    }
-
-    var dots = dotsContainer.querySelectorAll('.hero-dot');
-
-    function goTo(idx) {
-      if (slides[current]) slides[current].classList.remove('active');
-      if (dots[current]) dots[current].classList.remove('active');
-      current = ((idx % total) + total) % total; // safe modulo
-      if (slides[current]) slides[current].classList.add('active');
-      if (dots[current]) dots[current].classList.add('active');
-    }
-
-    function advance() {
-      if (!paused) goTo(current + 1);
-    }
-
-    function restartTimer() {
-      if (timer) clearInterval(timer);
-      timer = setInterval(advance, 4000);
-    }
-
-    // Pause on hover
-    var hero = document.getElementById('hero-slideshow');
-    if (hero) {
-      hero.addEventListener('mouseenter', function() { paused = true; });
-      hero.addEventListener('mouseleave', function() { paused = false; });
-    }
-
-    // Start cycling after 500ms
-    setTimeout(function() {
-      restartTimer();
-    }, 500);
-  }
-
-  // Init after a short delay to ensure page is rendered
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSlideshow);
-  } else {
-    initSlideshow();
-  }
-})();
 </script>
 <script src="animation.js?v=8"></script>
 <script src="nav.js?v=10"></script>
