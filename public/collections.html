@@ -58,9 +58,12 @@ img { display: block; max-width: 100%; }
 .intro-advantage p { margin-bottom: 10px; }
 .intro-advantage p:last-child { margin-bottom: 0; }
 
-/* --- SWATCH --- */
-.swatch { width: 100%; height: 715px; overflow: hidden; }
-.swatch img { width: 100%; height: 100%; object-fit: cover; }
+/* --- COLLECTION SWATCH --- */
+.coll-swatch { width: 100%; height: 715px; overflow: hidden; position: relative; }
+.coll-swatch-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease; }
+.coll-swatch-img.active { opacity: 1; }
+.coll-swatch-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 32px 40px; background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 100%); pointer-events: none; z-index: 1; }
+.coll-swatch-label { font-family: 'Concrette S', serif; font-weight: 400; font-size: 14px; color: var(--white); line-height: 1.4; }
 
 /* --- COLLECTIONS ACCORDION --- */
 .collections-section { /* no bg — each group has its own */ }
@@ -214,9 +217,16 @@ img { display: block; max-width: 100%; }
   </div>
 </section>
 
-<!-- SWATCH -->
-<section class="swatch">
-  <img src="images/collection_235.jpg" alt="Stone surface detail">
+<!-- COLLECTION SWATCH — changes with active accordion -->
+<section class="coll-swatch" id="coll-swatch">
+  <img class="coll-swatch-img active" data-coll="0" src="images/collection-hero-01.webp" alt="Collection 01 slab">
+  <img class="coll-swatch-img" data-coll="1" src="images/collection-hero-02.webp" alt="Collection 02 slab">
+  <img class="coll-swatch-img" data-coll="2" src="images/collection-hero-03.webp" alt="Collection 03 slab">
+  <img class="coll-swatch-img" data-coll="3" src="images/collection-hero-04.webp" alt="Collection 04 slab">
+  <img class="coll-swatch-img" data-coll="4" src="images/collection-hero-05.webp" alt="Collection 05 slab">
+  <div class="coll-swatch-overlay">
+    <p class="coll-swatch-label" id="coll-swatch-label">Collection 01 — Calacatta &amp; Statuario — Classic neutrals with fine particle textures</p>
+  </div>
 </section>
 
 <!-- COLLECTIONS ACCORDION -->
@@ -347,51 +357,92 @@ img { display: block; max-width: 100%; }
         group.appendChild(content);
         container.appendChild(group);
 
-        // Click to toggle
+        // Click to toggle — also syncs swatch image
         header.addEventListener('click', function() {
+          var wasOpen = group.classList.contains('open');
           group.classList.toggle('open');
+          if (!wasOpen) {
+            showSwatchForGroup(group, i);
+            userInteracted = true;
+            clearTimeout(autoTimer);
+            clearInterval(cycleTimer);
+            autoTimer = setTimeout(startAutoCycle, 60000);
+          }
         });
       });
 
-      // Deep link: auto-open collection from URL hash
+      // ── Swatch sync ──
+      var swatchImgs = document.querySelectorAll('.coll-swatch-img');
+      var swatchLabel = document.getElementById('coll-swatch-label');
+      var collDescriptors = [
+        'Collection 01 \u2014 Calacatta & Statuario \u2014 Classic neutrals with fine particle textures',
+        'Collection 02 \u2014 Prairie & Sage \u2014 Pure whites to organic neutrals',
+        'Collection 03 \u2014 Soapstone & Verde \u2014 Sophisticated stone with subtle veining',
+        'Collection 04 \u2014 Dramatic & Noir \u2014 Authentic natural-stone recreations',
+        'Collection 05 \u2014 Urban & Minimal \u2014 Visually striking with through-body veining'
+      ];
+      var currentSwatch = 0;
+
+      function showSwatchForGroup(group, idx) {
+        if (idx >= swatchImgs.length) return;
+        if (idx === currentSwatch) return;
+        swatchImgs[currentSwatch].classList.remove('active');
+        currentSwatch = idx;
+        swatchImgs[currentSwatch].classList.add('active');
+        if (swatchLabel && collDescriptors[idx]) swatchLabel.textContent = collDescriptors[idx];
+      }
+
+      // ── Auto-rotation after 60s idle ──
+      var userInteracted = false;
+      var autoTimer = null;
+      var cycleTimer = null;
+      var groups = container.querySelectorAll('.collection-group');
+
+      function startAutoCycle() {
+        if (groups.length < 2) return;
+        cycleTimer = setInterval(function() {
+          var nextIdx = (currentSwatch + 1) % Math.min(groups.length, 5);
+          for (var g = 0; g < groups.length; g++) groups[g].classList.remove('open');
+          if (groups[nextIdx]) groups[nextIdx].classList.add('open');
+          showSwatchForGroup(groups[nextIdx], nextIdx);
+        }, 8000);
+      }
+
+      // Start the 60s idle timer
+      autoTimer = setTimeout(startAutoCycle, 60000);
+
+      // ── Deep link ──
       function openCollectionByHash() {
         var hash = (window.location.hash || '').replace(/^#/, '');
-        var groups = container.querySelectorAll('.collection-group');
         if (!groups.length) return;
 
-        // Close all first
         for (var i = 0; i < groups.length; i++) groups[i].classList.remove('open');
 
         if (!hash) {
-          // No hash: open first
           groups[0].classList.add('open');
+          showSwatchForGroup(groups[0], 0);
           return;
         }
 
-        // Find matching group
         var found = false;
         for (var j = 0; j < groups.length; j++) {
-          var id = groups[j].id;
-          if (id === hash || (hash === 'alpha-zero' && id === 'original-alpha-zero')) {
+          var gid = groups[j].id;
+          if (gid === hash || (hash === 'alpha-zero' && gid === 'original-alpha-zero')) {
             groups[j].classList.add('open');
+            var swatchIdx = Math.min(j, 4);
+            showSwatchForGroup(groups[j], swatchIdx);
             found = true;
-            // Scroll to it
             setTimeout(function() {
-              var el = groups[j];
-              var top = el.getBoundingClientRect().top + window.pageYOffset - 120;
+              var top = groups[j].getBoundingClientRect().top + window.pageYOffset - 120;
               window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
             }, 600);
             break;
           }
         }
-
-        // Fallback: open first if hash didn't match
-        if (!found) groups[0].classList.add('open');
+        if (!found) { groups[0].classList.add('open'); showSwatchForGroup(groups[0], 0); }
       }
 
       openCollectionByHash();
-
-      // Also handle hash changes (e.g. clicking mega menu while already on collections page)
       window.addEventListener('hashchange', openCollectionByHash);
 
       // Reveal animation
