@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 50" width="120" height="50">
+  <rect width="120" height="50" rx="4" fill="#1a365d"/>
+  <text x="60" y="20" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="white" text-anchor="middle">NSF</text>
+  <text x="60" y="35" font-family="Arial,sans-serif" font-size="8" fill="rgba(255,255,255,0.7)" text-anchor="middle">CERTIFIED</text>
+</svg>

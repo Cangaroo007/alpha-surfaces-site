@@ -75,7 +75,7 @@ img { display: block; max-width: 100%; }
 
 /* --- STONE GRID --- */
 .stones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 54px 54px; }
-.stone-card { text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; }
+.stone-card { text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; cursor: pointer; }
 .stone-card-image { position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #1a1a0a; }
 .stone-card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
 .stone-card:hover .stone-card-image img { transform: scale(1.04); }
@@ -176,7 +176,7 @@ img { display: block; max-width: 100%; }
       </div>
       <div class="intro-advantage">
         <p><strong>Discover the Alpha Advantage:</strong></p>
-        <p>natural-stone realism with exceptional durability. Exclusive AlphaShield&#8482; protection guards against everyday wear and tear for low-maintenance care, so your surface stays beautiful for longer.</p>
+        <p>Natural-stone realism with exceptional durability. Exclusive AlphaShield&#8482; protection guards against everyday wear and tear for low-maintenance care, so your surface stays beautiful for longer.</p>
         <p>&nbsp;</p>
         <p>All surfaces are silica-free and certified to NSF and GREENGUARD Gold standards, ensuring health, safety and environmental compliance.</p>
       </div>
@@ -217,7 +217,7 @@ img { display: block; max-width: 100%; }
       <div class="quality-text">
         <p class="quality-heading">Our quality assurance.<br>Your peace of mind.</p>
         <p class="quality-body">At Alpha Surfaces, we understand that our responsibility extends far beyond installation; a commitment to ongoing support and satisfaction is essential. Alpha Surfaces come with a 15-Year Limited Warranty on manufacturing defects. AlphaShield&#8482; surface protectant is supported by a Lifetime Stain Resistance Guarantee.</p>
-        <a href="/#contact" class="btn-contact">Contact Us</a>
+        <a href="/downloads/warranty.pdf" class="btn-contact">Warranty</a>
       </div>
     </div>
   </div>
@@ -297,7 +297,7 @@ img { display: block; max-width: 100%; }
 
           if (stone.image) {
             const img = document.createElement('img');
-            img.src = stone.image;
+            img.src = stone.swatch || stone.image;
             img.alt = stone.name;
             img.loading = 'lazy';
             imgWrap.appendChild(img);
