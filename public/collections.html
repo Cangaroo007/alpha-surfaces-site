@@ -52,7 +52,7 @@ img { display: block; max-width: 100%; }
 
 /* --- COLLECTION SWATCH --- */
 .coll-swatch { width: 100%; height: 715px; overflow: hidden; position: relative; }
-.coll-swatch-img { position: absolute; inset: 0; width: 110%; height: 110%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease; transform: translate(0, 0); }
+.coll-swatch-img { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease; }
 .coll-swatch-img.active { opacity: 1; animation: slabPan 25s ease-in-out infinite alternate; }
 @keyframes slabPan {
   0% { transform: translate(0, 0) scale(1); }
@@ -433,7 +433,7 @@ img { display: block; max-width: 100%; }
       revealEls.forEach(el => io.observe(el));
     });
 </script>
-<script src="animation.js?v=8"></script>
+<script src="animation.js?v=9"></script>
 <script src="nav.js?v=10"></script>
 <script src="sample-modal.js?v=1"></script>
 <script src="sample-popup.js?v=1"></script>
