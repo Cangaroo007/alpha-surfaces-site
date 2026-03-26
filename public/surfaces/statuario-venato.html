@@ -88,8 +88,17 @@ img { display: block; max-width: 100%; }
 .stone-card.active .stone-card-image { outline: 2px solid var(--white); outline-offset: -2px; }
 
 /* --- FOOTER --- */
-.footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
-.footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
+.footer { background: var(--white); border-top: 1px solid var(--border); padding: 50px 60px 40px; }
+.footer-inner { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; }
+.footer-col-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 14px; color: var(--black); margin-bottom: 10px; }
+.footer-col p, .footer-col a { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; color: var(--black); line-height: 1.6; }
+.footer-col a { text-decoration: underline; text-underline-offset: 2px; }
+.footer-col a:hover { color: var(--olive); }
+.footer-email-form { display: flex; gap: 8px; margin-top: 12px; }
+.footer-email-input { flex: 1; border: none; border-bottom: 1px solid var(--border); padding: 6px 0; font-family: 'Degular', sans-serif; font-size: 13px; background: transparent; outline: none; }
+.footer-email-btn { background: var(--olive); color: var(--white); border: none; border-radius: 8px; padding: 6px 20px; font-family: 'Degular', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; }
+.footer-bottom { border-top: 1px solid var(--border); margin-top: 30px; padding-top: 20px; }
+.footer-bottom p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 11px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
 
 /* --- MOBILE --- */
 @media (max-width: 1024px) {
@@ -110,7 +119,8 @@ img { display: block; max-width: 100%; }
   .stone-card-finish { font-size: 11px; }
 
   .footer { padding: 30px 24px; }
-  .footer p { font-size: 12px; letter-spacing: 0.36px; }
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 30px; }
+  .footer-bottom p { font-size: 10px; letter-spacing: 0.36px; }
 }
 </style>
 <link rel="stylesheet" href="../animation.css?v=8">
@@ -136,7 +146,35 @@ img { display: block; max-width: 100%; }
 
 <!-- FOOTER -->
 <footer class="footer">
-  <p>Copyright &copy; 2024 Alpha Surfaces &#8211; ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+  <div class="footer-inner">
+    <div class="footer-col">
+      <p class="footer-col-heading">Stay in the loop.</p>
+      <p>Sign up for the latest from Alpha Surfaces.</p>
+      <div class="footer-email-form">
+        <input type="email" class="footer-email-input" placeholder="Email">
+        <button class="footer-email-btn">Submit</button>
+      </div>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Follow us</p>
+      <p><a href="https://instagram.com/alphasurfaces" target="_blank">Instagram</a></p>
+      <p><a href="https://facebook.com/alphasurfaces" target="_blank">Facebook</a></p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Contact us</p>
+      <p><a href="tel:1800000000">Call Toll Free</a></p>
+      <p><a href="mailto:info@alphasurfaces.com.au">Email us</a></p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Resources</p>
+      <p><a href="/downloads/product-info.pdf" target="_blank">Product info</a></p>
+      <p><a href="/downloads/fabrication-guide.pdf" target="_blank">Fabrication guide</a></p>
+      <p><a href="/downloads/warranty.pdf" target="_blank">Warranty</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>COPYRIGHT &copy; 2024 ALPHA SURFACES – ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+  </div>
 </footer>
 
 <script>

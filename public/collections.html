@@ -59,8 +59,10 @@ img { display: block; max-width: 100%; }
   50% { transform: translate(-3%, -2%) scale(1.02); }
   100% { transform: translate(-5%, -1%) scale(1); }
 }
-.coll-swatch-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 32px 40px; background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 100%); pointer-events: none; z-index: 1; }
-.coll-swatch-label { font-family: 'Concrette S', serif; font-weight: 400; font-size: 14px; color: var(--white); line-height: 1.4; }
+.coll-swatch-overlay { position: absolute; top: 50%; left: 60px; transform: translateY(-50%); background: rgba(255,255,255,0.92); padding: 40px 44px; max-width: 340px; z-index: 1; pointer-events: auto; }
+.coll-swatch-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--black); margin-bottom: 14px; line-height: 1.2; }
+.coll-swatch-desc { font-family: 'Concrette S', serif; font-weight: 400; font-size: 13px; color: var(--black); line-height: 1.5; margin-bottom: 18px; }
+.coll-swatch-link { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 12px; color: var(--olive); text-decoration: underline; text-underline-offset: 3px; letter-spacing: 0.02em; }
 
 /* --- COLLECTIONS ACCORDION --- */
 .collections-section { /* no bg — each group has its own */ }
@@ -106,8 +108,18 @@ img { display: block; max-width: 100%; }
 .btn-contact:hover { opacity: 0.9; }
 
 /* --- FOOTER --- */
-.footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
-.footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
+.footer { background: var(--white); border-top: 1px solid var(--border); padding: 50px 60px 40px; }
+.footer-inner { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; }
+.footer-col-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 14px; color: var(--black); margin-bottom: 10px; }
+.footer-col p, .footer-col a { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; color: var(--black); line-height: 1.6; }
+.footer-col a { text-decoration: underline; text-underline-offset: 2px; }
+.footer-col a:hover { color: var(--olive); }
+.footer-email-form { display: flex; gap: 8px; margin-top: 12px; }
+.footer-email-input { flex: 1; border: none; border-bottom: 1px solid var(--border); padding: 6px 0; font-family: 'Degular', sans-serif; font-size: 13px; background: transparent; outline: none; }
+.footer-email-btn { background: var(--olive); color: var(--white); border: none; border-radius: 8px; padding: 6px 20px; font-family: 'Degular', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; }
+.footer-email-btn:hover { opacity: 0.9; }
+.footer-bottom { border-top: 1px solid var(--border); margin-top: 30px; padding-top: 20px; }
+.footer-bottom p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 11px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
 
 /* --- REVEAL --- */
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
@@ -129,7 +141,10 @@ img { display: block; max-width: 100%; }
   .intro-shield img { width: 80px; height: 93px; }
   .intro-advantage { font-size: 16px; max-width: 100%; }
 
-  .swatch { height: 300px; }
+  .coll-swatch { height: 300px; }
+  .coll-swatch-overlay { left: 24px; padding: 24px 28px; max-width: 260px; }
+  .coll-swatch-title { font-size: 20px; margin-bottom: 10px; }
+  .coll-swatch-desc { font-size: 12px; margin-bottom: 12px; }
 
   .collection-group { padding: 32px 24px; }
   .collection-title { font-size: 22px; }
@@ -147,7 +162,8 @@ img { display: block; max-width: 100%; }
   .btn-contact { width: 100%; }
 
   .footer { padding: 30px 24px; }
-  .footer p { font-size: 12px; letter-spacing: 0.36px; }
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 30px; }
+  .footer-bottom p { font-size: 10px; letter-spacing: 0.36px; }
 }
 </style>
 <link rel="stylesheet" href="animation.css?v=8">
@@ -165,8 +181,8 @@ img { display: block; max-width: 100%; }
   <img src="images/collections-hero.webp" alt="Alpha Surfaces — Premium Australian benchtops">
   <div class="hero-overlay" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.4) 0%,transparent 50%);pointer-events:none;"></div>
   <div style="position:absolute;bottom:32px;left:40px;z-index:1;">
-    <p style="font-family:'Concrette S',serif;font-weight:700;font-size:14px;color:#fff;margin:0;">Autumn Gold</p>
-    <p style="font-family:'Concrette S',serif;font-weight:400;font-size:12px;color:rgba(255,255,255,0.7);margin:0;">Collection 05</p>
+    <p style="font-family:'Concrette S',serif;font-weight:700;font-size:14px;color:#fff;margin:0;">Calacatta Leggera</p>
+    <p style="font-family:'Concrette S',serif;font-weight:400;font-size:12px;color:rgba(255,255,255,0.7);margin:0;">Collection 04</p>
   </div>
 </section>
 
@@ -202,8 +218,10 @@ img { display: block; max-width: 100%; }
   <img class="coll-swatch-img" data-coll="2" src="images/collection-hero-03.webp" alt="Collection 03 slab">
   <img class="coll-swatch-img" data-coll="3" src="images/collection-hero-04.webp" alt="Collection 04 slab">
   <img class="coll-swatch-img" data-coll="4" src="images/collection-hero-05.webp" alt="Collection 05 slab">
-  <div class="coll-swatch-overlay">
-    <p class="coll-swatch-label" id="coll-swatch-label">Collection 01 — Calacatta &amp; Statuario — Classic neutrals with fine particle textures</p>
+  <div class="coll-swatch-overlay" id="coll-swatch-overlay">
+    <p class="coll-swatch-title" id="coll-swatch-title">Collection 01</p>
+    <p class="coll-swatch-desc" id="coll-swatch-desc">Our entry-level price point offers classic neutrals with textures ranging from fine particles to subtle grains.</p>
+    <a class="coll-swatch-link" id="coll-swatch-link" href="/collections.html#collection-01">Visit Collection 01</a>
   </div>
 </section>
 
@@ -249,7 +267,35 @@ img { display: block; max-width: 100%; }
 
 <!-- FOOTER -->
 <footer class="footer">
-  <p>Copyright &copy; 2024 Alpha Surfaces – ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+  <div class="footer-inner">
+    <div class="footer-col">
+      <p class="footer-col-heading">Stay in the loop.</p>
+      <p>Sign up for the latest from Alpha Surfaces.</p>
+      <div class="footer-email-form">
+        <input type="email" class="footer-email-input" placeholder="Email">
+        <button class="footer-email-btn">Submit</button>
+      </div>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Follow us</p>
+      <p><a href="https://instagram.com/alphasurfaces" target="_blank">Instagram</a></p>
+      <p><a href="https://facebook.com/alphasurfaces" target="_blank">Facebook</a></p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Contact us</p>
+      <p><a href="tel:1800000000">Call Toll Free</a></p>
+      <p><a href="mailto:info@alphasurfaces.com.au">Email us</a></p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Resources</p>
+      <p><a href="/downloads/product-info.pdf" target="_blank">Product info</a></p>
+      <p><a href="/downloads/fabrication-guide.pdf" target="_blank">Fabrication guide</a></p>
+      <p><a href="/downloads/warranty.pdf" target="_blank">Warranty</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Copyright &copy; 2024 Alpha Surfaces – ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+  </div>
 </footer>
 
 <script>
@@ -351,13 +397,15 @@ img { display: block; max-width: 100%; }
 
       // ── Swatch sync ──
       var swatchImgs = document.querySelectorAll('.coll-swatch-img');
-      var swatchLabel = document.getElementById('coll-swatch-label');
-      var collDescriptors = [
-        'Collection 01 \u2014 Calacatta & Statuario \u2014 Classic neutrals with fine particle textures',
-        'Collection 02 \u2014 Prairie & Sage \u2014 Pure whites to organic neutrals',
-        'Collection 03 \u2014 Soapstone & Verde \u2014 Sophisticated stone with subtle veining',
-        'Collection 04 \u2014 Dramatic & Noir \u2014 Authentic natural-stone recreations',
-        'Collection 05 \u2014 Urban & Minimal \u2014 Visually striking with through-body veining'
+      var swatchTitle = document.getElementById('coll-swatch-title');
+      var swatchDesc = document.getElementById('coll-swatch-desc');
+      var swatchLink = document.getElementById('coll-swatch-link');
+      var collCards = [
+        { title: 'Collection 01', desc: 'Our entry-level price point offers classic neutrals with textures ranging from fine particles to subtle grains.', anchor: 'collection-01' },
+        { title: 'Collection 02', desc: 'Pure whites through to organic neutrals, offering a refined palette for contemporary Australian interiors.', anchor: 'collection-02' },
+        { title: 'Collection 03', desc: 'Sophisticated stone recreations with subtle veining. Features our Indoor-Outdoor range for versatile living.', anchor: 'collection-03' },
+        { title: 'Collection 04', desc: 'Dramatic, authentic natural-stone recreations with expressive veining and luxurious visual depth.', anchor: 'collection-04' },
+        { title: 'Collection 05', desc: 'At the top-tier price point are visually striking, natural-looking surfaces with the advanced mastery of through-body veining.', anchor: 'collection-05' }
       ];
       var currentSwatch = 0;
 
@@ -367,7 +415,12 @@ img { display: block; max-width: 100%; }
         swatchImgs[currentSwatch].classList.remove('active');
         currentSwatch = idx;
         swatchImgs[currentSwatch].classList.add('active');
-        if (swatchLabel && collDescriptors[idx]) swatchLabel.textContent = collDescriptors[idx];
+        if (collCards[idx]) {
+          swatchTitle.textContent = collCards[idx].title;
+          swatchDesc.textContent = collCards[idx].desc;
+          swatchLink.textContent = 'Visit ' + collCards[idx].title;
+          swatchLink.href = '/collections.html#' + collCards[idx].anchor;
+        }
       }
 
       // ── Auto-rotation after 60s idle ──
