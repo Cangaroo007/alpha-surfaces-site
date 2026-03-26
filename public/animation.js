@@ -33,9 +33,7 @@
       '.about-partner-inner, .about-partner-brand, .about-partner-text',
       
       '.collection-group, .collection-header, .collection-desc',
-      
-      
-      
+      '.feature-panel',
     ].join(', ');
 
     document.querySelectorAll(revealSelectors).forEach(function(el) {
@@ -61,7 +59,7 @@
     });
 
     // Stagger grid children at 120ms
-    document.querySelectorAll('.value-grid, .showcase-grid, .stones-grid, .location-cards, .back-benefits, .gallery-grid, .back-collections-row').forEach(function(grid) {
+    document.querySelectorAll('.value-grid, .showcase-grid, .stones-grid, .location-cards, .back-benefits, .gallery-grid, .back-collections-row, .feature-panels').forEach(function(grid) {
       grid.classList.add('anim-stagger');
       var children = grid.children;
       for (var i = 0; i < children.length; i++) {
@@ -154,7 +152,7 @@
 
   /* ─── 4. SECTION TRANSITIONS ─── */
   function initSectionTransitions() {
-    document.querySelectorAll('.statement, .about, .gallery, .value, .showcase, .contact, .locations, .collections-section, .quality, .about-partner, .intro, .swatch, .full-swatch').forEach(function(el) {
+    document.querySelectorAll('.statement, .about, .gallery, .feature-panels, .value, .showcase, .contact, .locations, .collections-section, .quality, .about-partner, .intro, .swatch, .full-swatch').forEach(function(el) {
       tag(el, 'anim-section');
     });
 

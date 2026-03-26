@@ -52,7 +52,7 @@ img { display: block; max-width: 100%; }
 .statement .arrow svg { width: 100%; height: 100%; }
 
 /* --- ABOUT --- */
-.about { background: var(--cream); display: flex; flex-direction: column; align-items: center; padding: 180px 161px 0; overflow: hidden; }
+.about { background: var(--cream); display: flex; flex-direction: column; align-items: center; padding: 180px 161px 100px; overflow: hidden; }
 .about-inner { width: 100%; }
 .about-top { padding: 10px; margin-bottom: 0; }
 .about-quote { font-family: 'Concrette S', serif; font-weight: 500; font-size: 30px; line-height: 1.2; color: var(--black); max-width: 751px; text-indent: -0.45em; margin-bottom: 22px; }
@@ -63,7 +63,7 @@ img { display: block; max-width: 100%; }
 .about-body p:last-child { margin-bottom: 0; }
 
 /* --- GALLERY --- */
-.gallery { background: var(--cream); padding: 0 161px 100px; }
+.gallery { background: var(--cream); padding: 40px 161px 100px; }
 .gallery-grid { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; min-height: 840px; }
 .gallery-left { display: flex; align-items: flex-start; }
 .gallery-left-inner { display: flex; flex-direction: column; gap: 12px; width: 525px; }
@@ -75,64 +75,38 @@ img { display: block; max-width: 100%; }
 .gallery-caption .gc-title { font-family: 'Concrette S', serif; font-weight: 700; }
 .gallery-caption .gc-sub { font-family: 'Concrette S', serif; font-weight: 400; }
 
-/* --- CONTACT --- */
-.contact { background: var(--white); padding: 280px 42px 60px; }
-.contact-inner { display: flex; gap: 266px; }
-.contact-left { width: 423px; flex-shrink: 0; display: flex; flex-direction: column; gap: 67px; }
-.contact-heading { font-size: 30px; color: var(--black); }
-.contact-heading .ch-bold { font-family: 'Concrette S', serif; font-weight: 700; line-height: 52px; display: block; }
-.contact-heading .ch-regular { font-family: 'Concrette S', serif; font-weight: 400; line-height: 1.2; display: block; max-width: 357px; }
-.contact-links { display: flex; flex-direction: column; gap: 67px; }
-.contact-block { font-family: 'Concrette S', serif; font-size: 30px; line-height: 1; color: var(--black); }
-.contact-block .cb-title { font-weight: 700; margin-bottom: 0; }
-.contact-block a { text-decoration: underline; }
-.contact-block .cb-items { font-weight: 400; text-decoration: underline; }
-.btn-order { display: inline-flex; align-items: center; justify-content: center; background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 8px 44px; border-radius: 12px; text-decoration: none; border: none; cursor: pointer; width: 207px; }
+/* --- FEATURE PANELS --- */
+.feature-panels { background: var(--cream); display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+.feature-panel { position: relative; overflow: hidden; }
+.feature-panel-link { display: block; text-decoration: none; color: inherit; position: relative; }
+.feature-panel-img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; transition: transform 0.6s ease; }
+.feature-panel-link:hover .feature-panel-img { transform: scale(1.04); }
+.feature-panel-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 24px; background: linear-gradient(to bottom, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.35) 100%); }
+.feature-panel-icon { width: 56px; height: 56px; margin-bottom: 20px; opacity: 0.9; }
+.feature-panel-label { font-family: 'Degular', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #fff; margin-bottom: 12px; }
+.feature-panel-desc { font-family: 'Concrette S', serif; font-weight: 400; font-size: 18px; line-height: 1.3; color: #fff; max-width: 260px; margin-bottom: 20px; }
+.feature-panel-cta { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: #fff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.6); padding-bottom: 2px; transition: border-color 0.3s; }
+.feature-panel-link:hover .feature-panel-cta { border-color: #fff; }
 
-/* --- FORM --- */
-.contact-form { flex: 1; max-width: 538px; display: flex; flex-direction: column; gap: 45px; }
-.form-row { display: flex; gap: 44px; }
-.form-group { flex: 1; display: flex; flex-direction: column; gap: 11px; }
-.form-label { display: flex; gap: 8px; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); }
-.form-label .required { color: var(--red); }
-.form-input { border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 4px 0; outline: none; width: 100%; }
-.form-input:focus { border-bottom-color: var(--olive); }
-.form-select-wrap { display: flex; flex-direction: column; gap: 11px; }
-.form-select-label { display: flex; flex-direction: column; gap: 8px; }
-.form-select-label .form-label { margin-bottom: 0; }
-.form-select { border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--gray); padding: 4px 0; outline: none; width: 100%; appearance: none; -webkit-appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right center; background-size: 12px 6px; }
-.form-select:valid { color: var(--black); }
-.form-checkbox { display: flex; align-items: center; gap: 12px; }
-.form-checkbox input[type="checkbox"] { width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--olive); cursor: pointer; }
-.form-checkbox label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); cursor: pointer; }
-.form-submit-row { display: flex; justify-content: flex-end; }
-.btn-submit { background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 8px 44px; border-radius: 12px; border: none; cursor: pointer; width: 189px; }
-.btn-submit:hover { opacity: 0.9; }
-
-/* --- LOCATIONS --- */
-.locations { background: var(--white); padding: 50px 50px; position: relative; min-height: 422px; }
-.locations-header { display: flex; justify-content: space-between; margin-bottom: 74px; }
-.locations-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 30px; color: var(--black); }
-.locations-grid { display: flex; gap: 20px; flex-wrap: wrap; }
-.locations-columns { display: flex; width: 100%; }
-.locations-col-left { width: 66.67%; }
-.locations-col-right { width: 33.33%; padding-left: 0; }
-.location-cards { display: flex; gap: 20px; flex-wrap: wrap; }
-.location-card { width: 212px; display: flex; flex-direction: column; gap: 20px; line-height: 1.2; color: var(--black); }
-.location-card .lc-type { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; text-transform: uppercase; }
-.location-card .lc-name { font-family: 'Concrette S', serif; font-weight: 700; font-size: 16px; }
-.location-card .lc-address { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; }
-.location-card .lc-details { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 16px; text-transform: uppercase; }
-.location-card .lc-details p { margin-bottom: 10px; }
-.location-card .lc-details p:last-child { margin-bottom: 0; }
-.resources-section { padding-top: 0; }
-.resources-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 30px; color: var(--black); margin-bottom: 25px; }
-.resources-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; text-transform: uppercase; color: var(--black); margin-bottom: 10px; }
-.resources-links a { font-family: 'Concrette S', serif; font-weight: 500; font-size: 16px; color: var(--black); text-decoration: underline; display: block; line-height: 1.2; margin-bottom: 5px; }
-
-/* --- FOOTER --- */
-.footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
-.footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
+/* --- SITE FOOTER --- */
+.site-footer { background: var(--white); padding: 80px 50px 30px; }
+.site-footer-inner { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; max-width: 1200px; margin: 0 auto; }
+.footer-col { display: flex; flex-direction: column; gap: 12px; }
+.footer-col-signup { flex: 1; max-width: 360px; }
+.footer-col-signup .footer-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 28px; color: var(--black); line-height: 1.2; margin-bottom: 4px; }
+.footer-col-signup .footer-sub { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; color: var(--black); line-height: 1.3; margin-bottom: 12px; }
+.footer-email-row { display: flex; gap: 8px; }
+.footer-email-input { flex: 1; border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15px; padding: 6px 0; outline: none; }
+.footer-email-input:focus { border-bottom-color: var(--olive); }
+.footer-email-btn { background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; padding: 8px 24px; border-radius: 8px; border: none; cursor: pointer; white-space: nowrap; }
+.footer-email-btn:hover { opacity: 0.9; }
+.footer-col-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 16px; color: var(--black); margin-bottom: 4px; }
+.footer-col a { font-family: 'Concrette S', serif; font-weight: 400; font-size: 15px; color: var(--black); text-decoration: underline; line-height: 1.6; }
+.footer-col a:hover { color: var(--olive); }
+.footer-col .footer-dl-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--black); margin-bottom: 2px; opacity: 0.6; }
+.footer-bottom { border-top: 1px solid var(--border); margin-top: 50px; padding-top: 20px; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin-left: auto; margin-right: auto; }
+.footer-bottom p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--black); }
+.footer-bottom a { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--black); text-decoration: underline; }
 
 /* --- REDUCED MOTION --- */
 @media (prefers-reduced-motion: reduce) {
@@ -161,7 +135,7 @@ img { display: block; max-width: 100%; }
   .about-bottom { justify-content: flex-start; }
   .about-top { margin-bottom: 45px; }
 
-  .gallery { padding: 0 24px 44px; background: var(--cream); }
+  .gallery { padding: 24px 24px 44px; background: var(--cream); }
   .gallery-grid { flex-direction: column; gap: 44px; min-height: auto; }
   .gallery-left-inner { width: 100%; }
   .gallery-left-inner img { height: 464px; }
@@ -169,29 +143,17 @@ img { display: block; max-width: 100%; }
   .gallery-right-inner { width: 100%; }
   .gallery-right-inner img { width: 100%; height: 441px; }
 
-  .contact { padding: 44px 24px; }
-  .contact-inner { flex-direction: column; gap: 80px; }
-  .contact-left { width: 100%; gap: 24px; }
-  .contact-links { gap: 24px; flex-direction: row; }
-  .contact-block { font-size: 18px; }
-  .btn-order { width: 100%; }
+  .feature-panels { grid-template-columns: 1fr; }
+  .feature-panel-img { aspect-ratio: 4 / 3; }
+  .feature-panel-desc { font-size: 16px; }
 
-  .contact-form { max-width: 100%; }
-  .form-row { gap: 24px; }
-  .btn-submit { width: 100%; }
-
-  .locations { padding: 24px; }
-  .locations-columns { flex-direction: column; gap: 32px; }
-  .locations-col-left, .locations-col-right { width: 100%; }
-  .location-cards { flex-wrap: wrap; }
-  .location-card { flex: 1; min-width: 150px; font-size: 14px; }
-  .location-card .lc-type { font-size: 14px; }
-  .location-card .lc-name { font-size: 14px; }
-  .location-card .lc-address { font-size: 14px; }
-  .location-card .lc-details { font-size: 14px; }
-
-  .footer { padding: 30px 24px; }
-  .footer p { font-size: 12px; letter-spacing: 0.36px; }
+  .site-footer { padding: 44px 24px 20px; }
+  .site-footer-inner { flex-direction: column; gap: 32px; }
+  .footer-col-signup { max-width: 100%; }
+  .footer-email-row { flex-direction: column; gap: 12px; }
+  .footer-email-btn { width: 100%; text-align: center; padding: 12px; }
+  .footer-bottom { flex-direction: column; gap: 8px; align-items: flex-start; margin-top: 32px; }
+  .footer-bottom p, .footer-bottom a { font-size: 11px; }
 }
 </style>
 <link rel="stylesheet" href="animation.css?v=8">
@@ -221,6 +183,30 @@ img { display: block; max-width: 100%; }
   <p>Stone.Life. Style.</p>
 </div>
 
+<!-- GALLERY — lifestyle images link to about page sections -->
+<section class="gallery">
+  <div class="gallery-grid">
+    <div class="gallery-left">
+      <a href="/about.html#zero-silica" class="gallery-left-inner" style="text-decoration:none;color:inherit;">
+        <img src="images/collection_235.jpg" alt="Carrara Collection">
+        <div class="gallery-caption">
+          <span class="gc-title">Carrara</span><br>
+          <span class="gc-sub">Collection 02</span>
+        </div>
+      </a>
+    </div>
+    <div class="gallery-right">
+      <a href="/about.html#alphashield" class="gallery-right-inner" style="text-decoration:none;color:inherit;">
+        <div class="gallery-caption">
+          <span class="gc-title">Statuario Gold</span><br>
+          <span class="gc-sub">Collection 04</span>
+        </div>
+        <img src="images/collection_242.jpg" alt="Statuario Gold Collection">
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- STATEMENT -->
 <section class="statement">
   <p>We're evolving with a new look, refreshed premium collections, and the same cutting-edge technology that defines industry-leading innovation – delivering Australia's complete surface solution.</p>
@@ -248,33 +234,46 @@ img { display: block; max-width: 100%; }
   </div>
 </section>
 
-<!-- GALLERY — images link to about page sections -->
-<section class="gallery">
-  <div class="gallery-grid">
-    <div class="gallery-left">
-      <a href="/about.html#zero-silica" class="gallery-left-inner" style="text-decoration:none;color:inherit;">
-        <img src="images/collection_235.jpg" alt="Carrara Collection">
-        <div class="gallery-caption">
-          <span class="gc-title">Carrara</span><br>
-          <span class="gc-sub">Collection 02</span>
-        </div>
-      </a>
-    </div>
-    <div class="gallery-right">
-      <a href="/about.html#alphashield" class="gallery-right-inner" style="text-decoration:none;color:inherit;">
-        <div class="gallery-caption">
-          <span class="gc-title">Statuario Gold</span><br>
-          <span class="gc-sub">Collection 04</span>
-        </div>
-        <img src="images/collection_242.jpg" alt="Statuario Gold Collection">
-      </a>
-    </div>
+<!-- FEATURE PANELS — Zero Silica, Indoor-Outdoor, AlphaShield -->
+<section class="feature-panels">
+  <div class="feature-panel">
+    <a href="/about.html#zero-silica" class="feature-panel-link">
+      <img class="feature-panel-img" src="images/zero-silica-hero.webp" alt="Zero Silica surfaces">
+      <div class="feature-panel-overlay">
+        <svg class="feature-panel-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="26" stroke="white" stroke-width="1.5"/><path d="M28 14v24M20 22l8-8 8 8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="feature-panel-label">Zero Silica</span>
+        <p class="feature-panel-desc">High-performance mineral surfaces — safe for fabricators and families.</p>
+        <span class="feature-panel-cta">Learn</span>
+      </div>
+    </a>
+  </div>
+  <div class="feature-panel">
+    <a href="/about.html#indoor-outdoor" class="feature-panel-link">
+      <img class="feature-panel-img" src="images/indoor-outdoor-hero.webp" alt="Indoor-Outdoor UV-stable range">
+      <div class="feature-panel-overlay">
+        <svg class="feature-panel-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="12" stroke="white" stroke-width="1.5"/><path d="M28 8v4M28 44v4M48 28h-4M12 28H8M42.14 13.86l-2.83 2.83M16.69 39.31l-2.83 2.83M42.14 42.14l-2.83-2.83M16.69 16.69l-2.83-2.83" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="feature-panel-label">Indoor–Outdoor</span>
+        <p class="feature-panel-desc">UV-stable performance for the indoor-outdoor range.</p>
+        <span class="feature-panel-cta">View</span>
+      </div>
+    </a>
+  </div>
+  <div class="feature-panel">
+    <a href="/about.html#alphashield" class="feature-panel-link">
+      <img class="feature-panel-img" src="images/alphashield-hero.webp" alt="AlphaShield protection technology">
+      <div class="feature-panel-overlay">
+        <svg class="feature-panel-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M28 4L6 16v16c0 12 10 18 22 22 12-4 22-10 22-22V16L28 4z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M20 28l6 6 10-12" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="feature-panel-label">AlphaShield</span>
+        <p class="feature-panel-desc">Lifetime stain resistance guarantee.</p>
+        <span class="feature-panel-cta">Discover</span>
+      </div>
+    </a>
   </div>
 </section>
 
 <!-- MIDDLE — Lifestyle CTA linking to Collections -->
 <section class="middle-cta" style="position:relative;width:100%;height:500px;overflow:hidden;">
-  <img src="images/collection-hero-03.webp" alt="Alpha Surfaces slab" style="position:absolute;inset:0;width:110%;height:110%;object-fit:cover;animation:slabPanMiddle 25s ease-in-out infinite alternate;">
+  <img src="images/collection-hero-03.webp" alt="Alpha Surfaces slab" style="position:absolute;top:-5%;left:-5%;width:110%;height:110%;object-fit:cover;animation:slabPanMiddle 25s ease-in-out infinite alternate;">
   <div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;">
     <p style="font-family:'Concrette S',serif;font-weight:500;font-size:36px;color:#fff;max-width:600px;line-height:1.2;margin-bottom:24px;">Natural stone depth, clarity and translucency.</p>
     <a href="/collections.html" style="font-family:'Degular',sans-serif;font-weight:500;font-size:14px;color:#fff;text-decoration:underline;text-underline-offset:4px;letter-spacing:0.1em;text-transform:uppercase;">View Collections</a>
@@ -288,178 +287,41 @@ img { display: block; max-width: 100%; }
 }
 </style>
 
-<!-- CONTACT -->
-<section class="contact" id="contact">
-  <div class="contact-inner">
-    <div class="contact-left">
-      <div class="contact-heading">
-        <span class="ch-bold">Stay in the loop.</span>
-        <span class="ch-regular">Sign up for the latest from Alpha Surfaces.</span>
-      </div>
-      <div class="contact-links">
-        <div class="contact-block">
-          <p class="cb-title">Follow us</p>
-          <p class="cb-items"><a href="https://www.instagram.com/alphasurfaces/" target="_blank">Instagram</a><br><a href="https://www.facebook.com/alphasurfaces/" target="_blank">Facebook</a></p>
-        </div>
-        <div class="contact-block">
-          <p class="cb-title">Contact us</p>
-          <p class="cb-items"><a href="tel:1800257420">Call Toll Free</a><br><a href="mailto:info@alphasurfaces.com.au">Email us</a></p>
-        </div>
-      </div>
-      <!-- Order A Sample removed from landing page per Belinda's feedback — kept on collection pages only -->
-    </div>
-    <form class="contact-form" action="#" method="POST">
-      <div class="form-row">
-        <div class="form-group">
-          <span class="form-label">First Name <span class="required">*</span></span>
-          <input type="text" class="form-input" name="first_name" required>
-        </div>
-        <div class="form-group">
-          <span class="form-label">Last Name <span class="required">*</span></span>
-          <input type="text" class="form-input" name="last_name" required>
-        </div>
-      </div>
-      <div class="form-group">
-        <span class="form-label">Phone Number <span class="required">*</span></span>
-        <input type="tel" class="form-input" name="phone" required>
-      </div>
-      <div class="form-group">
-        <span class="form-label">Email <span class="required">*</span></span>
-        <input type="email" class="form-input" name="email" required>
-      </div>
-      <div class="form-group">
-        <span class="form-label">Postcode</span>
-        <input type="text" class="form-input" name="postcode">
-      </div>
-      <div class="form-select-wrap">
-        <div class="form-select-label">
-          <span class="form-label">State <span class="required">*</span></span>
-          <select class="form-select" name="state" required>
-            <option value="" disabled selected>- Select -</option>
-            <option value="NSW">NSW</option>
-            <option value="VIC">VIC</option>
-            <option value="QLD">QLD</option>
-            <option value="WA">WA</option>
-            <option value="SA">SA</option>
-            <option value="TAS">TAS</option>
-            <option value="ACT">ACT</option>
-            <option value="NT">NT</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-select-wrap">
-        <div class="form-select-label">
-          <span class="form-label">I am a:</span>
-          <select class="form-select" name="role">
-            <option value="" disabled selected>- Select -</option>
-            <option value="homeowner">Homeowner</option>
-            <option value="architect">Architect</option>
-            <option value="designer">Designer</option>
-            <option value="builder">Builder</option>
-            <option value="fabricator">Fabricator</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-select-wrap">
-        <div class="form-select-label">
-          <span class="form-label">Reason for Contacting Us</span>
-          <select class="form-select" name="reason">
-            <option value="" disabled selected>- Select -</option>
-            <option value="general">General Enquiry</option>
-            <option value="sample">Order a Sample</option>
-            <option value="quote">Request a Quote</option>
-            <option value="support">Product Support</option>
-            <option value="partnership">Partnership</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-checkbox">
-        <input type="checkbox" id="consent" name="consent">
-        <label for="consent">I agree to receive updates from Alpha Surfaces.</label>
-      </div>
-      <div class="form-submit-row">
-        <button type="submit" class="btn-submit">Submit Form</button>
-      </div>
-    </form>
-  </div>
-</section>
-
-<!-- LOCATIONS -->
-<section class="locations">
-  <div class="locations-columns">
-    <div class="locations-col-left">
-      <h2 class="locations-title">Locations</h2>
-      <div class="location-cards" style="margin-top: 74px;">
-        <div class="location-card">
-          <div>
-            <p class="lc-type">head office</p>
-            <p class="lc-name">Alpha Surfaces</p>
-            <p class="lc-address">13 Enterprise Street,<br>Kunda Park QLD 4556</p>
-          </div>
-          <div class="lc-details">
-            <p>T. 07 5486 3112</p>
-            <p>Showroom open:<br>Mon – Thurs: 8.30 am – 4pm<br>Fri: 8.30 am – 1pm</p>
-            <p>Full slabs on display.</p>
-          </div>
-        </div>
-        <div class="location-card">
-          <div>
-            <p class="lc-type">warehouse</p>
-            <p class="lc-name">New South Wales</p>
-            <p class="lc-address">235 Kurrajong Rd,<br>Prestons NSW 2170</p>
-          </div>
-          <div class="lc-details">
-            <p>T. 02 7208 8442</p>
-            <p>Full slabs on display.</p>
-          </div>
-        </div>
-        <div class="location-card">
-          <div>
-            <p class="lc-type">distributors</p>
-            <p class="lc-name">Zenstone</p>
-            <p class="lc-address">10 Lillee crescent, Tullamarine vic 3043</p>
-          </div>
-          <div class="lc-details">
-            <p>T. 03 9330 0033</p>
-            <p>Full slabs on display.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="locations-col-right">
-      <div class="resources-section">
-        <h2 class="resources-title">Resources</h2>
-        <p class="resources-label">downloads</p>
-        <div class="resources-links">
-          <a href="/downloads/fabrication-guide.pdf" target="_blank">Fabrication guide</a>
-          <a href="/downloads/warranty.pdf" target="_blank">Warranty</a>
-          <a href="/downloads/care-maintenance.pdf" target="_blank">Care &amp; maintenance</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- INSTAGRAM -->
-<section style="background:var(--cream,#f3f1e6);padding:50px 0;">
-  <div style="max-width:1000px;margin:0 auto;padding:0 40px;text-align:center;">
-    <p style="font-family:'Degular',sans-serif;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:0.3em;color:#564d22;margin:0;">@ALPHASURFACES</p>
-    <p style="font-family:'Concrette S',serif;font-weight:400;font-size:24px;color:#000;margin:8px 0 20px;">Follow us on Instagram</p>
-    <a href="https://instagram.com/alphasurfaces" target="_blank" style="display:block;text-decoration:none;">
-      <img src="images/instagram-grid.webp" alt="Alpha Surfaces Instagram feed" style="width:100%;height:220px;object-fit:cover;object-position:center;border-radius:6px;display:block;">
-      <span style="display:inline-block;margin-top:16px;font-family:'Degular',sans-serif;font-weight:500;font-size:12px;letter-spacing:0.15em;color:#564d22;text-transform:uppercase;">View on Instagram &rarr;</span>
-    </a>
-  </div>
-</section>
-
 <!-- FOOTER -->
-<footer class="footer">
-  <p>Copyright &copy; 2024 Alpha Surfaces – ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+<footer class="site-footer" id="contact">
+  <div class="site-footer-inner">
+    <div class="footer-col footer-col-signup">
+      <p class="footer-heading">Stay in the loop.</p>
+      <p class="footer-sub">Sign up for the latest from Alpha Surfaces.</p>
+      <form class="footer-email-row" action="#" method="POST">
+        <input type="email" class="footer-email-input" name="email" placeholder="Your email address" required>
+        <button type="submit" class="footer-email-btn">Submit</button>
+      </form>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Follow us</p>
+      <a href="https://www.instagram.com/alphasurfaces/" target="_blank">Instagram</a>
+      <a href="https://www.facebook.com/alphasurfaces/" target="_blank">Facebook</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Contact us</p>
+      <a href="tel:1800257420">Call Toll Free</a>
+      <a href="mailto:info@alphasurfaces.com.au">Email us</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Resources</p>
+      <span class="footer-dl-label">Downloads</span>
+      <a href="/downloads/fabrication-guide.pdf" target="_blank">Fabrication guide</a>
+      <a href="/downloads/warranty.pdf" target="_blank">Warranty</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Copyright &copy; 2025 Alpha Surfaces – All rights reserved</p>
+    <a href="/privacy.html">Privacy Policy</a>
+  </div>
 </footer>
 
-<script src="animation.js?v=9"></script>
+<script src="animation.js?v=10"></script>
 <script src="nav.js?v=10"></script>
 <script src="sample-modal.js?v=1"></script>
 </body>
