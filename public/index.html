@@ -84,24 +84,17 @@ img { display: block; max-width: 100%; }
 .feature-panel-cta { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.08em; text-transform: capitalize; color: var(--olive); text-decoration: underline; text-underline-offset: 3px; }
 
 /* --- SITE FOOTER --- */
-.site-footer { background: var(--white); padding: 80px 50px 30px; }
-.site-footer-inner { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; max-width: 1200px; margin: 0 auto; }
-.footer-col { display: flex; flex-direction: column; gap: 12px; }
-.footer-col-signup { flex: 1; max-width: 360px; }
-.footer-col-signup .footer-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 28px; color: var(--black); line-height: 1.2; margin-bottom: 4px; }
-.footer-col-signup .footer-sub { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; color: var(--black); line-height: 1.3; margin-bottom: 12px; }
-.footer-email-row { display: flex; gap: 8px; }
-.footer-email-input { flex: 1; border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15px; padding: 6px 0; outline: none; }
-.footer-email-input:focus { border-bottom-color: var(--olive); }
-.footer-email-btn { background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; padding: 8px 24px; border-radius: 8px; border: none; cursor: pointer; white-space: nowrap; }
-.footer-email-btn:hover { opacity: 0.9; }
-.footer-col-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 16px; color: var(--black); margin-bottom: 4px; }
-.footer-col a { font-family: 'Concrette S', serif; font-weight: 400; font-size: 15px; color: var(--black); text-decoration: underline; line-height: 1.6; }
+.footer { background: var(--white); border-top: 1px solid var(--border); padding: 50px 60px 40px; }
+.footer-inner { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; }
+.footer-col-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 14px; color: var(--black); margin-bottom: 10px; }
+.footer-col p, .footer-col a { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; color: var(--black); line-height: 1.6; }
+.footer-col a { text-decoration: underline; text-underline-offset: 2px; }
 .footer-col a:hover { color: var(--olive); }
-.footer-col .footer-dl-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--black); margin-bottom: 2px; opacity: 0.6; }
-.footer-bottom { border-top: 1px solid var(--border); margin-top: 50px; padding-top: 20px; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin-left: auto; margin-right: auto; }
-.footer-bottom p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--black); }
-.footer-bottom a { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--black); text-decoration: underline; }
+.footer-email-form { display: flex; gap: 8px; margin-top: 12px; }
+.footer-email-input { flex: 1; border: none; border-bottom: 1px solid var(--border); padding: 6px 0; font-family: 'Degular', sans-serif; font-size: 13px; background: transparent; outline: none; }
+.footer-email-btn { background: var(--olive); color: var(--white); border: none; border-radius: 8px; padding: 6px 20px; font-family: 'Degular', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; }
+.footer-bottom { border-top: 1px solid var(--border); margin-top: 30px; padding-top: 20px; }
+.footer-bottom p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 11px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
 
 /* --- REDUCED MOTION --- */
 @media (prefers-reduced-motion: reduce) {
@@ -139,13 +132,12 @@ img { display: block; max-width: 100%; }
   .feature-panel-body { padding: 16px 12px 24px; }
   .feature-panel-desc { font-size: 14px; }
 
-  .site-footer { padding: 44px 24px 20px; }
-  .site-footer-inner { flex-direction: column; gap: 32px; }
-  .footer-col-signup { max-width: 100%; }
-  .footer-email-row { flex-direction: column; gap: 12px; }
+  .footer { padding: 44px 24px 20px; }
+  .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+  .footer-email-form { flex-direction: column; gap: 12px; }
   .footer-email-btn { width: 100%; text-align: center; padding: 12px; }
-  .footer-bottom { flex-direction: column; gap: 8px; align-items: flex-start; margin-top: 32px; }
-  .footer-bottom p, .footer-bottom a { font-size: 11px; }
+  .footer-bottom { margin-top: 32px; }
+  .footer-bottom p { font-size: 11px; }
 }
 </style>
 <link rel="stylesheet" href="animation.css?v=8">
@@ -285,36 +277,35 @@ img { display: block; max-width: 100%; }
 </style>
 
 <!-- FOOTER -->
-<footer class="site-footer" id="contact">
-  <div class="site-footer-inner">
-    <div class="footer-col footer-col-signup">
-      <p class="footer-heading">Stay in the loop.</p>
-      <p class="footer-sub">Sign up for the latest from Alpha Surfaces.</p>
-      <form class="footer-email-row" action="#" method="POST">
-        <input type="email" class="footer-email-input" name="email" placeholder="Your email address" required>
-        <button type="submit" class="footer-email-btn">Submit</button>
-      </form>
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <p class="footer-col-heading">Stay in the loop.</p>
+      <p>Sign up for the latest from Alpha Surfaces.</p>
+      <div class="footer-email-form">
+        <input type="email" class="footer-email-input" placeholder="Email">
+        <button class="footer-email-btn">Submit</button>
+      </div>
     </div>
     <div class="footer-col">
-      <p class="footer-col-title">Follow us</p>
-      <a href="https://www.instagram.com/alphasurfaces/" target="_blank">Instagram</a>
-      <a href="https://www.facebook.com/alphasurfaces/" target="_blank">Facebook</a>
+      <p class="footer-col-heading">Follow us</p>
+      <p><a href="https://instagram.com/alphasurfaces" target="_blank">Instagram</a></p>
+      <p><a href="https://facebook.com/alphasurfaces" target="_blank">Facebook</a></p>
     </div>
     <div class="footer-col">
-      <p class="footer-col-title">Contact us</p>
-      <a href="tel:1800257420">Call Toll Free</a>
-      <a href="mailto:info@alphasurfaces.com.au">Email us</a>
+      <p class="footer-col-heading">Contact us</p>
+      <p><a href="tel:1800000000">Call Toll Free</a></p>
+      <p><a href="mailto:info@alphasurfaces.com.au">Email us</a></p>
     </div>
     <div class="footer-col">
-      <p class="footer-col-title">Resources</p>
-      <span class="footer-dl-label">Downloads</span>
-      <a href="/downloads/fabrication-guide.pdf" target="_blank">Fabrication guide</a>
-      <a href="/downloads/warranty.pdf" target="_blank">Warranty</a>
+      <p class="footer-col-heading">Resources</p>
+      <p><a href="/downloads/product-info.pdf" target="_blank">Product info</a></p>
+      <p><a href="/downloads/fabrication-guide.pdf" target="_blank">Fabrication guide</a></p>
+      <p><a href="/downloads/warranty.pdf" target="_blank">Warranty</a></p>
     </div>
   </div>
   <div class="footer-bottom">
-    <p>Copyright &copy; 2025 Alpha Surfaces – All rights reserved</p>
-    <a href="/privacy.html">Privacy Policy</a>
+    <p>COPYRIGHT &copy; 2024 ALPHA SURFACES – ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
   </div>
 </footer>
 

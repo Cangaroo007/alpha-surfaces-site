@@ -41,20 +41,21 @@ img { display: block; max-width: 100%; }
 /* FORM */
 .order-form { flex: 1; max-width: 538px; display: flex; flex-direction: column; gap: 32px; }
 .form-row { display: flex; gap: 44px; }
-.form-input { background: var(--cream); border: none; border-radius: 12px; padding: 8px 24px; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); width: 100%; outline: none; }
+.form-input { background: transparent; border: none; border-bottom: 1px solid var(--border); border-radius: 0; padding: 8px 0; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 16px; color: var(--black); width: 100%; outline: none; }
 .form-input::placeholder { color: var(--black); opacity: 0.4; }
-.form-input:focus { box-shadow: 0 0 0 2px var(--olive); }
+.form-input:focus { border-bottom-color: var(--olive); }
 .form-select-group { display: flex; flex-direction: column; gap: 8px; }
 .form-select-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); }
 .form-select-label .req { color: var(--red); }
-.form-select { background: var(--cream); border: none; border-radius: 12px; padding: 8px 24px; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); width: 100%; outline: none; appearance: none; -webkit-appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 24px center; background-size: 12px 6px; padding-right: 48px; }
-.form-textarea { background: var(--cream); border: none; border-radius: 12px; padding: 8px 24px 78px; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; color: var(--black); width: 100%; outline: none; resize: vertical; min-height: 100px; }
+.form-select { background: transparent; border: none; border-bottom: 1px solid var(--border); border-radius: 0; padding: 8px 0; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 16px; color: var(--black); width: 100%; outline: none; appearance: none; -webkit-appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0 center; background-size: 12px 6px; padding-right: 24px; }
+.form-textarea { background: transparent; border: none; border-bottom: 1px solid var(--border); border-radius: 0; padding: 8px 0 40px; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 16px; color: var(--black); width: 100%; outline: none; resize: vertical; min-height: 60px; }
 .form-textarea::placeholder { color: var(--black); opacity: 0.4; }
+.form-textarea:focus { border-bottom-color: var(--olive); }
 .form-checkbox { display: flex; align-items: center; gap: 12px; }
 .form-checkbox input { width: 16px; height: 16px; accent-color: var(--olive); cursor: pointer; flex-shrink: 0; }
 .form-checkbox label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; color: var(--black); cursor: pointer; }
 .form-submit-row { display: flex; justify-content: flex-end; }
-.btn-submit { background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 8px 44px; border-radius: 12px; border: none; cursor: pointer; width: 189px; }
+.btn-submit { background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; padding: 10px 44px; border-radius: 24px; border: none; cursor: pointer; width: 189px; }
 .btn-submit:hover { opacity: 0.9; }
 
 /* ADDITIONAL STONES */
@@ -68,8 +69,17 @@ img { display: block; max-width: 100%; }
 .stone-option span { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; color: var(--black); }
 
 /* FOOTER */
-.footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
-.footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
+.footer { background: var(--white); border-top: 1px solid var(--border); padding: 50px 60px 40px; }
+.footer-inner { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; }
+.footer-col-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 14px; color: var(--black); margin-bottom: 10px; }
+.footer-col p, .footer-col a { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; color: var(--black); line-height: 1.6; }
+.footer-col a { text-decoration: underline; text-underline-offset: 2px; }
+.footer-col a:hover { color: var(--olive); }
+.footer-email-form { display: flex; gap: 8px; margin-top: 12px; }
+.footer-email-input { flex: 1; border: none; border-bottom: 1px solid var(--border); padding: 6px 0; font-family: 'Degular', sans-serif; font-size: 13px; background: transparent; outline: none; }
+.footer-email-btn { background: var(--olive); color: var(--white); border: none; border-radius: 8px; padding: 6px 20px; font-family: 'Degular', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; }
+.footer-bottom { border-top: 1px solid var(--border); margin-top: 30px; padding-top: 20px; }
+.footer-bottom p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 11px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
 
 @media (max-width: 1024px) {
   .order { padding: 44px 24px; }
@@ -109,7 +119,7 @@ img { display: block; max-width: 100%; }
       <input type="tel" class="form-input" name="phone" placeholder="Phone Number *" required>
       <input type="email" class="form-input" name="email" placeholder="Email *" required>
       <div class="form-select-group">
-        <span class="form-select-label">I am a</span>
+        <span class="form-select-label">I am a:</span>
         <select class="form-select" name="role">
           <option value="" disabled selected>- Select -</option>
           <option value="homeowner">Homeowner</option>
@@ -117,6 +127,17 @@ img { display: block; max-width: 100%; }
           <option value="builder">Builder</option>
           <option value="fabricator">Fabricator</option>
           <option value="developer">Developer</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-select-group">
+        <span class="form-select-label">Reason for Contacting Us</span>
+        <select class="form-select" name="reason">
+          <option value="" disabled selected>- Select -</option>
+          <option value="sample">Order a sample</option>
+          <option value="quote">Request a quote</option>
+          <option value="stockist">Find a stockist</option>
+          <option value="general">General enquiry</option>
           <option value="other">Other</option>
         </select>
       </div>
@@ -159,7 +180,35 @@ img { display: block; max-width: 100%; }
 </section>
 
 <footer class="footer">
-  <p>Copyright &copy; 2024 Alpha Surfaces &#8211; ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+  <div class="footer-inner">
+    <div class="footer-col">
+      <p class="footer-col-heading">Stay in the loop.</p>
+      <p>Sign up for the latest from Alpha Surfaces.</p>
+      <div class="footer-email-form">
+        <input type="email" class="footer-email-input" placeholder="Email">
+        <button class="footer-email-btn">Submit</button>
+      </div>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Follow us</p>
+      <p><a href="https://instagram.com/alphasurfaces" target="_blank">Instagram</a></p>
+      <p><a href="https://facebook.com/alphasurfaces" target="_blank">Facebook</a></p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Contact us</p>
+      <p><a href="tel:1800000000">Call Toll Free</a></p>
+      <p><a href="mailto:info@alphasurfaces.com.au">Email us</a></p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Resources</p>
+      <p><a href="/downloads/product-info.pdf" target="_blank">Product info</a></p>
+      <p><a href="/downloads/fabrication-guide.pdf" target="_blank">Fabrication guide</a></p>
+      <p><a href="/downloads/warranty.pdf" target="_blank">Warranty</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>COPYRIGHT &copy; 2024 ALPHA SURFACES – ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+  </div>
 </footer>
 
 <script>
