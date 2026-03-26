@@ -31,10 +31,19 @@ img { display: block; max-width: 100%; }
 
 /* --- HERO --- */
 .hero { position: relative; width: 100%; overflow: hidden; }
-.hero-video { width: 100%; height: 730px; object-fit: cover; display: block; }
-.hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; }
+.hero-video { width: 100%; height: 730px; object-fit: cover; display: block; animation: heroKenBurns 20s ease-in-out infinite alternate; transform-origin: center center; }
+@keyframes heroKenBurns {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.08) translate(-1%, -1%); }
+}
+.hero-logo-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 1; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; }
+.hero-logo-overlay img { width: 45%; max-width: 500px; height: auto; opacity: 0.55; mix-blend-mode: multiply; filter: brightness(0.6); }
+@keyframes heroLogoFadeIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+.hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; z-index: 2; }
 .hero-caption .caption-title { font-family: 'Concrette S', serif; font-weight: 700; }
 .hero-caption .caption-sub { font-family: 'Concrette S', serif; font-weight: 400; }
+.hero-tagline { text-align: center; padding: 48px 24px; background: var(--cream, #f3f1e6); }
+.hero-tagline p { font-family: 'Concrette S', serif; font-weight: 500; font-size: 36px; color: var(--black); letter-spacing: 0.02em; }
 
 /* --- STATEMENT --- */
 .statement { background: var(--olive); display: flex; flex-direction: column; align-items: center; padding: 150px 171px 0; min-height: 661px; position: relative; }
@@ -125,10 +134,21 @@ img { display: block; max-width: 100%; }
 .footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
 .footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
 
+/* --- REDUCED MOTION --- */
+@media (prefers-reduced-motion: reduce) {
+  .hero-video { animation: none !important; }
+  .hero-logo-overlay { animation: none !important; opacity: 1 !important; }
+  .middle-cta img { animation: none !important; }
+}
+
 /* --- MOBILE --- */
 @media (max-width: 1024px) {
   .hero-video { height: 340px; }
   .hero-caption { padding: 12px; }
+  .hero-logo-overlay img { width: 60%; max-width: 280px; }
+  .hero-tagline p { font-size: 24px; padding: 32px 24px; }
+  .middle-cta { height: 350px !important; }
+  .middle-cta p { font-size: 24px !important; }
 
   .statement { padding: 44px 24px 88px; min-height: auto; gap: 124px; }
   .statement p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 24px; line-height: 1.15; }
@@ -187,11 +207,19 @@ img { display: block; max-width: 100%; }
 <!-- HERO -->
 <section class="hero">
   <img class="hero-video" src="images/hero.jpg" alt="Alpha Surfaces premium benchtop">
+  <div class="hero-logo-overlay">
+    <img src="images/alpha-a-symbol.webp" alt="">
+  </div>
   <div class="hero-caption">
     <span class="caption-title">Autumn Gold</span><br>
     <span class="caption-sub">Collection 05</span>
   </div>
 </section>
+
+<!-- TAGLINE -->
+<div class="hero-tagline">
+  <p>Stone.Life. Style.</p>
+</div>
 
 <!-- STATEMENT -->
 <section class="statement">
@@ -220,29 +248,45 @@ img { display: block; max-width: 100%; }
   </div>
 </section>
 
-<!-- GALLERY -->
+<!-- GALLERY — images link to about page sections -->
 <section class="gallery">
   <div class="gallery-grid">
     <div class="gallery-left">
-      <div class="gallery-left-inner">
+      <a href="/about.html#zero-silica" class="gallery-left-inner" style="text-decoration:none;color:inherit;">
         <img src="images/collection_235.jpg" alt="Carrara Collection">
         <div class="gallery-caption">
           <span class="gc-title">Carrara</span><br>
           <span class="gc-sub">Collection 02</span>
         </div>
-      </div>
+      </a>
     </div>
     <div class="gallery-right">
-      <div class="gallery-right-inner">
+      <a href="/about.html#alphashield" class="gallery-right-inner" style="text-decoration:none;color:inherit;">
         <div class="gallery-caption">
           <span class="gc-title">Statuario Gold</span><br>
           <span class="gc-sub">Collection 04</span>
         </div>
         <img src="images/collection_242.jpg" alt="Statuario Gold Collection">
-      </div>
+      </a>
     </div>
   </div>
 </section>
+
+<!-- MIDDLE — Lifestyle CTA linking to Collections -->
+<section class="middle-cta" style="position:relative;width:100%;height:500px;overflow:hidden;">
+  <img src="images/collection-hero-03.webp" alt="Alpha Surfaces slab" style="position:absolute;inset:0;width:110%;height:110%;object-fit:cover;animation:slabPanMiddle 25s ease-in-out infinite alternate;">
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;">
+    <p style="font-family:'Concrette S',serif;font-weight:500;font-size:36px;color:#fff;max-width:600px;line-height:1.2;margin-bottom:24px;">Natural stone depth, clarity and translucency.</p>
+    <a href="/collections.html" style="font-family:'Degular',sans-serif;font-weight:500;font-size:14px;color:#fff;text-decoration:underline;text-underline-offset:4px;letter-spacing:0.1em;text-transform:uppercase;">View Collections</a>
+  </div>
+</section>
+<style>
+@keyframes slabPanMiddle {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-3%, -2%) scale(1.02); }
+  100% { transform: translate(-5%, -1%) scale(1); }
+}
+</style>
 
 <!-- CONTACT -->
 <section class="contact" id="contact">
