@@ -392,7 +392,9 @@
           "name": "Venatino",
           "slug": "venatino",
           "finish": "Polished",
-          "image": "",
+          "image": "/images/stones/venatino.webp",
+          "thumbnail": "/images/stones/venatino-thumb.webp",
+          "swatch": "/images/stones/venatino.webp",
           "slab_width": 3200,
           "slab_height": 1600,
           "thickness": 20,
@@ -412,7 +414,9 @@
           "name": "Glacier Grey",
           "finish": "Polished",
           "slug": "glacier-grey",
-          "image": ""
+          "image": "/images/stones/glacier-grey.webp",
+          "thumbnail": "/images/stones/glacier-grey-thumb.webp",
+          "swatch": "/images/stones/glacier-grey.webp"
         },
         {
           "name": "Infinity Gris",
@@ -438,13 +442,17 @@
           "name": "Acropolis",
           "finish": "Polished",
           "slug": "acropolis",
-          "image": ""
+          "image": "/images/stones/acropolis.webp",
+          "thumbnail": "/images/stones/acropolis-thumb.webp",
+          "swatch": "/images/stones/acropolis.webp"
         },
         {
           "name": "Serena",
           "finish": "Polished",
           "slug": "serena",
-          "image": ""
+          "image": "/images/stones/serena.webp",
+          "thumbnail": "/images/stones/serena-thumb.webp",
+          "swatch": "/images/stones/serena.webp"
         },
         {
           "name": "Basaltina",
@@ -544,7 +552,9 @@
           "name": "Calacatta Borghini",
           "finish": "Polished",
           "slug": "calacatta-borghini",
-          "image": ""
+          "image": "/images/stones/calacatta-borghini.webp",
+          "thumbnail": "/images/stones/calacatta-borghini-thumb.webp",
+          "swatch": "/images/stones/calacatta-borghini.webp"
         }
       ]
     }
