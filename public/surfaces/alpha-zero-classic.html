@@ -163,7 +163,7 @@ img { display: block; max-width: 100%; }
         if (stone) break;
       }
 
-      if (!stone) return;
+      if (!stone) { window.location.replace("/collections.html"); return; }
 
       // --- Title ---
       document.title = stone.name + ' | Alpha Surfaces';
