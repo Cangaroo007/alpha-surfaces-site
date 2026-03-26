@@ -1,0 +1,2257 @@
+From 3aa4998c6b963242f1f01ddd025e7fe866e795aa Mon Sep 17 00:00:00 2001
+From: Sean <sean@cangaroo.ai>
+Date: Thu, 26 Mar 2026 12:38:03 -0700
+Subject: [PATCH] Add animations and design updates from Figma notes
+
+- Hero: Ken Burns slow zoom/pan animation on hero image
+- Hero: Alpha "A" logo overlay with fade-in (acnestudios reference)
+- Hero: "Stone.Life. Style." tagline section below hero
+- Landing: "Natural stone depth" middle CTA section linking to collections
+- Landing: Gallery images now link to about page anchor points
+- Collections: Slab pan animation on collection swatch images
+- Product pages (52): Slab pan animation on full slab images
+- Product pages (52): Subtle zoom on hover for close-up swatch images
+- All animations respect prefers-reduced-motion
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+---
+ public/collections.html                  |  14 +++++-
+ public/images/alpha-a-symbol.webp        | Bin 0 -> 62986 bytes
+ public/index.html                        |  58 ++++++++++++++++++++---
+ public/surfaces/acropolis.html           |   7 ++-
+ public/surfaces/alpha-zero-classic.html  |   7 ++-
+ public/surfaces/alpha-zero-pure.html     |   7 ++-
+ public/surfaces/arabescato.html          |   7 ++-
+ public/surfaces/arctic.html              |   7 ++-
+ public/surfaces/ash.html                 |   7 ++-
+ public/surfaces/autumn-gold.html         |   7 ++-
+ public/surfaces/basaltina.html           |   7 ++-
+ public/surfaces/bondi.html               |   7 ++-
+ public/surfaces/brilliance.html          |   7 ++-
+ public/surfaces/broome.html              |   7 ++-
+ public/surfaces/cabarita.html            |   7 ++-
+ public/surfaces/calacatta-borghini.html  |   7 ++-
+ public/surfaces/calacatta-leggera.html   |   7 ++-
+ public/surfaces/calacatta-oro.html       |   7 ++-
+ public/surfaces/calacatta-viola.html     |   7 ++-
+ public/surfaces/carbon.html              |   7 ++-
+ public/surfaces/carrara.html             |   7 ++-
+ public/surfaces/crystal.html             |   7 ++-
+ public/surfaces/davinci-gris.html        |   7 ++-
+ public/surfaces/davinci-oro.html         |   7 ++-
+ public/surfaces/desert-dune.html         |   7 ++-
+ public/surfaces/earthy-concrete.html     |   7 ++-
+ public/surfaces/elba.html                |   7 ++-
+ public/surfaces/eternity.html            |   7 ++-
+ public/surfaces/fraser.html              |   7 ++-
+ public/surfaces/glacier-grey.html        |   7 ++-
+ public/surfaces/glacier.html             |   7 ++-
+ public/surfaces/grande-glacier.html      |   7 ++-
+ public/surfaces/graphite.html            |   7 ++-
+ public/surfaces/jewel.html               |   7 ++-
+ public/surfaces/metallic-grey.html       |   7 ++-
+ public/surfaces/mont-blanc.html          |   7 ++-
+ public/surfaces/noosa.html               |   7 ++-
+ public/surfaces/opal-mist.html           |   7 ++-
+ public/surfaces/oyster-grey.html         |   7 ++-
+ public/surfaces/patagonia.html           |   7 ++-
+ public/surfaces/pearl.html               |   7 ++-
+ public/surfaces/salt-stone.html          |   7 ++-
+ public/surfaces/santorini-gold.html      |   7 ++-
+ public/surfaces/serena.html              |   7 ++-
+ public/surfaces/shell.html               |   7 ++-
+ public/surfaces/silver-travertine.html   |   7 ++-
+ public/surfaces/statuario-gold.html      |   7 ++-
+ public/surfaces/statuario-venato.html    |   7 ++-
+ public/surfaces/taj-mahal.html           |   7 ++-
+ public/surfaces/torquay.html             |   7 ++-
+ public/surfaces/travertino-classico.html |   7 ++-
+ public/surfaces/unique-carrara.html      |   7 ++-
+ public/surfaces/viola-ligera.html        |   7 ++-
+ public/surfaces/white-cloud.html         |   7 ++-
+ public/surfaces/whitehaven.html          |   7 ++-
+ 55 files changed, 323 insertions(+), 113 deletions(-)
+ create mode 100644 public/images/alpha-a-symbol.webp
+
+diff --git a/public/collections.html b/public/collections.html
+index 86590c4..e433c4d 100644
+--- a/public/collections.html
++++ b/public/collections.html
+@@ -52,8 +52,13 @@ img { display: block; max-width: 100%; }
+ 
+ /* --- COLLECTION SWATCH --- */
+ .coll-swatch { width: 100%; height: 715px; overflow: hidden; position: relative; }
+-.coll-swatch-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease; }
+-.coll-swatch-img.active { opacity: 1; }
++.coll-swatch-img { position: absolute; inset: 0; width: 110%; height: 110%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease; transform: translate(0, 0); }
++.coll-swatch-img.active { opacity: 1; animation: slabPan 25s ease-in-out infinite alternate; }
++@keyframes slabPan {
++  0% { transform: translate(0, 0) scale(1); }
++  50% { transform: translate(-3%, -2%) scale(1.02); }
++  100% { transform: translate(-5%, -1%) scale(1); }
++}
+ .coll-swatch-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 32px 40px; background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 100%); pointer-events: none; z-index: 1; }
+ .coll-swatch-label { font-family: 'Concrette S', serif; font-weight: 400; font-size: 14px; color: var(--white); line-height: 1.4; }
+ 
+@@ -108,6 +113,11 @@ img { display: block; max-width: 100%; }
+ .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+ .reveal.visible { opacity: 1; transform: translateY(0); }
+ 
++/* --- REDUCED MOTION --- */
++@media (prefers-reduced-motion: reduce) {
++  .coll-swatch-img.active { animation: none !important; width: 100%; height: 100%; }
++}
++
+ /* --- MOBILE --- */
+ @media (max-width: 1024px) {
+   .hero { height: 400px; }
+diff --git a/public/images/alpha-a-symbol.webp b/public/images/alpha-a-symbol.webp
+new file mode 100644
+index 0000000000000000000000000000000000000000..c1947aa13691f00976feaafd2fe775a7ac0aec5a
+GIT binary patch
+literal 62986
+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
+LMhGIE3BdmVWIpE4
+
+literal 0
+HcmV?d00001
+
+diff --git a/public/index.html b/public/index.html
+index 9471066..e5a4e98 100644
+--- a/public/index.html
++++ b/public/index.html
+@@ -31,10 +31,19 @@ img { display: block; max-width: 100%; }
+ 
+ /* --- HERO --- */
+ .hero { position: relative; width: 100%; overflow: hidden; }
+-.hero-video { width: 100%; height: 730px; object-fit: cover; display: block; }
+-.hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; }
++.hero-video { width: 100%; height: 730px; object-fit: cover; display: block; animation: heroKenBurns 20s ease-in-out infinite alternate; transform-origin: center center; }
++@keyframes heroKenBurns {
++  0% { transform: scale(1) translate(0, 0); }
++  100% { transform: scale(1.08) translate(-1%, -1%); }
++}
++.hero-logo-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 1; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; }
++.hero-logo-overlay img { width: 45%; max-width: 500px; height: auto; opacity: 0.55; mix-blend-mode: multiply; filter: brightness(0.6); }
++@keyframes heroLogoFadeIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
++.hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; z-index: 2; }
+ .hero-caption .caption-title { font-family: 'Concrette S', serif; font-weight: 700; }
+ .hero-caption .caption-sub { font-family: 'Concrette S', serif; font-weight: 400; }
++.hero-tagline { text-align: center; padding: 48px 24px; background: var(--cream, #f3f1e6); }
++.hero-tagline p { font-family: 'Concrette S', serif; font-weight: 500; font-size: 36px; color: var(--black); letter-spacing: 0.02em; }
+ 
+ /* --- STATEMENT --- */
+ .statement { background: var(--olive); display: flex; flex-direction: column; align-items: center; padding: 150px 171px 0; min-height: 661px; position: relative; }
+@@ -125,10 +134,21 @@ img { display: block; max-width: 100%; }
+ .footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
+ .footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
+ 
++/* --- REDUCED MOTION --- */
++@media (prefers-reduced-motion: reduce) {
++  .hero-video { animation: none !important; }
++  .hero-logo-overlay { animation: none !important; opacity: 1 !important; }
++  .middle-cta img { animation: none !important; }
++}
++
+ /* --- MOBILE --- */
+ @media (max-width: 1024px) {
+   .hero-video { height: 340px; }
+   .hero-caption { padding: 12px; }
++  .hero-logo-overlay img { width: 60%; max-width: 280px; }
++  .hero-tagline p { font-size: 24px; padding: 32px 24px; }
++  .middle-cta { height: 350px !important; }
++  .middle-cta p { font-size: 24px !important; }
+ 
+   .statement { padding: 44px 24px 88px; min-height: auto; gap: 124px; }
+   .statement p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 24px; line-height: 1.15; }
+@@ -187,12 +207,20 @@ img { display: block; max-width: 100%; }
+ <!-- HERO -->
+ <section class="hero">
+   <img class="hero-video" src="images/hero.jpg" alt="Alpha Surfaces premium benchtop">
++  <div class="hero-logo-overlay">
++    <img src="images/alpha-a-symbol.webp" alt="">
++  </div>
+   <div class="hero-caption">
+     <span class="caption-title">Autumn Gold</span><br>
+     <span class="caption-sub">Collection 05</span>
+   </div>
+ </section>
+ 
++<!-- TAGLINE -->
++<div class="hero-tagline">
++  <p>Stone.Life. Style.</p>
++</div>
++
+ <!-- STATEMENT -->
+ <section class="statement">
+   <p>We're evolving with a new look, refreshed premium collections, and the same cutting-edge technology that defines industry-leading innovation – delivering Australia's complete surface solution.</p>
+@@ -220,30 +248,46 @@ img { display: block; max-width: 100%; }
+   </div>
+ </section>
+ 
+-<!-- GALLERY -->
++<!-- GALLERY — images link to about page sections -->
+ <section class="gallery">
+   <div class="gallery-grid">
+     <div class="gallery-left">
+-      <div class="gallery-left-inner">
++      <a href="/about.html#zero-silica" class="gallery-left-inner" style="text-decoration:none;color:inherit;">
+         <img src="images/collection_235.jpg" alt="Carrara Collection">
+         <div class="gallery-caption">
+           <span class="gc-title">Carrara</span><br>
+           <span class="gc-sub">Collection 02</span>
+         </div>
+-      </div>
++      </a>
+     </div>
+     <div class="gallery-right">
+-      <div class="gallery-right-inner">
++      <a href="/about.html#alphashield" class="gallery-right-inner" style="text-decoration:none;color:inherit;">
+         <div class="gallery-caption">
+           <span class="gc-title">Statuario Gold</span><br>
+           <span class="gc-sub">Collection 04</span>
+         </div>
+         <img src="images/collection_242.jpg" alt="Statuario Gold Collection">
+-      </div>
++      </a>
+     </div>
+   </div>
+ </section>
+ 
++<!-- MIDDLE — Lifestyle CTA linking to Collections -->
++<section class="middle-cta" style="position:relative;width:100%;height:500px;overflow:hidden;">
++  <img src="images/collection-hero-03.webp" alt="Alpha Surfaces slab" style="position:absolute;inset:0;width:110%;height:110%;object-fit:cover;animation:slabPanMiddle 25s ease-in-out infinite alternate;">
++  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;">
++    <p style="font-family:'Concrette S',serif;font-weight:500;font-size:36px;color:#fff;max-width:600px;line-height:1.2;margin-bottom:24px;">Natural stone depth, clarity and translucency.</p>
++    <a href="/collections.html" style="font-family:'Degular',sans-serif;font-weight:500;font-size:14px;color:#fff;text-decoration:underline;text-underline-offset:4px;letter-spacing:0.1em;text-transform:uppercase;">View Collections</a>
++  </div>
++</section>
++<style>
++@keyframes slabPanMiddle {
++  0% { transform: translate(0, 0) scale(1); }
++  50% { transform: translate(-3%, -2%) scale(1.02); }
++  100% { transform: translate(-5%, -1%) scale(1); }
++}
++</style>
++
+ <!-- CONTACT -->
+ <section class="contact" id="contact">
+   <div class="contact-inner">
+diff --git a/public/surfaces/acropolis.html b/public/surfaces/acropolis.html
+index fc5fb56..08fb3f3 100644
+--- a/public/surfaces/acropolis.html
++++ b/public/surfaces/acropolis.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/alpha-zero-classic.html b/public/surfaces/alpha-zero-classic.html
+index c442126..7175252 100644
+--- a/public/surfaces/alpha-zero-classic.html
++++ b/public/surfaces/alpha-zero-classic.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/alpha-zero-pure.html b/public/surfaces/alpha-zero-pure.html
+index 18b6909..f82dcf2 100644
+--- a/public/surfaces/alpha-zero-pure.html
++++ b/public/surfaces/alpha-zero-pure.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/arabescato.html b/public/surfaces/arabescato.html
+index 74b7317..a5da297 100644
+--- a/public/surfaces/arabescato.html
++++ b/public/surfaces/arabescato.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/arctic.html b/public/surfaces/arctic.html
+index 683e5ff..371ea8e 100644
+--- a/public/surfaces/arctic.html
++++ b/public/surfaces/arctic.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/ash.html b/public/surfaces/ash.html
+index 9e52f08..47a0ea3 100644
+--- a/public/surfaces/ash.html
++++ b/public/surfaces/ash.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/autumn-gold.html b/public/surfaces/autumn-gold.html
+index 020a065..7ec24d5 100644
+--- a/public/surfaces/autumn-gold.html
++++ b/public/surfaces/autumn-gold.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/basaltina.html b/public/surfaces/basaltina.html
+index d5fea2c..06bc7c3 100644
+--- a/public/surfaces/basaltina.html
++++ b/public/surfaces/basaltina.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/bondi.html b/public/surfaces/bondi.html
+index 600c7de..db44312 100644
+--- a/public/surfaces/bondi.html
++++ b/public/surfaces/bondi.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/brilliance.html b/public/surfaces/brilliance.html
+index a43a95d..8a31487 100644
+--- a/public/surfaces/brilliance.html
++++ b/public/surfaces/brilliance.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/broome.html b/public/surfaces/broome.html
+index d46dd9f..c7b019c 100644
+--- a/public/surfaces/broome.html
++++ b/public/surfaces/broome.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/cabarita.html b/public/surfaces/cabarita.html
+index 31f2111..288459f 100644
+--- a/public/surfaces/cabarita.html
++++ b/public/surfaces/cabarita.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/calacatta-borghini.html b/public/surfaces/calacatta-borghini.html
+index 9c17db7..4e5f99b 100644
+--- a/public/surfaces/calacatta-borghini.html
++++ b/public/surfaces/calacatta-borghini.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/calacatta-leggera.html b/public/surfaces/calacatta-leggera.html
+index f6e6837..c644de6 100644
+--- a/public/surfaces/calacatta-leggera.html
++++ b/public/surfaces/calacatta-leggera.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/calacatta-oro.html b/public/surfaces/calacatta-oro.html
+index 6b82dd5..79ac63b 100644
+--- a/public/surfaces/calacatta-oro.html
++++ b/public/surfaces/calacatta-oro.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/calacatta-viola.html b/public/surfaces/calacatta-viola.html
+index 8076e12..d1d939a 100644
+--- a/public/surfaces/calacatta-viola.html
++++ b/public/surfaces/calacatta-viola.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/carbon.html b/public/surfaces/carbon.html
+index 3ab63c9..bfe6879 100644
+--- a/public/surfaces/carbon.html
++++ b/public/surfaces/carbon.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/carrara.html b/public/surfaces/carrara.html
+index 63f1659..e558345 100644
+--- a/public/surfaces/carrara.html
++++ b/public/surfaces/carrara.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/crystal.html b/public/surfaces/crystal.html
+index 6bf7077..436a90b 100644
+--- a/public/surfaces/crystal.html
++++ b/public/surfaces/crystal.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/davinci-gris.html b/public/surfaces/davinci-gris.html
+index f8a53c9..4941a7a 100644
+--- a/public/surfaces/davinci-gris.html
++++ b/public/surfaces/davinci-gris.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/davinci-oro.html b/public/surfaces/davinci-oro.html
+index 10b1d3d..9e76505 100644
+--- a/public/surfaces/davinci-oro.html
++++ b/public/surfaces/davinci-oro.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/desert-dune.html b/public/surfaces/desert-dune.html
+index 730688d..41e89cf 100644
+--- a/public/surfaces/desert-dune.html
++++ b/public/surfaces/desert-dune.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/earthy-concrete.html b/public/surfaces/earthy-concrete.html
+index 68c1163..b827944 100644
+--- a/public/surfaces/earthy-concrete.html
++++ b/public/surfaces/earthy-concrete.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/elba.html b/public/surfaces/elba.html
+index 29da964..be0c98f 100644
+--- a/public/surfaces/elba.html
++++ b/public/surfaces/elba.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/eternity.html b/public/surfaces/eternity.html
+index 17cdccf..af759d7 100644
+--- a/public/surfaces/eternity.html
++++ b/public/surfaces/eternity.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/fraser.html b/public/surfaces/fraser.html
+index de1f039..bcb7d48 100644
+--- a/public/surfaces/fraser.html
++++ b/public/surfaces/fraser.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/glacier-grey.html b/public/surfaces/glacier-grey.html
+index a2486cf..fbfe967 100644
+--- a/public/surfaces/glacier-grey.html
++++ b/public/surfaces/glacier-grey.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/glacier.html b/public/surfaces/glacier.html
+index 408a2cb..5534e71 100644
+--- a/public/surfaces/glacier.html
++++ b/public/surfaces/glacier.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/grande-glacier.html b/public/surfaces/grande-glacier.html
+index 901982a..9117284 100644
+--- a/public/surfaces/grande-glacier.html
++++ b/public/surfaces/grande-glacier.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/graphite.html b/public/surfaces/graphite.html
+index c1366bb..6f85d55 100644
+--- a/public/surfaces/graphite.html
++++ b/public/surfaces/graphite.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/jewel.html b/public/surfaces/jewel.html
+index ca57ce0..df4e48d 100644
+--- a/public/surfaces/jewel.html
++++ b/public/surfaces/jewel.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/metallic-grey.html b/public/surfaces/metallic-grey.html
+index c999cdd..40b990c 100644
+--- a/public/surfaces/metallic-grey.html
++++ b/public/surfaces/metallic-grey.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/mont-blanc.html b/public/surfaces/mont-blanc.html
+index cde491e..a1818cf 100644
+--- a/public/surfaces/mont-blanc.html
++++ b/public/surfaces/mont-blanc.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/noosa.html b/public/surfaces/noosa.html
+index 60c7c18..c1b206d 100644
+--- a/public/surfaces/noosa.html
++++ b/public/surfaces/noosa.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/opal-mist.html b/public/surfaces/opal-mist.html
+index c08fb11..c365b6d 100644
+--- a/public/surfaces/opal-mist.html
++++ b/public/surfaces/opal-mist.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/oyster-grey.html b/public/surfaces/oyster-grey.html
+index 1ba4170..463763b 100644
+--- a/public/surfaces/oyster-grey.html
++++ b/public/surfaces/oyster-grey.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/patagonia.html b/public/surfaces/patagonia.html
+index c306f48..fe862e6 100644
+--- a/public/surfaces/patagonia.html
++++ b/public/surfaces/patagonia.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/pearl.html b/public/surfaces/pearl.html
+index 5702a5b..8730b32 100644
+--- a/public/surfaces/pearl.html
++++ b/public/surfaces/pearl.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/salt-stone.html b/public/surfaces/salt-stone.html
+index c1b662f..5c11187 100644
+--- a/public/surfaces/salt-stone.html
++++ b/public/surfaces/salt-stone.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/santorini-gold.html b/public/surfaces/santorini-gold.html
+index 18ebd45..23ba62a 100644
+--- a/public/surfaces/santorini-gold.html
++++ b/public/surfaces/santorini-gold.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/serena.html b/public/surfaces/serena.html
+index f63f182..607a244 100644
+--- a/public/surfaces/serena.html
++++ b/public/surfaces/serena.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/shell.html b/public/surfaces/shell.html
+index 98994ab..b07f974 100644
+--- a/public/surfaces/shell.html
++++ b/public/surfaces/shell.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/silver-travertine.html b/public/surfaces/silver-travertine.html
+index d131514..af38f21 100644
+--- a/public/surfaces/silver-travertine.html
++++ b/public/surfaces/silver-travertine.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/statuario-gold.html b/public/surfaces/statuario-gold.html
+index fa2be39..bd78946 100644
+--- a/public/surfaces/statuario-gold.html
++++ b/public/surfaces/statuario-gold.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/statuario-venato.html b/public/surfaces/statuario-venato.html
+index c3f9af2..45c9f3b 100644
+--- a/public/surfaces/statuario-venato.html
++++ b/public/surfaces/statuario-venato.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/taj-mahal.html b/public/surfaces/taj-mahal.html
+index 664e380..a2a5cd7 100644
+--- a/public/surfaces/taj-mahal.html
++++ b/public/surfaces/taj-mahal.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/torquay.html b/public/surfaces/torquay.html
+index d48052e..e53b62e 100644
+--- a/public/surfaces/torquay.html
++++ b/public/surfaces/torquay.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/travertino-classico.html b/public/surfaces/travertino-classico.html
+index c9a6e6e..29d496d 100644
+--- a/public/surfaces/travertino-classico.html
++++ b/public/surfaces/travertino-classico.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/unique-carrara.html b/public/surfaces/unique-carrara.html
+index 04046fe..0c8a2b7 100644
+--- a/public/surfaces/unique-carrara.html
++++ b/public/surfaces/unique-carrara.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/viola-ligera.html b/public/surfaces/viola-ligera.html
+index fb55ff4..b8264ca 100644
+--- a/public/surfaces/viola-ligera.html
++++ b/public/surfaces/viola-ligera.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/white-cloud.html b/public/surfaces/white-cloud.html
+index 0b33d64..63f4050 100644
+--- a/public/surfaces/white-cloud.html
++++ b/public/surfaces/white-cloud.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+diff --git a/public/surfaces/whitehaven.html b/public/surfaces/whitehaven.html
+index 2bbb479..c8738e8 100644
+--- a/public/surfaces/whitehaven.html
++++ b/public/surfaces/whitehaven.html
+@@ -51,12 +51,15 @@ img { display: block; max-width: 100%; }
+ .btn-order:hover { opacity: 0.9; }
+ .intro-disclaimer { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; line-height: 1.2; color: var(--black); max-width: 500px; }
+ .intro-swatch { flex: 1; min-width: 0; align-self: stretch; }
+-.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; }
++.intro-swatch { overflow: hidden; }
++.intro-swatch img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; cursor: zoom-in; }
++.intro-swatch img:hover { transform: scale(1.05); }
+ .intro-swatch-placeholder { width: 100%; height: 100%; min-height: 500px; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 20px; color: rgba(0,0,0,0.15); font-style: italic; }
+ 
+ /* --- FULL SWATCH --- */
+ .full-swatch { width: 100%; height: 715px; overflow: hidden; }
+-.full-swatch img { width: 100%; height: 100%; object-fit: cover; }
++.full-swatch img { width: 110%; height: 110%; object-fit: cover; animation: slabPanProduct 25s ease-in-out infinite alternate; }
++@keyframes slabPanProduct { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-3%, -2%) scale(1.02); } 100% { transform: translate(-5%, -1%) scale(1); } }
+ .full-swatch-placeholder { width: 100%; height: 100%; background: #c8c0ab; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 24px; color: rgba(0,0,0,0.2); font-style: italic; }
+ 
+ /* --- GALLERY --- */
+-- 
+2.34.1
+
