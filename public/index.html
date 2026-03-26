@@ -63,30 +63,22 @@ img { display: block; max-width: 100%; }
 .about-body p:last-child { margin-bottom: 0; }
 
 /* --- GALLERY --- */
-.gallery { background: var(--cream); padding: 40px 161px 100px; }
-.gallery-grid { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; min-height: 840px; }
-.gallery-left { display: flex; align-items: flex-start; }
-.gallery-left-inner { display: flex; flex-direction: column; gap: 12px; width: 525px; }
-.gallery-left-inner img { width: 100%; height: 702px; object-fit: cover; display: block; }
-.gallery-right { display: flex; align-items: flex-end; height: 100%; min-height: 840px; }
-.gallery-right-inner { display: flex; flex-direction: column; gap: 10px; }
-.gallery-right-inner img { width: 442px; height: 561px; object-fit: cover; display: block; }
-.gallery-caption { font-size: 12px; line-height: 1.2; color: var(--black); width: 293px; }
-.gallery-caption .gc-title { font-family: 'Concrette S', serif; font-weight: 700; }
-.gallery-caption .gc-sub { font-family: 'Concrette S', serif; font-weight: 400; }
+.gallery { background: var(--cream); padding: 40px 80px 80px; }
+.gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.gallery-grid a { display: block; text-decoration: none; overflow: hidden; }
+.gallery-grid img { width: 100%; height: 500px; object-fit: cover; display: block; transition: transform 0.6s ease; }
+.gallery-grid a:hover img { transform: scale(1.03); }
 
 /* --- FEATURE PANELS --- */
-.feature-panels { background: var(--cream); display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
-.feature-panel { position: relative; overflow: hidden; }
-.feature-panel-link { display: block; text-decoration: none; color: inherit; position: relative; }
-.feature-panel-img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; transition: transform 0.6s ease; }
+.feature-panels { background: var(--cream); display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; padding: 0 80px 80px; }
+.feature-panel { overflow: hidden; }
+.feature-panel-link { display: block; text-decoration: none; color: inherit; }
+.feature-panel-img-wrap { overflow: hidden; }
+.feature-panel-img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; transition: transform 0.6s ease; }
 .feature-panel-link:hover .feature-panel-img { transform: scale(1.04); }
-.feature-panel-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 24px; background: linear-gradient(to bottom, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.35) 100%); }
-.feature-panel-icon { width: 56px; height: 56px; margin-bottom: 20px; opacity: 0.9; }
-.feature-panel-label { font-family: 'Degular', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #fff; margin-bottom: 12px; }
-.feature-panel-desc { font-family: 'Concrette S', serif; font-weight: 400; font-size: 18px; line-height: 1.3; color: #fff; max-width: 260px; margin-bottom: 20px; }
-.feature-panel-cta { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: #fff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.6); padding-bottom: 2px; transition: border-color 0.3s; }
-.feature-panel-link:hover .feature-panel-cta { border-color: #fff; }
+.feature-panel-body { background: var(--cream); text-align: center; padding: 24px 20px 32px; }
+.feature-panel-desc { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; line-height: 1.3; color: var(--black); margin-bottom: 12px; }
+.feature-panel-cta { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.08em; text-transform: capitalize; color: var(--olive); text-decoration: underline; text-underline-offset: 3px; }
 
 /* --- SITE FOOTER --- */
 .site-footer { background: var(--white); padding: 80px 50px 30px; }
@@ -135,17 +127,14 @@ img { display: block; max-width: 100%; }
   .about-bottom { justify-content: flex-start; }
   .about-top { margin-bottom: 45px; }
 
-  .gallery { padding: 24px 24px 44px; background: var(--cream); }
-  .gallery-grid { flex-direction: column; gap: 44px; min-height: auto; }
-  .gallery-left-inner { width: 100%; }
-  .gallery-left-inner img { height: 464px; }
-  .gallery-right { min-height: auto; align-items: flex-start; }
-  .gallery-right-inner { width: 100%; }
-  .gallery-right-inner img { width: 100%; height: 441px; }
+  .gallery { padding: 20px 24px 40px; }
+  .gallery-grid { grid-template-columns: 1fr; gap: 16px; }
+  .gallery-grid img { height: 300px; }
 
-  .feature-panels { grid-template-columns: 1fr; }
-  .feature-panel-img { aspect-ratio: 4 / 3; }
-  .feature-panel-desc { font-size: 16px; }
+  .feature-panels { grid-template-columns: 1fr; padding: 0 24px 40px; }
+  .feature-panel-img { aspect-ratio: 16 / 9; }
+  .feature-panel-body { padding: 16px 12px 24px; }
+  .feature-panel-desc { font-size: 14px; }
 
   .site-footer { padding: 44px 24px 20px; }
   .site-footer-inner { flex-direction: column; gap: 32px; }
@@ -183,27 +172,15 @@ img { display: block; max-width: 100%; }
   <p>Stone.Life. Style.</p>
 </div>
 
-<!-- GALLERY — lifestyle images link to about page sections -->
+<!-- GALLERY — two lifestyle images side by side -->
 <section class="gallery">
   <div class="gallery-grid">
-    <div class="gallery-left">
-      <a href="/about.html#zero-silica" class="gallery-left-inner" style="text-decoration:none;color:inherit;">
-        <img src="images/collection_235.jpg" alt="Carrara Collection">
-        <div class="gallery-caption">
-          <span class="gc-title">Carrara</span><br>
-          <span class="gc-sub">Collection 02</span>
-        </div>
-      </a>
-    </div>
-    <div class="gallery-right">
-      <a href="/about.html#alphashield" class="gallery-right-inner" style="text-decoration:none;color:inherit;">
-        <div class="gallery-caption">
-          <span class="gc-title">Statuario Gold</span><br>
-          <span class="gc-sub">Collection 04</span>
-        </div>
-        <img src="images/collection_242.jpg" alt="Statuario Gold Collection">
-      </a>
-    </div>
+    <a href="/about.html#zero-silica">
+      <img src="images/collection_235.jpg" alt="Lifestyle kitchen scene">
+    </a>
+    <a href="/about.html#alphashield">
+      <img src="images/collection_242.jpg" alt="Lifestyle kitchen scene">
+    </a>
   </div>
 </section>
 
@@ -238,33 +215,33 @@ img { display: block; max-width: 100%; }
 <section class="feature-panels">
   <div class="feature-panel">
     <a href="/about.html#zero-silica" class="feature-panel-link">
-      <img class="feature-panel-img" src="images/zero-silica-hero.webp" alt="Zero Silica surfaces">
-      <div class="feature-panel-overlay">
-        <svg class="feature-panel-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="26" stroke="white" stroke-width="1.5"/><path d="M28 14v24M20 22l8-8 8 8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span class="feature-panel-label">Zero Silica</span>
-        <p class="feature-panel-desc">High-performance mineral surfaces — safe for fabricators and families.</p>
+      <div class="feature-panel-img-wrap">
+        <img class="feature-panel-img" src="images/zero-silica-hero.webp" alt="Zero Silica surfaces">
+      </div>
+      <div class="feature-panel-body">
+        <p class="feature-panel-desc">High-performance mineral surfaces</p>
         <span class="feature-panel-cta">Learn</span>
       </div>
     </a>
   </div>
   <div class="feature-panel">
     <a href="/about.html#indoor-outdoor" class="feature-panel-link">
-      <img class="feature-panel-img" src="images/indoor-outdoor-hero.webp" alt="Indoor-Outdoor UV-stable range">
-      <div class="feature-panel-overlay">
-        <svg class="feature-panel-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="12" stroke="white" stroke-width="1.5"/><path d="M28 8v4M28 44v4M48 28h-4M12 28H8M42.14 13.86l-2.83 2.83M16.69 39.31l-2.83 2.83M42.14 42.14l-2.83-2.83M16.69 16.69l-2.83-2.83" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
-        <span class="feature-panel-label">Indoor–Outdoor</span>
-        <p class="feature-panel-desc">UV-stable performance for the indoor-outdoor range.</p>
+      <div class="feature-panel-img-wrap">
+        <img class="feature-panel-img" src="images/indoor-outdoor-hero.webp" alt="Indoor-Outdoor UV-stable range">
+      </div>
+      <div class="feature-panel-body">
+        <p class="feature-panel-desc">UV-stable performance Indoor-Outdoor range</p>
         <span class="feature-panel-cta">View</span>
       </div>
     </a>
   </div>
   <div class="feature-panel">
     <a href="/about.html#alphashield" class="feature-panel-link">
-      <img class="feature-panel-img" src="images/alphashield-hero.webp" alt="AlphaShield protection technology">
-      <div class="feature-panel-overlay">
-        <svg class="feature-panel-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M28 4L6 16v16c0 12 10 18 22 22 12-4 22-10 22-22V16L28 4z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M20 28l6 6 10-12" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span class="feature-panel-label">AlphaShield</span>
-        <p class="feature-panel-desc">Lifetime stain resistance guarantee.</p>
+      <div class="feature-panel-img-wrap">
+        <img class="feature-panel-img" src="images/alphashield-hero.webp" alt="AlphaShield protection technology">
+      </div>
+      <div class="feature-panel-body">
+        <p class="feature-panel-desc">Lifetime stain resistance guarantee</p>
         <span class="feature-panel-cta">Discover</span>
       </div>
     </a>
@@ -321,7 +298,7 @@ img { display: block; max-width: 100%; }
   </div>
 </footer>
 
-<script src="animation.js?v=10"></script>
+<script src="animation.js?v=11"></script>
 <script src="nav.js?v=10"></script>
 <script src="sample-modal.js?v=1"></script>
 </body>
