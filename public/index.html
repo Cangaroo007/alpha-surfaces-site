@@ -73,9 +73,12 @@ img { display: block; max-width: 100%; }
 .feature-panels { background: var(--cream); display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; padding: 0 80px 80px; }
 .feature-panel { overflow: hidden; }
 .feature-panel-link { display: block; text-decoration: none; color: inherit; }
-.feature-panel-img-wrap { overflow: hidden; }
+.feature-panel-img-wrap { position: relative; overflow: hidden; }
 .feature-panel-img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; transition: transform 0.6s ease; }
 .feature-panel-link:hover .feature-panel-img { transform: scale(1.04); }
+.feature-panel-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.25) 100%); }
+.feature-panel-overlay svg { width: 56px; height: 56px; margin-bottom: 14px; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2)); }
+.feature-panel-overlay-label { font-family: 'Degular', sans-serif; font-weight: 600; font-size: 18px; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,0.3); }
 .feature-panel-body { background: var(--cream); text-align: center; padding: 24px 20px 32px; }
 .feature-panel-desc { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; line-height: 1.3; color: var(--black); margin-bottom: 12px; }
 .feature-panel-cta { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.08em; text-transform: capitalize; color: var(--olive); text-decoration: underline; text-underline-offset: 3px; }
@@ -175,11 +178,11 @@ img { display: block; max-width: 100%; }
 <!-- GALLERY — two lifestyle images side by side -->
 <section class="gallery">
   <div class="gallery-grid">
-    <a href="/about.html#zero-silica">
-      <img src="images/collection_235.jpg" alt="Lifestyle kitchen scene">
+    <a href="/collections.html">
+      <img src="images/gallery-kitchen.webp" alt="Modern kitchen with marble benchtop and motion blur">
     </a>
-    <a href="/about.html#alphashield">
-      <img src="images/collection_242.jpg" alt="Lifestyle kitchen scene">
+    <a href="/collections.html">
+      <img src="images/gallery-bathroom.webp" alt="Bathroom vanity with oval mirror and stone surfaces">
     </a>
   </div>
 </section>
@@ -217,6 +220,9 @@ img { display: block; max-width: 100%; }
     <a href="/about.html#zero-silica" class="feature-panel-link">
       <div class="feature-panel-img-wrap">
         <img class="feature-panel-img" src="images/zero-silica-hero.webp" alt="Zero Silica surfaces">
+        <div class="feature-panel-overlay">
+          <span class="feature-panel-overlay-label">Zero Silica</span>
+        </div>
       </div>
       <div class="feature-panel-body">
         <p class="feature-panel-desc">High-performance mineral surfaces</p>
@@ -228,6 +234,12 @@ img { display: block; max-width: 100%; }
     <a href="/about.html#indoor-outdoor" class="feature-panel-link">
       <div class="feature-panel-img-wrap">
         <img class="feature-panel-img" src="images/indoor-outdoor-hero.webp" alt="Indoor-Outdoor UV-stable range">
+        <div class="feature-panel-overlay">
+          <!-- Filled starburst icon matching Figma -->
+          <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M40 0L46 26L62 6L52 30L80 24L56 38L80 40L56 42L80 56L52 50L62 74L46 54L40 80L34 54L18 74L28 50L0 56L24 42L0 40L24 38L0 24L28 30L18 6L34 26L40 0Z" fill="white"/>
+          </svg>
+        </div>
       </div>
       <div class="feature-panel-body">
         <p class="feature-panel-desc">UV-stable performance Indoor-Outdoor range</p>
@@ -239,6 +251,14 @@ img { display: block; max-width: 100%; }
     <a href="/about.html#alphashield" class="feature-panel-link">
       <div class="feature-panel-img-wrap">
         <img class="feature-panel-img" src="images/alphashield-hero.webp" alt="AlphaShield protection technology">
+        <div class="feature-panel-overlay">
+          <!-- Filled shield/tulip icon matching Figma -->
+          <svg viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M28 0C28 0 28 24 28 38C28 52 16 62 4 70C4 70 0 60 0 44C0 28 0 0 0 0L28 0Z" fill="white"/>
+            <path d="M32 0C32 0 32 24 32 38C32 52 44 62 56 70C56 70 60 60 60 44C60 28 60 0 60 0L32 0Z" fill="white" opacity="0.65"/>
+          </svg>
+          <span class="feature-panel-overlay-label">Alpha Shield</span>
+        </div>
       </div>
       <div class="feature-panel-body">
         <p class="feature-panel-desc">Lifetime stain resistance guarantee</p>
@@ -250,7 +270,7 @@ img { display: block; max-width: 100%; }
 
 <!-- MIDDLE — Lifestyle CTA linking to Collections -->
 <section class="middle-cta" style="position:relative;width:100%;height:500px;overflow:hidden;">
-  <img src="images/collection-hero-03.webp" alt="Alpha Surfaces slab" style="position:absolute;top:-5%;left:-5%;width:110%;height:110%;object-fit:cover;animation:slabPanMiddle 25s ease-in-out infinite alternate;">
+  <img src="images/collection-hero-04.webp" alt="Alpha Surfaces marble slab with gold veining" style="position:absolute;top:-5%;left:-5%;width:110%;height:110%;object-fit:cover;animation:slabPanMiddle 25s ease-in-out infinite alternate;">
   <div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;">
     <p style="font-family:'Concrette S',serif;font-weight:500;font-size:36px;color:#fff;max-width:600px;line-height:1.2;margin-bottom:24px;">Natural stone depth, clarity and translucency.</p>
     <a href="/collections.html" style="font-family:'Degular',sans-serif;font-weight:500;font-size:14px;color:#fff;text-decoration:underline;text-underline-offset:4px;letter-spacing:0.1em;text-transform:uppercase;">View Collections</a>
