@@ -1,0 +1,202 @@
+/* ═══════════════════════════════════════════════════
+   ALPHA SURFACES — Mobile & Tablet Responsive Fixes
+   Breakpoints: Tablet 768-1199px, Mobile <768px
+   ═══════════════════════════════════════════════════ */
+
+/* --- GLOBAL --- */
+html { overflow-x: hidden; }
+body { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+
+/* --- FONT FALLBACKS (Windows/Chrome) --- */
+* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+/* --- TABLET: 768px - 1199px --- */
+@media (max-width: 1199px) and (min-width: 768px) {
+  .nav { padding: 16px 40px; }
+  .nav-logo { padding-left: 10px; }
+  .nav-logo img { height: 60px; }
+
+  /* Intro / About sections */
+  .intro { padding: 80px 60px; }
+  .statement { padding: 80px 60px 0; min-height: auto; }
+  .statement p { font-size: 32px; }
+  .about { padding: 80px 60px; }
+  .about-quote { font-size: 24px; }
+  .about-body { font-size: 17px; max-width: 100%; }
+
+  /* Gallery */
+  .gallery { padding: 0 60px 60px; }
+  .gallery-left-inner { width: 400px; }
+  .gallery-left-inner img { height: 540px; }
+  .gallery-right-inner img { width: 340px; height: 440px; }
+
+  /* Stone grid: 3 columns on tablet */
+  .stones-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 32px !important; }
+
+  /* Contact */
+  .contact { padding: 80px 60px; }
+  .contact-inner { gap: 60px; }
+  .contact-left { width: 320px; }
+
+  /* Collections intro */
+  .intro-bottom { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .intro-shield { padding: 20px 0; }
+  .intro-advantage { max-width: 100%; }
+
+  /* About module images */
+  .module-image img { max-height: 500px !important; }
+
+  /* Quality section */
+  .quality { padding: 60px; }
+  .quality-inner { gap: 40px; min-height: auto; }
+  .quality-img-wrap { width: 400px; }
+  .quality-img-wrap img { height: 540px; }
+  .quality-right { min-height: auto; }
+
+  /* Locations */
+  .locations { padding: 40px; }
+  .location-card { width: auto; min-width: 180px; }
+
+  /* Order page */
+  .order { padding: 60px 40px; }
+  .order-inner { gap: 60px; }
+}
+
+/* --- MOBILE: max 767px --- */
+@media (max-width: 767px) {
+  /* Typography caps */
+  h1 { font-size: 32px !important; }
+  h2 { font-size: 24px !important; }
+
+  /* Hero */
+  .hero { height: 60vw !important; max-height: 400px; min-height: 250px; }
+
+  /* Nav handled by nav.css already at 1024px */
+
+  /* Statement */
+  .statement { padding: 40px 20px 60px !important; min-height: auto !important; }
+  .statement p { font-size: 22px !important; }
+  .statement .arrow { width: 36px; height: 20px; margin-bottom: 0; }
+
+  /* About */
+  .about { padding: 40px 20px !important; }
+  .about-quote { font-size: 20px !important; }
+  .about-author { font-size: 13px !important; }
+  .about-body { font-size: 15px !important; max-width: 100%; }
+  .about-bottom { flex-direction: column; align-items: flex-start; }
+
+  /* Gallery */
+  .gallery { padding: 0 20px 40px !important; }
+  .gallery-grid { flex-direction: column !important; gap: 32px !important; min-height: auto !important; }
+  .gallery-left-inner { width: 100% !important; }
+  .gallery-left-inner img { height: auto !important; aspect-ratio: 4/3; }
+  .gallery-right { min-height: auto !important; align-items: flex-start !important; }
+  .gallery-right-inner { width: 100% !important; }
+  .gallery-right-inner img { width: 100% !important; height: auto !important; aspect-ratio: 4/3; }
+
+  /* Contact */
+  .contact { padding: 40px 20px !important; }
+  .contact-inner { flex-direction: column !important; gap: 40px !important; }
+  .contact-left { width: 100% !important; }
+  .contact-form { max-width: 100% !important; }
+  .contact-heading { font-size: 24px !important; }
+  .contact-heading .ch-bold { line-height: 1.2 !important; }
+
+  /* Stone grid: 2 columns */
+  .stones-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; }
+  .stone-card-name { font-size: 14px !important; }
+  .stone-card-finish { font-size: 10px !important; }
+
+  /* Collection accordion */
+  .collection-group { padding: 24px 16px !important; }
+  .collection-title { font-size: 20px !important; }
+  .collection-desc { font-size: 15px !important; }
+  .collection-header { min-height: 48px; }
+  .collection-toggle { width: 20px; height: 20px; }
+
+  /* Swatch section */
+  .coll-swatch { height: 300px !important; }
+  .swatch { height: 250px !important; }
+
+  /* Collections intro */
+  .intro { padding: 40px 20px !important; }
+  .intro-inner { gap: 40px; }
+  .intro-heading { font-size: 22px !important; }
+  .intro-body { font-size: 18px !important; }
+  .intro-body p { font-size: 18px !important; }
+  .intro-bottom { flex-direction: column !important; align-items: flex-start !important; gap: 20px; }
+  .intro-shield { padding: 16px 0 !important; }
+  .intro-shield img { width: 80px !important; height: auto !important; }
+  .intro-advantage { font-size: 15px !important; max-width: 100% !important; }
+
+  /* Quality section */
+  .quality { padding: 40px 20px !important; }
+  .quality-inner { flex-direction: column !important; gap: 32px !important; min-height: auto !important; }
+  .quality-img-wrap { width: 100% !important; }
+  .quality-img-wrap img { height: auto !important; aspect-ratio: 4/3; }
+  .quality-right { min-height: auto !important; align-items: flex-start !important; justify-content: flex-start !important; }
+  .quality-text { width: 100% !important; }
+  .quality-heading { font-size: 22px !important; }
+  .quality-body { font-size: 15px !important; max-width: 100% !important; }
+  .btn-contact { width: 100% !important; min-height: 44px; }
+
+  /* Locations */
+  .locations { padding: 24px 20px !important; }
+  .locations-columns { flex-direction: column !important; gap: 24px !important; }
+  .locations-col-left, .locations-col-right { width: 100% !important; }
+  .location-cards { flex-direction: column !important; }
+  .location-card { width: 100% !important; }
+
+  /* Buttons — touch targets */
+  .btn-order, .btn-submit, .btn-contact { min-height: 44px; display: flex; align-items: center; justify-content: center; }
+  .form-input, .form-select, .smf-input, .smf-select { min-height: 44px; font-size: 16px !important; }
+
+  /* Order page */
+  .order { padding: 32px 20px !important; }
+  .order-inner { flex-direction: column !important; gap: 32px !important; }
+  .order-left { width: 100% !important; }
+  .order-form { max-width: 100% !important; }
+  .order-heading { font-size: 26px !important; }
+  .form-row, .smf-row { flex-direction: column !important; gap: 16px !important; }
+  .stones-picker { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* About page modules */
+  .brand-statement { padding: 40px 20px !important; min-height: auto !important; }
+  .brand-heading { font-size: 28px !important; }
+  .brand-quote { font-size: 20px !important; }
+  .module-image img { max-height: 400px !important; }
+  .module-detail.open { padding: 32px 20px !important; }
+  .module-detail-inner { flex-direction: column !important; gap: 16px !important; }
+  .faqs { padding: 40px 20px !important; }
+  .faqs-heading { font-size: 28px !important; }
+  .faq-question h3 { font-size: 17px !important; }
+  .faq-answer p { font-size: 15px !important; }
+
+  /* Footer */
+  .footer { padding: 24px 20px !important; flex-direction: column !important; gap: 8px !important; }
+  .footer p { font-size: 11px !important; }
+
+  /* Instagram section */
+  .instagram-section, section[style*="max-width:1000px"] { padding: 30px 20px !important; }
+
+  /* Sample modal */
+  .sample-modal { width: 95% !important; max-height: 85vh; }
+  .sample-modal-header { padding: 24px 20px 0 !important; }
+  .sample-modal-stone { margin: 12px 20px 0 !important; }
+  .sample-modal-form { padding: 16px 20px 24px !important; }
+
+  /* Stone detail page intro */
+  .intro-stone-name { font-size: 24px !important; }
+  .intro-collection { font-size: 16px !important; }
+  .intro-specs { font-size: 14px !important; }
+  .intro-swatch img, .intro-swatch-placeholder { min-height: 280px !important; height: 280px !important; }
+  .full-swatch { height: 200px !important; }
+}
+
+/* --- VERY SMALL: max 380px --- */
+@media (max-width: 380px) {
+  .stones-grid { grid-template-columns: 1fr !important; }
+  .hero { height: 50vw !important; }
+  .brand-heading { font-size: 24px !important; }
+  h1 { font-size: 26px !important; }
+}
