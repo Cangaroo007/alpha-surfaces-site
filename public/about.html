@@ -14,219 +14,206 @@
 @font-face { font-family: 'Degular'; src: url('fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root { --olive: #564d22; --olive-deep: #2a2406; --cream: #f3f1e6; --white: #ffffff; --black: #000000; --border: rgba(0,0,0,0.1); }
+:root { --olive: #564d22; --cream: #f3f1e6; --white: #ffffff; --black: #000000; --border: rgba(0,0,0,0.1); }
 html { scroll-behavior: smooth; }
 body { background: #f5f5f5; color: var(--black); font-family: 'Degular', sans-serif; font-weight: 400; line-height: 1.2; overflow-x: hidden; }
 a { color: inherit; }
 img { display: block; max-width: 100%; }
 
-/* MODULE 1 — Brand Statement */
-.brand-statement { background: var(--olive); padding: 150px 161px; min-height: 600px; display: flex; flex-direction: column; justify-content: center; }
-.brand-heading { font-family: 'Concrette S', serif; font-weight: 500; font-size: 52px; line-height: 1.15; color: var(--white); margin-bottom: 48px; }
-.brand-quote { font-family: 'Concrette S', serif; font-weight: 400; font-size: 30px; line-height: 1.2; color: var(--white); max-width: 900px; text-indent: -0.45em; margin-bottom: 24px; }
-.brand-author { font-family: 'Concrette S', serif; font-weight: 700; font-size: 16px; line-height: 1.15; color: var(--white); opacity: 0.6; }
+/* --- HERO --- */
+.about-hero { position: relative; width: 100%; overflow: hidden; }
+.about-hero img { width: 100%; height: 500px; object-fit: cover; display: block; }
+.about-hero-caption { position: absolute; bottom: 20px; left: 40px; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; color: #fff; opacity: 0.7; letter-spacing: 0.5px; }
 
-/* MODULES 2-4 — Image + Expandable */
-.module { width: 100%; }
-.module-image { width: 100%; overflow: hidden; }
-.module-image img { width: 100%; display: block; max-height: 600px; object-fit: cover; }
-.module-detail { background: var(--cream); padding: 0; overflow: hidden; max-height: 0; transition: max-height 0.5s ease, padding 0.5s ease; }
-.module-detail.open { max-height: 600px; padding: 60px 161px; }
-.module-detail-inner { display: flex; justify-content: space-between; align-items: flex-start; gap: 80px; }
-.module-body { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px; line-height: 1.4; color: var(--black); max-width: 700px; }
-.module-cta { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--olive); text-decoration: none; border-bottom: 1px solid var(--olive); padding-bottom: 2px; white-space: nowrap; flex-shrink: 0; }
-.module-cta:hover { opacity: 0.7; }
-.module-toggle { display: flex; align-items: center; justify-content: center; padding: 16px; cursor: pointer; background: var(--cream); border: none; width: 100%; font-family: 'Degular', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: var(--olive); gap: 8px; transition: background 0.2s; }
-.module-toggle:hover { background: #e8e5d8; }
-.module-toggle .toggle-icon { transition: transform 0.3s; font-size: 18px; }
-.module-toggle.open .toggle-icon { transform: rotate(45deg); }
+/* --- INTRO --- */
+.about-intro { background: var(--cream); padding: 138px 136px; }
+.about-intro-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 32px; line-height: 1.2; color: var(--black); margin-bottom: 24px; }
+.about-intro-body { font-family: 'Concrette S', serif; font-weight: 400; font-size: 18px; line-height: 1.5; color: var(--black); max-width: 680px; margin-bottom: 20px; }
+.about-intro-quote { font-family: 'Concrette S', serif; font-weight: 400; font-size: 24px; line-height: 1.35; color: var(--black); max-width: 680px; margin-top: 48px; text-indent: -0.4em; }
+.about-intro-author { font-family: 'Concrette S', serif; font-weight: 700; font-size: 14px; line-height: 1.4; color: var(--black); opacity: 0.6; margin-top: 16px; }
 
-/* MODULE 5 — FAQs */
-.faqs { background: var(--white); padding: 100px 161px; }
-.faqs-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 42px; color: var(--black); margin-bottom: 48px; }
+/* --- FEATURE MODULES (2-col: image left, text right) --- */
+.about-module { background: var(--cream); padding: 0 136px; }
+.about-module-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--border); padding: 80px 0; }
+.about-module-image { position: relative; overflow: hidden; }
+.about-module-image img { width: 100%; height: 100%; min-height: 400px; object-fit: cover; display: block; }
+.about-module-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 100%); }
+.about-module-overlay svg { width: 56px; height: 56px; margin-bottom: 14px; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2)); }
+.about-module-overlay-label { font-family: 'Degular', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+.about-module-text { padding: 0 0 0 60px; display: flex; flex-direction: column; justify-content: flex-start; }
+.about-module-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 28px; color: var(--black); margin-bottom: 8px; }
+.about-module-subtitle { font-family: 'Concrette S', serif; font-weight: 500; font-size: 16px; line-height: 1.3; color: var(--black); margin-bottom: 24px; font-style: italic; }
+.about-module-body { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; line-height: 1.55; color: var(--black); }
+.about-module-body p { margin-bottom: 16px; }
+.about-module-cta { display: inline-block; margin-top: 8px; font-family: 'Degular', sans-serif; font-weight: 500; font-size: 14px; letter-spacing: 0.5px; color: var(--olive); text-decoration: underline; text-underline-offset: 3px; }
+
+/* --- FAQs --- */
+.faqs { background: var(--white); padding: 100px 136px; }
+.faqs-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 36px; color: var(--black); margin-bottom: 48px; }
 .faq-item { border-bottom: 1px solid var(--border); }
 .faq-question { display: flex; align-items: center; justify-content: space-between; padding: 24px 0; cursor: pointer; background: none; border: none; width: 100%; text-align: left; }
-.faq-question h3 { font-family: 'Concrette S', serif; font-weight: 600; font-size: 22px; color: var(--black); line-height: 1.3; flex: 1; padding-right: 20px; }
-.faq-question .faq-icon { font-family: 'Degular', sans-serif; font-size: 24px; color: var(--olive); flex-shrink: 0; transition: transform 0.3s; }
+.faq-question h3 { font-family: 'Concrette S', serif; font-weight: 500; font-size: 20px; color: var(--black); line-height: 1.3; flex: 1; padding-right: 20px; }
+.faq-question .faq-icon { font-family: 'Degular', sans-serif; font-size: 22px; color: var(--olive); flex-shrink: 0; transition: transform 0.3s; }
 .faq-item.open .faq-icon { transform: rotate(45deg); }
 .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-.faq-item.open .faq-answer { max-height: 300px; }
+.faq-item.open .faq-answer { max-height: 400px; }
 .faq-answer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 17px; line-height: 1.6; color: var(--black); opacity: 0.75; padding-bottom: 24px; max-width: 800px; }
 
-/* INSTAGRAM */
-.instagram-section { background: var(--olive-deep); padding: 60px 90px; text-align: center; }
-.instagram-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
-.instagram-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 30px; color: var(--white); margin-bottom: 32px; }
-.instagram-grid { display: block; width: 100%; border-radius: 4px; overflow: hidden; }
-.instagram-grid img { width: 100%; display: block; }
+/* --- INSTAGRAM --- */
+.instagram-section { background: var(--cream); padding: 80px 136px; text-align: center; }
+.instagram-heading { font-family: 'Concrette S', serif; font-weight: 400; font-size: 28px; color: var(--black); margin-bottom: 32px; }
+.instagram-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.instagram-grid a { display: block; overflow: hidden; border-radius: 4px; }
+.instagram-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; transition: transform 0.5s ease; }
+.instagram-grid a:hover img { transform: scale(1.04); }
 
-/* FOOTER */
-.footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
-.footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
+/* --- FOOTER --- */
+.site-footer { background: var(--white); padding: 80px 50px 30px; }
+.site-footer-inner { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; max-width: 1200px; margin: 0 auto; }
+.footer-col { display: flex; flex-direction: column; gap: 12px; }
+.footer-col-signup { flex: 1; max-width: 360px; }
+.footer-col-signup .footer-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 28px; color: var(--black); line-height: 1.2; margin-bottom: 4px; }
+.footer-col-signup .footer-sub { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; color: var(--black); line-height: 1.3; margin-bottom: 12px; }
+.footer-email-row { display: flex; gap: 8px; }
+.footer-email-input { flex: 1; border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15px; padding: 6px 0; outline: none; }
+.footer-email-input:focus { border-bottom-color: var(--olive); }
+.footer-email-btn { background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; padding: 8px 24px; border-radius: 8px; border: none; cursor: pointer; white-space: nowrap; }
+.footer-email-btn:hover { opacity: 0.9; }
+.footer-col-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 16px; color: var(--black); margin-bottom: 4px; }
+.footer-col a { font-family: 'Concrette S', serif; font-weight: 400; font-size: 15px; color: var(--black); text-decoration: underline; line-height: 1.6; }
+.footer-col a:hover { color: var(--olive); }
+.footer-col .footer-dl-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--black); margin-bottom: 2px; opacity: 0.6; }
+.footer-bottom { border-top: 1px solid var(--border); margin-top: 50px; padding-top: 20px; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin-left: auto; margin-right: auto; }
+.footer-bottom p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--black); }
+.footer-bottom a { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--black); text-decoration: underline; }
 
+/* --- MOBILE --- */
 @media (max-width: 1024px) {
-  .brand-statement { padding: 60px 24px; min-height: auto; }
-  .brand-heading { font-size: 32px; margin-bottom: 32px; }
-  .brand-quote { font-size: 22px; }
-  .module-detail.open { padding: 40px 24px; }
-  .module-detail-inner { flex-direction: column; gap: 24px; }
+  .about-hero img { height: 300px; }
+  .about-hero-caption { left: 20px; bottom: 12px; font-size: 11px; }
+  .about-intro { padding: 60px 24px; }
+  .about-intro-heading { font-size: 26px; }
+  .about-intro-body { font-size: 16px; }
+  .about-intro-quote { font-size: 20px; margin-top: 32px; }
+  .about-module { padding: 0 24px; }
+  .about-module-inner { grid-template-columns: 1fr; padding: 48px 0; }
+  .about-module-image img { min-height: 280px; }
+  .about-module-text { padding: 32px 0 0 0; }
+  .about-module-title { font-size: 24px; }
+  .about-module-body { font-size: 15px; }
   .faqs { padding: 60px 24px; }
-  .faqs-heading { font-size: 30px; }
-  .faq-question h3 { font-size: 18px; }
-  .instagram-section { padding: 40px 24px; }
-  .footer { padding: 30px 24px; }
-  .footer p { font-size: 12px; letter-spacing: 0.36px; }
+  .faqs-heading { font-size: 28px; }
+  .faq-question h3 { font-size: 17px; }
+  .instagram-section { padding: 48px 24px; }
+  .instagram-heading { font-size: 22px; }
+  .instagram-grid { grid-template-columns: repeat(2, 1fr); }
+  .site-footer { padding: 44px 24px 20px; }
+  .site-footer-inner { flex-direction: column; gap: 32px; }
+  .footer-col-signup { max-width: 100%; }
+  .footer-email-row { flex-direction: column; gap: 12px; }
+  .footer-email-btn { width: 100%; text-align: center; padding: 12px; }
+  .footer-bottom { flex-direction: column; gap: 8px; align-items: flex-start; margin-top: 32px; }
+  .footer-bottom p, .footer-bottom a { font-size: 11px; }
 }
 </style>
 <link rel="stylesheet" href="animation.css?v=8">
 <link rel="stylesheet" href="nav.css?v=10">
+<link rel="stylesheet" href="sample-modal.css?v=1">
 <link rel="stylesheet" href="mobile.css?v=1">
 </head>
 <body>
 
 <nav class="nav" id="main-nav"></nav>
 
-<!-- MODULE 1 — Brand Statement -->
-<section class="brand-statement">
-  <h1 class="brand-heading">A complete surface solution.</h1>
-  <p class="brand-quote">&ldquo;At Alpha Surfaces, we deliver a complete surface solution that redefines the standard for benchtops in Australia &#8212; beautiful, durable, low maintenance, safe, and sustainable. Everything you could want in one exceptional surface.&rdquo;</p>
-  <p class="brand-author">Belinda Kelaher, Managing Director</p>
+<!-- HERO IMAGE -->
+<section class="about-hero">
+  <img src="images/collections-hero.webp" alt="Alpha Surfaces premium kitchen with marble benchtop">
+  <span class="about-hero-caption">Calacatta Leggera, Collection 04</span>
 </section>
 
-<!-- MODULE 2 — Zero Silica -->
-<section class="module" id="zero-silica">
-  <div class="module-image">
-    <img src="images/zero-silica-hero.png" alt="Zero Silica — safe surfaces for fabricators and families">
-  </div>
-  <button class="module-toggle" onclick="toggleModule(this)">
-    <span>Learn more</span>
-    <span class="toggle-icon">+</span>
-  </button>
-  <div class="module-detail">
-    <div class="module-detail-inner">
-      <p class="module-body">Alpha Surfaces represents the next generation of high-performance mineral surfaces. Developed using an advanced Zero Silica Formulation, Alpha Surfaces is engineered from premium minerals and recycled materials to deliver exceptional durability, enhanced translucency, and superior aesthetic performance &#8212; while prioritising fabrication safety and environmental responsibility.</p>
-      <a href="/downloads/fabrication-guide.pdf" target="_blank" class="module-cta">Download our fabrication guide &rarr;</a>
+<!-- INTRO -->
+<section class="about-intro">
+  <h1 class="about-intro-heading">The complete surface solution.</h1>
+  <p class="about-intro-body">Alpha Surfaces is a premium Australian benchtop brand built on a solid foundation of leading innovation and a wealth of industry expertise. Cutting-edge technology delivers mineral stone surfaces of leading durability and practicality, with unmatched natural-stone realism and contemporary sophistication. As pioneers of silica-free surface technology, we&#8217;ve set a new industry benchmark while delivering the quality and consistency trusted by architects, designers, builders, and fabricators nationwide.</p>
+  <p class="about-intro-body">For Australian homes, our mission is clear: to provide surfaces people love to live with &#8211; enriching every day with effortless functionality and individual style.</p>
+  <blockquote class="about-intro-quote">&#8220;We help shape how people experience, enjoy, and interact with the spaces around them. We love seeing our surfaces bring people&#8217;s design visions to life and how they stamp their individual style on it.&#8221;</blockquote>
+  <p class="about-intro-author">Belinda Kelaher, Managing Director, Alpha Surfaces</p>
+</section>
+
+<!-- ZERO SILICA MODULE -->
+<section class="about-module" id="zero-silica">
+  <div class="about-module-inner">
+    <div class="about-module-image">
+      <img src="images/zero-silica-hero.webp" alt="Zero Silica surfaces">
+      <div class="about-module-overlay">
+        <span class="about-module-overlay-label">Zero Silica</span>
+      </div>
+    </div>
+    <div class="about-module-text">
+      <h2 class="about-module-title">Zero Silica</h2>
+      <div class="about-module-body">
+        <p>Alpha Surfaces represents the next generation of high-performance mineral surfaces. Developed using an advanced zero silica formulation, Alpha Surfaces is engineered from premium minerals and recycled materials to deliver exceptional durability, enhanced translucency, and superior aesthetic performance &#8211; while prioritising fabrication safety and environmental responsibility.</p>
+        <p>For more information on our zero silica formulation please download our <a href="/downloads/fabrication-guide.pdf" target="_blank" class="about-module-cta">SDS here</a>.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- MODULE 3 — Indoor-Outdoor -->
-<section class="module" id="indoor-outdoor">
-  <div class="module-image">
-    <img src="images/indoor-outdoor-hero.png" alt="Indoor-Outdoor range — UV stable surfaces for alfresco living">
-  </div>
-  <button class="module-toggle" onclick="toggleModule(this)">
-    <span>Learn more</span>
-    <span class="toggle-icon">+</span>
-  </button>
-  <div class="module-detail">
-    <div class="module-detail-inner">
-      <p class="module-body">The four surfaces in Alpha Surfaces&#8217; Indoor-Outdoor range take the luxury of natural stone to exterior applications. With UV protection, non-porous waterproof properties, and our AlphaShield&#8482; protectant, surfaces repel stains and resist chemicals &#8212; to effortlessly maintain outdoor surface applications. For optimal longevity, we recommend use in undercover outdoor areas. The Indoor-Outdoor range comprises Whitehaven, Cabarita, Torquay, and Broome in Collection 03.</p>
-      <a href="/collections.html#collection-03" class="module-cta">Explore the Indoor-Outdoor range &rarr;</a>
+<!-- ALPHA SHIELD MODULE -->
+<section class="about-module" id="alphashield">
+  <div class="about-module-inner">
+    <div class="about-module-image">
+      <img src="images/alphashield-hero.webp" alt="AlphaShield protection technology">
+      <div class="about-module-overlay">
+        <!-- Shield/tulip icon -->
+        <svg viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M28 0C28 0 28 24 28 38C28 52 16 62 4 70C4 70 0 60 0 44C0 28 0 0 0 0L28 0Z" fill="white"/>
+          <path d="M32 0C32 0 32 24 32 38C32 52 44 62 56 70C56 70 60 60 60 44C60 28 60 0 60 0L32 0Z" fill="white" opacity="0.65"/>
+        </svg>
+        <span class="about-module-overlay-label">Alpha Shield</span>
+      </div>
+    </div>
+    <div class="about-module-text">
+      <h2 class="about-module-title">Alpha Shield</h2>
+      <p class="about-module-subtitle">Durability for real life. Protection for a lifetime.</p>
+      <div class="about-module-body">
+        <p>Our exclusive AlphaShield&#8482; surface treatment delivers an ultra-durable layer of protection that guards against everyday wear and tear, confidently backed by a Lifetime Stain Resistance Guarantee.</p>
+        <p>AlphaShield&#8482; is scientifically formulated to repel stains such as red wine, coffee, and acidic foods and most household chemicals &#8211; with built-in microbial protection for optimal hygiene and food safety assurance.</p>
+        <p>Nano Enhancement of Surfaces (NEOS) technology creates an impenetrable barrier that&#8217;s invisible and permanent, and free from VOCs, fluorine, and halogens.</p>
+        <p>The AlphaShield&#8482; creation applied during the final stage of manufacture, is embedded into the top layer of the surface, filling the microscopic pores. This process results in Alpha Surfaces&#8217; industry-leading durability and easy-care qualities, as well as enhanced ease of maintenance and surface longevity.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- MODULE 4 — AlphaShield -->
-<section class="module" id="alphashield">
-  <div class="module-image">
-    <img src="images/alphashield-hero.png" alt="AlphaShield — exclusive surface protection technology">
-  </div>
-  <button class="module-toggle" onclick="toggleModule(this)">
-    <span>Learn more</span>
-    <span class="toggle-icon">+</span>
-  </button>
-  <div class="module-detail">
-    <div class="module-detail-inner">
-      <p class="module-body">Our exclusive AlphaShield&#8482; surface treatment delivers an ultra-durable layer of protection that guards against everyday wear and tear, confidently backed by a Lifetime Stain Resistance Guarantee. Scientifically formulated to repel stains such as red wine, coffee, and acidic foods, with built-in microbial protection for optimal hygiene and food safety. Nano Enhancement of Surfaces (NEOS) technology creates an impenetrable, invisible, permanent barrier &#8212; free from VOCs, fluorine, and halogens.</p>
-      <a href="/downloads/care-maintenance.pdf" target="_blank" class="module-cta">Download care &amp; maintenance guide &rarr;</a>
+<!-- INDOOR-OUTDOOR MODULE -->
+<section class="about-module" id="indoor-outdoor">
+  <div class="about-module-inner">
+    <div class="about-module-image">
+      <img src="images/indoor-outdoor-hero.webp" alt="Indoor-Outdoor UV-stable range">
+      <div class="about-module-overlay">
+        <!-- Starburst icon -->
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M40 0L46 26L62 6L52 30L80 24L56 38L80 40L56 42L80 56L52 50L62 74L46 54L40 80L34 54L18 74L28 50L0 56L24 42L0 40L24 38L0 24L28 30L18 6L34 26L40 0Z" fill="white"/>
+        </svg>
+      </div>
+    </div>
+    <div class="about-module-text">
+      <h2 class="about-module-title">Indoor-Outdoor range</h2>
+      <p class="about-module-subtitle">Refined style. Robust. UV-stable performance.</p>
+      <div class="about-module-body">
+        <p>The four surfaces in Alpha Surfaces&#8217; Indoor-Outdoor range take the luxury of natural stone to exterior applications.</p>
+        <p>With UV protection, non-porous waterproof properties, and our AlphaShield&#8482; protectant, surfaces repel stains and resist chemicals &#8211; to effortlessly maintain outdoor surface applications.</p>
+        <p>For optimal longevity, we recommend use in undercover outdoor areas.</p>
+        <p>The Indoor-Outdoor range comprises Whitehaven, Cabarita, Torquay, and Broome in <a href="/collections.html#collection-03" class="about-module-cta">Collection 03</a>.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- MODULE 5 — FAQs -->
+<!-- FAQs -->
 <section class="faqs" id="faqs">
   <h2 class="faqs-heading">Frequently asked questions</h2>
-
-  <div class="faq-item">
-    <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>Does Alpha Surfaces contain silica?</h3>
-      <span class="faq-icon">+</span>
-    </button>
-    <div class="faq-answer"><p>No. Alpha Surfaces are completely silica-free, manufactured using recycled materials such as glass and minerals. Our exclusive formulation prioritises both performance and safety without compromising on aesthetics.</p></div>
-  </div>
-
-  <div class="faq-item">
-    <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>Are Alpha Surfaces printed?</h3>
-      <span class="faq-icon">+</span>
-    </button>
-    <div class="faq-answer"><p>No. Alpha Surfaces are not printed. Each slab is crafted using advanced techniques that create authentic, through-body veining with organic pigments &#8212; resulting in a natural and consistent appearance throughout.</p></div>
-  </div>
-
-  <div class="faq-item">
-    <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>Are Alpha Surfaces safe for food preparation?</h3>
-      <span class="faq-icon">+</span>
-    </button>
-    <div class="faq-answer"><p>Yes. Alpha Surfaces are NSF-certified, making them safe and hygienic for direct food preparation.</p></div>
-  </div>
-
-  <div class="faq-item">
-    <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>What thickness are Alpha Surfaces?</h3>
-      <span class="faq-icon">+</span>
-    </button>
-    <div class="faq-answer"><p>Alpha Surfaces are available in a standard 20mm thickness. Your fabricator can customise a variety of edge profiles to achieve your desired look.</p></div>
-  </div>
-
-  <div class="faq-item">
-    <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>How do I clean Alpha Surfaces?</h3>
-      <span class="faq-icon">+</span>
-    </button>
-    <div class="faq-answer"><p>Alpha Surfaces are low-maintenance and easy to clean. Simply use a soft cloth with warm water and a mild detergent for everyday cleaning. Avoid abrasive cleaners or harsh chemicals to maintain the surface finish.</p></div>
-  </div>
-
-  <div class="faq-item">
-    <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>What applications can Alpha Surfaces be used for?</h3>
-      <span class="faq-icon">+</span>
-    </button>
-    <div class="faq-answer"><p>Alpha Surfaces are designed for a wide range of interior applications &#8212; ideal for kitchen benchtops, bathroom vanities, laundry surfaces, splashbacks, and bath surrounds. Our premium surfaces suit both residential and commercial projects, offering a balance of durability, safety, and refined design.</p></div>
-  </div>
-
-  <div class="faq-item">
-    <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>Can Alpha Surfaces be used outdoors?</h3>
-      <span class="faq-icon">+</span>
-    </button>
-    <div class="faq-answer"><p>Yes, selected designs from the Alpha Surfaces Indoor-Outdoor range are suitable for exterior applications. With UV protection, non-porous waterproof properties, and our AlphaShield&#8482; surface treatment, these surfaces resist stains, chemicals, and environmental wear. For best performance and longevity, we recommend installation in covered outdoor areas.</p></div>
-  </div>
-
-  <div class="faq-item">
-    <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>Are Alpha Surfaces environmentally conscious?</h3>
-      <span class="faq-icon">+</span>
-    </button>
-    <div class="faq-answer"><p>Yes. Alpha Surfaces are manufactured with a strong commitment to sustainability and safety, guided by our 4Rs principles: Reduce (zero crystalline silica formulation), Recycle (up to 90% recycled content including glass), Reuse (nearly 100% water recycling in manufacturing), and Respect (eco-conscious processes that minimise waste).</p></div>
-  </div>
-
-  <div class="faq-item">
-    <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>What certifications do Alpha Surfaces hold?</h3>
-      <span class="faq-icon">+</span>
-    </button>
-    <div class="faq-answer"><p>Alpha Surfaces hold NSF Certification (safe for food preparation), GREENGUARD Certification (low chemical emissions for healthier indoor air), and an Environmental Product Declaration (EPD) providing transparent, independently verified data on environmental impact. Together, these certifications meet rigorous global standards for both environmental responsibility and everyday use.</p></div>
-  </div>
-
-  <div class="faq-item">
-    <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>How much do Alpha Surfaces cost?</h3>
-      <span class="faq-icon">+</span>
-    </button>
-    <div class="faq-answer"><p>Alpha Surfaces are offered across five collections (Collection 01 to Collection 05). Pricing varies depending on the complexity of the design, veining technology, and surface finish. For accurate pricing, we recommend contacting your local supplier or fabricator.</p></div>
-  </div>
 
   <div class="faq-item">
     <button class="faq-question" onclick="toggleFaq(this)">
@@ -238,52 +225,96 @@ img { display: block; max-width: 100%; }
 
   <div class="faq-item">
     <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>Do Alpha Surfaces come with a warranty?</h3>
+      <h3>Are Alpha Surfaces products silica-free?</h3>
       <span class="faq-icon">+</span>
     </button>
-    <div class="faq-answer"><p>Yes. Alpha Surfaces are backed by a 15-Year Limited Warranty covering manufacturing defects. In addition, the AlphaShield&#8482; surface treatment includes a Lifetime Stain Resistance Guarantee. Full warranty details and registration information are available on our website.</p></div>
+    <div class="faq-answer"><p>Yes. Alpha Surfaces are completely silica-free, manufactured using recycled materials such as glass and minerals. Our exclusive formulation prioritises both performance and safety without compromising on aesthetics.</p></div>
   </div>
 
   <div class="faq-item">
     <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>Is Alpha Surfaces porcelain?</h3>
+      <h3>Are surfaces suitable for outdoor use?</h3>
       <span class="faq-icon">+</span>
     </button>
-    <div class="faq-answer"><p>No. Alpha Surfaces are part of the mineral surfaces category. Mineral surfaces are widely chosen for their natural stone appearance, ease of fabrication, and ability to be repaired if required.</p></div>
+    <div class="faq-answer"><p>Yes, selected designs from the Alpha Surfaces Indoor-Outdoor range are suitable for exterior applications. With UV protection, non-porous waterproof properties, and our AlphaShield&#8482; surface treatment, these surfaces resist stains, chemicals, and environmental wear. For best performance and longevity, we recommend installation in covered outdoor areas.</p></div>
   </div>
 
   <div class="faq-item">
     <button class="faq-question" onclick="toggleFaq(this)">
-      <h3>How do I buy Alpha Surfaces?</h3>
+      <h3>What warranty is provided?</h3>
       <span class="faq-icon">+</span>
     </button>
-    <div class="faq-answer"><p>Alpha Surfaces are available through a network of authorised distributors and fabricators. Visit our website to locate your nearest supplier or call Alpha Surfaces on 1300 257 420.</p></div>
+    <div class="faq-answer"><p>Alpha Surfaces are backed by a 15-Year Limited Warranty covering manufacturing defects. In addition, the AlphaShield&#8482; surface treatment includes a Lifetime Stain Resistance Guarantee. Full warranty details and registration information are available on our website.</p></div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-question" onclick="toggleFaq(this)">
+      <h3>What slab sizes are available?</h3>
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-answer"><p>Alpha Surfaces are available in a standard 20mm thickness. Your fabricator can customise a variety of edge profiles to achieve your desired look.</p></div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-question" onclick="toggleFaq(this)">
+      <h3>How do I order a sample?</h3>
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-answer"><p>You can order a sample directly through our website. Visit any stone&#8217;s product page and click the &#8220;Order a Sample&#8221; button, or contact us directly on 1300 257 420.</p></div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-question" onclick="toggleFaq(this)">
+      <h3>Where are Alpha Surfaces products available?</h3>
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-answer"><p>Alpha Surfaces are available through a network of authorised distributors and fabricators across Australia. Visit our website to locate your nearest supplier or call Alpha Surfaces on 1300 257 420.</p></div>
   </div>
 </section>
 
 <!-- INSTAGRAM -->
-<section style="background:var(--cream,#f3f1e6);padding:50px 0;">
-  <div style="max-width:1000px;margin:0 auto;padding:0 40px;text-align:center;">
-    <p style="font-family:'Degular',sans-serif;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:0.3em;color:#564d22;margin:0;">@ALPHASURFACES</p>
-    <p style="font-family:'Concrette S',serif;font-weight:400;font-size:24px;color:#000;margin:8px 0 20px;">Follow us on Instagram</p>
-    <a href="https://instagram.com/alphasurfaces" target="_blank" style="display:block;text-decoration:none;">
-      <img src="images/instagram-grid.webp" alt="Alpha Surfaces Instagram feed" style="width:100%;height:220px;object-fit:cover;object-position:center;border-radius:6px;display:block;">
-      <span style="display:inline-block;margin-top:16px;font-family:'Degular',sans-serif;font-weight:500;font-size:12px;letter-spacing:0.15em;color:#564d22;text-transform:uppercase;">View on Instagram &rarr;</span>
-    </a>
+<section class="instagram-section">
+  <h2 class="instagram-heading">Follow us on Instagram</h2>
+  <div class="instagram-grid">
+    <a href="https://instagram.com/alphasurfaces" target="_blank"><img src="images/instagram-grid.webp" alt="Alpha Surfaces Instagram" style="aspect-ratio:auto;height:220px;"></a>
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer class="footer">
-  <p>Copyright &copy; 2024 Alpha Surfaces &#8211; ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+<footer class="site-footer" id="contact">
+  <div class="site-footer-inner">
+    <div class="footer-col footer-col-signup">
+      <p class="footer-heading">Stay in the loop.</p>
+      <p class="footer-sub">Sign up for the latest from Alpha Surfaces.</p>
+      <form class="footer-email-row" action="#" method="POST">
+        <input type="email" class="footer-email-input" name="email" placeholder="Email *" required>
+        <button type="submit" class="footer-email-btn">Submit</button>
+      </form>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Follow us</p>
+      <a href="https://instagram.com/alphasurfaces" target="_blank">Instagram</a>
+      <a href="https://facebook.com/alphasurfaces" target="_blank">Facebook</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Contact us</p>
+      <a href="tel:1300257420">Call Toll Free</a>
+      <a href="mailto:info@alphasurfaces.com.au">Email us</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Resources</p>
+      <span class="footer-dl-label">Downloads</span>
+      <a href="/downloads/fabrication-guide.pdf" target="_blank">Fabrication guide</a>
+      <a href="/downloads/warranty.pdf" target="_blank">Warranty</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Copyright &copy; 2025 Alpha Surfaces &mdash; All Rights Reserved</p>
+    <a href="/privacy.html">Privacy Policy</a>
+  </div>
 </footer>
 
 <script>
-function toggleModule(btn) {
-  var detail = btn.nextElementSibling;
-  btn.classList.toggle('open');
-  detail.classList.toggle('open');
-}
 function toggleFaq(btn) {
   var item = btn.closest('.faq-item');
   item.classList.toggle('open');
