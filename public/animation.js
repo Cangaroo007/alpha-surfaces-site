@@ -120,6 +120,10 @@
     var heroImg = document.querySelector('.hero > img, .hero .hero-video, .hero-img');
     if (!heroImg) return;
 
+    // Skip parallax if hero has Ken Burns CSS animation (landing page)
+    var heroHasKenBurns = getComputedStyle(heroImg).animationName !== 'none';
+    if (heroHasKenBurns) return;
+
     heroImg.classList.add('anim-parallax-hero');
     var heroSection = heroImg.closest('.hero') || heroImg.parentElement;
     var heroHeight = heroSection ? heroSection.offsetHeight : 900;
