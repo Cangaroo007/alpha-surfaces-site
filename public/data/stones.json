@@ -11,7 +11,8 @@
           "slug": "brilliance",
           "image": "/images/stones/brilliance.webp",
           "thumbnail": "/images/stones/brilliance-thumb.webp",
-          "swatch": "/images/stones/brilliance-swatch.webp"
+          "swatch": "/images/stones/brilliance-swatch.webp",
+          "slab": "/images/stones/brilliance-slab.webp"
         },
         {
           "name": "Crystal",
@@ -19,7 +20,8 @@
           "slug": "crystal",
           "image": "/images/stones/crystal.webp",
           "thumbnail": "/images/stones/crystal-thumb.webp",
-          "swatch": "/images/stones/crystal-swatch.webp"
+          "swatch": "/images/stones/crystal-swatch.webp",
+          "slab": "/images/stones/crystal-slab.webp"
         },
         {
           "name": "Jewel",
@@ -27,7 +29,8 @@
           "slug": "jewel",
           "image": "/images/stones/jewel.webp",
           "thumbnail": "/images/stones/jewel-thumb.webp",
-          "swatch": "/images/stones/jewel-swatch.webp"
+          "swatch": "/images/stones/jewel-swatch.webp",
+          "slab": "/images/stones/jewel-slab.webp"
         },
         {
           "name": "Graphite",
@@ -35,7 +38,8 @@
           "slug": "graphite",
           "image": "/images/stones/graphite.webp",
           "thumbnail": "/images/stones/graphite-thumb.webp",
-          "swatch": "/images/stones/graphite-swatch.webp"
+          "swatch": "/images/stones/graphite-swatch.webp",
+          "slab": "/images/stones/graphite-slab.webp"
         },
         {
           "name": "Bondi",
@@ -43,7 +47,8 @@
           "slug": "bondi",
           "image": "/images/stones/bondi.webp",
           "thumbnail": "/images/stones/bondi-thumb.webp",
-          "swatch": "/images/stones/bondi-swatch.webp"
+          "swatch": "/images/stones/bondi-swatch.webp",
+          "slab": "/images/stones/bondi-slab.webp"
         },
         {
           "name": "Fraser",
@@ -51,7 +56,8 @@
           "slug": "fraser",
           "image": "/images/stones/fraser.webp",
           "thumbnail": "/images/stones/fraser-thumb.webp",
-          "swatch": "/images/stones/fraser-swatch.webp"
+          "swatch": "/images/stones/fraser-swatch.webp",
+          "slab": "/images/stones/fraser-slab.webp"
         }
       ]
     },
@@ -66,7 +72,8 @@
           "slug": "arctic",
           "image": "/images/stones/arctic.webp",
           "thumbnail": "/images/stones/arctic-thumb.webp",
-          "swatch": "/images/stones/arctic-swatch.webp"
+          "swatch": "/images/stones/arctic-swatch.webp",
+          "slab": "/images/stones/arctic-slab.webp"
         },
         {
           "name": "Pearl",
@@ -74,7 +81,8 @@
           "slug": "pearl",
           "image": "/images/stones/pearl.webp",
           "thumbnail": "/images/stones/pearl-thumb.webp",
-          "swatch": "/images/stones/pearl-swatch.webp"
+          "swatch": "/images/stones/pearl-swatch.webp",
+          "slab": "/images/stones/pearl-slab.webp"
         },
         {
           "name": "Ash",
@@ -82,7 +90,8 @@
           "slug": "ash",
           "image": "/images/stones/ash.webp",
           "thumbnail": "/images/stones/ash-thumb.webp",
-          "swatch": "/images/stones/ash-swatch.webp"
+          "swatch": "/images/stones/ash-swatch.webp",
+          "slab": "/images/stones/ash-slab.webp"
         },
         {
           "name": "Shell",
@@ -90,7 +99,8 @@
           "slug": "shell",
           "image": "/images/stones/shell.webp",
           "thumbnail": "/images/stones/shell-thumb.webp",
-          "swatch": "/images/stones/shell-swatch.webp"
+          "swatch": "/images/stones/shell-swatch.webp",
+          "slab": "/images/stones/shell-slab.webp"
         },
         {
           "name": "Carrara",
@@ -106,7 +116,8 @@
           "thickness": 20,
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
-          "silica_free": true
+          "silica_free": true,
+          "slab": "/images/stones/carrara-slab.webp"
         },
         {
           "name": "Oyster Grey",
@@ -114,7 +125,8 @@
           "slug": "oyster-grey",
           "image": "/images/stones/oyster-grey.webp",
           "thumbnail": "/images/stones/oyster-grey-thumb.webp",
-          "swatch": "/images/stones/oyster-grey-swatch.webp"
+          "swatch": "/images/stones/oyster-grey-swatch.webp",
+          "slab": "/images/stones/oyster-grey-slab.webp"
         },
         {
           "name": "Earthy Concrete",
@@ -122,7 +134,8 @@
           "slug": "earthy-concrete",
           "image": "/images/stones/earthy-concrete.webp",
           "thumbnail": "/images/stones/earthy-concrete-thumb.webp",
-          "swatch": "/images/stones/earthy-concrete-swatch.webp"
+          "swatch": "/images/stones/earthy-concrete-swatch.webp",
+          "slab": "/images/stones/earthy-concrete-slab.webp"
         }
       ]
     },
@@ -137,7 +150,8 @@
           "slug": "salt-stone",
           "image": "/images/stones/salt-stone.webp",
           "thumbnail": "/images/stones/salt-stone-thumb.webp",
-          "swatch": "/images/stones/salt-stone-swatch.webp"
+          "swatch": "/images/stones/salt-stone-swatch.webp",
+          "slab": "/images/stones/salt-stone-slab.webp"
         },
         {
           "name": "Davinci Gris",
@@ -153,7 +167,8 @@
           "thickness": 20,
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
-          "silica_free": true
+          "silica_free": true,
+          "slab": "/images/stones/davinci-gris-slab.webp"
         },
         {
           "name": "Davinci Oro",
@@ -161,7 +176,8 @@
           "slug": "davinci-oro",
           "image": "/images/stones/davinci-oro.webp",
           "thumbnail": "/images/stones/davinci-oro-thumb.webp",
-          "swatch": "/images/stones/davinci-oro-swatch.webp"
+          "swatch": "/images/stones/davinci-oro-swatch.webp",
+          "slab": "/images/stones/davinci-oro-slab.webp"
         },
         {
           "name": "Desert Dune",
@@ -169,7 +185,8 @@
           "slug": "desert-dune",
           "image": "/images/stones/desert-dune.webp",
           "thumbnail": "/images/stones/desert-dune-thumb.webp",
-          "swatch": "/images/stones/desert-dune-swatch.webp"
+          "swatch": "/images/stones/desert-dune-swatch.webp",
+          "slab": "/images/stones/desert-dune-slab.webp"
         },
         {
           "name": "Broome",
@@ -179,7 +196,8 @@
           "thumbnail": "/images/stones/broome-thumb.webp",
           "swatch": "/images/stones/broome-swatch.webp",
           "indoor_outdoor": true,
-          "uv_stable": true
+          "uv_stable": true,
+          "slab": "/images/stones/broome-slab.webp"
         },
         {
           "name": "Cabarita",
@@ -189,7 +207,8 @@
           "thumbnail": "/images/stones/cabarita-thumb.webp",
           "swatch": "/images/stones/cabarita-swatch.webp",
           "indoor_outdoor": true,
-          "uv_stable": true
+          "uv_stable": true,
+          "slab": "/images/stones/cabarita-slab.webp"
         },
         {
           "name": "Torquay",
@@ -199,7 +218,8 @@
           "thumbnail": "/images/stones/torquay-thumb.webp",
           "swatch": "/images/stones/torquay-swatch.webp",
           "indoor_outdoor": true,
-          "uv_stable": true
+          "uv_stable": true,
+          "slab": "/images/stones/torquay-slab.webp"
         },
         {
           "name": "Whitehaven",
@@ -225,7 +245,8 @@
           "thickness": 20,
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
-          "silica_free": true
+          "silica_free": true,
+          "slab": "/images/stones/whitehaven-slab.webp"
         }
       ]
     },
@@ -248,7 +269,8 @@
           "thickness": 20,
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
-          "silica_free": true
+          "silica_free": true,
+          "slab": "/images/stones/opal-mist-slab.webp"
         },
         {
           "name": "Calacatta Leggera",
@@ -276,7 +298,8 @@
           "thickness": 20,
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
-          "silica_free": true
+          "silica_free": true,
+          "slab": "/images/stones/calacatta-leggera-slab.webp"
         },
         {
           "name": "Metallic Grey",
@@ -284,7 +307,8 @@
           "slug": "metallic-grey",
           "image": "/images/stones/metallic-grey.webp",
           "thumbnail": "/images/stones/metallic-grey-thumb.webp",
-          "swatch": "/images/stones/metallic-grey-swatch.webp"
+          "swatch": "/images/stones/metallic-grey-swatch.webp",
+          "slab": "/images/stones/metallic-grey-slab.webp"
         },
         {
           "name": "Statuario Gold",
@@ -300,7 +324,8 @@
           "thickness": 20,
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
-          "silica_free": true
+          "silica_free": true,
+          "slab": "/images/stones/statuario-gold-slab.webp"
         },
         {
           "name": "Eternity",
@@ -308,7 +333,8 @@
           "slug": "eternity",
           "image": "/images/stones/eternity.webp",
           "thumbnail": "/images/stones/eternity-thumb.webp",
-          "swatch": "/images/stones/eternity-swatch.webp"
+          "swatch": "/images/stones/eternity-swatch.webp",
+          "slab": "/images/stones/eternity-slab.webp"
         },
         {
           "name": "White Cloud",
@@ -316,7 +342,8 @@
           "slug": "white-cloud",
           "image": "/images/stones/white-cloud.webp",
           "thumbnail": "/images/stones/white-cloud-thumb.webp",
-          "swatch": "/images/stones/white-cloud-swatch.webp"
+          "swatch": "/images/stones/white-cloud-swatch.webp",
+          "slab": "/images/stones/white-cloud-slab.webp"
         },
         {
           "name": "Glacier",
@@ -324,7 +351,8 @@
           "slug": "glacier",
           "image": "/images/stones/glacier.webp",
           "thumbnail": "/images/stones/glacier-thumb.webp",
-          "swatch": "/images/stones/glacier-swatch.webp"
+          "swatch": "/images/stones/glacier-swatch.webp",
+          "slab": "/images/stones/glacier-slab.webp"
         },
         {
           "name": "Arabescato",
@@ -332,7 +360,8 @@
           "slug": "arabescato",
           "image": "/images/stones/arabescato.webp",
           "thumbnail": "/images/stones/arabescato-thumb.webp",
-          "swatch": "/images/stones/arabescato-swatch.webp"
+          "swatch": "/images/stones/arabescato-swatch.webp",
+          "slab": "/images/stones/arabescato-slab.webp"
         }
       ]
     },
@@ -355,7 +384,8 @@
           "thickness": 20,
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
-          "silica_free": true
+          "silica_free": true,
+          "slab": "/images/stones/calacatta-viola-slab.webp"
         },
         {
           "name": "Autumn Gold",
@@ -371,7 +401,8 @@
           "thickness": 20,
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
-          "silica_free": true
+          "silica_free": true,
+          "slab": "/images/stones/autumn-gold-slab.webp"
         }
       ]
     },

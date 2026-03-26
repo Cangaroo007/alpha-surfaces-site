@@ -234,6 +234,11 @@ img { display: block; max-width: 100%; }
 
       intro.innerHTML = textHTML + swatchHTML;
 
+      // --- SLAB LIGHTBOX ---
+      if (stone.slab && window.initSlabLightbox) {
+        setTimeout(function() { window.initSlabLightbox(stone.slab, stone.name); }, 100);
+      }
+
       // --- FULL SWATCH ---
       var fullSwatch = document.getElementById('full-swatch');
       var galleryImages = stone.gallery || [];
@@ -314,6 +319,7 @@ img { display: block; max-width: 100%; }
 })();
 </script>
 <script src="../animation.js?v=8"></script>
+<script src="../slab-lightbox.js?v=1"></script>
 <script src="../nav.js?v=10"></script>
 </body>
 </html>
