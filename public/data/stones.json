@@ -325,6 +325,14 @@
           "image": "/images/stones/glacier.webp",
           "thumbnail": "/images/stones/glacier-thumb.webp",
           "swatch": "/images/stones/glacier-swatch.webp"
+        },
+        {
+          "name": "Arabescato",
+          "finish": "Polished",
+          "slug": "arabescato",
+          "image": "/images/stones/arabescato.webp",
+          "thumbnail": "/images/stones/arabescato-thumb.webp",
+          "swatch": "/images/stones/arabescato-swatch.webp"
         }
       ]
     },
@@ -348,14 +356,6 @@
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
           "silica_free": true
-        },
-        {
-          "name": "Arabescato",
-          "finish": "Polished",
-          "slug": "arabescato",
-          "image": "/images/stones/arabescato.webp",
-          "thumbnail": "/images/stones/arabescato-thumb.webp",
-          "swatch": "/images/stones/arabescato-swatch.webp"
         },
         {
           "name": "Autumn Gold",

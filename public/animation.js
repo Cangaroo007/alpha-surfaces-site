@@ -25,17 +25,17 @@
       '.statement > *',
       '.about > *, .about-inner, .about-top, .about-bottom, .about-quote, .about-author, .about-body',
       '.gallery > *, .gallery-grid, .gallery-left, .gallery-right, .gallery-left-inner, .gallery-right-inner',
-      '.contact > *, .contact-inner, .contact-left, .contact-form',
-      '.locations > *, .locations-columns',
-      '.intro > *, .intro-inner, .intro-top, .intro-bottom',
-      '.quality > *, .quality-inner, .quality-text, .quality-img-wrap',
+      '.contact-inner, .contact-form',
+      '.locations-columns',
+      '.intro-inner',
+      '.quality-inner, .quality-img-wrap',
       '.stone-card, .col-card, .value-card, .showcase-card, .location-card, .back-benefit',
       '.about-partner-inner, .about-partner-brand, .about-partner-text',
-      '.contact-heading, .contact-person, .contact-details, .contact-links, .contact-block',
+      
       '.collection-group, .collection-header, .collection-desc',
-      '.btn-order, .btn-contact, .btn-submit',
-      '.intro-heading, .intro-body, .intro-shield, .intro-advantage',
-      '.resources-section, .hero-caption'
+      
+      
+      
     ].join(', ');
 
     document.querySelectorAll(revealSelectors).forEach(function(el) {
@@ -44,7 +44,7 @@
     });
 
     // Headings — X+Y reveal
-    document.querySelectorAll('h1, h2, h3').forEach(function(el) {
+    document.querySelectorAll('h1, h2').forEach(function(el) {
       if (el.closest('nav') || el.closest('footer') || el.closest('.hero')) return;
       el.classList.remove('anim-reveal');
       tag(el, 'anim-reveal-heading');

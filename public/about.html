@@ -29,7 +29,7 @@ img { display: block; max-width: 100%; }
 /* MODULES 2-4 — Image + Expandable */
 .module { width: 100%; }
 .module-image { width: 100%; overflow: hidden; }
-.module-image img { width: 100%; display: block; }
+.module-image img { width: 100%; display: block; max-height: 600px; object-fit: cover; }
 .module-detail { background: var(--cream); padding: 0; overflow: hidden; max-height: 0; transition: max-height 0.5s ease, padding 0.5s ease; }
 .module-detail.open { max-height: 400px; padding: 60px 161px; }
 .module-detail-inner { display: flex; justify-content: space-between; align-items: flex-start; gap: 80px; }
