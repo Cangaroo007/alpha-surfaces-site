@@ -24,7 +24,7 @@
     var revealSelectors = [
       '.statement > *',
       '.about > *, .about-inner, .about-top, .about-bottom, .about-quote, .about-author, .about-body',
-      '.gallery > *, .gallery-grid, .gallery-left, .gallery-right, .gallery-left-inner, .gallery-right-inner',
+      '.gallery > *, .gallery-grid, .gallery-grid a',
       '.contact-inner, .contact-form',
       '.locations-columns',
       '.intro-inner',
@@ -69,7 +69,7 @@
     });
 
     // Images — clip-path wipe
-    document.querySelectorAll('.gallery-left-inner img, .gallery-right-inner img, .quality-img-wrap img, .intro-swatch img, .full-swatch img, .showcase-card img, .swatch img').forEach(function(img) {
+    document.querySelectorAll('.gallery-grid img, .quality-img-wrap img, .intro-swatch img, .full-swatch img, .showcase-card img, .swatch img').forEach(function(img) {
       if (img.classList.contains('anim-parallax-hero')) return;
       tag(img, 'anim-img-reveal');
     });
