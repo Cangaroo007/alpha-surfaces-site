@@ -128,10 +128,10 @@
     if (window.innerWidth >= 1024) clearTimeout(hoverTimer);
   });
   trigger.addEventListener('mouseleave', function() {
-    if (window.innerWidth >= 1024) hoverTimer = setTimeout(function() { if (!megaMenu.matches(':hover')) megaMenu.classList.remove('open'); }, 150);
+    if (window.innerWidth >= 1024) hoverTimer = setTimeout(function() { if (!megaMenu.matches(':hover')) megaMenu.classList.remove('open'); }, 350);
   });
   megaMenu.addEventListener('mouseleave', function() {
-    if (window.innerWidth >= 1024) hoverTimer = setTimeout(function() { megaMenu.classList.remove('open'); }, 150);
+    if (window.innerWidth >= 1024) hoverTimer = setTimeout(function() { if (!trigger.matches(':hover')) megaMenu.classList.remove('open'); }, 350);
   });
 
   // Click outside closes
