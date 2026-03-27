@@ -108,13 +108,15 @@ img { display: block; max-width: 100%; }
 .btn-contact:hover { opacity: 0.9; }
 
 /* --- INSTAGRAM --- */
-.instagram-section { background: #ffffff; padding: 100px 193px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.instagram-header { text-align: center; margin-bottom: 30px; }
+.instagram-section { background: #ffffff; padding: 100px 193px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.instagram-header { text-align: center; margin-bottom: 30px; width: 100%; }
 .instagram-handle { font-family: 'Degular', sans-serif; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3em; color: #564d22; margin: 0; }
 .instagram-title { font-family: 'Concrette S', serif; font-weight: 400; font-size: 24px; color: #000; margin: 8px 0 0; }
-.instagram-grid-link { display: block; text-decoration: none; width: 100%; }
-.instagram-grid-img { width: 100%; aspect-ratio: 1054/320; object-fit: cover; object-position: center top; display: block; }
-.instagram-cta { display: inline-block; margin-top: 24px; font-family: 'Degular', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.15em; color: #564d22; text-transform: uppercase; text-decoration: none; }
+.instagram-grid { display: flex; gap: 10px; width: 100%; }
+.instagram-item { flex: 1; aspect-ratio: 4/5; overflow: hidden; display: block; text-decoration: none; }
+.instagram-img { width: 100%; height: 100%; background-image: url('images/instagram-grid.webp'); background-size: 200% 200%; transition: transform 0.4s ease; }
+.instagram-item:hover .instagram-img { transform: scale(1.05); }
+.instagram-cta { display: block; margin-top: 24px; font-family: 'Degular', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.15em; color: #564d22; text-transform: uppercase; text-decoration: none; text-align: center; width: 100%; }
 .instagram-cta:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* --- FOOTER --- */
@@ -173,7 +175,7 @@ img { display: block; max-width: 100%; }
 
   
   .instagram-section { padding: 60px 24px; }
-  .instagram-grid-img { aspect-ratio: auto; height: auto; }
+  .instagram-grid { flex-wrap: wrap; } .instagram-item { flex: 1 1 45%; }
 
   .footer { padding: 30px 24px; }
   .footer-inner { grid-template-columns: 1fr 1fr; gap: 30px; }
@@ -269,15 +271,18 @@ img { display: block; max-width: 100%; }
 
 <!-- INSTAGRAM -->
 <section class="instagram-section">
-  <div class="instagram-header">
-    <p class="instagram-handle">@ALPHASURFACES</p>
-    <p class="instagram-title">Follow us on Instagram</p>
-  </div>
-  <a href="https://instagram.com/alphasurfaces" target="_blank" class="instagram-grid-link">
-    <img src="images/instagram-grid.webp" alt="Alpha Surfaces Instagram feed" class="instagram-grid-img">
-    <span class="instagram-cta" style="text-align:center;display:block;">View on Instagram &rarr;</span>
-  </a>
-</section>
+    <div class="instagram-header">
+      <p class="instagram-handle">@ALPHASURFACES</p>
+      <p class="instagram-title">Follow us on Instagram</p>
+    </div>
+    <div class="instagram-grid">
+      <a href="https://instagram.com/alphasurfaces" target="_blank" class="instagram-item"><div class="instagram-img" style="background-position: 0% 0%;"></div></a>
+      <a href="https://instagram.com/alphasurfaces" target="_blank" class="instagram-item"><div class="instagram-img" style="background-position: 100% 0%;"></div></a>
+      <a href="https://instagram.com/alphasurfaces" target="_blank" class="instagram-item"><div class="instagram-img" style="background-position: 0% 100%;"></div></a>
+      <a href="https://instagram.com/alphasurfaces" target="_blank" class="instagram-item"><div class="instagram-img" style="background-position: 100% 100%;"></div></a>
+    </div>
+    <a href="https://instagram.com/alphasurfaces" target="_blank" class="instagram-cta">@alpha.surfaces</a>
+  </section>
 
 <!-- FOOTER -->
 <footer class="footer">
