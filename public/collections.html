@@ -52,12 +52,12 @@ img { display: block; max-width: 100%; }
 
 /* --- COLLECTION SWATCH --- */
 .coll-swatch { width: 100%; height: 715px; overflow: hidden; position: relative; }
-.coll-swatch-img { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease; }
+.coll-swatch-img { position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease; }
 .coll-swatch-img.active { opacity: 1; animation: slabPan 25s ease-in-out infinite alternate; }
 @keyframes slabPan {
   0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-3%, -2%) scale(1.02); }
-  100% { transform: translate(-5%, -1%) scale(1); }
+  50% { transform: translate(-2%, -1%) scale(1.02); }
+  100% { transform: translate(-4%, -1%) scale(1); }
 }
 .coll-swatch-overlay { position: absolute; top: 50%; left: 60px; transform: translateY(-50%); background: rgba(255,255,255,0.92); padding: 40px 44px; max-width: 340px; z-index: 1; pointer-events: auto; }
 .coll-swatch-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 24px; color: var(--black); margin-bottom: 14px; line-height: 1.2; }
@@ -65,7 +65,7 @@ img { display: block; max-width: 100%; }
 .coll-swatch-link { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 12px; color: var(--olive); text-decoration: underline; text-underline-offset: 3px; letter-spacing: 0.02em; }
 
 /* --- COLLECTIONS ACCORDION --- */
-.collections-section { /* no bg — each group has its own */ }
+.collections-section { /* no bg â each group has its own */ }
 .collection-group { background: var(--olive-deep); border: 1px solid #151203; padding: 44px 32px; }
 .collection-header { display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
 .collection-title-row { display: flex; align-items: center; gap: 16px; }
@@ -106,6 +106,16 @@ img { display: block; max-width: 100%; }
 .quality-body { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px; line-height: 1.2; color: var(--black); max-width: 379px; }
 .btn-contact { display: inline-flex; align-items: center; justify-content: center; background: var(--olive); color: var(--white); font-family: 'Degular', sans-serif; font-weight: 400; font-size: 18.333px; padding: 8px 44px; border-radius: 12px; text-decoration: none; width: 174px; }
 .btn-contact:hover { opacity: 0.9; }
+
+/* --- INSTAGRAM --- */
+.instagram-section { background: #ffffff; padding: 100px 193px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.instagram-header { text-align: center; margin-bottom: 30px; }
+.instagram-handle { font-family: 'Degular', sans-serif; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3em; color: #564d22; margin: 0; }
+.instagram-title { font-family: 'Concrette S', serif; font-weight: 400; font-size: 24px; color: #000; margin: 8px 0 0; }
+.instagram-grid-link { display: block; text-decoration: none; width: 100%; }
+.instagram-grid-img { width: 100%; aspect-ratio: 1054/320; object-fit: cover; object-position: center top; display: block; }
+.instagram-cta { display: inline-block; margin-top: 24px; font-family: 'Degular', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.15em; color: #564d22; text-transform: uppercase; text-decoration: none; }
+.instagram-cta:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* --- FOOTER --- */
 .footer { background: var(--white); border-top: 1px solid var(--border); padding: 50px 60px 40px; }
@@ -161,6 +171,10 @@ img { display: block; max-width: 100%; }
   .quality-body { font-size: 16px; max-width: 100%; }
   .btn-contact { width: 100%; }
 
+  
+  .instagram-section { padding: 60px 24px; }
+  .instagram-grid-img { aspect-ratio: auto; height: auto; }
+
   .footer { padding: 30px 24px; }
   .footer-inner { grid-template-columns: 1fr 1fr; gap: 30px; }
   .footer-bottom p { font-size: 10px; letter-spacing: 0.36px; }
@@ -176,9 +190,9 @@ img { display: block; max-width: 100%; }
 <!-- NAV -->
 <nav class="nav" id="main-nav"></nav>
 
-<!-- HERO — Lifestyle kitchen photo -->
+<!-- HERO â Lifestyle kitchen photo -->
 <section class="hero">
-  <img src="images/collections-hero.webp" alt="Alpha Surfaces — Premium Australian benchtops">
+  <img src="images/collections-hero.webp" alt="Alpha Surfaces â Premium Australian benchtops">
   <div class="hero-overlay" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.4) 0%,transparent 50%);pointer-events:none;"></div>
   <div style="position:absolute;bottom:32px;left:40px;z-index:1;">
     <p style="font-family:'Concrette S',serif;font-weight:700;font-size:14px;color:#fff;margin:0;">Calacatta Leggera</p>
@@ -211,7 +225,7 @@ img { display: block; max-width: 100%; }
   </div>
 </section>
 
-<!-- COLLECTION SWATCH — changes with active accordion -->
+<!-- COLLECTION SWATCH â changes with active accordion -->
 <section class="coll-swatch" id="coll-swatch">
   <img class="coll-swatch-img active" data-coll="0" src="images/collection-hero-01.webp" alt="Collection 01 slab">
   <img class="coll-swatch-img" data-coll="1" src="images/collection-hero-02.webp" alt="Collection 02 slab">
@@ -254,15 +268,15 @@ img { display: block; max-width: 100%; }
 
 
 <!-- INSTAGRAM -->
-<section style="background:var(--cream,#f3f1e6);padding:50px 0;">
-  <div style="max-width:1000px;margin:0 auto;padding:0 40px;text-align:center;">
-    <p style="font-family:'Degular',sans-serif;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:0.3em;color:#564d22;margin:0;">@ALPHASURFACES</p>
-    <p style="font-family:'Concrette S',serif;font-weight:400;font-size:24px;color:#000;margin:8px 0 20px;">Follow us on Instagram</p>
-    <a href="https://instagram.com/alphasurfaces" target="_blank" style="display:block;text-decoration:none;">
-      <img src="images/instagram-grid.webp" alt="Alpha Surfaces Instagram feed" style="width:100%;height:220px;object-fit:cover;object-position:center;border-radius:6px;display:block;">
-      <span style="display:inline-block;margin-top:16px;font-family:'Degular',sans-serif;font-weight:500;font-size:12px;letter-spacing:0.15em;color:#564d22;text-transform:uppercase;">View on Instagram &rarr;</span>
-    </a>
+<section class="instagram-section">
+  <div class="instagram-header">
+    <p class="instagram-handle">@ALPHASURFACES</p>
+    <p class="instagram-title">Follow us on Instagram</p>
   </div>
+  <a href="https://instagram.com/alphasurfaces" target="_blank" class="instagram-grid-link">
+    <img src="images/instagram-grid.webp" alt="Alpha Surfaces Instagram feed" class="instagram-grid-img">
+    <span class="instagram-cta" style="text-align:center;display:block;">View on Instagram &rarr;</span>
+  </a>
 </section>
 
 <!-- FOOTER -->
@@ -294,7 +308,7 @@ img { display: block; max-width: 100%; }
     </div>
   </div>
   <div class="footer-bottom">
-    <p>Copyright &copy; 2024 Alpha Surfaces – ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
+    <p>Copyright &copy; 2024 Alpha Surfaces â ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVACY POLICY</p>
   </div>
 </footer>
 
@@ -381,7 +395,7 @@ img { display: block; max-width: 100%; }
         group.appendChild(content);
         container.appendChild(group);
 
-        // Click to toggle — also syncs swatch image
+        // Click to toggle â also syncs swatch image
         header.addEventListener('click', function() {
           var wasOpen = group.classList.contains('open');
           group.classList.toggle('open');
@@ -395,7 +409,7 @@ img { display: block; max-width: 100%; }
         });
       });
 
-      // ── Swatch sync ──
+      // ââ Swatch sync ââ
       var swatchImgs = document.querySelectorAll('.coll-swatch-img');
       var swatchTitle = document.getElementById('coll-swatch-title');
       var swatchDesc = document.getElementById('coll-swatch-desc');
@@ -423,7 +437,7 @@ img { display: block; max-width: 100%; }
         }
       }
 
-      // ── Auto-rotation after 60s idle ──
+      // ââ Auto-rotation after 60s idle ââ
       var userInteracted = false;
       var autoTimer = null;
       var cycleTimer = null;
@@ -433,16 +447,13 @@ img { display: block; max-width: 100%; }
         if (groups.length < 2) return;
         cycleTimer = setInterval(function() {
           var nextIdx = (currentSwatch + 1) % Math.min(groups.length, 5);
-          for (var g = 0; g < groups.length; g++) groups[g].classList.remove('open');
-          if (groups[nextIdx]) groups[nextIdx].classList.add('open');
-          showSwatchForGroup(groups[nextIdx], nextIdx);
+          showSwatchForGroup(null, nextIdx);
         }, 8000);
       }
 
-      // Start the 60s idle timer
-      autoTimer = setTimeout(startAutoCycle, 60000);
+      // Auto-cycle is started by openCollectionByHash when no hash is present
 
-      // ── Deep link ──
+      // ââ Deep link ââ
       function openCollectionByHash() {
         var hash = (window.location.hash || '').replace(/^#/, '');
         if (!groups.length) return;
@@ -450,10 +461,9 @@ img { display: block; max-width: 100%; }
         for (var i = 0; i < groups.length; i++) groups[i].classList.remove('open');
 
         if (!hash) {
-          groups[0].classList.add('open');
-          showSwatchForGroup(groups[0], 0);
-          return;
-        }
+        startAutoCycle();
+        return;
+      }
 
         var found = false;
         for (var j = 0; j < groups.length; j++) {
@@ -470,7 +480,9 @@ img { display: block; max-width: 100%; }
             break;
           }
         }
-        if (!found) { groups[0].classList.add('open'); showSwatchForGroup(groups[0], 0); }
+        if (!found) {
+        startAutoCycle();
+      }
       }
 
       openCollectionByHash();
