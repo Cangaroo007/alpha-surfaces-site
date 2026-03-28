@@ -252,8 +252,8 @@ img { display: block; max-width: 100%; }
       <div class="quality-img-wrap">
         <img src="images/about.jpg" alt="Premium kitchen with Alpha Surfaces benchtop">
         <div class="quality-caption">
-          <span class="qc-title">Carrara</span><br>
-          <span class="qc-sub">Collection 02</span>
+          <span class="qc-title">Emerald Haze</span><br>
+          <span class="qc-sub">Collection 05</span>
         </div>
       </div>
     </div>
@@ -352,6 +352,15 @@ img { display: block; max-width: 100%; }
           header.appendChild(desc);
         }
 
+        // Add discontinued messaging for Original Alpha Zero
+        if (collection.id === 'original-alpha-zero') {
+          const notice = document.createElement('p');
+          notice.className = 'collection-desc';
+          notice.style.cssText = 'color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 8px; line-height: 1.6;';
+          notice.innerHTML = 'These colours are discontinued and available as heavily discounted run-out stock while supplies last. Contact us on <a href="tel:1300257420" style="color: #D4C08A; text-decoration: underline;">1300 257 420</a> or <a href="mailto:info@alphasurfaces.com.au" style="color: #D4C08A; text-decoration: underline;">info@alphasurfaces.com.au</a> for availability and pricing.';
+          header.appendChild(notice);
+        }
+
         group.appendChild(header);
 
         // Stone grid content
@@ -393,6 +402,13 @@ img { display: block; max-width: 100%; }
 
           grid.appendChild(card);
         });
+
+        // Add "Click images to show full slabs" hint above the grid
+        const hint = document.createElement('p');
+        hint.className = 'slab-click-hint';
+        hint.textContent = 'Click images to show full slabs';
+        hint.style.cssText = 'font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin: 0 0 16px 0; font-family: "Degular", sans-serif;';
+        content.appendChild(hint);
 
         content.appendChild(grid);
         group.appendChild(content);
