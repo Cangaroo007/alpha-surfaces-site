@@ -60,12 +60,12 @@ img { display: block; max-width: 100%; }
 .faq-answer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 17px; line-height: 1.6; color: var(--black); opacity: 0.75; padding-bottom: 24px; max-width: 800px; }
 
 /* --- INSTAGRAM --- */
-.instagram-section { background: var(--cream); padding: 80px 136px; text-align: center; }
-.instagram-heading { font-family: 'Concrette S', serif; font-weight: 400; font-size: 28px; color: var(--black); margin-bottom: 32px; }
-.instagram-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.instagram-grid a { display: block; overflow: hidden; border-radius: 4px; }
-.instagram-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; transition: transform 0.5s ease; }
-.instagram-grid a:hover img { transform: scale(1.04); }
+.instagram-section { background: #ffffff; padding: 100px 136px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.instagram-heading { font-family: 'Concrette S', serif; font-weight: 400; font-size: 42px; color: var(--black); margin-bottom: 32px; text-align: center; width: 100%; }
+.instagram-grid { display: flex; gap: 10px; width: 100%; }
+.instagram-grid .instagram-item { flex: 1; aspect-ratio: 4/5; overflow: hidden; display: block; text-decoration: none; }
+.instagram-grid .instagram-img { width: 100%; height: 100%; background-image: url('images/instagram-grid.webp'); background-size: 200% 200%; transition: transform 0.4s ease; }
+.instagram-grid .instagram-item:hover .instagram-img { transform: scale(1.05); }
 
 /* --- FOOTER --- */
 .footer { background: var(--white); border-top: 1px solid var(--border); padding: 50px 60px 40px; }
@@ -99,7 +99,8 @@ img { display: block; max-width: 100%; }
   .faq-question h3 { font-size: 17px; }
   .instagram-section { padding: 48px 24px; }
   .instagram-heading { font-size: 22px; }
-  .instagram-grid { grid-template-columns: repeat(2, 1fr); }
+  .instagram-grid { flex-wrap: wrap; }
+  .instagram-grid .instagram-item { flex: 1 1 45%; }
   .footer { padding: 44px 24px 20px; }
   .footer-inner { grid-template-columns: 1fr; gap: 32px; }
   .footer-email-form { flex-direction: column; gap: 12px; }
@@ -157,11 +158,7 @@ img { display: block; max-width: 100%; }
     <div class="about-module-image">
       <img src="images/alphashield-hero.webp" alt="AlphaShield protection technology">
       <div class="about-module-overlay">
-        <!-- Shield/tulip icon -->
-        <svg viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M28 0C28 0 28 24 28 38C28 52 16 62 4 70C4 70 0 60 0 44C0 28 0 0 0 0L28 0Z" fill="white"/>
-          <path d="M32 0C32 0 32 24 32 38C32 52 44 62 56 70C56 70 60 60 60 44C60 28 60 0 60 0L32 0Z" fill="white" opacity="0.65"/>
-        </svg>
+        <img src="/logos/03 Alpha Shield/Inverse_white/Alpha Surfaces_Alpha Shield_Inverse.png" alt="Alpha Shield" style="width:56px;height:56px;margin-bottom:14px;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.2));">
         <span class="about-module-overlay-label">Alpha Shield</span>
       </div>
     </div>
@@ -184,10 +181,8 @@ img { display: block; max-width: 100%; }
     <div class="about-module-image">
       <img src="images/indoor-outdoor-hero.webp" alt="Indoor-Outdoor UV-stable range">
       <div class="about-module-overlay">
-        <!-- Starburst icon -->
-        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M40 0L46 26L62 6L52 30L80 24L56 38L80 40L56 42L80 56L52 50L62 74L46 54L40 80L34 54L18 74L28 50L0 56L24 42L0 40L24 38L0 24L28 30L18 6L34 26L40 0Z" fill="white"/>
-        </svg>
+        <img src="/logos/04_Indoor-Outdoor range icon/Inverse_white/Alpha Surfaces_Indoor-Outdoor Range Icon_Inverse.png" alt="Indoor-Outdoor" style="width:56px;height:56px;margin-bottom:14px;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.2));">
+        <span class="about-module-overlay-label">Indoor-Outdoor</span>
       </div>
     </div>
     <div class="about-module-text">
@@ -269,12 +264,12 @@ img { display: block; max-width: 100%; }
 <section class="instagram-section">
   <h2 class="instagram-heading">Follow us on Instagram</h2>
   <div class="instagram-grid">
-    <a href="https://instagram.com/alphasurfaces" target="_blank"><img src="images/instagram-grid.webp" alt="Alpha Surfaces Instagram" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:0% 0%;"></a>
-    <a href="https://instagram.com/alphasurfaces" target="_blank"><img src="images/instagram-grid.webp" alt="Alpha Surfaces Instagram" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:100% 0%;"></a>
-    <a href="https://instagram.com/alphasurfaces" target="_blank"><img src="images/instagram-grid.webp" alt="Alpha Surfaces Instagram" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:0% 100%;"></a>
-    <a href="https://instagram.com/alphasurfaces" target="_blank"><img src="images/instagram-grid.webp" alt="Alpha Surfaces Instagram" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:100% 100%;"></a>
+    <a href="https://instagram.com/alphasurfaces" target="_blank" class="instagram-item"><div class="instagram-img" style="background-position: 0% 0%;"></div></a>
+    <a href="https://instagram.com/alphasurfaces" target="_blank" class="instagram-item"><div class="instagram-img" style="background-position: 100% 0%;"></div></a>
+    <a href="https://instagram.com/alphasurfaces" target="_blank" class="instagram-item"><div class="instagram-img" style="background-position: 0% 100%;"></div></a>
+    <a href="https://instagram.com/alphasurfaces" target="_blank" class="instagram-item"><div class="instagram-img" style="background-position: 100% 100%;"></div></a>
   </div>
-  <a href="https://instagram.com/alphasurfaces" target="_blank" style="display:block;margin-top:24px;font-family:'Degular',sans-serif;font-size:18px;color:#000;text-decoration:none;text-align:center;">@alpha.surfaces</a>
+  <a href="https://instagram.com/alphasurfaces" target="_blank" style="display:block;margin-top:24px;font-family:'Degular',sans-serif;font-weight:400;font-size:25px;color:#000;text-decoration:none;text-align:center;width:100%;">@alpha.surfaces</a>
 </section>
 
 <!-- FOOTER -->
