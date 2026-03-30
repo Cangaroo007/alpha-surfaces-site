@@ -272,7 +272,7 @@ img { display: block; max-width: 100%; }
         swatchHTML += '<div class="intro-swatch-placeholder">' + stone.name + '</div>';
       }
       if (stone.slab) {
-        swatchHTML += '<a href="#" class="view-full-slab" onclick="event.preventDefault(); if(window.initSlabLightbox) window.initSlabLightbox('' + stone.slab.replace(/'/g, "\\'") + '', '' + stone.name.replace(/'/g, "\\'") + '');" style="display:block;margin-top:12px;text-align:center;font-family:Degular,sans-serif;font-size:12px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--olive,#564d22);text-decoration:underline;text-underline-offset:3px;">View Full Slab</a>';
+        swatchHTML += '<a href="#" class="view-full-slab slab-lightbox-trigger" data-slab="' + encodeURIComponent(stone.slab) + '" data-name="' + encodeURIComponent(stone.name) + '" style="display:block;margin-top:12px;text-align:center;font-family:Degular,sans-serif;font-size:12px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--olive,#564d22);text-decoration:underline;text-underline-offset:3px;">View Full Slab</a>';
       }
       swatchHTML += '</div>';
 
@@ -361,6 +361,17 @@ img { display: block; max-width: 100%; }
       section.appendChild(grid);
     }).catch(function(err) { console.error('Failed to load stones.json:', err); });
 })();
+
+// Delegated click handler for slab lightbox triggers
+document.addEventListener('click', function(e) {
+  var trigger = e.target.closest('.slab-lightbox-trigger');
+  if (trigger) {
+    e.preventDefault();
+    var slab = decodeURIComponent(trigger.getAttribute('data-slab'));
+    var name = decodeURIComponent(trigger.getAttribute('data-name'));
+    if (window.initSlabLightbox) window.initSlabLightbox(slab, name);
+  }
+});
 </script>
 <script src="../animation.js?v=8"></script>
 <script src="../slab-lightbox.js?v=1"></script>
