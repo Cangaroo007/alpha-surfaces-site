@@ -121,7 +121,7 @@
         },
         {
           "name": "Oyster Grey",
-          "finish": "Polished",
+          "finish": "Matte",
           "slug": "oyster-grey",
           "image": "/images/stones/oyster-grey.webp",
           "thumbnail": "/images/stones/oyster-grey-thumb.webp",
@@ -130,7 +130,7 @@
         },
         {
           "name": "Earthy Concrete",
-          "finish": "Polished",
+          "finish": "Matte",
           "slug": "earthy-concrete",
           "image": "/images/stones/earthy-concrete.webp",
           "thumbnail": "/images/stones/earthy-concrete-thumb.webp",

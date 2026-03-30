@@ -271,6 +271,9 @@ img { display: block; max-width: 100%; }
       } else {
         swatchHTML += '<div class="intro-swatch-placeholder">' + stone.name + '</div>';
       }
+      if (stone.slab) {
+        swatchHTML += '<a href="#" class="view-full-slab" onclick="event.preventDefault(); if(window.initSlabLightbox) window.initSlabLightbox('' + stone.slab.replace(/'/g, "\\'") + '', '' + stone.name.replace(/'/g, "\\'") + '');" style="display:block;margin-top:12px;text-align:center;font-family:Degular,sans-serif;font-size:12px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--olive,#564d22);text-decoration:underline;text-underline-offset:3px;">View Full Slab</a>';
+      }
       swatchHTML += '</div>';
 
       intro.innerHTML = textHTML + swatchHTML;
