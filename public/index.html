@@ -315,10 +315,8 @@ img { display: block; max-width: 100%; }
     if (!ticking) {
       requestAnimationFrame(function() {
         var scrollY = window.scrollY;
-        // Parallax scroll: move the "A" down as user scrolls
-        if (scrollY < heroHeight * 2) {
-          heroOverlay.style.transform = 'translate(-50%, calc(-50% + ' + (scrollY * 0.3) + 'px))';
-        }
+        // Keep "A" pinned at centre (no parallax drift)
+        heroOverlay.style.transform = 'translate(-50%, -50%)';
         // Fade out the "A" as the tagline scrolls out of view
         if (tagline) {
           var tagBottom = tagline.getBoundingClientRect().bottom;
