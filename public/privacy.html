@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy | Alpha Surfaces</title>
+<style>
+@font-face { font-family: 'Concrette S'; src: url('fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --olive: #564d22;
+  --cream: #f3f1e6;
+  --white: #ffffff;
+  --black: #000000;
+  --border: rgba(0,0,0,0.1);
+}
+html { scroll-behavior: smooth; }
+body { background: #f5f5f5; color: var(--black); font-family: 'Degular', sans-serif; font-weight: 400; line-height: 1.2; overflow-x: hidden; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* --- PRIVACY CONTENT --- */
+.privacy-header { background: var(--cream); padding: 80px 60px 48px; text-align: center; }
+.privacy-header h1 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 36px; letter-spacing: 0.04em; color: var(--black); margin-bottom: 12px; }
+.privacy-header p { font-family: 'Degular', sans-serif; font-size: 14px; color: #666; }
+
+.privacy-content { max-width: 800px; margin: 0 auto; padding: 60px 40px 80px; }
+.privacy-content h2 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 20px; color: var(--black); margin: 40px 0 16px; }
+.privacy-content h2:first-of-type { margin-top: 0; }
+.privacy-content p { font-family: 'Degular', sans-serif; font-size: 15px; line-height: 1.7; color: #333; margin-bottom: 14px; }
+.privacy-content ul { list-style: none; padding: 0; margin: 0 0 14px 0; }
+.privacy-content li { font-family: 'Degular', sans-serif; font-size: 15px; line-height: 1.7; color: #333; padding-left: 20px; position: relative; margin-bottom: 6px; }
+.privacy-content li::before { content: '–'; position: absolute; left: 0; color: var(--olive); }
+.privacy-content a { color: var(--olive); text-decoration: underline; text-underline-offset: 2px; }
+.privacy-content a:hover { opacity: 0.7; }
+
+/* --- FOOTER --- */
+.footer { background: var(--white); border-top: 1px solid var(--border); padding: 50px 60px 40px; }
+.footer-inner { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; }
+.footer-col-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 14px; color: var(--black); margin-bottom: 10px; }
+.footer-col p, .footer-col a { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; color: var(--black); line-height: 1.6; }
+.footer-col a { text-decoration: underline; text-underline-offset: 2px; }
+.footer-col a:hover { color: var(--olive); }
+.footer-email-form { display: flex; gap: 8px; margin-top: 12px; }
+.footer-email-input { flex: 1; border: none; border-bottom: 1px solid var(--border); padding: 6px 0; font-family: 'Degular', sans-serif; font-size: 13px; background: transparent; outline: none; }
+.footer-email-btn { background: var(--olive); color: var(--white); border: none; border-radius: 8px; padding: 6px 20px; font-family: 'Degular', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; }
+.footer-bottom { border-top: 1px solid var(--border); margin-top: 30px; padding-top: 20px; }
+.footer-bottom p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 11px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
+.footer-bottom a { text-decoration: underline; text-underline-offset: 2px; }
+
+@media (max-width: 768px) {
+  .privacy-header { padding: 60px 24px 36px; }
+  .privacy-header h1 { font-size: 28px; }
+  .privacy-content { padding: 40px 24px 60px; }
+  .footer { padding: 44px 24px 20px; }
+  .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+  .footer-email-form { flex-direction: column; gap: 12px; }
+  .footer-email-btn { width: 100%; text-align: center; padding: 12px; }
+}
+</style>
+<link rel="stylesheet" href="nav.css?v=10">
+</head>
+<body>
+
+<nav class="nav" id="main-nav"></nav>
+
+<div class="privacy-header">
+  <h1>Privacy Policy</h1>
+  <p>Last updated: 31 March 2026</p>
+</div>
+
+<div class="privacy-content">
+
+  <h2>Introduction</h2>
+  <p>Alpha Surfaces Pty Ltd (ABN to be confirmed) ("Alpha Surfaces", "we", "us", "our") is committed to protecting the privacy of your personal information. This Privacy Policy explains how we collect, use, disclose and otherwise handle personal information in accordance with the Privacy Act 1988 (Cth) and the Australian Privacy Principles (APPs).</p>
+  <p>By using our website at alphasurfaces.com.au or engaging with our services, you consent to the collection and use of information as described in this policy.</p>
+
+  <h2>What personal information we collect</h2>
+  <p>We may collect the following types of personal information:</p>
+  <ul>
+    <li>Name, email address, phone number and postal address</li>
+    <li>Business or company name and role</li>
+    <li>Details of enquiries, sample requests or orders you submit through our website</li>
+    <li>Communication preferences</li>
+    <li>Website usage data such as IP address, browser type, pages visited and referring URLs (collected automatically via cookies and analytics tools)</li>
+  </ul>
+  <p>We do not collect sensitive information (such as health, racial or ethnic origin, political opinions, or criminal records) unless required by law or with your explicit consent.</p>
+
+  <h2>How we collect personal information</h2>
+  <p>We collect personal information directly from you when you:</p>
+  <ul>
+    <li>Submit an enquiry or contact form on our website</li>
+    <li>Request a sample or product information</li>
+    <li>Subscribe to our newsletter or mailing list</li>
+    <li>Communicate with us by email, phone or social media</li>
+    <li>Visit our website (via cookies and analytics — see below)</li>
+  </ul>
+  <p>We may also receive personal information from third parties such as our distributors, trade partners or referral sources, where you have consented to that disclosure.</p>
+
+  <h2>How we use your personal information</h2>
+  <p>We use personal information for the purposes for which it was collected, including:</p>
+  <ul>
+    <li>Responding to your enquiries and providing customer support</li>
+    <li>Processing sample requests and orders</li>
+    <li>Sending you product information, updates and marketing communications (with your consent)</li>
+    <li>Improving our website, products and services</li>
+    <li>Complying with our legal obligations</li>
+    <li>Internal record keeping and business administration</li>
+  </ul>
+
+  <h2>Disclosure of personal information</h2>
+  <p>We may disclose your personal information to:</p>
+  <ul>
+    <li>Our employees, contractors and service providers who assist in operating our business (e.g. IT, marketing, logistics)</li>
+    <li>Our distributors and trade partners, where relevant to your enquiry or order</li>
+    <li>Professional advisers such as accountants, auditors and lawyers</li>
+    <li>Government bodies or law enforcement agencies, where required or authorised by law</li>
+  </ul>
+  <p>We do not sell, rent or trade your personal information to third parties for marketing purposes.</p>
+
+  <h2>Overseas disclosure</h2>
+  <p>Some of our service providers (such as website hosting, email and analytics platforms) may store data on servers located outside Australia. Where this occurs, we take reasonable steps to ensure that overseas recipients handle your personal information in accordance with the APPs. Countries may include the United States and countries within the European Union.</p>
+
+  <h2>Cookies and website analytics</h2>
+  <p>Our website uses cookies and similar technologies to enhance your browsing experience and collect aggregate usage data. This may include tools such as Google Analytics.</p>
+  <p>You can manage your cookie preferences through your browser settings. Disabling cookies may affect certain features of the website.</p>
+
+  <h2>Security of your information</h2>
+  <p>We take reasonable steps to protect your personal information from misuse, interference, loss, unauthorised access, modification or disclosure. This includes using secure hosting, encrypted connections (SSL/TLS) and access controls.</p>
+  <p>However, no method of electronic transmission or storage is completely secure, and we cannot guarantee absolute security.</p>
+
+  <h2>Access and correction</h2>
+  <p>You have the right to request access to the personal information we hold about you and to request corrections if you believe it is inaccurate, incomplete or out of date. To make a request, please contact us using the details below.</p>
+  <p>We will respond to access requests within a reasonable timeframe and may require identity verification before releasing information.</p>
+
+  <h2>Direct marketing and opting out</h2>
+  <p>If you have opted in to receive marketing communications from us, you may opt out at any time by clicking the "unsubscribe" link in our emails or contacting us directly. We will process your request promptly.</p>
+
+  <h2>Complaints</h2>
+  <p>If you believe we have breached your privacy or the APPs, you may lodge a complaint with us using the contact details below. We will investigate and respond within 30 days.</p>
+  <p>If you are not satisfied with our response, you may contact the Office of the Australian Information Commissioner (OAIC) at <a href="https://www.oaic.gov.au" target="_blank">www.oaic.gov.au</a> or by phone on 1300 363 992.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements. The updated version will be posted on this page with a revised "Last updated" date.</p>
+
+  <h2>Contact us</h2>
+  <p>If you have any questions about this Privacy Policy or how we handle your personal information, please contact us:</p>
+  <ul>
+    <li>Email: <a href="mailto:info@alphasurfaces.com.au">info@alphasurfaces.com.au</a></li>
+    <li>Phone: <a href="tel:1800000000">1800 000 000</a></li>
+  </ul>
+
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <p class="footer-col-heading">Stay in the loop</p>
+      <p>Be the first to find out about our new collections.</p>
+      <form class="footer-email-form" onsubmit="return false;">
+        <input class="footer-email-input" type="email" placeholder="Email address">
+        <button class="footer-email-btn">Subscribe</button>
+      </form>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Follow us</p>
+      <p><a href="https://instagram.com/alphasurfaces" target="_blank">Instagram</a></p>
+      <p><a href="https://facebook.com/alphasurfaces" target="_blank">Facebook</a></p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Contact us</p>
+      <p><a href="tel:1800000000">Call Toll Free</a></p>
+      <p><a href="mailto:info@alphasurfaces.com.au">Email us</a></p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Resources</p>
+      <p><span style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;">DOWNLOADS</span></p>
+      <p><a href="/downloads/fabrication-guide.pdf" target="_blank">Fabrication guide</a></p>
+      <p><a href="/downloads/warranty.pdf" target="_blank">Warranty</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>COPYRIGHT &copy; 2026 ALPHA SURFACES – ALL RIGHTS RESERVED &nbsp;|&nbsp; <a href="/privacy.html" style="text-decoration:underline;text-underline-offset:2px;">PRIVACY POLICY</a></p>
+  </div>
+</footer>
+
+<script src="nav.js?v=10"></script>
+</body>
+</html>
