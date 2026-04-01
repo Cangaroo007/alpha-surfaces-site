@@ -37,7 +37,7 @@ img { display: block; max-width: 100%; }
   100% { transform: scale(1.08) translate(-1%, -1%); }
 }
 .hero-logo-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; max-width: 800px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 1; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; }
-.hero-logo-overlay img { width: 100%; height: auto; opacity: 0.12; object-fit: contain; }
+.hero-logo-overlay img { width: 100%; height: auto; opacity: 0.18; object-fit: contain; }
 @keyframes heroLogoFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 .hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; z-index: 2; }
 .hero-caption .caption-title { font-family: 'Concrette S', serif; font-weight: 700; }
@@ -303,5 +303,19 @@ img { display: block; max-width: 100%; }
 <script src="animation.js?v=11"></script>
 <script src="nav.js?v=10"></script>
 <script src="sample-modal.js?v=1"></script>
+<!-- A watermark: follows viewport scroll, clipped by hero overflow:hidden -->
+<script>
+(function() {
+  var overlay = document.querySelector('.hero-logo-overlay');
+  var hero = document.querySelector('.hero');
+  if (!overlay || !hero) return;
+  window.addEventListener('scroll', function() {
+    var scrollY = window.scrollY;
+    if (scrollY <= hero.offsetHeight) {
+      overlay.style.transform = 'translate(-50%, calc(-50% + ' + scrollY + 'px))';
+    }
+  });
+})();
+</script>
 </body>
 </html>
