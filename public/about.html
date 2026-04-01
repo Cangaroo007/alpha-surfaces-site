@@ -33,14 +33,15 @@ img { display: block; max-width: 100%; }
 .about-intro-author { font-family: 'Concrette S', serif; font-weight: 700; font-size: 14px; line-height: 1.4; color: var(--black); opacity: 0.6; margin-top: 16px; }
 
 /* --- FEATURE MODULES (2-col: image left, text right) --- */
+/* Figma: module container 1168px (1440 - 136×2), image 525×525, gap ~174px, text ~464px */
 .about-module { background: var(--cream); padding: 0 136px; }
-.about-module-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--border); padding: 80px 0; }
+.about-module-inner { display: grid; grid-template-columns: min(525px, 45%) 1fr; column-gap: clamp(60px, 12vw, 174px); border-top: 1px solid var(--border); padding: 50px 0; align-items: start; }
 .about-module-image { position: relative; overflow: hidden; }
-.about-module-image img { width: 100%; height: 100%; min-height: 400px; object-fit: cover; display: block; }
-.about-module-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 100%); }
+.about-module-image img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; }
+.about-module-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; text-align: center; pointer-events: none; padding-bottom: 40px; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.25) 100%); }
 .about-module-overlay svg { width: 56px; height: 56px; margin-bottom: 14px; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2)); }
 .about-module-overlay-label { font-family: 'Degular', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
-.about-module-text { padding: 0 0 0 60px; display: flex; flex-direction: column; justify-content: flex-start; }
+.about-module-text { padding: 0; display: flex; flex-direction: column; justify-content: flex-start; }
 .about-module-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 28px; color: var(--black); margin-bottom: 8px; }
 .about-module-subtitle { font-family: 'Concrette S', serif; font-weight: 500; font-size: 16px; line-height: 1.3; color: var(--black); margin-bottom: 24px; font-style: italic; }
 .about-module-body { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; line-height: 1.55; color: var(--black); }
@@ -89,8 +90,8 @@ img { display: block; max-width: 100%; }
   .about-intro-body { font-size: 16px; }
   .about-intro-quote { font-size: 20px; margin-top: 32px; }
   .about-module { padding: 0 24px; }
-  .about-module-inner { grid-template-columns: 1fr; padding: 48px 0; }
-  .about-module-image img { min-height: 280px; }
+  .about-module-inner { grid-template-columns: 1fr; column-gap: 0; padding: 48px 0; }
+  .about-module-image img { aspect-ratio: 4 / 3; }
   .about-module-text { padding: 32px 0 0 0; }
   .about-module-title { font-size: 24px; }
   .about-module-body { font-size: 15px; }
@@ -139,7 +140,7 @@ img { display: block; max-width: 100%; }
     <div class="about-module-image">
       <img src="images/zero-silica-hero.webp" alt="Zero Silica surfaces">
       <div class="about-module-overlay">
-        <span style="font-family:'Degular',sans-serif;font-weight:600;font-size:18px;letter-spacing:0.14em;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,0.3);position:absolute;bottom:40px;left:50%;transform:translateX(-50%);">ZERO SILICA</span>
+        <span class="about-module-overlay-label">ZERO SILICA</span>
       </div>
     </div>
     <div class="about-module-text">
