@@ -5,7 +5,7 @@
 
 /* --- GLOBAL --- */
 html { overflow-x: hidden; }
-body { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+body { -webkit-text-size-adjust: 100%; }
 
 /* --- FONT FALLBACKS (Windows/Chrome) --- */
 * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
