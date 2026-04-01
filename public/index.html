@@ -36,7 +36,7 @@ img { display: block; max-width: 100%; }
   0% { transform: scale(1) translate(0, 0); }
   100% { transform: scale(1.08) translate(-1%, -1%); }
 }
-.hero-logo-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; max-width: 800px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; }
+.hero-logo-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; max-width: 800px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 1; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; }
 .hero-logo-overlay img { width: 100%; height: auto; opacity: 0.12; object-fit: contain; }
 @keyframes heroLogoFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 .hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; z-index: 2; }
@@ -300,41 +300,7 @@ img { display: block; max-width: 100%; }
   </div>
 </footer>
 
-<script>
-// "A" watermark: stays fixed in centre while content scrolls up behind it.
-// Fades out as the statement (olive) panel scrolls into view.
-(function() {
-  var heroOverlay = document.querySelector('.hero-logo-overlay');
-  if (!heroOverlay) return;
-
-  var tagline = document.querySelector('.hero-tagline');
-  var heroHeight = document.querySelector('.hero') ? document.querySelector('.hero').offsetHeight : 800;
-  var ticking = false;
-
-  window.addEventListener('scroll', function() {
-    if (!ticking) {
-      requestAnimationFrame(function() {
-        var scrollY = window.scrollY;
-        // Keep "A" pinned at centre (no parallax drift)
-        heroOverlay.style.transform = 'translate(-50%, -50%)';
-        // Fade out the "A" as the tagline scrolls out of view
-        if (tagline) {
-          var tagBottom = tagline.getBoundingClientRect().bottom;
-          var fadeStart = window.innerHeight * 0.6;
-          if (tagBottom < fadeStart) {
-            var opacity = Math.max(0, tagBottom / fadeStart);
-            heroOverlay.style.opacity = opacity;
-          } else {
-            heroOverlay.style.opacity = '';
-          }
-        }
-        ticking = false;
-      });
-      ticking = true;
-    }
-  }, { passive: true });
-})();
-</script>
+<!-- A watermark is position:absolute inside .hero with overflow:hidden — no JS needed -->
 <script src="animation.js?v=11"></script>
 <script src="nav.js?v=10"></script>
 <script src="sample-modal.js?v=1"></script>
