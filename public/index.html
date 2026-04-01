@@ -304,38 +304,54 @@ img { display: block; max-width: 100%; }
 <script src="nav.js?v=10"></script>
 <script src="sample-modal.js?v=1"></script>
 <script>
-// "A" watermark: stays fixed in centre while content scrolls up behind it.
-// Fades out as the statement (olive) panel scrolls into view.
+// A watermark: fixed at screen centre, clipped to hero bounds (never bleeds into nav
+// or below hero), fades out as the olive statement section scrolls into view.
 (function() {
-  var heroOverlay = document.querySelector('.hero-logo-overlay');
-  if (!heroOverlay) return;
-
+  var overlay = document.querySelector('.hero-logo-overlay');
+  var hero = document.querySelector('.hero');
+  var nav = document.querySelector('.nav');
   var tagline = document.querySelector('.hero-tagline');
-  var heroHeight = document.querySelector('.hero') ? document.querySelector('.hero').offsetHeight : 800;
-  var ticking = false;
+  if (!overlay || !hero || !nav) return;
 
-  window.addEventListener('scroll', function() {
+  var ticking = false;
+  function onScroll() {
     if (!ticking) {
       requestAnimationFrame(function() {
-        var scrollY = window.scrollY;
-        // Keep "A" pinned at centre (no parallax drift)
-        heroOverlay.style.transform = 'translate(-50%, -50%)';
-        // Fade out the "A" as the tagline scrolls out of view
+        var heroRect = hero.getBoundingClientRect();
+        var navBottom = nav.getBoundingClientRect().bottom;
+        var overlayRect = overlay.getBoundingClientRect();
+
+        // Clip: only show A within hero area AND below the nav
+        var visibleTop = Math.max(navBottom, heroRect.top);
+        var visibleBottom = heroRect.bottom;
+
+        if (visibleBottom <= visibleTop) {
+          overlay.style.clipPath = 'inset(100% 0 0 0)';
+        } else {
+          var clipTop = Math.max(0, visibleTop - overlayRect.top);
+          var clipBottom = Math.max(0, overlayRect.bottom - visibleBottom);
+          overlay.style.clipPath = 'inset(' + clipTop + 'px 0 ' + clipBottom + 'px 0)';
+        }
+
+        // Fade out as tagline scrolls away
         if (tagline) {
           var tagBottom = tagline.getBoundingClientRect().bottom;
           var fadeStart = window.innerHeight * 0.6;
           if (tagBottom < fadeStart) {
-            var opacity = Math.max(0, tagBottom / fadeStart);
-            heroOverlay.style.opacity = opacity;
+            overlay.style.opacity = Math.max(0, tagBottom / fadeStart);
           } else {
-            heroOverlay.style.opacity = '';
+            overlay.style.opacity = '';
           }
         }
+
         ticking = false;
       });
       ticking = true;
     }
-  }, { passive: true });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 })();
 </script>
 </body>
