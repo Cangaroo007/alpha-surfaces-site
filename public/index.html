@@ -303,19 +303,6 @@ img { display: block; max-width: 100%; }
 <script src="animation.js?v=11"></script>
 <script src="nav.js?v=10"></script>
 <script src="sample-modal.js?v=1"></script>
-<!-- A watermark: follows viewport scroll, clipped by hero overflow:hidden -->
-<script>
-(function() {
-  var overlay = document.querySelector('.hero-logo-overlay');
-  var hero = document.querySelector('.hero');
-  if (!overlay || !hero) return;
-  window.addEventListener('scroll', function() {
-    var scrollY = window.scrollY;
-    if (scrollY <= hero.offsetHeight) {
-      overlay.style.transform = 'translate(-50%, calc(-50% + ' + scrollY + 'px))';
-    }
-  });
-})();
-</script>
+
 </body>
 </html>
