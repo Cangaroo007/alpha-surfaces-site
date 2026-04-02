@@ -1,7 +1,21 @@
 /* ═══════════════════════════════════════════════════════════════
-   ALPHA SURFACES — Shared Animation Styles v4
-   Fix: no transition on hidden state — transition only on reveal
+   ALPHA SURFACES — Shared Animation Styles v5
+   Adds: Lenis smooth scroll base, enhanced reveal timings
    ═══════════════════════════════════════════════════════════════ */
+
+/* --- 0. LENIS SMOOTH SCROLL --- */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
 
 /* --- 1. SCROLL REVEAL --- */
 .anim-reveal {

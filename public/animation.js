@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   ALPHA SURFACES — Shared Animation Controller v4
-   Fix: 100ms init delay + above-fold stagger + transition on reveal only
+   ALPHA SURFACES — Shared Animation Controller v5
+   Adds: Lenis smooth scroll, hero carousel, enhanced reveals
    ═══════════════════════════════════════════════════════════════ */
 
 (function() {
@@ -18,7 +18,119 @@
     return rect.top < window.innerHeight;
   }
 
-  /* ─── 1. SCROLL REVEAL ─── */
+  /* ─── 0. LENIS SMOOTH SCROLL ─── */
+  function initLenis() {
+    if (prefersReduced) return null;
+    if (typeof Lenis === 'undefined') return null;
+
+    var lenis = new Lenis({
+      duration: 1.2,
+      easing: function(t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+      infinite: false
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // Sync lenis with anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        var target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          lenis.scrollTo(target, { offset: -80 });
+        }
+      });
+    });
+
+    return lenis;
+  }
+
+  /* ─── 1. HERO CAROUSEL ─── */
+  function initHeroCarousel() {
+    var hero = document.getElementById('hero-carousel');
+    if (!hero) return;
+
+    var slides = hero.querySelectorAll('.hero-slide');
+    var dots = hero.querySelectorAll('.hero-dot');
+    if (slides.length < 2) return;
+
+    var current = 0;
+    var total = slides.length;
+    var interval = 5500;
+    var timer = null;
+    var isTransitioning = false;
+
+    function goToSlide(idx) {
+      if (isTransitioning || idx === current) return;
+      isTransitioning = true;
+
+      // Fade out current
+      slides[current].classList.remove('is-active');
+      dots[current].classList.remove('is-active');
+
+      // Fade in next
+      current = idx;
+      slides[current].classList.add('is-active');
+      dots[current].classList.add('is-active');
+
+      // Reset Ken Burns for new slide
+      var img = slides[current].querySelector('img');
+      if (img) {
+        img.style.animation = 'none';
+        img.offsetHeight; // force reflow
+        img.style.animation = '';
+      }
+
+      setTimeout(function() {
+        isTransitioning = false;
+      }, 1200);
+    }
+
+    function nextSlide() {
+      goToSlide((current + 1) % total);
+    }
+
+    function startAutoplay() {
+      stopAutoplay();
+      timer = setInterval(nextSlide, interval);
+    }
+
+    function stopAutoplay() {
+      if (timer) clearInterval(timer);
+    }
+
+    // Dot navigation
+    dots.forEach(function(dot) {
+      dot.addEventListener('click', function() {
+        var idx = parseInt(dot.getAttribute('data-slide'), 10);
+        goToSlide(idx);
+        startAutoplay(); // reset timer on manual navigation
+      });
+    });
+
+    // Pause on hover
+    hero.addEventListener('mouseenter', stopAutoplay);
+    hero.addEventListener('mouseleave', startAutoplay);
+
+    // Pause when tab is not visible
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) stopAutoplay();
+      else startAutoplay();
+    });
+
+    startAutoplay();
+  }
+
+  /* ─── 2. SCROLL REVEAL ─── */
   function initReveal() {
     // Tag all major content elements
     var revealSelectors = [
@@ -31,9 +143,10 @@
       '.quality-inner, .quality-img-wrap',
       '.stone-card, .col-card, .value-card, .showcase-card, .location-card, .back-benefit',
       '.about-partner-inner, .about-partner-brand, .about-partner-text',
-      
       '.collection-group, .collection-header, .collection-desc',
       '.feature-panel',
+      '.middle-cta > div',
+      '.hero-tagline',
     ].join(', ');
 
     document.querySelectorAll(revealSelectors).forEach(function(el) {
@@ -110,15 +223,18 @@
     belowFold.forEach(function(el) { io.observe(el); });
   }
 
-  /* ─── 2. PARALLAX HERO ─── */
+  /* ─── 3. PARALLAX HERO ─── */
   function initParallax() {
     if (prefersReduced) return;
     if (window.innerWidth < 768) return;
 
+    // Skip hero parallax when carousel is present (Ken Burns handles it)
+    var hasCarousel = document.getElementById('hero-carousel');
+    if (hasCarousel) return;
+
     var heroImg = document.querySelector('.hero > img, .hero .hero-video, .hero-img');
     if (!heroImg) return;
 
-    // Skip parallax if hero has Ken Burns CSS animation (landing page)
     var heroHasKenBurns = getComputedStyle(heroImg).animationName !== 'none';
     if (heroHasKenBurns) return;
 
@@ -143,16 +259,16 @@
     }, { passive: true });
   }
 
-  /* ─── 3. CARD HOVER ─── */
+  /* ─── 4. CARD HOVER ─── */
   function initCardHover() {
     document.querySelectorAll('.stone-card, .showcase-card, .col-card').forEach(function(card) {
       card.classList.add('anim-card');
     });
   }
 
-  /* ─── 4. SECTION TRANSITIONS ─── */
+  /* ─── 5. SECTION TRANSITIONS ─── */
   function initSectionTransitions() {
-    document.querySelectorAll('.statement, .about, .gallery, .feature-panels, .value, .showcase, .contact, .locations, .collections-section, .quality, .about-partner, .intro, .swatch, .full-swatch').forEach(function(el) {
+    document.querySelectorAll('.statement, .about, .gallery, .feature-panels, .value, .showcase, .contact, .locations, .collections-section, .quality, .about-partner, .intro, .swatch, .full-swatch, .ticker').forEach(function(el) {
       tag(el, 'anim-section');
     });
 
@@ -168,7 +284,7 @@
     document.querySelectorAll('.anim-section').forEach(function(el) { io.observe(el); });
   }
 
-  /* ─── 5. NAV SCROLL ─── */
+  /* ─── 6. NAV SCROLL ─── */
   function initNavScroll() {
     var nav = document.querySelector('.nav');
     if (!nav) return;
@@ -185,7 +301,7 @@
     }, { passive: true });
   }
 
-  /* ─── 6. SWATCH PARALLAX ─── */
+  /* ─── 7. SWATCH PARALLAX ─── */
   function initSwatchParallax() {
     if (prefersReduced) return;
     if (window.innerWidth < 768) return;
@@ -215,7 +331,7 @@
     }, { passive: true });
   }
 
-  /* ─── 7. COUNT-UP STATS ─── */
+  /* ─── 8. COUNT-UP STATS ─── */
   function initCountUp() {
     var stats = document.querySelectorAll('.hero-stat-value, .front-stat-number');
     if (!stats.length) return;
@@ -253,7 +369,7 @@
     stats.forEach(function(el) { if (el.hasAttribute('data-count-target')) io.observe(el); });
   }
 
-  /* ─── 8. HORIZONTAL SCROLL (mobile) ─── */
+  /* ─── 9. HORIZONTAL SCROLL (mobile) ─── */
   function initHScroll() {
     if (window.innerWidth >= 768) return;
     document.querySelectorAll('.stones-grid').forEach(function(grid) {
@@ -266,12 +382,33 @@
     });
   }
 
+  /* ─── 10. TICKER SPEED ON HOVER ─── */
+  function initTicker() {
+    var ticker = document.querySelector('.ticker');
+    if (!ticker) return;
+    var track = ticker.querySelector('.ticker-track');
+    if (!track) return;
+
+    // Slow down on hover for readability
+    ticker.addEventListener('mouseenter', function() {
+      track.style.animationDuration = '70s';
+    });
+    ticker.addEventListener('mouseleave', function() {
+      track.style.animationDuration = '35s';
+    });
+  }
+
   /* ─── INIT ─── */
   function initAnimations() {
-    // Immediate: nav scroll and parallax
+    // Smooth scroll
+    var lenis = initLenis();
+
+    // Immediate: nav scroll, parallax, carousel
     initNavScroll();
     initParallax();
     initSwatchParallax();
+    initHeroCarousel();
+    initTicker();
 
     // Wait for dynamic content (stones.json), then tag elements
     setTimeout(function() {
@@ -282,8 +419,6 @@
       initHScroll();
 
       // CRITICAL: Add transitions AFTER elements are tagged and painted in hidden state.
-      // Without this double-rAF, browsers batch the opacity:0 + transition + opacity:1
-      // into a single frame and the animation is never visible.
       requestAnimationFrame(function() {
         requestAnimationFrame(function() {
           document.documentElement.classList.add('anim-ready');
