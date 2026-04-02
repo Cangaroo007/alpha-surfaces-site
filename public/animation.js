@@ -54,83 +54,7 @@
     return lenis;
   }
 
-  /* ─── 1. HERO CAROUSEL ─── */
-  function initHeroCarousel() {
-    var hero = document.getElementById('hero-carousel');
-    if (!hero) return;
-
-    var slides = hero.querySelectorAll('.hero-slide');
-    var dots = hero.querySelectorAll('.hero-dot');
-    if (slides.length < 2) return;
-
-    var current = 0;
-    var total = slides.length;
-    var interval = 5500;
-    var timer = null;
-    var isTransitioning = false;
-
-    function goToSlide(idx) {
-      if (isTransitioning || idx === current) return;
-      isTransitioning = true;
-
-      // Fade out current
-      slides[current].classList.remove('is-active');
-      dots[current].classList.remove('is-active');
-
-      // Fade in next
-      current = idx;
-      slides[current].classList.add('is-active');
-      dots[current].classList.add('is-active');
-
-      // Reset Ken Burns for new slide
-      var img = slides[current].querySelector('img');
-      if (img) {
-        img.style.animation = 'none';
-        img.offsetHeight; // force reflow
-        img.style.animation = '';
-      }
-
-      setTimeout(function() {
-        isTransitioning = false;
-      }, 1200);
-    }
-
-    function nextSlide() {
-      goToSlide((current + 1) % total);
-    }
-
-    function startAutoplay() {
-      stopAutoplay();
-      timer = setInterval(nextSlide, interval);
-    }
-
-    function stopAutoplay() {
-      if (timer) clearInterval(timer);
-    }
-
-    // Dot navigation
-    dots.forEach(function(dot) {
-      dot.addEventListener('click', function() {
-        var idx = parseInt(dot.getAttribute('data-slide'), 10);
-        goToSlide(idx);
-        startAutoplay(); // reset timer on manual navigation
-      });
-    });
-
-    // Pause on hover
-    hero.addEventListener('mouseenter', stopAutoplay);
-    hero.addEventListener('mouseleave', startAutoplay);
-
-    // Pause when tab is not visible
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden) stopAutoplay();
-      else startAutoplay();
-    });
-
-    startAutoplay();
-  }
-
-  /* ─── 2. SCROLL REVEAL ─── */
+  /* ─── 1. SCROLL REVEAL ─── */
   function initReveal() {
     // Tag all major content elements
     var revealSelectors = [
@@ -223,14 +147,10 @@
     belowFold.forEach(function(el) { io.observe(el); });
   }
 
-  /* ─── 3. PARALLAX HERO ─── */
+  /* ─── 2. PARALLAX HERO ─── */
   function initParallax() {
     if (prefersReduced) return;
     if (window.innerWidth < 768) return;
-
-    // Skip hero parallax when carousel is present (Ken Burns handles it)
-    var hasCarousel = document.getElementById('hero-carousel');
-    if (hasCarousel) return;
 
     var heroImg = document.querySelector('.hero > img, .hero .hero-video, .hero-img');
     if (!heroImg) return;
@@ -407,7 +327,6 @@
     initNavScroll();
     initParallax();
     initSwatchParallax();
-    initHeroCarousel();
     initTicker();
 
     // Wait for dynamic content (stones.json), then tag elements
