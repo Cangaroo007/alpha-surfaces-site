@@ -29,9 +29,12 @@ body { background: #f5f5f5; color: var(--black); font-family: 'Degular', sans-se
 a { color: inherit; }
 img { display: block; max-width: 100%; }
 
-/* --- HERO --- */
-.hero { position: relative; width: 100%; overflow: hidden; }
-.hero-video { width: 100%; height: 730px; object-fit: cover; display: block; animation: heroKenBurns 20s ease-in-out infinite alternate; transform-origin: center center; }
+/* --- HERO CAROUSEL --- */
+.hero { position: relative; width: 100%; height: 730px; overflow: hidden; }
+.hero-slides { position: relative; width: 100%; height: 100%; }
+.hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1); z-index: 0; }
+.hero-slide.is-active { opacity: 1; z-index: 1; }
+.hero-slide img { width: 100%; height: 100%; object-fit: cover; display: block; animation: heroKenBurns 20s ease-in-out infinite alternate; transform-origin: center center; }
 @keyframes heroKenBurns {
   0% { transform: scale(1) translate(0, 0); }
   100% { transform: scale(1.08) translate(-1%, -1%); }
@@ -39,11 +42,30 @@ img { display: block; max-width: 100%; }
 .hero-logo-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; max-width: 800px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; }
 .hero-logo-overlay img { width: 100%; height: auto; opacity: 0.18; object-fit: contain; }
 @keyframes heroLogoFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
-.hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; z-index: 2; }
-.hero-caption .caption-title { font-family: 'Concrette S', serif; font-weight: 700; }
-.hero-caption .caption-sub { font-family: 'Concrette S', serif; font-weight: 400; }
+.hero-slide-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; z-index: 3; opacity: 0; transform: translateY(12px); transition: opacity 0.8s ease-out 0.4s, transform 0.8s ease-out 0.4s; }
+.hero-slide.is-active .hero-slide-caption { opacity: 1; transform: translateY(0); }
+.caption-title { font-family: 'Concrette S', serif; font-weight: 700; }
+.caption-sub { font-family: 'Concrette S', serif; font-weight: 400; }
+.hero-dots { position: absolute; bottom: 32px; right: 32px; display: flex; gap: 10px; z-index: 4; }
+.hero-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.7); background: transparent; cursor: pointer; padding: 0; transition: background 0.4s ease, transform 0.3s ease, border-color 0.4s ease; }
+.hero-dot.is-active { background: var(--white); border-color: var(--white); transform: scale(1.2); }
+.hero-dot:hover { background: rgba(255,255,255,0.5); }
 .hero-tagline { text-align: center; padding: 48px 24px; background: var(--cream, #f3f1e6); }
 .hero-tagline p { font-family: 'Concrette S', serif; font-weight: 600; font-size: 62px; color: #564D22; letter-spacing: 0; }
+
+/* --- TICKER --- */
+.ticker { background: var(--olive); padding: 28px 0; overflow: hidden; white-space: nowrap; }
+.ticker-track { display: flex; width: max-content; animation: tickerScroll 35s linear infinite; }
+.ticker-content { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
+.ticker-text { font-family: 'Concrette S', serif; font-weight: 500; font-size: 22px; color: var(--white); letter-spacing: 0.04em; padding: 0 24px; text-transform: uppercase; }
+.ticker-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); flex-shrink: 0; }
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+}
 
 /* --- STATEMENT --- */
 .statement { background: var(--olive); display: flex; flex-direction: column; align-items: center; padding: 150px 171px 0; min-height: 661px; position: relative; }
@@ -98,18 +120,24 @@ img { display: block; max-width: 100%; }
 
 /* --- REDUCED MOTION --- */
 @media (prefers-reduced-motion: reduce) {
-  .hero-video { animation: none !important; }
+  .hero-slide img { animation: none !important; }
   .hero-logo-overlay { animation: none !important; opacity: 1 !important; }
   .middle-cta img { animation: none !important; }
+  .hero-slide { transition: none !important; }
+  .hero-slide-caption { transition: none !important; opacity: 1 !important; transform: none !important; }
 }
 
 /* --- MOBILE --- */
 @media (max-width: 1024px) {
-  .hero-video { height: 340px; }
-  .hero-caption { padding: 12px; }
+  .hero { height: 340px; }
+  .hero-slide-caption { padding: 12px; }
   .hero-logo-overlay { width: 80vw; }
   .hero-logo-overlay img { width: 100%; }
   .hero-tagline p { font-size: 32px; padding: 32px 24px; }
+  .hero-dots { bottom: 16px; right: 16px; gap: 8px; }
+  .hero-dot { width: 8px; height: 8px; }
+  .ticker-text { font-size: 16px; padding: 0 16px; }
+  .ticker { padding: 20px 0; }
   .middle-cta { height: 350px !important; }
   .middle-cta p { font-size: 24px !important; }
 
@@ -141,7 +169,7 @@ img { display: block; max-width: 100%; }
   .footer-bottom p { font-size: 11px; }
 }
 </style>
-<link rel="stylesheet" href="animation.css?v=8">
+<link rel="stylesheet" href="animation.css?v=9">
 <link rel="stylesheet" href="nav.css?v=10">
 <link rel="stylesheet" href="sample-modal.css?v=1">
 <link rel="stylesheet" href="mobile.css?v=1">
@@ -151,15 +179,54 @@ img { display: block; max-width: 100%; }
 <!-- NAV -->
 <nav class="nav" id="main-nav"></nav>
 
-<!-- HERO -->
-<section class="hero">
-  <img class="hero-video" src="images/hero.jpg" alt="Alpha Surfaces premium benchtop">
+<!-- HERO CAROUSEL -->
+<section class="hero" id="hero-carousel">
+  <div class="hero-slides">
+    <div class="hero-slide is-active">
+      <img src="images/hero.jpg" alt="Alpha Surfaces premium benchtop">
+      <div class="hero-slide-caption">
+        <span class="caption-title">Autumn Gold</span><br>
+        <span class="caption-sub">Collection 05</span>
+      </div>
+    </div>
+    <div class="hero-slide">
+      <img src="images/collection-hero-01.webp" alt="Collection 01 surface">
+      <div class="hero-slide-caption">
+        <span class="caption-title">Alpine White</span><br>
+        <span class="caption-sub">Collection 01</span>
+      </div>
+    </div>
+    <div class="hero-slide">
+      <img src="images/collection-hero-02.webp" alt="Collection 02 surface">
+      <div class="hero-slide-caption">
+        <span class="caption-title">Coastal Grey</span><br>
+        <span class="caption-sub">Collection 02</span>
+      </div>
+    </div>
+    <div class="hero-slide">
+      <img src="images/collection-hero-03.webp" alt="Collection 03 surface">
+      <div class="hero-slide-caption">
+        <span class="caption-title">Sandstone</span><br>
+        <span class="caption-sub">Collection 03</span>
+      </div>
+    </div>
+    <div class="hero-slide">
+      <img src="images/collection-hero-05.webp" alt="Collection 05 surface">
+      <div class="hero-slide-caption">
+        <span class="caption-title">Midnight Marble</span><br>
+        <span class="caption-sub">Collection 04</span>
+      </div>
+    </div>
+  </div>
   <div class="hero-logo-overlay">
     <img src="images/alpha-a-symbol.webp" alt="">
   </div>
-  <div class="hero-caption">
-    <span class="caption-title">Autumn Gold</span><br>
-    <span class="caption-sub">Collection 05</span>
+  <div class="hero-dots">
+    <button class="hero-dot is-active" data-slide="0" aria-label="Slide 1"></button>
+    <button class="hero-dot" data-slide="1" aria-label="Slide 2"></button>
+    <button class="hero-dot" data-slide="2" aria-label="Slide 3"></button>
+    <button class="hero-dot" data-slide="3" aria-label="Slide 4"></button>
+    <button class="hero-dot" data-slide="4" aria-label="Slide 5"></button>
   </div>
 </section>
 
@@ -267,6 +334,48 @@ img { display: block; max-width: 100%; }
 }
 </style>
 
+<!-- TICKER -->
+<section class="ticker">
+  <div class="ticker-track">
+    <div class="ticker-content">
+      <span class="ticker-text">Stone</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">Life</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">Style</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">Innovation</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">Craftsmanship</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">Zero Silica</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">AlphaShield</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">Premium Surfaces</span>
+      <span class="ticker-dot"></span>
+    </div>
+    <div class="ticker-content" aria-hidden="true">
+      <span class="ticker-text">Stone</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">Life</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">Style</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">Innovation</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">Craftsmanship</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">Zero Silica</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">AlphaShield</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-text">Premium Surfaces</span>
+      <span class="ticker-dot"></span>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-inner">
@@ -300,7 +409,8 @@ img { display: block; max-width: 100%; }
   </div>
 </footer>
 
-<script src="animation.js?v=11"></script>
+<script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+<script src="animation.js?v=12"></script>
 <script src="nav.js?v=10"></script>
 <script src="sample-modal.js?v=1"></script>
 <script>
