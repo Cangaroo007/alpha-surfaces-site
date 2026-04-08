@@ -68,8 +68,7 @@ body { -webkit-text-size-adjust: 100%; }
   h1 { font-size: 32px !important; }
   h2 { font-size: 24px !important; }
 
-  /* Hero */
-  .hero { height: 60vw !important; max-height: 400px; min-height: 250px; }
+  /* Hero height handled by each page's own stylesheet */
 
   /* Nav handled by nav.css already at 1024px */
 
@@ -196,7 +195,6 @@ body { -webkit-text-size-adjust: 100%; }
 /* --- VERY SMALL: max 380px --- */
 @media (max-width: 380px) {
   .stones-grid { grid-template-columns: 1fr !important; }
-  .hero { height: 50vw !important; }
   .brand-heading { font-size: 24px !important; }
   h1 { font-size: 26px !important; }
 }
