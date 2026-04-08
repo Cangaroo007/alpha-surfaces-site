@@ -1258,6 +1258,14 @@ app.get('/collections', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'collections.html'));
 });
 
+// TODO: Instagram API endpoint
+// When Belinda provides Instagram credentials, add a /api/instagram route here
+// that fetches the latest 4 posts from the Instagram Graph API and returns
+// { posts: [{ imageUrl, permalink, caption }] }
+// Then update public/collections.html to fetch from this endpoint on page load
+// and replace the .instagram-placeholder tiles with live content.
+// Instagram handle: @alpha.surfaces (unconfirmed — verify with Belinda)
+
 // ─── Stone detail page ───
 app.get('/surfaces/:slug', (req, res) => {
   const slug = req.params.slug.replace(/[^a-z0-9-]/gi, '');
