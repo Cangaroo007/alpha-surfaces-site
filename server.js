@@ -1266,6 +1266,17 @@ app.get('/collections', (req, res) => {
 // and replace the .instagram-placeholder tiles with live content.
 // Instagram handle: @alpha.surfaces (unconfirmed — verify with Belinda)
 
+// ─── Document pages (clean URLs) ───
+app.get('/care-and-maintenance', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'care-and-maintenance.html'));
+});
+app.get('/fabrication-guide', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'fabrication-guide.html'));
+});
+app.get('/warranty', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'warranty.html'));
+});
+
 // ─── Discontinued Alpha Zero stones — redirect to collections ───
 const discontinuedSlugs = [
   'silver-travertine', 'crystello', 'grande-glacier', 'basaltina',
