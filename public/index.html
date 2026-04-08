@@ -36,8 +36,8 @@ img { display: block; max-width: 100%; }
   0% { transform: scale(1) translate(0, 0); }
   100% { transform: scale(1.08) translate(-1%, -1%); }
 }
-.hero-logo-overlay { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: auto; height: 100vh; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; transition: opacity 0.3s ease; padding-top: 111px; }
-.hero-logo-overlay img { width: auto; height: 80%; max-width: 50vw; max-height: 80vh; opacity: 0.18; object-fit: contain; border-bottom-left-radius: 50%; border-bottom-right-radius: 50%; }
+.hero-logo-overlay { position: fixed; top: 0; left: 50%; transform: translateX(-50%); height: 100vh; width: auto; display: flex; align-items: flex-start; justify-content: center; pointer-events: none; z-index: 2; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; transition: opacity 0.3s ease; padding-top: 111px; }
+.hero-logo-overlay img { height: calc(100vh - 111px); width: auto; max-width: 65vw; opacity: 0.18; object-fit: contain; border-bottom-left-radius: 50%; border-bottom-right-radius: 50%; }
 @keyframes heroLogoFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 .hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; z-index: 3; }
 .caption-title { font-family: 'Concrette S', serif; font-weight: 700; }
@@ -122,7 +122,7 @@ img { display: block; max-width: 100%; }
   .hero { height: 100svh; }
   .hero-caption { padding: 12px; }
   .hero-logo-overlay { padding-top: 90px; }
-  .hero-logo-overlay img { max-width: 70vw; max-height: 70vh; }
+  .hero-logo-overlay img { height: calc(100vh - 90px); max-width: 85vw; }
   .hero-tagline p { font-size: 32px; padding: 32px 24px; }
   .ticker-text { font-size: 16px; padding: 0 16px; }
   .ticker { padding: 20px 0; }
@@ -157,10 +157,10 @@ img { display: block; max-width: 100%; }
   .footer-bottom p { font-size: 11px; }
 }
 </style>
-<link rel="stylesheet" href="animation.css?v=15">
-<link rel="stylesheet" href="nav.css?v=15">
-<link rel="stylesheet" href="sample-modal.css?v=15">
-<link rel="stylesheet" href="mobile.css?v=15">
+<link rel="stylesheet" href="animation.css?v=16">
+<link rel="stylesheet" href="nav.css?v=16">
+<link rel="stylesheet" href="sample-modal.css?v=16">
+<link rel="stylesheet" href="mobile.css?v=16">
 </head>
 <body>
 
@@ -362,41 +362,42 @@ img { display: block; max-width: 100%; }
 </footer>
 
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
-<script src="animation.js?v=15"></script>
-<script src="nav.js?v=15"></script>
-<script src="sample-modal.js?v=15"></script>
+<script src="animation.js?v=16"></script>
+<script src="nav.js?v=16"></script>
+<script src="sample-modal.js?v=16"></script>
 <script>
-// A logo — fixed below nav, fills hero height, fades out as hero scrolls away
+// A logo — fade out as hero scrolls away
 (function() {
   var overlay = document.querySelector('.hero-logo-overlay');
-  var hero = document.querySelector('.hero');
-  if (!overlay || !hero) return;
+  var heroSection = document.querySelector('.hero');
+  if (!overlay || !heroSection) return;
 
-  var navHeight = 111; // nav padding (18*2) + logo height (75)
+  var navHeight = 111;
 
-  function updateALogo() {
-    var heroRect = hero.getBoundingClientRect();
-    var heroBottom = heroRect.bottom;
-    var viewportHeight = window.innerHeight;
-    var fadeStart = viewportHeight * 0.8;
-    var fadeEnd = navHeight;
+  function updateFade() {
+    var heroRect = heroSection.getBoundingClientRect();
 
-    if (heroBottom <= fadeEnd) {
-      // Hero scrolled completely above nav — A hidden
+    if (heroRect.bottom <= navHeight) {
+      // Hero fully scrolled past nav — A completely hidden
       overlay.style.opacity = '0';
-    } else if (heroBottom >= fadeStart) {
-      // Hero still mostly visible — A fully shown
-      overlay.style.opacity = '';
+    } else if (heroRect.bottom >= window.innerHeight * 0.75) {
+      // Hero bottom still well below 75% of viewport — A fully visible
+      if (overlay.style.opacity !== '') {
+        overlay.style.opacity = '1';
+      }
     } else {
-      // Fading zone
-      var progress = (heroBottom - fadeEnd) / (fadeStart - fadeEnd);
+      // Fade zone: hero bottom between navHeight and 75% viewport height
+      var fadeStart = window.innerHeight * 0.75;
+      var fadeEnd = navHeight;
+      var progress = (heroRect.bottom - fadeEnd) / (fadeStart - fadeEnd);
       overlay.style.opacity = String(Math.max(0, Math.min(1, progress)));
     }
   }
 
-  window.addEventListener('scroll', updateALogo, { passive: true });
-  window.addEventListener('resize', updateALogo, { passive: true });
-  updateALogo();
+  window.addEventListener('scroll', updateFade, { passive: true });
+  window.addEventListener('resize', updateFade, { passive: true });
+  // Don't call on load — let CSS animation complete first
+  setTimeout(updateFade, 2400);
 })();
 </script>
 </body>
