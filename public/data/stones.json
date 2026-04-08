@@ -205,7 +205,7 @@
           "image": "/images/stones/davinci-gris.webp",
           "thumbnail": "/images/stones/davinci-gris-thumb.webp",
           "tagline": "Warm grey with earthy mineral movement",
-          "description": "Davinci Gris captures the depth and warmth of natural grey stone. Rich mineral movement through a sophisticated grey ground \u2014 perfect for contemporary interiors.",
+          "description": "Davinci Gris captures the depth and warmth of natural grey stone. Rich mineral movement through a sophisticated grey ground — perfect for contemporary interiors.",
           "swatch": "/images/stones/davinci-gris-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
@@ -324,7 +324,7 @@
           "image": "/images/stones/opal-mist.webp",
           "thumbnail": "/images/stones/opal-mist-thumb.webp",
           "tagline": "Translucent white with a soft misted finish",
-          "description": "Opal Mist is a dream surface \u2014 delicately translucent white with a soft, almost atmospheric quality. Brings light and calm to any space.",
+          "description": "Opal Mist is a dream surface — delicately translucent white with a soft, almost atmospheric quality. Brings light and calm to any space.",
           "swatch": "/images/stones/opal-mist-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
@@ -356,7 +356,7 @@
             "/images/stones/gallery/calacatta-leggera-10.webp"
           ],
           "tagline": "Soft white marble with delicate grey veining",
-          "description": "Calacatta Leggera brings the timeless elegance of Italian marble to Australian homes. Soft white ground with gentle grey veining and warm undertones \u2014 refined without being imposing.",
+          "description": "Calacatta Leggera brings the timeless elegance of Italian marble to Australian homes. Soft white ground with gentle grey veining and warm undertones — refined without being imposing.",
           "swatch": "/images/stones/calacatta-leggera-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
@@ -388,7 +388,7 @@
           "image": "/images/stones/statuario-gold.webp",
           "thumbnail": "/images/stones/statuario-gold-thumb.webp",
           "tagline": "Bold gold veining on a luminous white ground",
-          "description": "Statuario Gold makes a statement. Dramatic gold and warm grey veining sweeps across a bright white ground \u2014 one of Alpha\u2019s most sought-after surfaces.",
+          "description": "Statuario Gold makes a statement. Dramatic gold and warm grey veining sweeps across a bright white ground — one of Alpha’s most sought-after surfaces.",
           "swatch": "/images/stones/statuario-gold-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
@@ -480,14 +480,15 @@
             "/images/stones/gallery/taj-mahal-15.webp"
           ],
           "tagline": "Warm cream with soft golden veining",
-          "description": "Taj Mahal is a surface of quiet grandeur. Warm cream ground with soft golden veining and delicate movement \u2014 endlessly versatile and timelessly beautiful.",
+          "description": "Taj Mahal is a surface of quiet grandeur. Warm cream ground with soft golden veining and delicate movement — endlessly versatile and timelessly beautiful.",
           "swatch": "/images/stones/taj-mahal.webp",
           "slab_width": 3200,
           "slab_height": 1600,
           "thickness": 20,
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
-          "silica_free": true
+          "silica_free": true,
+          "slab": ""
         },
         {
           "name": "Perla Mahal",
@@ -511,7 +512,7 @@
           "image": "/images/stones/calacatta-viola.webp",
           "thumbnail": "/images/stones/calacatta-viola-thumb.webp",
           "tagline": "White marble with striking violet undertones",
-          "description": "Calacatta Viola is unlike anything else in the range. Pure white ground with distinctive violet and purple veining \u2014 bold, beautiful, and completely unique.",
+          "description": "Calacatta Viola is unlike anything else in the range. Pure white ground with distinctive violet and purple veining — bold, beautiful, and completely unique.",
           "swatch": "/images/stones/calacatta-viola-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
@@ -531,7 +532,7 @@
           "image": "/images/stones/autumn-gold.webp",
           "thumbnail": "/images/stones/autumn-gold-thumb.webp",
           "tagline": "Warm amber tones with rich golden movement",
-          "description": "Autumn Gold radiates warmth. Deep amber and honey tones move through a soft ground \u2014 a surface that brings genuine character and presence to any benchtop.",
+          "description": "Autumn Gold radiates warmth. Deep amber and honey tones move through a soft ground — a surface that brings genuine character and presence to any benchtop.",
           "swatch": "/images/stones/autumn-gold-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
@@ -603,15 +604,16 @@
           "uv_stable": false,
           "discontinued": true,
           "images_pending": false,
-          "image": "",
-          "thumbnail": "",
+          "image": "/images/stones/silver-travertine.webp",
+          "thumbnail": "/images/stones/silver-travertine-thumb.webp",
           "swatch": "/images/stones/silver-trav-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
           "thickness": 20,
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
-          "silica_free": true
+          "silica_free": true,
+          "slab": ""
         },
         {
           "name": "Crystello",
@@ -634,7 +636,8 @@
           "images_pending": false,
           "image": "/images/stones/grande-glacier.webp",
           "thumbnail": "/images/stones/grande-glacier-thumb.webp",
-          "swatch": "/images/stones/grande-glacier-swatch.webp"
+          "swatch": "/images/stones/grande-glacier-swatch.webp",
+          "slab": ""
         },
         {
           "name": "Basaltina",
@@ -645,7 +648,8 @@
           "images_pending": false,
           "image": "/images/stones/basaltina.webp",
           "thumbnail": "/images/stones/basaltina-thumb.webp",
-          "swatch": "/images/stones/basaltina-swatch.webp"
+          "swatch": "/images/stones/basaltina-swatch.webp",
+          "slab": ""
         },
         {
           "name": "Carbon",
@@ -656,7 +660,8 @@
           "images_pending": false,
           "image": "/images/stones/carbon.webp",
           "thumbnail": "/images/stones/carbon-thumb.webp",
-          "swatch": "/images/stones/carbon-swatch.webp"
+          "swatch": "/images/stones/carbon-swatch.webp",
+          "slab": ""
         },
         {
           "name": "Acropolis",
@@ -667,7 +672,8 @@
           "images_pending": false,
           "image": "/images/stones/acropolis.webp",
           "thumbnail": "/images/stones/acropolis-thumb.webp",
-          "swatch": "/images/stones/acropolis-swatch.webp"
+          "swatch": "/images/stones/acropolis-swatch.webp",
+          "slab": ""
         },
         {
           "name": "Glacier Grey",
@@ -678,7 +684,8 @@
           "images_pending": false,
           "image": "/images/stones/glacier-grey.webp",
           "thumbnail": "/images/stones/glacier-grey-thumb.webp",
-          "swatch": "/images/stones/glacier-grey-swatch.webp"
+          "swatch": "/images/stones/glacier-grey-swatch.webp",
+          "slab": ""
         },
         {
           "name": "Noosa",
@@ -689,7 +696,8 @@
           "images_pending": false,
           "image": "/images/stones/noosa.webp",
           "thumbnail": "/images/stones/noosa-thumb.webp",
-          "swatch": "/images/stones/noosa.webp"
+          "swatch": "/images/stones/noosa.webp",
+          "slab": ""
         },
         {
           "name": "Calacatta Oro",
@@ -700,7 +708,8 @@
           "images_pending": false,
           "image": "/images/stones/calacatta-oro.webp",
           "thumbnail": "/images/stones/calacatta-oro-thumb.webp",
-          "swatch": "/images/stones/calacatta-oro-swatch.webp"
+          "swatch": "/images/stones/calacatta-oro-swatch.webp",
+          "slab": ""
         },
         {
           "name": "Serena",
@@ -711,7 +720,8 @@
           "images_pending": false,
           "image": "/images/stones/serena.webp",
           "thumbnail": "/images/stones/serena-thumb.webp",
-          "swatch": "/images/stones/serena-swatch.webp"
+          "swatch": "/images/stones/serena-swatch.webp",
+          "slab": ""
         }
       ]
     }
