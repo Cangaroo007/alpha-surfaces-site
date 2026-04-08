@@ -36,8 +36,8 @@ img { display: block; max-width: 100%; }
   0% { transform: scale(1) translate(0, 0); }
   100% { transform: scale(1.08) translate(-1%, -1%); }
 }
-.hero-logo-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; max-width: 800px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; }
-.hero-logo-overlay img { width: 100%; height: auto; opacity: 0.18; object-fit: contain; }
+.hero-logo-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; max-width: 800px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; transition: opacity 0.15s ease; }
+.hero-logo-overlay img { width: 100%; height: auto; opacity: 0.18; object-fit: contain; border-bottom-left-radius: 50%; border-bottom-right-radius: 50%; }
 @keyframes heroLogoFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 .hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; z-index: 3; }
 .caption-title { font-family: 'Concrette S', serif; font-weight: 700; }
@@ -157,7 +157,7 @@ img { display: block; max-width: 100%; }
   .footer-bottom p { font-size: 11px; }
 }
 </style>
-<link rel="stylesheet" href="animation.css?v=9">
+<link rel="stylesheet" href="animation.css?v=10">
 <link rel="stylesheet" href="nav.css?v=10">
 <link rel="stylesheet" href="sample-modal.css?v=1">
 <link rel="stylesheet" href="mobile.css?v=1">
@@ -210,15 +210,15 @@ img { display: block; max-width: 100%; }
 <section class="about" id="about">
   <div class="about-inner">
     <div class="about-top">
-      <p class="about-quote">"At Alpha Surfaces, we deliver a complete surface solution that redefines the standard for benchtops in Australia – beautiful, durable, low maintenance, safe, and sustainable. Everything you could want in one exceptional surface."</p>
-      <p class="about-author">Belinda Kelaher, Managing Director, Alpha Surfaces</p>
-    </div>
-    <div class="about-bottom">
       <div class="about-body">
         <p>Alpha Surfaces is a premium Australian benchtop brand built on a solid foundation of leading innovation and a wealth of industry expertise. Cutting-edge technology delivers mineral stone surfaces of leading durability and practicality, with unmatched natural-stone realism and contemporary sophistication.</p>
         <p>As pioneers of silica-free surface technology, we've set a new industry benchmark while delivering the quality and consistency trusted by architects, designers, builders, and fabricators nationwide.</p>
         <p>For Australian homes, our mission is clear: to provide surfaces people love to live with – enriching every day with effortless functionality and individual style.</p>
       </div>
+    </div>
+    <div class="about-bottom">
+      <p class="about-quote">"At Alpha Surfaces, we deliver a complete surface solution that redefines the standard for benchtops in Australia – beautiful, durable, low maintenance, safe, and sustainable. Everything you could want in one exceptional surface."</p>
+      <p class="about-author">Belinda Kelaher, Managing Director, Alpha Surfaces</p>
     </div>
   </div>
 </section>
@@ -295,7 +295,7 @@ img { display: block; max-width: 100%; }
       <span class="ticker-dot"></span>
       <span class="ticker-text">Innovation</span>
       <span class="ticker-dot"></span>
-      <span class="ticker-text">Craftsmanship</span>
+      <span class="ticker-text">Superior Quality</span>
       <span class="ticker-dot"></span>
       <span class="ticker-text">Zero Silica</span>
       <span class="ticker-dot"></span>
@@ -313,7 +313,7 @@ img { display: block; max-width: 100%; }
       <span class="ticker-dot"></span>
       <span class="ticker-text">Innovation</span>
       <span class="ticker-dot"></span>
-      <span class="ticker-text">Craftsmanship</span>
+      <span class="ticker-text">Superior Quality</span>
       <span class="ticker-dot"></span>
       <span class="ticker-text">Zero Silica</span>
       <span class="ticker-dot"></span>
@@ -359,22 +359,35 @@ img { display: block; max-width: 100%; }
 </footer>
 
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
-<script src="animation.js?v=12"></script>
+<script src="animation.js?v=13"></script>
 <script src="nav.js?v=10"></script>
 <script src="sample-modal.js?v=1"></script>
 <script>
-(function(){
+// A logo — stays fixed at screen centre, fades out as hero scrolls away
+(function() {
   var overlay = document.querySelector('.hero-logo-overlay');
   var hero = document.querySelector('.hero');
-  if(!overlay||!hero) return;
-  window.addEventListener('scroll', function(){
-    var y = window.scrollY;
-    var h = hero.offsetHeight;
-    var progress = Math.min(y / h, 1);
-    overlay.style.transform = 'translate(-50%, calc(-50% + ' + (y * -0.4) + 'px))';
-    var opacity = 1 - progress * 1.8;
-    overlay.style.opacity = Math.max(0, Math.min(1, opacity));
-  }, {passive:true});
+  if (!overlay || !hero) return;
+
+  function updateALogo() {
+    var heroBottom = hero.getBoundingClientRect().bottom;
+    var logoHeight = overlay.offsetHeight || 400;
+
+    if (heroBottom > logoHeight) {
+      // Hero still visible — A fully shown
+      overlay.style.opacity = '';
+    } else if (heroBottom > 0) {
+      // Hero bottom approaching top — fade out
+      var progress = 1 - (heroBottom / logoHeight);
+      overlay.style.opacity = String(Math.max(0, 1 - progress));
+    } else {
+      // Hero fully scrolled past — A hidden
+      overlay.style.opacity = '0';
+    }
+  }
+
+  window.addEventListener('scroll', updateALogo, { passive: true });
+  updateALogo();
 })();
 </script>
 </body>
