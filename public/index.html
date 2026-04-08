@@ -36,8 +36,8 @@ img { display: block; max-width: 100%; }
   0% { transform: scale(1) translate(0, 0); }
   100% { transform: scale(1.08) translate(-1%, -1%); }
 }
-.hero-logo-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; max-width: 800px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; transition: opacity 0.15s ease; }
-.hero-logo-overlay img { width: 100%; height: auto; opacity: 0.18; object-fit: contain; border-bottom-left-radius: 50%; border-bottom-right-radius: 50%; }
+.hero-logo-overlay { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: auto; height: 100vh; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; transition: opacity 0.3s ease; padding-top: 111px; }
+.hero-logo-overlay img { width: auto; height: 100%; max-width: 60vw; opacity: 0.18; object-fit: contain; border-bottom-left-radius: 50%; border-bottom-right-radius: 50%; }
 @keyframes heroLogoFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 .hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; z-index: 3; }
 .caption-title { font-family: 'Concrette S', serif; font-weight: 700; }
@@ -121,8 +121,8 @@ img { display: block; max-width: 100%; }
 @media (max-width: 1024px) {
   .hero { height: 100svh; }
   .hero-caption { padding: 12px; }
-  .hero-logo-overlay { width: 80vw; }
-  .hero-logo-overlay img { width: 100%; }
+  .hero-logo-overlay { padding-top: 90px; }
+  .hero-logo-overlay img { max-width: 80vw; }
   .hero-tagline p { font-size: 32px; padding: 32px 24px; }
   .ticker-text { font-size: 16px; padding: 0 16px; }
   .ticker { padding: 20px 0; }
@@ -363,30 +363,36 @@ img { display: block; max-width: 100%; }
 <script src="nav.js?v=10"></script>
 <script src="sample-modal.js?v=1"></script>
 <script>
-// A logo — stays fixed at screen centre, fades out as hero scrolls away
+// A logo — fixed below nav, fills hero height, fades out as hero scrolls away
 (function() {
   var overlay = document.querySelector('.hero-logo-overlay');
   var hero = document.querySelector('.hero');
   if (!overlay || !hero) return;
 
-  function updateALogo() {
-    var heroBottom = hero.getBoundingClientRect().bottom;
-    var logoHeight = overlay.offsetHeight || 400;
+  var navHeight = 111; // nav padding (18*2) + logo height (75)
 
-    if (heroBottom > logoHeight) {
-      // Hero still visible — A fully shown
-      overlay.style.opacity = '';
-    } else if (heroBottom > 0) {
-      // Hero bottom approaching top — fade out
-      var progress = 1 - (heroBottom / logoHeight);
-      overlay.style.opacity = String(Math.max(0, 1 - progress));
-    } else {
-      // Hero fully scrolled past — A hidden
+  function updateALogo() {
+    var heroRect = hero.getBoundingClientRect();
+    var heroBottom = heroRect.bottom;
+    var viewportHeight = window.innerHeight;
+    var fadeStart = viewportHeight * 0.8;
+    var fadeEnd = navHeight;
+
+    if (heroBottom <= fadeEnd) {
+      // Hero scrolled completely above nav — A hidden
       overlay.style.opacity = '0';
+    } else if (heroBottom >= fadeStart) {
+      // Hero still mostly visible — A fully shown
+      overlay.style.opacity = '';
+    } else {
+      // Fading zone
+      var progress = (heroBottom - fadeEnd) / (fadeStart - fadeEnd);
+      overlay.style.opacity = String(Math.max(0, Math.min(1, progress)));
     }
   }
 
   window.addEventListener('scroll', updateALogo, { passive: true });
+  window.addEventListener('resize', updateALogo, { passive: true });
   updateALogo();
 })();
 </script>
