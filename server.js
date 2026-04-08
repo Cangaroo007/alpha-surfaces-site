@@ -1265,6 +1265,7 @@ app.get('/collections', (req, res) => {
 // Then update public/collections.html to fetch from this endpoint on page load
 // and replace the .instagram-placeholder tiles with live content.
 // Instagram handle: @alpha.surfaces (unconfirmed — verify with Belinda)
+// Facebook URL: https://facebook.com/alphasurfaces (unconfirmed — verify with Belinda)
 
 // ─── Document pages (clean URLs) ───
 app.get('/care-and-maintenance', (req, res) => {
