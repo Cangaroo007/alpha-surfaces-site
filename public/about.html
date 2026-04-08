@@ -21,8 +21,8 @@ a { color: inherit; }
 img { display: block; max-width: 100%; }
 
 /* --- HERO --- */
-.about-hero { position: relative; width: 100%; overflow: hidden; }
-.about-hero img { width: 100%; height: 500px; object-fit: cover; display: block; }
+.about-hero { position: relative; width: 100%; height: 100vh; overflow: hidden; }
+.about-hero img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
 .about-hero-caption { position: absolute; bottom: 20px; left: 40px; font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; color: #fff; opacity: 0.7; letter-spacing: 0.5px; }
 
 /* --- INTRO --- */
@@ -83,7 +83,7 @@ img { display: block; max-width: 100%; }
 
 /* --- MOBILE --- */
 @media (max-width: 1024px) {
-  .about-hero img { height: 300px; }
+  .about-hero { height: 70vh; min-height: 400px; }
   .about-hero-caption { left: 20px; bottom: 12px; font-size: 11px; }
   .about-intro { padding: 60px 24px; }
   .about-intro-heading { font-size: 26px; }
@@ -123,7 +123,7 @@ img { display: block; max-width: 100%; }
 
 <!-- HERO IMAGE -->
 <section class="about-hero">
-  <img src="images/about-hero.webp" alt="Contemporary bathroom with Alpha Surfaces stone benchtop">
+  <img src="images/about-hero-v2.webp" alt="Contemporary bathroom with Alpha Surfaces stone benchtop">
   <span class="about-hero-caption">Calacatta Leggera, Collection 04</span>
 </section>
 
