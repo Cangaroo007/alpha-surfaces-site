@@ -1266,9 +1266,18 @@ app.get('/collections', (req, res) => {
 // and replace the .instagram-placeholder tiles with live content.
 // Instagram handle: @alpha.surfaces (unconfirmed — verify with Belinda)
 
+// ─── Discontinued Alpha Zero stones — redirect to collections ───
+const discontinuedSlugs = [
+  'silver-travertine', 'crystello', 'grande-glacier', 'basaltina',
+  'carbon', 'acropolis', 'glacier-grey', 'noosa', 'calacatta-oro', 'serena'
+];
+
 // ─── Stone detail page ───
 app.get('/surfaces/:slug', (req, res) => {
   const slug = req.params.slug.replace(/[^a-z0-9-]/gi, '');
+  if (discontinuedSlugs.includes(slug)) {
+    return res.redirect(301, '/collections#alpha-zero');
+  }
   const filePath = path.join(__dirname, 'public', 'surfaces', slug + '.html');
   if (fs.existsSync(filePath)) {
     res.sendFile(filePath);

@@ -361,12 +361,14 @@ img { display: block; max-width: 100%; }
           header.appendChild(desc);
         }
 
-        // Add discontinued messaging for Original Alpha Zero
-        if (collection.id === 'original-alpha-zero') {
-          const notice = document.createElement('p');
-          notice.className = 'collection-desc';
-          notice.style.cssText = 'color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 8px; line-height: 1.6;';
-          notice.innerHTML = 'These colours are discontinued and available as heavily discounted run-out stock while supplies last. Contact us on <a href="tel:1300257420" style="color: #D4C08A; text-decoration: underline;">1300 257 420</a> or <a href="mailto:info@alphasurfaces.com.au" style="color: #D4C08A; text-decoration: underline;">info@alphasurfaces.com.au</a> for availability and pricing.';
+        // Add discontinued messaging for Alpha Zero
+        if (collection.id === 'alpha-zero') {
+          const notice = document.createElement('div');
+          notice.style.cssText = 'border-left: 3px solid #D4C08A; padding: 16px 24px; margin-top: 16px; line-height: 1.6;';
+          notice.innerHTML = '<p style="color: rgba(255,255,255,0.8); font-size: 15px; margin: 0 0 12px 0;">These colours are discontinued and available as run-out stock at significantly reduced prices.</p>' +
+            '<a href="tel:1300257420" style="color: #D4C08A; text-decoration: underline; font-size: 14px;">1300 257 420</a>' +
+            '<span style="color: rgba(255,255,255,0.4); margin: 0 8px;">|</span>' +
+            '<a href="mailto:info@alphasurfaces.com.au" style="color: #D4C08A; text-decoration: underline; font-size: 14px;">info@alphasurfaces.com.au</a>';
           header.appendChild(notice);
         }
 
@@ -380,17 +382,49 @@ img { display: block; max-width: 100%; }
         grid.className = 'stones-grid';
 
         collection.stones.forEach(stone => {
+          var isDiscontinued = stone.discontinued;
+          var hasImage = stone.image && !stone.images_pending;
+
+          // Skip stones with no image and images_pending (e.g. Crystello)
+          if (!hasImage && stone.images_pending) {
+            return; // hidden — no image available
+          }
+
           const card = document.createElement('a');
-          card.className = 'stone-card';
-          card.href = '/surfaces/' + stone.slug;
+          card.className = 'stone-card' + (isDiscontinued ? ' discontinued-stone' : '');
+
+          if (isDiscontinued && stone.slab) {
+            // Discontinued stones: open slab in lightbox
+            card.href = '#';
+            card.dataset.slab = stone.slab;
+            card.dataset.name = stone.name;
+            card.addEventListener('click', function(e) {
+              e.preventDefault();
+              var lb = document.querySelector('.slab-lightbox');
+              if (lb) {
+                lb.querySelector('img').src = stone.slab;
+                lb.querySelector('img').alt = stone.name + ' — full slab';
+                lb.classList.add('open');
+              } else {
+                window.open(stone.slab, '_blank');
+              }
+            });
+          } else if (isDiscontinued) {
+            // Discontinued without slab — no click
+            card.href = '#';
+            card.addEventListener('click', function(e) { e.preventDefault(); });
+            card.style.cursor = 'default';
+          } else {
+            card.href = '/surfaces/' + stone.slug;
+          }
 
           const imgWrap = document.createElement('div');
           imgWrap.className = 'stone-card-image';
 
-          if (stone.image) {
+          if (hasImage) {
             const img = document.createElement('img');
-            img.src = stone.swatch || stone.image;
-            img.alt = stone.name;
+            img.src = stone.swatch || stone.thumbnail || stone.image;
+            img.alt = stone.name + (isDiscontinued ? ' — Discontinued' : '');
             img.loading = 'lazy';
             imgWrap.appendChild(img);
           } else {
@@ -402,11 +436,13 @@ img { display: block; max-width: 100%; }
 
           card.appendChild(imgWrap);
 
+          // Fix: finish field already includes "Finish", don't double it
+          var finishLabel = stone.finish || '';
           const info = document.createElement('div');
           info.className = 'stone-card-info';
           info.innerHTML =
             '<div class="stone-card-name">' + stone.name + '</div>' +
-            '<div class="stone-card-finish">' + collection.name + ' | ' + stone.finish + ' Finish</div>';
+            '<div class="stone-card-finish">' + collection.name.replace(' — Discontinued', '') + ' | ' + finishLabel + '</div>';
           card.appendChild(info);
 
           grid.appendChild(card);
@@ -496,7 +532,7 @@ img { display: block; max-width: 100%; }
         var found = false;
         for (var j = 0; j < groups.length; j++) {
           var gid = groups[j].id;
-          if (gid === hash || (hash === 'alpha-zero' && gid === 'original-alpha-zero')) {
+          if (gid === hash) {
             groups[j].classList.add('open');
             var swatchIdx = Math.min(j, 4);
             showSwatchForGroup(groups[j], swatchIdx);
