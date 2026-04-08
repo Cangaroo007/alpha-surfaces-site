@@ -124,6 +124,19 @@ app.use(
     },
   })
 );
+// No-cache headers for HTML during pre-launch review period
+// TODO: Remove after launch when Cloudflare handles cache invalidation
+app.use((req, res, next) => {
+  if (!req.path.includes('.') || req.path.endsWith('.html')) {
+    res.set({
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const loginLimiter = rateLimit({
@@ -1266,6 +1279,11 @@ app.get('/collections', (req, res) => {
 // and replace the .instagram-placeholder tiles with live content.
 // Instagram handle: @alpha.surfaces (unconfirmed — verify with Belinda)
 // Facebook URL: https://facebook.com/alphasurfaces (unconfirmed — verify with Belinda)
+
+// ─── Preview route — shareable URL for Belinda and Jay to review ───
+app.get('/preview', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // ─── Document pages (clean URLs) ───
 app.get('/care-and-maintenance', (req, res) => {
