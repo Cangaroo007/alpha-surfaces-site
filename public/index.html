@@ -37,7 +37,7 @@ img { display: block; max-width: 100%; }
   100% { transform: scale(1.08) translate(-1%, -1%); }
 }
 .hero-logo-overlay { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: auto; height: 100vh; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; transition: opacity 0.3s ease; padding-top: 111px; }
-.hero-logo-overlay img { width: auto; height: 100%; max-width: 60vw; opacity: 0.18; object-fit: contain; border-bottom-left-radius: 50%; border-bottom-right-radius: 50%; }
+.hero-logo-overlay img { width: auto; height: 80%; max-width: 50vw; max-height: 80vh; opacity: 0.18; object-fit: contain; border-bottom-left-radius: 50%; border-bottom-right-radius: 50%; }
 @keyframes heroLogoFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 .hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; z-index: 3; }
 .caption-title { font-family: 'Concrette S', serif; font-weight: 700; }
@@ -122,7 +122,7 @@ img { display: block; max-width: 100%; }
   .hero { height: 100svh; }
   .hero-caption { padding: 12px; }
   .hero-logo-overlay { padding-top: 90px; }
-  .hero-logo-overlay img { max-width: 80vw; }
+  .hero-logo-overlay img { max-width: 70vw; max-height: 70vh; }
   .hero-tagline p { font-size: 32px; padding: 32px 24px; }
   .ticker-text { font-size: 16px; padding: 0 16px; }
   .ticker { padding: 20px 0; }
@@ -157,7 +157,7 @@ img { display: block; max-width: 100%; }
   .footer-bottom p { font-size: 11px; }
 }
 </style>
-<link rel="stylesheet" href="animation.css?v=10">
+<link rel="stylesheet" href="animation.css?v=11">
 <link rel="stylesheet" href="nav.css?v=10">
 <link rel="stylesheet" href="sample-modal.css?v=1">
 <link rel="stylesheet" href="mobile.css?v=1">
