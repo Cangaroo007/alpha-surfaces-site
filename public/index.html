@@ -37,7 +37,7 @@ img { display: block; max-width: 100%; }
   100% { transform: scale(1.08) translate(-1%, -1%); }
 }
 .hero-logo-overlay { position: fixed; top: 0; left: 50%; transform: translateX(-50%); height: 100vh; width: auto; display: flex; align-items: flex-start; justify-content: center; pointer-events: none; z-index: 2; opacity: 0; animation: heroLogoFadeIn 1.8s ease-out 0.5s forwards; transition: opacity 0.3s ease; padding-top: 111px; }
-.hero-logo-overlay img { height: calc(100vh - 111px); width: auto; max-width: 65vw; opacity: 0.18; object-fit: contain; border-bottom-left-radius: 50%; border-bottom-right-radius: 50%; }
+.hero-logo-overlay img { height: 100%; width: auto; max-width: none; opacity: 0.18; object-fit: contain; border-bottom-left-radius: 50%; border-bottom-right-radius: 50%; }
 @keyframes heroLogoFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 .hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; z-index: 3; }
 .caption-title { font-family: 'Concrette S', serif; font-weight: 700; }
