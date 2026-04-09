@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 130">
+  <rect width="480" height="130" fill="#000000"/>
+  <rect x="16" y="12" width="40" height="40" fill="#B5BDA0"/>
+  <rect x="60" y="12" width="40" height="40" fill="#8A8C6A"/>
+  <rect x="104" y="12" width="40" height="40" fill="#1B6B5A"/>
+  <rect x="148" y="28" width="46" height="24" fill="#FFFFFF"/>
+  <text x="198" y="55" font-family="Arial, Helvetica, sans-serif" font-size="60" font-weight="bold" fill="#FFFFFF" letter-spacing="2">EPD</text>
+  <text x="16" y="100" font-family="Arial, Helvetica, sans-serif" font-size="23" fill="#FFFFFF" letter-spacing="4.5" font-weight="300">INTERNATIONAL EPD SYSTEM</text>
+</svg>
