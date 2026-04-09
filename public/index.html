@@ -379,14 +379,14 @@ img { display: block; max-width: 100%; }
     if (rect.top <= 0) {
       // Olive section at top — A fully hidden
       overlay.style.opacity = '0';
-    } else if (rect.top >= vh * 0.6) {
+    } else if (rect.top >= window.innerHeight) {
       // Olive section still well below — A fully visible
       if (overlay.style.opacity !== '') {
         overlay.style.opacity = '1';
       }
     } else {
       // Fade zone — olive section between 60% viewport and top
-      var progress = rect.top / (vh * 0.6);
+      var progress = rect.top / window.innerHeight;
       overlay.style.opacity = String(Math.max(0, Math.min(1, progress)));
     }
   }
