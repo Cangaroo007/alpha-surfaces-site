@@ -376,7 +376,7 @@ img { display: block; max-width: 100%; }
     var rect = oliveSection.getBoundingClientRect();
     var vh = window.innerHeight;
 
-    if (rect.top <= 0) {
+    if (rect.top <= window.innerHeight * 0.3) {
       // Olive section at top — A fully hidden
       overlay.style.opacity = '0';
     } else if (rect.top >= window.innerHeight) {
