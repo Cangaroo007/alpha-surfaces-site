@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 19.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="layer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="131 70 378 505"  xml:space="preserve">
+	 viewBox="0 0 652 652" style="enable-background:new 0 0 652 652;" xml:space="preserve">
+<defs>
+  <filter id="greyscale">
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+</defs>
 <style type="text/css">
 	.st0{fill:#8FD400;}
 	.st1{fill:none;stroke:#FFFFFF;stroke-width:5.8043;stroke-miterlimit:10;}
@@ -9,7 +14,7 @@
 	.st3{fill-rule:evenodd;clip-rule:evenodd;fill:#FFFFFF;}
 	.st4{fill:none;stroke:#FFFFFF;stroke-width:3.8695;stroke-miterlimit:10;}
 </style>
-<g>
+<g filter="url(#greyscale)">
 	<path class="st0" d="M202.2,572.4c-37.6,0-68.4-30.7-68.4-68.1V140.6c0-37.5,30.8-68.2,68.4-68.2h234.9c37.7,0,68.4,30.7,68.4,68.2
 		v363.7c0,37.5-30.8,68.1-68.4,68.1H202.2z"/>
 	<line class="st1" x1="134.6" y1="506.8" x2="506.4" y2="506.8"/>
