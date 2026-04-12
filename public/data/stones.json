@@ -555,18 +555,6 @@
           "slab": ""
         },
         {
-          "name": "Viola Ligerra",
-          "finish": "Polished Finish",
-          "slug": "viola-ligerra",
-          "uv_stable": false,
-          "discontinued": false,
-          "images_pending": true,
-          "image": "",
-          "thumbnail": "",
-          "swatch": "",
-          "slab": ""
-        },
-        {
           "name": "Crystal Mahal",
           "finish": "Polished Finish",
           "slug": "crystal-mahal",
@@ -595,7 +583,7 @@
     {
       "id": "alpha-zero",
       "name": "Alpha Zero — Discontinued",
-      "subtitle": "The Signature Range",
+      "subtitle": "",
       "stones": [
         {
           "name": "Silver Travertine",
@@ -607,25 +595,7 @@
           "image": "/images/stones/silver-travertine.webp",
           "thumbnail": "/images/stones/silver-travertine-thumb.webp",
           "swatch": "/images/stones/silver-trav-swatch.webp",
-          "slab_width": 3200,
-          "slab_height": 1600,
-          "thickness": 20,
-          "weight": 236,
-          "warranty": "15-Year Limited Warranty",
-          "silica_free": true,
-          "slab": ""
-        },
-        {
-          "name": "Crystello",
-          "finish": "Matte Finish",
-          "slug": "crystello",
-          "uv_stable": false,
-          "discontinued": true,
-          "images_pending": true,
-          "image": "",
-          "thumbnail": "",
-          "swatch": "",
-          "slab": ""
+          "slab": "/images/stones/silver-travertine-slab.webp"
         },
         {
           "name": "Grande Glacier",
@@ -637,7 +607,7 @@
           "image": "/images/stones/grande-glacier.webp",
           "thumbnail": "/images/stones/grande-glacier-thumb.webp",
           "swatch": "/images/stones/grande-glacier-swatch.webp",
-          "slab": ""
+          "slab": "/images/stones/grande-glacier-slab.webp"
         },
         {
           "name": "Basaltina",
@@ -649,7 +619,7 @@
           "image": "/images/stones/basaltina.webp",
           "thumbnail": "/images/stones/basaltina-thumb.webp",
           "swatch": "/images/stones/basaltina-swatch.webp",
-          "slab": ""
+          "slab": "/images/stones/basaltina-slab.webp"
         },
         {
           "name": "Carbon",
@@ -661,7 +631,7 @@
           "image": "/images/stones/carbon.webp",
           "thumbnail": "/images/stones/carbon-thumb.webp",
           "swatch": "/images/stones/carbon-swatch.webp",
-          "slab": ""
+          "slab": "/images/stones/carbon-slab.webp"
         },
         {
           "name": "Acropolis",
@@ -673,7 +643,7 @@
           "image": "/images/stones/acropolis.webp",
           "thumbnail": "/images/stones/acropolis-thumb.webp",
           "swatch": "/images/stones/acropolis-swatch.webp",
-          "slab": ""
+          "slab": "/images/stones/acropolis-slab.webp"
         },
         {
           "name": "Glacier Grey",
@@ -685,7 +655,7 @@
           "image": "/images/stones/glacier-grey.webp",
           "thumbnail": "/images/stones/glacier-grey-thumb.webp",
           "swatch": "/images/stones/glacier-grey-swatch.webp",
-          "slab": ""
+          "slab": "/images/stones/glacier-grey-slab.webp"
         },
         {
           "name": "Noosa",
@@ -697,7 +667,7 @@
           "image": "/images/stones/noosa.webp",
           "thumbnail": "/images/stones/noosa-thumb.webp",
           "swatch": "/images/stones/noosa.webp",
-          "slab": ""
+          "slab": "/images/stones/noosa-slab.webp"
         },
         {
           "name": "Calacatta Oro",
@@ -709,7 +679,7 @@
           "image": "/images/stones/calacatta-oro.webp",
           "thumbnail": "/images/stones/calacatta-oro-thumb.webp",
           "swatch": "/images/stones/calacatta-oro-swatch.webp",
-          "slab": ""
+          "slab": "/images/stones/calacatta-oro-slab.webp"
         },
         {
           "name": "Serena",
@@ -721,7 +691,79 @@
           "image": "/images/stones/serena.webp",
           "thumbnail": "/images/stones/serena-thumb.webp",
           "swatch": "/images/stones/serena-swatch.webp",
+          "slab": "/images/stones/serena-slab.webp"
+        },
+        {
+          "name": "Venatino",
+          "finish": "Polished Finish",
+          "slug": "venatino",
+          "uv_stable": false,
+          "discontinued": true,
+          "images_pending": false,
+          "image": "/images/stones/venatino.webp",
+          "thumbnail": "/images/stones/venatino-thumb.webp",
+          "swatch": "/images/stones/venatino-swatch.webp",
+          "slab": "/images/stones/venatino-slab.webp"
+        },
+        {
+          "name": "Crystello",
+          "finish": "Matte Finish",
+          "slug": "crystello",
+          "uv_stable": false,
+          "discontinued": true,
+          "images_pending": false,
+          "image": "/images/stones/crystello.webp",
+          "thumbnail": "/images/stones/crystello-thumb.webp",
+          "swatch": "/images/stones/crystello-swatch.webp",
+          "slab": "/images/stones/crystello-slab.webp"
+        },
+        {
+          "name": "Travertino Classico",
+          "finish": "Matte Finish",
+          "slug": "travertino-classico",
+          "uv_stable": false,
+          "discontinued": true,
+          "images_pending": false,
+          "image": "/images/stones/travertino-classico.webp",
+          "thumbnail": "/images/stones/travertino-classico-thumb.webp",
+          "swatch": "/images/stones/travertino-classico-swatch.webp",
+          "slab": "/images/stones/travertino-classico-slab.webp"
+        },
+        {
+          "name": "Dolomite",
+          "finish": "Polished Finish",
+          "slug": "dolomite",
+          "uv_stable": false,
+          "discontinued": true,
+          "images_pending": false,
+          "image": "/images/stones/dolomite.webp",
+          "thumbnail": "/images/stones/dolomite-thumb.webp",
+          "swatch": "/images/stones/dolomite-swatch.webp",
+          "slab": "/images/stones/dolomite-slab.webp"
+        },
+        {
+          "name": "Infinity Gris",
+          "finish": "Polished Finish",
+          "slug": "infinity-gris",
+          "uv_stable": false,
+          "discontinued": true,
+          "images_pending": true,
+          "image": "",
+          "thumbnail": "",
+          "swatch": "",
           "slab": ""
+        },
+        {
+          "name": "Statuario Grigio",
+          "finish": "Polished Finish",
+          "slug": "statuario-grigio",
+          "uv_stable": false,
+          "discontinued": true,
+          "images_pending": false,
+          "image": "/images/stones/statuario-grigio.webp",
+          "thumbnail": "/images/stones/statuario-grigio-thumb.webp",
+          "swatch": "/images/stones/statuario-grigio-swatch.webp",
+          "slab": "/images/stones/statuario-grigio-slab.webp"
         }
       ]
     }

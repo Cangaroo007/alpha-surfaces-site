@@ -28,8 +28,8 @@
       stones: ['Opal Mist','Calacatta Leggera','Metallic Grey','Statuario Gold','Eternity','White Cloud','Glacier'] },
     { id: 'collection-05', label: 'Collection 05', name: 'Urban & Minimal',
       stones: ['Calacatta Viola','Arabescato','Autumn Gold'] },
-    { id: 'original-alpha-zero', label: 'Original Alpha Zero', name: '',
-      stones: ['Carbon','Venatino','Noosa','Glacier Grey','Infinity Gris','Calacatta Oro','Acropolis','Serena','Basaltina','Silver Trav','Biscotti','Grande Glacier','Taj Mahal','Patagonia','Calacatta Borghini'] }
+    { id: 'alpha-zero', label: 'Alpha Zero', name: '',
+      stones: ['Silver Travertine','Grande Glacier','Basaltina','Carbon','Acropolis','Glacier Grey','Noosa','Calacatta Oro','Serena','Venatino','Crystello','Travertino Classico','Dolomite','Infinity Gris','Statuario Grigio'] }
   ];
 
   function slug(name) { return name.toLowerCase().replace(/\s+/g, '-'); }
@@ -62,7 +62,7 @@
   // Desktop mega menu
   var dHtml = '<div class="mega-menu-inner">';
   COLLECTIONS.forEach(function(col, ci) {
-    var anchor = col.id === 'original-alpha-zero' ? 'alpha-zero' : col.id;
+    var anchor = col.id;
     dHtml += '<div class="mega-menu-col">';
     dHtml += '<a href="/collections.html#' + anchor + '" class="mega-menu-col-heading">';
     dHtml += '<span class="mm-col-num">' + col.label + '</span>';
@@ -92,7 +92,7 @@
     '<button class="mobile-toggle-btn" id="mobile-coll-toggle"><span class="toggle-icon">+</span></button></div>' +
     '<div class="mobile-collections-panel" id="mobile-coll-panel">';
   COLLECTIONS.forEach(function(col) {
-    var anchor = col.id === 'original-alpha-zero' ? 'alpha-zero' : col.id;
+    var anchor = col.id;
     mHtml += '<div class="mobile-coll-group">';
     mHtml += '<div class="mobile-coll-header">';
     mHtml += '<a href="/collections.html#' + anchor + '" class="mobile-coll-name">' + col.label + '</a>';
