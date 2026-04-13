@@ -481,14 +481,14 @@
           ],
           "tagline": "Warm cream with soft golden veining",
           "description": "Taj Mahal is a surface of quiet grandeur. Warm cream ground with soft golden veining and delicate movement — endlessly versatile and timelessly beautiful.",
-          "swatch": "/images/stones/taj-mahal.webp",
+          "swatch": "/images/stones/taj-mahal-swatch.webp",
           "slab_width": 3200,
           "slab_height": 1600,
           "thickness": 20,
           "weight": 236,
           "warranty": "15-Year Limited Warranty",
           "silica_free": true,
-          "slab": ""
+          "slab": "/images/stones/taj-mahal-slab.webp"
         },
         {
           "name": "Perla Mahal",
