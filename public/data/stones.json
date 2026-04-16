@@ -508,11 +508,11 @@
           "slug": "perla-mahal",
           "uv_stable": false,
           "discontinued": false,
-          "images_pending": true,
-          "image": "",
-          "thumbnail": "",
-          "swatch": "",
-          "slab": ""
+          "images_pending": false,
+          "image": "/images/stones/perla-mahal.webp",
+          "thumbnail": "/images/stones/perla-mahal-thumb.webp",
+          "swatch": "/images/stones/perla-mahal-swatch.webp",
+          "slab": "/images/stones/perla-mahal-slab.webp"
         },
         {
           "name": "Calacatta Viola",
@@ -560,11 +560,11 @@
           "slug": "emerald-haze",
           "uv_stable": false,
           "discontinued": false,
-          "images_pending": true,
-          "image": "",
-          "thumbnail": "",
-          "swatch": "",
-          "slab": ""
+          "images_pending": false,
+          "image": "/images/stones/emerald-haze.webp",
+          "thumbnail": "/images/stones/emerald-haze-thumb.webp",
+          "swatch": "/images/stones/emerald-haze-swatch.webp",
+          "slab": "/images/stones/emerald-haze-slab.webp"
         },
         {
           "name": "Crystal Mahal",
@@ -572,11 +572,11 @@
           "slug": "crystal-mahal",
           "uv_stable": false,
           "discontinued": false,
-          "images_pending": true,
-          "image": "",
-          "thumbnail": "",
-          "swatch": "",
-          "slab": ""
+          "images_pending": false,
+          "image": "/images/stones/crystal-mahal.webp",
+          "thumbnail": "/images/stones/crystal-mahal-thumb.webp",
+          "swatch": "/images/stones/crystal-mahal-swatch.webp",
+          "slab": "/images/stones/crystal-mahal-slab.webp"
         },
         {
           "name": "Venato",
@@ -584,11 +584,23 @@
           "slug": "venato",
           "uv_stable": false,
           "discontinued": false,
-          "images_pending": true,
-          "image": "",
-          "thumbnail": "",
-          "swatch": "",
-          "slab": ""
+          "images_pending": false,
+          "image": "/images/stones/venato.webp",
+          "thumbnail": "/images/stones/venato-thumb.webp",
+          "swatch": "/images/stones/venato-swatch.webp",
+          "slab": "/images/stones/venato-slab.webp"
+        },
+        {
+          "name": "Viola Ligerra",
+          "finish": "Polished Finish",
+          "slug": "viola-ligerra",
+          "uv_stable": false,
+          "discontinued": false,
+          "images_pending": false,
+          "image": "/images/stones/viola-ligerra.webp",
+          "thumbnail": "/images/stones/viola-ligerra-thumb.webp",
+          "swatch": "/images/stones/viola-ligerra-swatch.webp",
+          "slab": "/images/stones/viola-ligerra-slab.webp"
         }
       ]
     },
