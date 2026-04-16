@@ -18,16 +18,16 @@
   /* ── Hardcoded collection/stone data ── */
   var COLLECTIONS = [
     { id: 'collection-01', label: 'Collection 01', name: 'Calacatta & Statuario',
-      stones: ['Brilliance','Crystal','Jewel','Graphite','Bondi','Fraser'] },
+      stones: ['Brilliance','Crystal','Jewel','Graphite','Bondi','Fraser','Oyster'] },
     { id: 'collection-02', label: 'Collection 02', name: 'Prairie & Sage',
       stones: ['Arctic','Pearl','Ash','Shell','Carrara','Oyster Grey','Earthy Concrete'] },
     { id: 'collection-03', label: 'Collection 03', name: 'Soapstone & Verde',
       stones: ['Salt Stone','Davinci Gris','Davinci Oro','Desert Dune'],
       indoorOutdoor: ['Broome','Cabarita','Torquay','Whitehaven'] },
     { id: 'collection-04', label: 'Collection 04', name: 'Dramatic & Noir',
-      stones: ['Opal Mist','Calacatta Leggera','Metallic Grey','Statuario Gold','Eternity','White Cloud','Glacier'] },
+      stones: ['Opal Mist','Calacatta Leggera','Metallic Grey','Statuario Gold','Eternity','White Cloud','Glacier','Arabescato'] },
     { id: 'collection-05', label: 'Collection 05', name: 'Urban & Minimal',
-      stones: ['Calacatta Viola','Arabescato','Autumn Gold'] },
+      stones: ['Taj Mahal','Perla Mahal','Calacatta Viola','Autumn Gold','Emerald Haze','Crystal Mahal','Venato','Viola Ligerra'] },
     { id: 'alpha-zero', label: 'Alpha Zero', name: '',
       stones: ['Silver Travertine','Grande Glacier','Basaltina','Carbon','Acropolis','Glacier Grey','Noosa','Calacatta Oro','Serena','Venatino','Crystello','Travertino Classico','Dolomite','Infinity Gris','Statuario Grigio'] }
   ];
