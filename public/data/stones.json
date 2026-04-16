@@ -76,6 +76,18 @@
           "thumbnail": "/images/stones/brilliance-thumb.webp",
           "swatch": "/images/stones/brilliance-swatch.webp",
           "slab": "/images/stones/brilliance-slab.webp"
+        },
+        {
+          "name": "Bondi",
+          "finish": "Polished Finish",
+          "slug": "bondi",
+          "uv_stable": false,
+          "discontinued": false,
+          "images_pending": false,
+          "image": "/images/stones/bondi.webp",
+          "thumbnail": "/images/stones/bondi-thumb.webp",
+          "swatch": "/images/stones/bondi-swatch.webp",
+          "slab": "/images/stones/bondi-slab.webp"
         }
       ]
     },
