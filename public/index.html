@@ -36,8 +36,8 @@ img { display: block; max-width: 100%; }
   0% { transform: scale(1) translate(0, 0); }
   100% { transform: scale(1.08) translate(-1%, -1%); }
 }
-.hero-logo-overlay { position: fixed; top: 0; left: 50%; transform: translateX(-50%); height: 100vh; width: auto; display: flex; align-items: flex-end; justify-content: center; pointer-events: none; z-index: 2; opacity: 0; transition: opacity 0.3s ease; padding-bottom: 40px; }
-.hero-logo-overlay img { height: 46vh; width: auto; max-width: none; opacity: 0.25; object-fit: contain; display: block; }
+.hero-logo-overlay { position: fixed; top: 0; left: 50%; transform: translateX(-50%); height: 100vh; width: auto; display: flex; align-items: flex-end; justify-content: center; pointer-events: none; z-index: 2; opacity: 0; transition: opacity 0.3s ease; padding-bottom: 0; }
+.hero-logo-overlay img { height: 60vh; width: auto; max-width: none; opacity: 0.25; object-fit: contain; display: block; }
 @keyframes heroLogoFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 .hero-caption { position: absolute; bottom: 0; left: 0; padding: 32px; color: var(--white); font-size: 12px; line-height: 1.2; z-index: 3; }
 .caption-title { font-family: 'Concrette S', serif; font-weight: 700; }
@@ -112,8 +112,8 @@ img { display: block; max-width: 100%; }
 @media (max-width: 1024px) {
   .hero { height: 100svh; }
   .hero-caption { padding: 12px; }
-  .hero-logo-overlay { padding-bottom: 40px; padding-top: 0; }
-  .hero-logo-overlay img { height: 46vh; max-width: 98vw; }
+  .hero-logo-overlay { padding-bottom: 0; padding-top: 0; }
+  .hero-logo-overlay img { height: 50vh; max-width: 90vw; }
   .hero-tagline p { font-size: 32px; padding: 32px 24px; }
   .ticker-text { font-size: 16px; padding: 0 16px; }
   .ticker { padding: 20px 0; }
