@@ -13,6 +13,7 @@ const OpenAI = require('openai');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const versions = require('./lib/versions');
+const { initDB } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -1336,6 +1337,11 @@ versions.ensureDirectories();
 versions.snapshotContentOnStartup(loadContent());
 versions.detectAndSnapshotPages();
 
-app.listen(PORT, () => {
-  console.log(`Alpha Surfaces CMS running on port ${PORT}`);
-});
+initDB()
+  .then(() => {
+    app.listen(PORT, () => console.log(`[server] Listening on port ${PORT}`));
+  })
+  .catch(err => {
+    console.error('[db] Failed to initialise database:', err);
+    process.exit(1);
+  });
