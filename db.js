@@ -28,11 +28,7 @@ async function initDB() {
         submission_id   INTEGER NOT NULL REFERENCES form_submissions(id) ON DELETE CASCADE,
         stone_slug      VARCHAR(100) NOT NULL,
         stone_name      VARCHAR(255) NOT NULL,
-        collection      VARCHAR(50),
-        CONSTRAINT max_three_samples CHECK (
-          (SELECT COUNT(*) FROM sample_request_items s
-           WHERE s.submission_id = submission_id) <= 3
-        )
+        collection      VARCHAR(50)
       );
 
       CREATE INDEX IF NOT EXISTS idx_submissions_form_type
