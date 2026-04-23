@@ -51,6 +51,19 @@
     '<div class="mega-menu" id="mega-menu"></div>' +
     '<div class="mobile-menu" id="mobile-menu"></div>';
 
+  /* If we're already on the homepage, tapping the logo smooth-scrolls to top
+     instead of triggering a full page reload. Other pages: navigate as normal. */
+  var navLogo = navEl.querySelector('.nav-logo');
+  if (navLogo) {
+    navLogo.addEventListener('click', function(e) {
+      var p = window.location.pathname;
+      if (p === '/' || p === '/index.html' || p === '') {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  }
+
   /* ══════════════════════════════════════════════════
      PHASE 2 — Build mega menu content
      ══════════════════════════════════════════════════ */

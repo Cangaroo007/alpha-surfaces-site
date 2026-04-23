@@ -1,6 +1,10 @@
 /* ═══════════════════════════════════════════
-   SLAB LIGHTBOX — Click close-up to see full slab
-   Runs on product pages after stones.json data loads
+   SLAB LIGHTBOX — Click swatch or "View Full Slab" link to see full slab.
+   Both the swatch <img> and the "View Full Slab" <a> share the
+   `.slab-lightbox-trigger` class + `data-slab`/`data-name` attrs, and a single
+   delegated click handler opens the overlay. This avoids the previous bug
+   where clicking the link (or the swatch on touch devices) attached a new
+   click handler instead of opening the lightbox.
    ═══════════════════════════════════════════ */
 (function() {
   'use strict';
@@ -29,6 +33,12 @@
   var lbImg = overlay.querySelector('img');
   var closeBtn = overlay.querySelector('.slab-lightbox-close');
 
+  function openLightbox(slabUrl, stoneName) {
+    if (!slabUrl) return;
+    lbImg.src = slabUrl;
+    lbImg.alt = (stoneName || '') + ' — full slab';
+    overlay.classList.add('open');
+  }
   function closeLightbox() {
     overlay.classList.remove('open');
   }
@@ -41,18 +51,30 @@
     if (e.key === 'Escape') closeLightbox();
   });
 
-  // Public API — called from product page JS after stone data loads
+  // SINGLE delegated click handler — fires for the swatch <img> AND the
+  // "View Full Slab" <a>. Both carry .slab-lightbox-trigger + data attrs.
+  document.addEventListener('click', function(e) {
+    var trigger = e.target.closest('.slab-lightbox-trigger');
+    if (!trigger) return;
+    e.preventDefault();
+    var slab = trigger.getAttribute('data-slab') || '';
+    var name = trigger.getAttribute('data-name') || '';
+    try { slab = decodeURIComponent(slab); } catch (_) {}
+    try { name = decodeURIComponent(name); } catch (_) {}
+    openLightbox(slab, name);
+  });
+
+  // Public API — call from product page JS once stone data has loaded.
+  // Marks the swatch <img> as a trigger by adding the class + data attrs.
+  // Idempotent: safe to call repeatedly.
   window.initSlabLightbox = function(slabUrl, stoneName) {
     if (!slabUrl) return;
     var swatchImg = document.querySelector('.intro-swatch img');
     if (!swatchImg) return;
-
     swatchImg.classList.add('has-slab');
+    swatchImg.classList.add('slab-lightbox-trigger');
+    swatchImg.setAttribute('data-slab', encodeURIComponent(slabUrl));
+    swatchImg.setAttribute('data-name', encodeURIComponent(stoneName || ''));
     swatchImg.title = 'Click to view full slab';
-    swatchImg.addEventListener('click', function() {
-      lbImg.src = slabUrl;
-      lbImg.alt = stoneName + ' — full slab';
-      overlay.classList.add('open');
-    });
   };
 })();

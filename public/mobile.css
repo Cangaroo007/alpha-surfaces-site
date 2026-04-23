@@ -4,8 +4,17 @@
    ═══════════════════════════════════════════════════ */
 
 /* --- GLOBAL --- */
-html { overflow-x: hidden; }
-body { -webkit-text-size-adjust: 100%; }
+/* Use overflow-x: clip (NOT hidden) — `hidden` on <html> creates a scrolling
+   context that breaks `position: sticky` on iOS Safari, killing the sticky nav. */
+html { overflow-x: clip; }
+body { -webkit-text-size-adjust: 100%; overflow-x: clip; }
+
+/* Belt-and-braces: re-assert the sticky nav at mobile breakpoints in case some
+   page-level CSS clobbers it. The `nav.css` rule should win, but this guarantees
+   the persistent header on every page. */
+@media (max-width: 1024px) {
+  .nav { position: sticky !important; top: 0 !important; z-index: 100 !important; }
+}
 
 /* --- FONT FALLBACKS (Windows/Chrome) --- */
 * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }

@@ -117,7 +117,14 @@ img { display: block; max-width: 100%; }
   .hero-tagline p { font-size: 32px; padding: 32px 24px; }
   .ticker-text { font-size: 16px; padding: 0 16px; }
   .ticker { padding: 20px 0; }
-  .middle-cta { height: 350px !important; }
+  /* Mobile: the lifestyle CTA image is 2880x1176 with text baked in.
+     `object-fit: cover` was cropping the image so the text "Natural stone
+     depth, clarity and translucency" touched the screen edges. Switch to
+     `contain` with auto height + cream background so the image fits in full
+     and the text breathes. */
+  .middle-cta { height: auto !important; background: var(--cream, #f3f1e6); padding: 16px 0; }
+  .middle-cta > a { position: relative !important; inset: auto !important; display: block !important; }
+  .middle-cta img { position: relative !important; inset: auto !important; height: auto !important; object-fit: contain !important; }
   .middle-cta p { font-size: 24px !important; }
 
   .statement { padding: 44px 24px 88px; min-height: auto; gap: 124px; }
@@ -148,10 +155,10 @@ img { display: block; max-width: 100%; }
   .footer-bottom p { font-size: 11px; }
 }
 </style>
-<link rel="stylesheet" href="animation.css?v=16">
-<link rel="stylesheet" href="nav.css?v=16">
-<link rel="stylesheet" href="sample-modal.css?v=16">
-<link rel="stylesheet" href="mobile.css?v=16">
+<link rel="stylesheet" href="animation.css?v=18">
+<link rel="stylesheet" href="nav.css?v=18">
+<link rel="stylesheet" href="sample-modal.css?v=18">
+<link rel="stylesheet" href="mobile.css?v=18">
 </head>
 <body>
 
@@ -355,9 +362,9 @@ img { display: block; max-width: 100%; }
 </footer>
 
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
-<script src="animation.js?v=16"></script>
-<script src="nav.js?v=17"></script>
-<script src="sample-modal.js?v=16"></script>
+<script src="animation.js?v=18"></script>
+<script src="nav.js?v=18"></script>
+<script src="sample-modal.js?v=18"></script>
 <script>
 // A logo — fade out completely before olive section reaches viewport
 (function() {
