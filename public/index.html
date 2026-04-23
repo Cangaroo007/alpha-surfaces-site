@@ -117,15 +117,21 @@ img { display: block; max-width: 100%; }
   .hero-tagline p { font-size: 32px; padding: 32px 24px; }
   .ticker-text { font-size: 16px; padding: 0 16px; }
   .ticker { padding: 20px 0; }
-  /* Mobile: the lifestyle CTA image is 2880x1176 with text baked in.
-     `object-fit: cover` was cropping the image so the text "Natural stone
-     depth, clarity and translucency" touched the screen edges. Switch to
-     `contain` with auto height + cream background so the image fits in full
-     and the text breathes. */
-  .middle-cta { height: auto !important; background: var(--cream, #f3f1e6); padding: 16px 0; }
-  .middle-cta > a { position: relative !important; inset: auto !important; display: block !important; }
-  .middle-cta img { position: relative !important; inset: auto !important; height: auto !important; object-fit: contain !important; }
-  .middle-cta p { font-size: 24px !important; }
+  /* Mobile lifestyle CTA — Figma mobile spec (frame 963-13542) calls for
+     a 395×343 visible section. The source image (2880×1176) has the
+     headline baked in at 47% of source width. With cover-fit at exact
+     395×343 (scale 0.292) the text spans 397px — touching both viewport
+     edges. Drop section height a touch (to ~76vw, ~290px on a 390 device)
+     so cover-fit yields scale 0.247 → text ≈ 336px wide with ~27px of
+     horizontal breathing room on each side, while keeping text big and
+     readable as in Figma. */
+  .middle-cta {
+    height: 76vw !important;
+    max-height: 343px !important;
+  }
+  .middle-cta > a > img {
+    object-position: center 38% !important;
+  }
 
   .statement { padding: 44px 24px 88px; min-height: auto; gap: 124px; }
   .statement p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 24px; line-height: 1.15; }
