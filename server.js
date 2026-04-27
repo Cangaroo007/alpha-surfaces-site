@@ -258,6 +258,75 @@ function validateImageType(buffer) {
   return false;
 }
 
+// ─── Railway environment variables API ───
+const RAILWAY_API_URL = 'https://backboard.railway.app/graphql/v2';
+const RAILWAY_PROJECT_ID = '83e36e08-4562-42ac-a39c-8111a7ceb192';
+const RAILWAY_SERVICE_ID = '64c256bc-0b41-4485-9611-8624dab25425';
+
+app.post('/api/admin/railway-vars', authMiddleware, async (req, res) => {
+  const { vars } = req.body;
+  if (!vars || typeof vars !== 'object') {
+    return res.status(400).json({ ok: false, error: 'Invalid payload' });
+  }
+
+  const isProduction = process.env.NODE_ENV === 'production';
+  const token = isProduction
+    ? process.env.RAILWAY_TOKEN_PRODUCTION
+    : process.env.RAILWAY_TOKEN_STAGING;
+
+  if (!token) {
+    return res.status(500).json({ ok: false, error: 'Railway token not configured' });
+  }
+
+  try {
+    const envRes = await fetch(RAILWAY_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        query: `query { project(id: "${RAILWAY_PROJECT_ID}") {
+          environments { edges { node { id name } } }
+        }}`
+      })
+    });
+    const envData = await envRes.json();
+    const envName = isProduction ? 'production' : 'staging';
+    const envs = envData.data.project.environments.edges.map(e => e.node);
+    const env = envs.find(e => e.name.toLowerCase() === envName) || envs[0];
+
+    for (const [name, value] of Object.entries(vars)) {
+      await fetch(RAILWAY_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          query: `mutation UpsertVariable($input: VariableUpsertInput!) {
+            variableUpsert(input: $input)
+          }`,
+          variables: {
+            input: {
+              projectId: RAILWAY_PROJECT_ID,
+              serviceId: RAILWAY_SERVICE_ID,
+              environmentId: env.id,
+              name,
+              value
+            }
+          }
+        })
+      });
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[railway-vars] Error:', err.message);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // ─── Upload route ───
 app.post('/api/upload', authMiddleware, upload.single('image'), (req, res) => {
   if (!req.file) {
