@@ -19,6 +19,11 @@ const { notifyOrderSample, notifyContact, notifySubscribe } = require('./notific
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Railway terminates HTTPS at one upstream proxy and forwards via HTTP with
+// X-Forwarded-For. express-rate-limit@8 throws ERR_ERL_UNEXPECTED_X_FORWARDED_FOR
+// unless we declare the proxy trust depth — set to 1 (single hop).
+app.set('trust proxy', 1);
+
 // ─── Config ───
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'alpha2025';
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
@@ -451,6 +456,22 @@ app.post('/api/admin/railway-vars', authMiddleware, async (req, res) => {
 
 // ─── Forms CMS + Submissions Dashboard ───
 const FORMS_PATH = path.join(DATA_DIR, 'forms.json');
+// Seed forms.json on the persistent volume from the bundled defaults if absent.
+// DATA_DIR may be a Railway volume mount (separate from __dirname), so on a
+// fresh volume we copy ./data/forms.json across once. Idempotent — skips if
+// the file already exists, so admin edits via PUT are never overwritten.
+{
+  const FORMS_DEFAULT = path.join(__dirname, 'data', 'forms.json');
+  if (FORMS_PATH !== FORMS_DEFAULT && !fs.existsSync(FORMS_PATH) && fs.existsSync(FORMS_DEFAULT)) {
+    try {
+      fs.mkdirSync(path.dirname(FORMS_PATH), { recursive: true });
+      fs.copyFileSync(FORMS_DEFAULT, FORMS_PATH);
+      console.log('[forms] Seeded', FORMS_PATH, 'from bundled defaults');
+    } catch (e) {
+      console.error('[forms] Seed failed:', e.message);
+    }
+  }
+}
 
 app.get('/api/admin/forms', authMiddleware, (req, res) => {
   try {
