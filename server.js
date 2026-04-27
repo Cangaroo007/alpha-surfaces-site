@@ -456,15 +456,15 @@ app.post('/api/admin/railway-vars', authMiddleware, async (req, res) => {
 
 // ─── Forms CMS + Submissions Dashboard ───
 const FORMS_PATH = path.join(DATA_DIR, 'forms.json');
-// Seed forms.json on the persistent volume from the bundled defaults if absent
-// or empty. DATA_DIR may be a Railway volume mount (separate from __dirname),
-// so on a fresh volume we copy ./data/forms.json across once. Also self-heals
-// the case where an earlier deploy wrote an empty stub ({forms:[]}) before the
-// route had any data — without this, the volume would shadow the bundled
-// defaults forever. Admin edits via PUT are preserved (forms.length > 0 → skip).
+// Seed forms.json on first boot — and self-heal if a prior deploy wrote an
+// empty stub. The bundled defaults live at seeds/forms.json (NOT under data/)
+// because Railway mounts a persistent volume on top of /app/data, which would
+// shadow anything baked into the image at data/forms.json. Reading the seed
+// from outside the volume mount is what makes this actually work.
+// Admin edits via PUT are preserved (forms.length > 0 → skip).
 {
-  const FORMS_DEFAULT = path.join(__dirname, 'data', 'forms.json');
-  if (FORMS_PATH !== FORMS_DEFAULT && fs.existsSync(FORMS_DEFAULT)) {
+  const FORMS_SEED = path.join(__dirname, 'seeds', 'forms.json');
+  if (fs.existsSync(FORMS_SEED)) {
     let needsSeed = !fs.existsSync(FORMS_PATH);
     if (!needsSeed) {
       try {
@@ -475,47 +475,18 @@ const FORMS_PATH = path.join(DATA_DIR, 'forms.json');
     if (needsSeed) {
       try {
         fs.mkdirSync(path.dirname(FORMS_PATH), { recursive: true });
-        fs.copyFileSync(FORMS_DEFAULT, FORMS_PATH);
-        console.log('[forms] Seeded', FORMS_PATH, 'from bundled defaults');
+        fs.copyFileSync(FORMS_SEED, FORMS_PATH);
+        console.log('[forms] Seeded', FORMS_PATH, 'from', FORMS_SEED);
       } catch (e) {
         console.error('[forms] Seed failed:', e.message);
       }
+    } else {
+      console.log('[forms] Skip seed — existing file has', FORMS_PATH);
     }
+  } else {
+    console.error('[forms] Seed source missing:', FORMS_SEED);
   }
 }
-
-// TEMP DIAGNOSTIC — remove once forms.json seeding verified
-app.get('/api/admin/_forms-debug', authMiddleware, (req, res) => {
-  const FORMS_DEFAULT = path.join(__dirname, 'data', 'forms.json');
-  const out = {
-    DATA_DIR,
-    FORMS_PATH,
-    FORMS_DEFAULT,
-    pathsEqual: FORMS_PATH === FORMS_DEFAULT,
-    forms_path_exists: fs.existsSync(FORMS_PATH),
-    forms_default_exists: fs.existsSync(FORMS_DEFAULT),
-  };
-  try {
-    if (out.forms_path_exists) {
-      const raw = fs.readFileSync(FORMS_PATH, 'utf8');
-      out.forms_path_size = raw.length;
-      try { out.forms_path_count = (JSON.parse(raw).forms || []).length; }
-      catch (e) { out.forms_path_parse_error = e.message; }
-    }
-    if (out.forms_default_exists) {
-      const raw = fs.readFileSync(FORMS_DEFAULT, 'utf8');
-      out.forms_default_size = raw.length;
-      try { out.forms_default_count = (JSON.parse(raw).forms || []).length; }
-      catch (e) { out.forms_default_parse_error = e.message; }
-    }
-    if (req.query.seed === '1' && out.forms_default_exists) {
-      fs.mkdirSync(path.dirname(FORMS_PATH), { recursive: true });
-      fs.copyFileSync(FORMS_DEFAULT, FORMS_PATH);
-      out.seeded = true;
-    }
-  } catch (e) { out.error = e.message; }
-  res.json(out);
-});
 
 app.get('/api/admin/forms', authMiddleware, (req, res) => {
   try {
