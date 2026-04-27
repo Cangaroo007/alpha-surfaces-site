@@ -462,6 +462,23 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .forms-toast.hidden{opacity:0;pointer-events:none}
 .forms-toast.success{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
 .forms-toast.error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+.notif-header-actions{display:flex;gap:8px;align-items:center}
+.notif-card-actions{display:flex;gap:8px}
+.notif-channel{margin-top:18px;padding-top:18px;border-top:1px solid #f0eee5}
+.notif-channel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.notif-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:#374151}
+.notif-toggle input{width:16px;height:16px;cursor:pointer}
+.btn-add-recipient{background:transparent;color:#564D22;border:1px solid #564D22;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:500}
+.btn-add-recipient:hover{background:#564D22;color:#fff}
+.btn-test{background:#fff;color:#374151;border:1px solid #d1d5db;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:500}
+.btn-test:hover{background:#f9fafb}
+.btn-save-schema.dirty{background:#b45309}
+.notif-recipients{width:100%;border-collapse:collapse;font-size:13px}
+.notif-recipients th{text-align:left;padding:6px 8px;font-weight:600;color:#6b7280;font-size:11px;letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #e5e7eb}
+.notif-recipients td{padding:6px 8px;border-bottom:1px solid #f3f4f6;vertical-align:middle}
+.notif-recipients tr.notif-empty td{text-align:center;color:#9ca3af;font-style:italic;padding:14px}
+.btn-remove-recipient{background:transparent;border:none;color:#9ca3af;font-size:18px;cursor:pointer;line-height:1;padding:2px 8px;border-radius:4px}
+.btn-remove-recipient:hover{background:#fee2e2;color:#991b1b}
 </style>
 </head>
 <body>
@@ -498,6 +515,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
       <a href="#" data-panel="cta" onclick="showPanel('cta',this)">📣 Call to Action</a>
       <a href="#" data-panel="footer" onclick="showPanel('footer',this)">📋 Footer</a>
       <a href="#" data-panel="forms" onclick="showPanel('forms',this)">📨 Forms</a>
+      <a href="#" data-panel="notifications" onclick="showPanel('notifications',this)">🔔 Notifications</a>
       <div class="divider"></div>
       <span class="nav-section-label">Integrations</span>
       <a href="#" data-panel="apikeys" onclick="showPanel('apikeys',this)">🔑 API Keys</a>
@@ -830,6 +848,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
         <div id="forms-panel"></div>
       </div>
 
+      <!-- NOTIFICATIONS -->
+      <div id="panel-notifications" class="panel">
+        <div id="notifications-panel"></div>
+      </div>
+
       <!-- AI ASSISTANT -->
       <div id="panel-ai" class="panel">
         <div class="ai-cms-header">
@@ -990,7 +1013,7 @@ function showPanel(id, el) {
   document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el?.classList.add('active');
-  const titles = { styles:'Brand Styles', layout:'Layout & Order', nav:'Navigation', hero:'Hero', features:'Features Strip', about:'About', collections:'Collections', product:'Product Detail', advantage:'Advantage', warranty:'Warranty', cta:'Call to Action', footer:'Footer', forms:'Forms', apikeys:'API Keys & Integrations', ai:'AI Content Assistant', versions:'Version History', settings:'Settings' };
+  const titles = { styles:'Brand Styles', layout:'Layout & Order', nav:'Navigation', hero:'Hero', features:'Features Strip', about:'About', collections:'Collections', product:'Product Detail', advantage:'Advantage', warranty:'Warranty', cta:'Call to Action', footer:'Footer', forms:'Forms', notifications:'Notifications', apikeys:'API Keys & Integrations', ai:'AI Content Assistant', versions:'Version History', settings:'Settings' };
   document.getElementById('panel-title').textContent = titles[id] || id;
   // Toggle AI-active mode on main container
   const mainEl = document.querySelector('.main');
@@ -2599,5 +2622,6 @@ checkAuth();
 </script>
 <script src="/admin-settings.js"></script>
 <script src="/admin-forms.js"></script>
+<script src="/admin-notifications.js"></script>
 </body>
 </html>

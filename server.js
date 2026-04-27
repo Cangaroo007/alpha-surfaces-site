@@ -14,7 +14,8 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const versions = require('./lib/versions');
 const { initDB, saveSubmission, saveSubscriber, unsubscribeEmail, pool } = require('./db');
-const { notifyOrderSample, notifyContact, notifySubscribe } = require('./notifications');
+const notifications = require('./notifications');
+const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, readSettings: readNotifSettings, writeSettings: writeNotifSettings } = notifications;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -487,6 +488,86 @@ const FORMS_PATH = path.join(DATA_DIR, 'forms.json');
     console.error('[forms] Seed source missing:', FORMS_SEED);
   }
 }
+
+// ─── Notifications settings (multi-recipient per-form, instant/daily cadence) ───
+const NOTIFICATIONS_PATH = path.join(DATA_DIR, 'notifications.json');
+// Same volume-shadow gotcha applies — bundled defaults must live in seeds/.
+{
+  const NOTIF_SEED = path.join(__dirname, 'seeds', 'notifications.json');
+  if (fs.existsSync(NOTIF_SEED)) {
+    let needsSeed = !fs.existsSync(NOTIFICATIONS_PATH);
+    if (!needsSeed) {
+      try {
+        const cur = JSON.parse(fs.readFileSync(NOTIFICATIONS_PATH, 'utf8'));
+        // Treat as needing seed only if structure is missing entirely; preserve admin edits.
+        needsSeed = !cur || !cur.notifications || typeof cur.notifications !== 'object';
+      } catch { needsSeed = true; }
+    }
+    if (needsSeed) {
+      try {
+        fs.mkdirSync(path.dirname(NOTIFICATIONS_PATH), { recursive: true });
+        fs.copyFileSync(NOTIF_SEED, NOTIFICATIONS_PATH);
+        console.log('[notify] Seeded', NOTIFICATIONS_PATH, 'from', NOTIF_SEED);
+      } catch (e) {
+        console.error('[notify] Seed failed:', e.message);
+      }
+    } else {
+      console.log('[notify] Skip seed — existing file has', NOTIFICATIONS_PATH);
+    }
+  } else {
+    console.error('[notify] Seed source missing:', NOTIF_SEED);
+  }
+}
+notifications.setSettingsPath(NOTIFICATIONS_PATH);
+
+// ─── Notifications admin API ───
+app.get('/api/admin/notifications', authMiddleware, (req, res) => {
+  try {
+    const cfg = readNotifSettings();
+    res.json(cfg || { notifications: {}, _state: {} });
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
+});
+
+app.put('/api/admin/notifications/:formId', authMiddleware, (req, res) => {
+  try {
+    const cfg = readNotifSettings() || { notifications: {}, _state: {} };
+    const formId = req.params.formId;
+    if (!cfg.notifications[formId]) {
+      return res.status(404).json({ ok: false, error: 'Unknown form ID: ' + formId });
+    }
+    // Accept partial update — replace the form's block, keep label.
+    const incoming = req.body || {};
+    const existing = cfg.notifications[formId];
+    cfg.notifications[formId] = {
+      label: existing.label,
+      sms: {
+        enabled: !!(incoming.sms && incoming.sms.enabled),
+        recipients: Array.isArray(incoming.sms && incoming.sms.recipients) ? incoming.sms.recipients : []
+      },
+      email: {
+        enabled: !!(incoming.email && incoming.email.enabled),
+        recipients: Array.isArray(incoming.email && incoming.email.recipients) ? incoming.email.recipients : []
+      }
+    };
+    writeNotifSettings(cfg);
+    res.json({ ok: true, notification: cfg.notifications[formId] });
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
+});
+
+app.post('/api/admin/notifications/:formId/test', authMiddleware, async (req, res) => {
+  try {
+    const results = await sendTestForForm(req.params.formId);
+    res.json({ ok: true, results });
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
+});
+
+// Manual digest fire (admin button + smoke test). Returns send summary.
+app.post('/api/admin/notifications/_digest-now', authMiddleware, async (req, res) => {
+  try {
+    const result = await sendDailyDigest({ pool });
+    res.json(result);
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
+});
 
 app.get('/api/admin/forms', authMiddleware, (req, res) => {
   try {
@@ -1636,9 +1717,49 @@ versions.ensureDirectories();
 versions.snapshotContentOnStartup(loadContent());
 versions.detectAndSnapshotPages();
 
+// ─── Daily digest scheduler ───
+// Fires sendDailyDigest({pool}) once per day at or after 17:00 Australia/Brisbane.
+// We compute the local Brisbane date string from Intl, and only fire when
+// _state.lastDigestSent is from a different day. Persisting the date string
+// after firing prevents the 60s-tick from re-sending within the same day.
+function brisbaneTodayString() {
+  // 'en-CA' gives YYYY-MM-DD which is naturally sortable / comparable.
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Australia/Brisbane' });
+}
+function brisbaneHour() {
+  const parts = new Intl.DateTimeFormat('en-AU', {
+    timeZone: 'Australia/Brisbane',
+    hour: 'numeric',
+    hour12: false
+  }).formatToParts(new Date());
+  const h = parts.find(p => p.type === 'hour');
+  return h ? parseInt(h.value, 10) : 0;
+}
+async function checkDailyDigest() {
+  try {
+    const cfg = readNotifSettings();
+    if (!cfg) return;
+    const today = brisbaneTodayString();
+    const lastSentISO = cfg._state && cfg._state.lastDigestSent;
+    const lastSentDay = lastSentISO
+      ? new Date(lastSentISO).toLocaleDateString('en-CA', { timeZone: 'Australia/Brisbane' })
+      : null;
+    if (lastSentDay === today) return;          // already fired today
+    if (brisbaneHour() < 17) return;             // before 5pm Brisbane
+    console.log('[notify] Firing daily digest for', today);
+    const result = await sendDailyDigest({ pool });
+    console.log('[notify] Digest result:', JSON.stringify(result));
+  } catch (err) {
+    console.error('[notify] Digest scheduler error:', err.message);
+  }
+}
+
 initDB()
   .then(() => {
     app.listen(PORT, () => console.log(`[server] Listening on port ${PORT}`));
+    // Kick off scheduler — first check after 30s, then every 60s.
+    setTimeout(checkDailyDigest, 30 * 1000);
+    setInterval(checkDailyDigest, 60 * 1000);
   })
   .catch(err => {
     console.error('[db] Failed to initialise database:', err);

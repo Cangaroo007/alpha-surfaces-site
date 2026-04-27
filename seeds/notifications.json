@@ -1,0 +1,28 @@
+{
+  "_comment": "Notification routing per form. Edit via Admin → Notifications. Cadence: 'instant' = SMS/email per submission; 'daily' = consolidated end-of-day digest at 17:00 Australia/Brisbane.",
+  "notifications": {
+    "order-sample": {
+      "label": "Sample Order Form",
+      "sms":   { "enabled": false, "recipients": [] },
+      "email": { "enabled": false, "recipients": [] }
+    },
+    "sample-modal": {
+      "label": "Sample Modal (Homepage / Collections)",
+      "sms":   { "enabled": false, "recipients": [] },
+      "email": { "enabled": false, "recipients": [] }
+    },
+    "partner-contact": {
+      "label": "Partner Contact Form",
+      "sms":   { "enabled": false, "recipients": [] },
+      "email": { "enabled": false, "recipients": [] }
+    },
+    "newsletter": {
+      "label": "Newsletter Subscribe",
+      "sms":   { "enabled": false, "recipients": [] },
+      "email": { "enabled": false, "recipients": [] }
+    }
+  },
+  "_state": {
+    "lastDigestSent": null
+  }
+}
