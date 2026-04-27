@@ -13,7 +13,7 @@ const OpenAI = require('openai');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const versions = require('./lib/versions');
-const { initDB, saveSubmission } = require('./db');
+const { initDB, saveSubmission, saveSubscriber, unsubscribeEmail } = require('./db');
 const { notifyOrderSample, notifyContact, notifySubscribe } = require('./notifications');
 
 const app = express();
@@ -215,6 +215,13 @@ app.post('/api/contact', (req, res) =>
   )
 );
 
+function generateUnsubscribeUrl(email) {
+  const secret  = process.env.SESSION_SECRET || 'alpha-surfaces-secret';
+  const token   = crypto.createHmac('sha256', secret).update(email.toLowerCase().trim()).digest('hex').substring(0, 16);
+  const base    = process.env.SITE_URL || 'https://alphasurfaces.com.au';
+  return `${base}/unsubscribe?email=${encodeURIComponent(email)}&token=${token}`;
+}
+
 app.post('/api/subscribe', async (req, res) => {
   try {
     const { email, consent } = req.body;
@@ -224,16 +231,64 @@ app.post('/api/subscribe', async (req, res) => {
     if (!consent) {
       return res.status(400).json({ ok: false, error: 'Please tick the consent checkbox to subscribe.' });
     }
-    const { id, submitted_at } = await saveSubmission('Newsletter', { email, consent }, []);
-    notifySubscribe(email, id, submitted_at).catch(err =>
+    const meta = {
+      ip:        req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip,
+      userAgent: req.headers['user-agent'] || '',
+      sourceUrl: req.headers['referer']    || ''
+    };
+    const row = await saveSubscriber(email, meta);
+    notifySubscribe(email, row.id, row.consent_timestamp_utc).catch(err =>
       console.error('[notify] Subscribe error:', err.message)
     );
     return res.json({ ok: true });
   } catch (err) {
+    if (err.message === 'SUPPRESSED') return res.json({ ok: true });
     console.error('[form] Subscribe error:', err.message);
     return res.status(500).json({ ok: false, error: 'Something went wrong. Please try again.' });
   }
 });
+
+app.get('/unsubscribe', async (req, res) => {
+  const { email, token } = req.query;
+  if (!email) return res.status(400).send(unsubscribePage('Invalid unsubscribe link.', false));
+  const secret   = process.env.SESSION_SECRET || 'alpha-surfaces-secret';
+  const expected = crypto.createHmac('sha256', secret).update(email.toLowerCase().trim()).digest('hex').substring(0, 16);
+  if (token !== expected) return res.status(400).send(unsubscribePage('This unsubscribe link is invalid or has expired.', false));
+  try {
+    await unsubscribeEmail(email, 'email-link');
+    return res.send(unsubscribePage('You\'ve been unsubscribed.', true, email));
+  } catch (err) {
+    console.error('[unsubscribe] Error:', err.message);
+    return res.status(500).send(unsubscribePage('Something went wrong. Please try again.', false));
+  }
+});
+
+function unsubscribePage(message, success, email = '') {
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unsubscribe — Alpha Surfaces</title>
+<style>
+  body { font-family:Georgia,sans-serif; background:#f3f1e6; display:flex;
+         align-items:center; justify-content:center; min-height:100vh;
+         margin:0; padding:24px; box-sizing:border-box; }
+  .card { background:#fff; border-radius:12px; padding:48px 40px;
+          max-width:480px; width:100%; text-align:center; }
+  .icon { font-size:40px; margin-bottom:16px; }
+  h1 { font-size:22px; color:#564D22; margin:0 0 12px; }
+  p  { color:#666; font-size:15px; line-height:1.6; margin:0 0 24px; }
+  a  { color:#564D22; }
+</style></head>
+<body><div class="card">
+  <div class="icon">${success ? '✓' : '✕'}</div>
+  <h1>${success ? 'Unsubscribed' : 'Something went wrong'}</h1>
+  <p>${message}${success && email ? `<br><br>We've removed <strong>${email}</strong> from our mailing list.` : ''}</p>
+  <p><a href="/">Return to Alpha Surfaces</a></p>
+  <p style="font-size:12px;color:#999;margin-top:32px">
+    Alpha Surfaces Pty Ltd · ABN 21 677 729 350<br>
+    13 Enterprise Street, Kunda Park QLD 4556
+  </p>
+</div></body></html>`;
+}
 
 // ─── Auth Routes ───
 // To generate a hash for a new password, run:

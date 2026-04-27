@@ -92,6 +92,10 @@ img { display: block; max-width: 100%; }
   .footer { padding: 30px 24px; }
   .footer p { font-size: 12px; letter-spacing: 0.36px; }
 }
+
+.sample-counter { font-size:14px; color:#564D22; font-weight:600; margin-bottom:12px; padding:8px 16px; background:#f3f1e6; border-radius:6px; display:inline-block; transition:background .2s,color .2s; }
+.sample-limit-msg { display:none; color:#564D22; font-size:13px; font-style:italic; margin-top:8px; padding:8px 14px; background:#f9f7ee; border-left:3px solid #564D22; border-radius:0 4px 4px 0; }
+input[name="samples"]:disabled + label { opacity:0.4; cursor:not-allowed; }
 </style>
 <link rel="stylesheet" href="animation.css?v=18">
 <link rel="stylesheet" href="nav.css?v=18">
@@ -111,7 +115,7 @@ img { display: block; max-width: 100%; }
         <div class="selected-stone-card" id="selected-stone-card"></div>
       </div>
     </div>
-    <form class="order-form" action="#" method="POST">
+    <form id="order-form" class="order-form" action="#" method="POST">
       <div class="form-row">
         <input type="text" class="form-input" name="first_name" placeholder="First Name *" required>
         <input type="text" class="form-input" name="last_name" placeholder="Last Name *" required>
@@ -165,6 +169,8 @@ img { display: block; max-width: 100%; }
       </div>
       <div class="form-select-group">
         <span class="form-select-label">I would like samples of...</span>
+        <div class="sample-counter" id="sample-counter"><span id="sample-count">0</span>/3 samples selected</div>
+        <p class="sample-limit-msg" id="sample-limit-msg">Maximum 3 samples selected. Uncheck a stone to choose a different one.</p>
         <div class="stones-picker" id="stones-picker"></div>
       </div>
       <textarea class="form-textarea" name="message" placeholder="Message"></textarea>
@@ -268,5 +274,70 @@ img { display: block; max-width: 100%; }
 </script>
 <script src="animation.js?v=18"></script>
 <script src="nav.js?v=18"></script>
+<script>
+(function(){
+  'use strict';
+  function initSampleLimit(){
+    var form=document.getElementById('order-form');
+    var counter=document.getElementById('sample-count');
+    var counterWrap=document.getElementById('sample-counter');
+    var limitMsg=document.getElementById('sample-limit-msg');
+    if(!form)return;
+    function updateLimit(){
+      var checked=form.querySelectorAll('input[name="samples"]:checked');
+      var unchecked=form.querySelectorAll('input[name="samples"]:not(:checked)');
+      var count=checked.length;
+      counter.textContent=count;
+      counterWrap.style.background=count===3?'#564D22':'#f3f1e6';
+      counterWrap.style.color=count===3?'#f3f1e6':'#564D22';
+      limitMsg.style.display=count>=3?'block':'none';
+      unchecked.forEach(function(cb){cb.disabled=count>=3;});
+    }
+    form.addEventListener('change',function(e){if(e.target.name==='samples')updateLimit();});
+    updateLimit();
+  }
+  function initOrderForm(){
+    var form=document.getElementById('order-form');
+    if(!form)return;
+    form.addEventListener('submit',async function(e){
+      e.preventDefault();
+      var btn=form.querySelector('[type="submit"]');
+      var originalText=btn.textContent;
+      var checked=form.querySelectorAll('input[name="samples"]:checked');
+      if(checked.length===0){showError('Please select at least one sample before submitting.');return;}
+      btn.disabled=true;btn.textContent='Submitting…';
+      try{
+        var formData=new FormData(form);
+        var fields={};
+        for(var[k,v]of formData.entries()){
+          if(k==='samples'){fields.samples=fields.samples||[];fields.samples.push(v);}
+          else{fields[k]=v;}
+        }
+        fields.sampleItems=(fields.samples||[]).map(function(slug){
+          var cb=form.querySelector('input[name="samples"][value="'+slug+'"]');
+          var label=cb?(cb.closest('label')||document.querySelector('label[for="'+cb.id+'"]')):null;
+          return{slug:slug,name:label?label.textContent.trim():slug,collection:''};
+        });
+        var res=await fetch('/api/order-sample',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(fields)});
+        var json=await res.json();
+        if(json.ok){
+          form.innerHTML='<div style="padding:48px 24px;text-align:center"><div style="font-size:48px;margin-bottom:16px">✓</div><h2 style="color:#564D22;margin:0 0 12px;font-size:22px">Request received.</h2><p style="color:#666;font-size:16px;line-height:1.7;margin:0 auto;max-width:400px">Thank you, '+fields.first_name+'. Your sample request has been sent. We will be in touch within 2–3 business days.</p></div>';
+        }else{throw new Error(json.error||'Submission failed');}
+      }catch(err){
+        btn.disabled=false;btn.textContent=originalText;
+        showError(err.message||'Something went wrong. Please call us on 1300 257 420.');
+      }
+    });
+  }
+  function showError(msg){
+    var el=document.getElementById('form-error-msg');
+    if(!el){el=document.createElement('p');el.id='form-error-msg';el.style.cssText='color:#c0392b;font-size:14px;margin:16px 0 0;text-align:center;padding:12px;background:#fef2f2;border-radius:6px';var btn=document.getElementById('order-form').querySelector('[type="submit"]');btn.parentNode.insertBefore(el,btn.nextSibling);}
+    el.textContent=msg;el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+  initSampleLimit();
+  initOrderForm();
+})();
+</script>
+<script src="/newsletter-form.js"></script>
 </body>
 </html>

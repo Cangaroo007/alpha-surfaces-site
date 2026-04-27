@@ -50,7 +50,9 @@
             <option value="other">Other</option>\
           </select>\
         </div>\
-        <input type="hidden" name="stone_slug" id="sample-modal-slug">\
+        <input type="hidden" name="stone_slug"       id="sample-modal-slug">\
+        <input type="hidden" name="stone_name"       id="sample-modal-name">\
+        <input type="hidden" name="stone_collection" id="sample-modal-collection">\
         <div class="smf-checkbox">\
           <input type="checkbox" id="sample-consent" name="consent">\
           <label for="sample-consent">I agree to receive updates from Alpha Surfaces.</label>\
@@ -67,6 +69,8 @@
   var closeBtn = document.getElementById('sample-modal-close');
   var stoneCard = document.getElementById('sample-modal-stone');
   var slugInput = document.getElementById('sample-modal-slug');
+  var nameInput = document.getElementById('sample-modal-name');
+  var collInput = document.getElementById('sample-modal-collection');
 
   function openModal(stoneName, stoneSlug, stoneImage, stoneCollection) {
     // Set stone info
@@ -79,9 +83,13 @@
         '<div class="sample-modal-stone-coll">' + (stoneCollection || '') + '</div></div>';
       stoneCard.style.display = '';
       slugInput.value = stoneSlug || '';
+      nameInput.value = stoneName || '';
+      collInput.value = stoneCollection || '';
     } else {
       stoneCard.style.display = 'none';
       slugInput.value = '';
+      nameInput.value = '';
+      collInput.value = '';
     }
     backdrop.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -145,4 +153,28 @@
 
   // Also run once after a delay for initial content
   setTimeout(attachSampleButtons, 500);
+
+  document.addEventListener('submit', async function(e){
+    if(!e.target.classList.contains('sample-modal-form'))return;
+    e.preventDefault();
+    var form=e.target;
+    var btn=form.querySelector('[type="submit"]');
+    var originalText=btn.textContent;
+    btn.disabled=true;btn.textContent='Submitting…';
+    try{
+      var formData=Object.fromEntries(new FormData(form));
+      var res=await fetch('/api/order-sample',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(formData)});
+      var json=await res.json();
+      if(json.ok){
+        var modal=form.closest('[class*="modal"],[id*="modal"]')||form.parentElement;
+        modal.innerHTML='<div style="padding:48px 24px;text-align:center"><div style="font-size:48px;margin-bottom:16px">✓</div><h2 style="color:#564D22;font-size:20px;margin:0 0 12px">Request received.</h2><p style="color:#666;font-size:15px;line-height:1.7;margin:0 auto;max-width:360px">Thank you, '+formData.first_name+'. We will be in touch within 2–3 business days.</p><button onclick="this.closest(\'[class*=modal],[id*=modal]\').style.display=\'none\'" style="margin-top:24px;padding:12px 28px;background:#564D22;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">Close</button></div>';
+      }else{throw new Error(json.error||'Submission failed');}
+    }catch(err){
+      btn.disabled=false;btn.textContent=originalText;
+      var errEl=document.createElement('p');
+      errEl.style.cssText='color:#c0392b;font-size:13px;text-align:center;margin:8px 0 0';
+      errEl.textContent=err.message||'Something went wrong. Please try again.';
+      form.appendChild(errEl);
+    }
+  });
 })();
