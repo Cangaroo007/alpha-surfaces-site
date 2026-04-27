@@ -1,0 +1,74 @@
+{
+  "forms": [
+    {
+      "id": "order-sample",
+      "label": "Sample Order Form",
+      "endpoint": "/api/order-sample",
+      "page": "/order-sample.html",
+      "description": "Full sample request form — up to 3 stones",
+      "fields": [
+        { "name": "first_name",  "type": "text",     "label": "First Name",       "placeholder": "First Name *",       "required": true  },
+        { "name": "last_name",   "type": "text",     "label": "Last Name",        "placeholder": "Last Name *",        "required": true  },
+        { "name": "phone",       "type": "tel",      "label": "Phone Number",     "placeholder": "Phone Number *",     "required": true  },
+        { "name": "email",       "type": "email",    "label": "Email",            "placeholder": "Email *",            "required": true  },
+        { "name": "role",        "type": "select",   "label": "I am a:",          "placeholder": "",                   "required": false,
+          "options": ["Homeowner","Designer-Architect","Builder","Fabricator","Developer","Other"] },
+        { "name": "reason",      "type": "select",   "label": "Reason for Contacting Us", "placeholder": "",           "required": false,
+          "options": ["Order a sample","Request a quote","Find a stockist","General enquiry","Other"] },
+        { "name": "unit",        "type": "text",     "label": "Unit / House No.", "placeholder": "Unit / House No. *", "required": true  },
+        { "name": "street",      "type": "text",     "label": "Street",           "placeholder": "Street *",           "required": true  },
+        { "name": "suburb",      "type": "text",     "label": "Suburb",           "placeholder": "Suburb *",           "required": true  },
+        { "name": "postcode",    "type": "text",     "label": "Postcode",         "placeholder": "Postcode *",         "required": true  },
+        { "name": "state",       "type": "select",   "label": "State",            "placeholder": "",                   "required": true,
+          "options": ["QLD","NSW","VIC","SA","WA","TAS","NT","ACT"] },
+        { "name": "message",     "type": "textarea", "label": "Message",          "placeholder": "Message",            "required": false },
+        { "name": "consent",     "type": "checkbox", "label": "I agree to receive updates from Alpha Surfaces.", "placeholder": "", "required": false }
+      ]
+    },
+    {
+      "id": "sample-modal",
+      "label": "Sample Modal (Homepage / Collections)",
+      "endpoint": "/api/order-sample",
+      "page": "index.html + collections.html (injected via sample-modal.js)",
+      "description": "Quick sample request modal triggered from stone cards",
+      "fields": [
+        { "name": "first_name", "type": "text",     "label": "First Name", "placeholder": "First Name *", "required": true  },
+        { "name": "last_name",  "type": "text",     "label": "Last Name",  "placeholder": "Last Name *",  "required": true  },
+        { "name": "email",      "type": "email",    "label": "Email",      "placeholder": "Email *",      "required": true  },
+        { "name": "phone",      "type": "tel",      "label": "Phone",      "placeholder": "Phone *",      "required": true  },
+        { "name": "postcode",   "type": "text",     "label": "Postcode",   "placeholder": "Postcode *",   "required": true  },
+        { "name": "state",      "type": "select",   "label": "State",      "placeholder": "",             "required": true,
+          "options": ["QLD","NSW","VIC","SA","WA","TAS","NT","ACT"] },
+        { "name": "role",       "type": "select",   "label": "I am a:",    "placeholder": "",             "required": false,
+          "options": ["Homeowner","Designer-Architect","Builder","Fabricator","Developer","Other"] },
+        { "name": "stone_slug", "type": "hidden",   "label": "Stone Slug", "placeholder": "",             "required": false },
+        { "name": "consent",    "type": "checkbox", "label": "I agree to receive updates from Alpha Surfaces.", "placeholder": "", "required": false }
+      ]
+    },
+    {
+      "id": "partner-contact",
+      "label": "Partner Contact Form",
+      "endpoint": "/api/contact",
+      "page": "kc.html + public/partners/*.html (22 pages)",
+      "description": "Contact form on all partner/trade pages",
+      "fields": [
+        { "name": "name",           "type": "text",   "label": "Full Name",      "placeholder": "Full Name *", "required": true  },
+        { "name": "phone",          "type": "tel",    "label": "Phone",          "placeholder": "Phone *",     "required": true  },
+        { "name": "email",          "type": "email",  "label": "Email",          "placeholder": "Email *",     "required": true  },
+        { "name": "store_location", "type": "select", "label": "Store Location", "placeholder": "- Select -",  "required": true,
+          "options": ["brisbane-north","brisbane-south","gold-coast","sunshine-coast","toowoomba","townsville","cairns","sydney-north","sydney-south","sydney-west","central-coast","newcastle","other"] }
+      ]
+    },
+    {
+      "id": "newsletter",
+      "label": "Newsletter Subscribe",
+      "endpoint": "/api/subscribe",
+      "page": "Footer on all 54 standard pages (injected via newsletter-form.js)",
+      "description": "Email newsletter opt-in — compliant with AU Spam Act + Privacy Act",
+      "fields": [
+        { "name": "email",   "type": "email",    "label": "Email Address", "placeholder": "Email address", "required": true  },
+        { "name": "consent", "type": "checkbox", "label": "Yes, I'd like to receive emails from Alpha Surfaces about new collections, products and events. I can unsubscribe anytime.", "placeholder": "", "required": true }
+      ]
+    }
+  ]
+}

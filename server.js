@@ -13,7 +13,7 @@ const OpenAI = require('openai');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const versions = require('./lib/versions');
-const { initDB, saveSubmission, saveSubscriber, unsubscribeEmail } = require('./db');
+const { initDB, saveSubmission, saveSubscriber, unsubscribeEmail, pool } = require('./db');
 const { notifyOrderSample, notifyContact, notifySubscribe } = require('./notifications');
 
 const app = express();
@@ -447,6 +447,78 @@ app.post('/api/admin/railway-vars', authMiddleware, async (req, res) => {
     console.error('[railway-vars] Error:', err.message);
     res.status(500).json({ ok: false, error: err.message });
   }
+});
+
+// ─── Forms CMS + Submissions Dashboard ───
+const FORMS_PATH = path.join(DATA_DIR, 'forms.json');
+
+app.get('/api/admin/forms', authMiddleware, (req, res) => {
+  try {
+    const raw  = fs.existsSync(FORMS_PATH) ? fs.readFileSync(FORMS_PATH, 'utf8') : '{"forms":[]}';
+    res.json(JSON.parse(raw));
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
+});
+
+app.put('/api/admin/forms/:formId', authMiddleware, (req, res) => {
+  try {
+    const raw   = fs.existsSync(FORMS_PATH) ? fs.readFileSync(FORMS_PATH, 'utf8') : '{"forms":[]}';
+    const data  = JSON.parse(raw);
+    const index = data.forms.findIndex(f => f.id === req.params.formId);
+    if (index === -1) return res.status(404).json({ ok: false, error: 'Form not found' });
+    data.forms[index] = { ...data.forms[index], ...req.body };
+    fs.writeFileSync(FORMS_PATH, JSON.stringify(data, null, 2));
+    res.json({ ok: true, form: data.forms[index] });
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
+});
+
+app.get('/api/admin/submissions', authMiddleware, async (req, res) => {
+  try {
+    const { form_type, status, limit = 50, offset = 0 } = req.query;
+    let query = 'SELECT * FROM form_submissions';
+    const vals = [], where = [];
+    if (form_type) { vals.push(form_type); where.push(`form_type = $${vals.length}`); }
+    if (status)    { vals.push(status);    where.push(`status = $${vals.length}`); }
+    if (where.length) query += ' WHERE ' + where.join(' AND ');
+    query += ` ORDER BY submitted_at DESC LIMIT $${vals.length+1} OFFSET $${vals.length+2}`;
+    vals.push(parseInt(limit), parseInt(offset));
+    const { rows } = await pool.query(query, vals);
+    const countQuery = 'SELECT COUNT(*) FROM form_submissions' +
+      (where.length ? ' WHERE ' + where.join(' AND ') : '');
+    const { rows: cr } = await pool.query(countQuery, vals.slice(0, vals.length-2));
+    res.json({ ok: true, submissions: rows, total: parseInt(cr[0].count) });
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
+});
+
+app.patch('/api/admin/submissions/:id', authMiddleware, async (req, res) => {
+  try {
+    await pool.query('UPDATE form_submissions SET status = $1 WHERE id = $2',
+      [req.body.status, req.params.id]);
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
+});
+
+app.get('/api/admin/submissions/export', authMiddleware, async (req, res) => {
+  try {
+    const { form_type } = req.query;
+    const vals = [];
+    let query = 'SELECT * FROM form_submissions';
+    if (form_type) { vals.push(form_type); query += ' WHERE form_type = $1'; }
+    query += ' ORDER BY submitted_at DESC';
+    const { rows } = await pool.query(query, vals);
+    const cols = ['id','form_type','submitted_at','name','email','phone',
+                  'state','postcode','store_location','message','status'];
+    const csv = [
+      cols.join(','),
+      ...rows.map(r => cols.map(c => {
+        const v = r[c] == null ? '' : String(r[c]);
+        return v.includes(',') || v.includes('"') || v.includes('\n')
+          ? `"${v.replace(/"/g,'""')}"` : v;
+      }).join(','))
+    ].join('\n');
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="submissions-${Date.now()}.csv"`);
+    res.send(csv);
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
 // ─── Upload route ───
