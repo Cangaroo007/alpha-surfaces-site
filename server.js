@@ -484,6 +484,39 @@ const FORMS_PATH = path.join(DATA_DIR, 'forms.json');
   }
 }
 
+// TEMP DIAGNOSTIC — remove once forms.json seeding verified
+app.get('/api/admin/_forms-debug', authMiddleware, (req, res) => {
+  const FORMS_DEFAULT = path.join(__dirname, 'data', 'forms.json');
+  const out = {
+    DATA_DIR,
+    FORMS_PATH,
+    FORMS_DEFAULT,
+    pathsEqual: FORMS_PATH === FORMS_DEFAULT,
+    forms_path_exists: fs.existsSync(FORMS_PATH),
+    forms_default_exists: fs.existsSync(FORMS_DEFAULT),
+  };
+  try {
+    if (out.forms_path_exists) {
+      const raw = fs.readFileSync(FORMS_PATH, 'utf8');
+      out.forms_path_size = raw.length;
+      try { out.forms_path_count = (JSON.parse(raw).forms || []).length; }
+      catch (e) { out.forms_path_parse_error = e.message; }
+    }
+    if (out.forms_default_exists) {
+      const raw = fs.readFileSync(FORMS_DEFAULT, 'utf8');
+      out.forms_default_size = raw.length;
+      try { out.forms_default_count = (JSON.parse(raw).forms || []).length; }
+      catch (e) { out.forms_default_parse_error = e.message; }
+    }
+    if (req.query.seed === '1' && out.forms_default_exists) {
+      fs.mkdirSync(path.dirname(FORMS_PATH), { recursive: true });
+      fs.copyFileSync(FORMS_DEFAULT, FORMS_PATH);
+      out.seeded = true;
+    }
+  } catch (e) { out.error = e.message; }
+  res.json(out);
+});
+
 app.get('/api/admin/forms', authMiddleware, (req, res) => {
   try {
     const raw  = fs.existsSync(FORMS_PATH) ? fs.readFileSync(FORMS_PATH, 'utf8') : '{"forms":[]}';
