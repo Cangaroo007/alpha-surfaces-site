@@ -456,19 +456,30 @@ app.post('/api/admin/railway-vars', authMiddleware, async (req, res) => {
 
 // ─── Forms CMS + Submissions Dashboard ───
 const FORMS_PATH = path.join(DATA_DIR, 'forms.json');
-// Seed forms.json on the persistent volume from the bundled defaults if absent.
-// DATA_DIR may be a Railway volume mount (separate from __dirname), so on a
-// fresh volume we copy ./data/forms.json across once. Idempotent — skips if
-// the file already exists, so admin edits via PUT are never overwritten.
+// Seed forms.json on the persistent volume from the bundled defaults if absent
+// or empty. DATA_DIR may be a Railway volume mount (separate from __dirname),
+// so on a fresh volume we copy ./data/forms.json across once. Also self-heals
+// the case where an earlier deploy wrote an empty stub ({forms:[]}) before the
+// route had any data — without this, the volume would shadow the bundled
+// defaults forever. Admin edits via PUT are preserved (forms.length > 0 → skip).
 {
   const FORMS_DEFAULT = path.join(__dirname, 'data', 'forms.json');
-  if (FORMS_PATH !== FORMS_DEFAULT && !fs.existsSync(FORMS_PATH) && fs.existsSync(FORMS_DEFAULT)) {
-    try {
-      fs.mkdirSync(path.dirname(FORMS_PATH), { recursive: true });
-      fs.copyFileSync(FORMS_DEFAULT, FORMS_PATH);
-      console.log('[forms] Seeded', FORMS_PATH, 'from bundled defaults');
-    } catch (e) {
-      console.error('[forms] Seed failed:', e.message);
+  if (FORMS_PATH !== FORMS_DEFAULT && fs.existsSync(FORMS_DEFAULT)) {
+    let needsSeed = !fs.existsSync(FORMS_PATH);
+    if (!needsSeed) {
+      try {
+        const cur = JSON.parse(fs.readFileSync(FORMS_PATH, 'utf8'));
+        needsSeed = !cur || !Array.isArray(cur.forms) || cur.forms.length === 0;
+      } catch { needsSeed = true; }
+    }
+    if (needsSeed) {
+      try {
+        fs.mkdirSync(path.dirname(FORMS_PATH), { recursive: true });
+        fs.copyFileSync(FORMS_DEFAULT, FORMS_PATH);
+        console.log('[forms] Seeded', FORMS_PATH, 'from bundled defaults');
+      } catch (e) {
+        console.error('[forms] Seed failed:', e.message);
+      }
     }
   }
 }
