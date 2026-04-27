@@ -10,9 +10,33 @@ async function renderNotificationsPanel(){
     +'<button class="btn-export" onclick="fireDigestNow(this)">Send daily digest now</button>'
     +'</div></div>'
     +'<p class="schema-intro">Configure who gets notified for each form. <strong>Instant</strong> sends per submission. <strong>Daily</strong> sends a consolidated digest at 5pm Brisbane time.</p>'
+    +'<div id="notif-status" class="notif-status">Checking integrations…</div>'
     +'<div id="notif-cards"><div class="loading">Loading…</div></div>'
     +'<div id="notif-toast" class="forms-toast hidden"></div>';
-  await loadNotifications();
+  await Promise.all([loadNotifStatus(), loadNotifications()]);
+}
+async function loadNotifStatus(){
+  var el=document.getElementById('notif-status');
+  if(!el)return;
+  try{
+    var res=await fetch('/api/admin/notifications/_status',{credentials:'include'});
+    var s=await res.json();
+    if(!s.ok){el.textContent='Status check failed: '+(s.error||'unknown');el.className='notif-status error';return;}
+    var twilio = s.twilio
+      ? '<span class="notif-status-ok">✓ Twilio'+(s.fromNumber?' ('+esc(s.fromNumber)+')':'')+'</span>'
+      : '<span class="notif-status-bad">✗ Twilio not configured</span>';
+    var smtp = s.smtp
+      ? '<span class="notif-status-ok">✓ SMTP'+(s.smtpFrom?' ('+esc(s.smtpFrom)+')':'')+'</span>'
+      : '<span class="notif-status-bad">✗ SMTP not configured</span>';
+    var rt = s.railwayToken
+      ? '<span class="notif-status-ok">✓ Railway token</span>'
+      : '<span class="notif-status-bad">✗ Railway token missing — Settings panel can\'t save env vars</span>';
+    el.innerHTML='Integrations: '+twilio+' &nbsp;·&nbsp; '+smtp+' &nbsp;·&nbsp; '+rt;
+    el.className='notif-status';
+  }catch(err){
+    el.textContent='Status check error: '+err.message;
+    el.className='notif-status error';
+  }
 }
 async function loadNotifications(){
   var cards=document.getElementById('notif-cards');
@@ -37,7 +61,8 @@ function renderFormCard(formId,n){
     +'<div class="schema-card-header">'
       +'<div><h3>'+n.label+'</h3><span class="schema-meta">Form ID: '+formId+'</span></div>'
       +'<div class="notif-card-actions">'
-        +'<button class="btn-test" onclick="testForm(\''+formId+'\',this)">Send test</button>'
+        +'<button class="btn-test" onclick="testForm(\''+formId+'\',\'sms\',this)">Test SMS</button>'
+        +'<button class="btn-test" onclick="testForm(\''+formId+'\',\'email\',this)">Test email</button>'
         +'<button class="btn-save-schema" onclick="saveNotif(\''+formId+'\')">Save</button>'
       +'</div>'
     +'</div>'
@@ -141,21 +166,25 @@ async function saveNotif(formId){
     btn.textContent='Save *';
   }finally{btn.disabled=false;}
 }
-async function testForm(formId,btn){
+async function testForm(formId,channel,btn){
+  var origLabel=btn.textContent;
   btn.disabled=true;btn.textContent='Sending…';
   try{
-    var res=await fetch('/api/admin/notifications/'+formId+'/test',{
-      method:'POST',credentials:'include'
-    });
+    var url='/api/admin/notifications/'+formId+'/test'+(channel?'?channel='+channel:'');
+    var res=await fetch(url,{method:'POST',credentials:'include'});
     var data=await res.json();
     if(!data.ok)throw new Error(data.error||'Test failed');
     var summary=data.results||[];
-    if(!summary.length){showNotifToast('No recipients configured for this form yet.','error');return;}
+    if(!summary.length){
+      showNotifToast('No '+(channel||'')+' recipients configured for this form yet.','error');
+      return;
+    }
     var ok=summary.filter(function(r){return r.ok;}).length;
     var fail=summary.length-ok;
-    showNotifToast('Test sent: '+ok+' succeeded'+(fail?', '+fail+' failed':''),fail?'error':'success');
+    var label=channel?(channel==='sms'?'SMS':'Email'):'Test';
+    showNotifToast(label+' sent: '+ok+' succeeded'+(fail?', '+fail+' failed':''),fail?'error':'success');
   }catch(err){showNotifToast('Error: '+err.message,'error');}
-  finally{btn.disabled=false;btn.textContent='Send test';}
+  finally{btn.disabled=false;btn.textContent=origLabel;}
 }
 async function fireDigestNow(btn){
   if(!confirm('Fire the daily digest now? This will send to all recipients with cadence=Daily.'))return;

@@ -212,7 +212,8 @@ async function notifySubscribe(email, id) {
 }
 
 // ─── Test send (used by admin "Send Test" button) ────────────────────────
-async function sendTestForForm(formId) {
+// channel: undefined | null = both; 'sms' = SMS only; 'email' = email only
+async function sendTestForForm(formId, channel) {
   const cfg = readSettings();
   const formLabel = (cfg && cfg.notifications && cfg.notifications[formId] && cfg.notifications[formId].label) || formId;
   const sms = `[TEST] Alpha Surfaces notification for "${formLabel}". If you got this, instant alerts are wired up.`;
@@ -220,8 +221,10 @@ async function sendTestForForm(formId) {
   const html = `<h2 style="color:#564D22">Test notification</h2>
     <p>This is a test from the Alpha Surfaces admin. Form: <strong>${formLabel}</strong>.</p>
     <p>If you got this, your instant alerts for this form are wired up correctly.</p>`;
-  const smsRecipients   = getRecipients(formId, 'sms',   null);
-  const emailRecipients = getRecipients(formId, 'email', null);
+  const wantSms   = !channel || channel === 'sms';
+  const wantEmail = !channel || channel === 'email';
+  const smsRecipients   = wantSms   ? getRecipients(formId, 'sms',   null) : [];
+  const emailRecipients = wantEmail ? getRecipients(formId, 'email', null) : [];
   const results = await Promise.all([
     ...smsRecipients.map(r => sendSMSTo(r.phone, sms).then(ok => ({ channel: 'sms', to: r.phone, name: r.name, ok }))),
     ...emailRecipients.map(r => sendEmailTo(r.email, subject, html).then(ok => ({ channel: 'email', to: r.email, name: r.name, ok })))
@@ -256,6 +259,8 @@ async function sendDailyDigest({ pool }) {
 
   let sent = 0;
   for (const [formId, subs] of Object.entries(byFormId)) {
+    // Defensive — byFormId only contains forms with submissions, but guard anyway.
+    if (!subs || subs.length === 0) continue;
     const smsRecipients   = getRecipients(formId, 'sms',   'daily');
     const emailRecipients = getRecipients(formId, 'email', 'daily');
     if (!smsRecipients.length && !emailRecipients.length) continue;

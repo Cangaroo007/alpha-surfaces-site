@@ -391,6 +391,17 @@ const RAILWAY_API_URL = 'https://backboard.railway.app/graphql/v2';
 const RAILWAY_PROJECT_ID = '83e36e08-4562-42ac-a39c-8111a7ceb192';
 const RAILWAY_SERVICE_ID = '64c256bc-0b41-4485-9611-8624dab25425';
 
+// Railway has two token formats:
+// - Project tokens (UUID format) — auth via `Project-Access-Token` header, scoped to one environment
+// - Personal account tokens (longer opaque string) — auth via `Authorization: Bearer`, account-wide
+// Detect by UUID shape and route to the correct header.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function railwayAuthHeaders(token) {
+  return UUID_RE.test(token)
+    ? { 'Content-Type': 'application/json', 'Project-Access-Token': token }
+    : { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+}
+
 app.post('/api/admin/railway-vars', authMiddleware, async (req, res) => {
   const { vars } = req.body;
   if (!vars || typeof vars !== 'object') {
@@ -406,13 +417,12 @@ app.post('/api/admin/railway-vars', authMiddleware, async (req, res) => {
     return res.status(500).json({ ok: false, error: 'Railway token not configured' });
   }
 
+  const headers = railwayAuthHeaders(token);
+
   try {
     const envRes = await fetch(RAILWAY_API_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+      headers,
       body: JSON.stringify({
         query: `query { project(id: "${RAILWAY_PROJECT_ID}") {
           environments { edges { node { id name } } }
@@ -420,6 +430,10 @@ app.post('/api/admin/railway-vars', authMiddleware, async (req, res) => {
       })
     });
     const envData = await envRes.json();
+    if (envData.errors) {
+      console.error('[railway-vars] GraphQL error:', JSON.stringify(envData.errors));
+      return res.status(500).json({ ok: false, error: envData.errors[0]?.message || 'Railway API error' });
+    }
     const envName = isProduction ? 'production' : 'staging';
     const envs = envData.data.project.environments.edges.map(e => e.node);
     const env = envs.find(e => e.name.toLowerCase() === envName) || envs[0];
@@ -427,10 +441,7 @@ app.post('/api/admin/railway-vars', authMiddleware, async (req, res) => {
     for (const [name, value] of Object.entries(vars)) {
       await fetch(RAILWAY_API_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers,
         body: JSON.stringify({
           query: `mutation UpsertVariable($input: VariableUpsertInput!) {
             variableUpsert(input: $input)
@@ -528,6 +539,22 @@ app.get('/api/admin/notifications', authMiddleware, (req, res) => {
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
+// Show the admin which notification env vars are configured (presence only — no values).
+app.get('/api/admin/notifications/_status', authMiddleware, (req, res) => {
+  try {
+    res.json({
+      ok: true,
+      twilio: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN),
+      smtp: !!(process.env.SMTP_USER && process.env.SMTP_PASS),
+      fromNumber: process.env.TWILIO_FROM || null,
+      smtpFrom: process.env.SMTP_USER || null,
+      railwayToken: !!(process.env.NODE_ENV === 'production'
+        ? process.env.RAILWAY_TOKEN_PRODUCTION
+        : process.env.RAILWAY_TOKEN_STAGING)
+    });
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
+});
+
 app.put('/api/admin/notifications/:formId', authMiddleware, (req, res) => {
   try {
     const cfg = readNotifSettings() || { notifications: {}, _state: {} };
@@ -556,8 +583,13 @@ app.put('/api/admin/notifications/:formId', authMiddleware, (req, res) => {
 
 app.post('/api/admin/notifications/:formId/test', authMiddleware, async (req, res) => {
   try {
-    const results = await sendTestForForm(req.params.formId);
-    res.json({ ok: true, results });
+    // Optional ?channel=sms|email to test only one channel.
+    const channel = req.query.channel || (req.body && req.body.channel) || null;
+    if (channel && channel !== 'sms' && channel !== 'email') {
+      return res.status(400).json({ ok: false, error: 'channel must be sms, email, or omitted' });
+    }
+    const results = await sendTestForForm(req.params.formId, channel);
+    res.json({ ok: true, channel: channel || 'both', results });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
