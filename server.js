@@ -13,7 +13,8 @@ const OpenAI = require('openai');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const versions = require('./lib/versions');
-const { initDB } = require('./db');
+const { initDB, saveSubmission } = require('./db');
+const { notifyOrderSample, notifyContact, notifySubscribe } = require('./notifications');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -167,6 +168,72 @@ function authMiddleware(req, res, next) {
   if (token && sessions.has(token)) return next();
   res.status(401).json({ error: 'Unauthorized' });
 }
+
+// ─── Public Form API ───
+async function handleForm(req, res, formType, handler) {
+  try {
+    const fields = req.body;
+    if (!fields.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
+      return res.status(400).json({ ok: false, error: 'A valid email address is required.' });
+    }
+    const sampleItems = fields.sampleItems
+      ? fields.sampleItems.slice(0, 3)
+      : fields.samples
+        ? (Array.isArray(fields.samples) ? fields.samples : [fields.samples])
+            .slice(0, 3).map(slug => ({ slug, name: slug, collection: '' }))
+        : [];
+    if (formType === 'Sample Request' && sampleItems.length === 0 && !fields.stone_slug) {
+      return res.status(400).json({ ok: false, error: 'Please select at least one sample.' });
+    }
+    if (fields.stone_slug && sampleItems.length === 0) {
+      sampleItems.push({
+        slug: fields.stone_slug,
+        name: fields.stone_name || fields.stone_slug,
+        collection: fields.stone_collection || ''
+      });
+    }
+    const { id, submitted_at } = await saveSubmission(formType, fields, sampleItems);
+    handler(fields, sampleItems, id, submitted_at).catch(err =>
+      console.error(`[notify] ${formType} notification error:`, err.message)
+    );
+    return res.json({ ok: true, id });
+  } catch (err) {
+    console.error(`[form] ${formType} error:`, err.message);
+    return res.status(500).json({ ok: false, error: 'Something went wrong. Please try again.' });
+  }
+}
+
+app.post('/api/order-sample', (req, res) =>
+  handleForm(req, res, 'Sample Request', (fields, samples, id, ts) =>
+    notifyOrderSample(fields, samples, id, ts)
+  )
+);
+
+app.post('/api/contact', (req, res) =>
+  handleForm(req, res, 'Contact Enquiry', (fields, _samples, id, ts) =>
+    notifyContact(fields, id, ts)
+  )
+);
+
+app.post('/api/subscribe', async (req, res) => {
+  try {
+    const { email, consent } = req.body;
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ ok: false, error: 'A valid email address is required.' });
+    }
+    if (!consent) {
+      return res.status(400).json({ ok: false, error: 'Please tick the consent checkbox to subscribe.' });
+    }
+    const { id, submitted_at } = await saveSubmission('Newsletter', { email, consent }, []);
+    notifySubscribe(email, id, submitted_at).catch(err =>
+      console.error('[notify] Subscribe error:', err.message)
+    );
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('[form] Subscribe error:', err.message);
+    return res.status(500).json({ ok: false, error: 'Something went wrong. Please try again.' });
+  }
+});
 
 // ─── Auth Routes ───
 // To generate a hash for a new password, run:

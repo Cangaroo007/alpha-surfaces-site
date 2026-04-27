@@ -10,17 +10,20 @@ async function initDB() {
   try {
     await client.query(`
       CREATE TABLE IF NOT EXISTS form_submissions (
-        id            SERIAL PRIMARY KEY,
-        form_type     VARCHAR(50)  NOT NULL,
-        submitted_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-        name          VARCHAR(255),
-        email         VARCHAR(255),
-        phone         VARCHAR(50),
-        company       VARCHAR(255),
-        message       TEXT,
-        postcode      VARCHAR(20),
-        state         VARCHAR(50),
-        status        VARCHAR(20)  NOT NULL DEFAULT 'new'
+        id              SERIAL PRIMARY KEY,
+        form_type       VARCHAR(50)  NOT NULL,
+        submitted_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+        name            VARCHAR(255),
+        email           VARCHAR(255),
+        phone           VARCHAR(50),
+        company         VARCHAR(255),
+        message         TEXT,
+        postcode        VARCHAR(20),
+        state           VARCHAR(50),
+        store_location  VARCHAR(255),
+        source          VARCHAR(100),
+        consent         BOOLEAN DEFAULT FALSE,
+        status          VARCHAR(20)  NOT NULL DEFAULT 'new'
       );
 
       CREATE TABLE IF NOT EXISTS sample_request_items (
@@ -57,19 +60,23 @@ async function saveSubmission(formType, fields, sampleItems = []) {
 
     const { rows } = await client.query(
       `INSERT INTO form_submissions
-        (form_type, name, email, phone, company, message, postcode, state)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-       RETURNING id, submitted_at`,
-      [
-        formType,
-        fields.name   || null,
-        fields.email  || null,
-        fields.phone  || null,
-        fields.company|| null,
-        fields.message|| null,
-        fields.postcode||null,
-        fields.state  || null
-      ]
+    (form_type, name, email, phone, company, message, postcode,
+     state, store_location, source, consent)
+   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+   RETURNING id, submitted_at`,
+  [
+    formType,
+    fields.name || `${fields.first_name || ''} ${fields.last_name || ''}`.trim() || null,
+    fields.email   || null,
+    fields.phone   || null,
+    fields.company || null,
+    fields.message || null,
+    fields.postcode|| null,
+    fields.state   || null,
+    fields.store_location || null,
+    fields.source  || null,
+    fields.consent ? true : false
+  ]
     );
 
     const { id, submitted_at } = rows[0];
