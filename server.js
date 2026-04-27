@@ -408,7 +408,9 @@ app.post('/api/admin/railway-vars', authMiddleware, async (req, res) => {
     return res.status(400).json({ ok: false, error: 'Invalid payload' });
   }
 
-  const isProduction = process.env.NODE_ENV === 'production';
+  // Railway sets NODE_ENV=production on BOTH envs. The reliable indicator is
+  // RAILWAY_ENVIRONMENT_NAME ("staging" | "production"), set by the platform.
+  const isProduction = (process.env.RAILWAY_ENVIRONMENT_NAME || '').toLowerCase() === 'production';
   const token = isProduction
     ? process.env.RAILWAY_TOKEN_PRODUCTION
     : process.env.RAILWAY_TOKEN_STAGING;
@@ -548,7 +550,7 @@ app.get('/api/admin/notifications/_status', authMiddleware, (req, res) => {
       smtp: !!(process.env.SMTP_USER && process.env.SMTP_PASS),
       fromNumber: process.env.TWILIO_FROM || null,
       smtpFrom: process.env.SMTP_USER || null,
-      railwayToken: !!(process.env.NODE_ENV === 'production'
+      railwayToken: !!((process.env.RAILWAY_ENVIRONMENT_NAME || '').toLowerCase() === 'production'
         ? process.env.RAILWAY_TOKEN_PRODUCTION
         : process.env.RAILWAY_TOKEN_STAGING)
     });
