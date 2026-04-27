@@ -2,7 +2,8 @@
   "name": "alpha-surfaces-cms",
   "version": "1.0.0",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "reset-admin": "node scripts/reset-admin-password.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
