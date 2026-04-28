@@ -622,53 +622,279 @@ app.put('/api/admin/forms/:formId', authMiddleware, (req, res) => {
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
+// ─── Submissions dashboard ───
+// Helper: build WHERE clause from query filters.
+// Supports:
+//   form_type      — exact match on form_submissions.form_type
+//   category       — semantic category mapped to form_type + store_location:
+//                    'sample'  → form_type='Sample Request'
+//                    'contact' → form_type='Contact Enquiry' AND store_location IS NULL
+//                    'partner' → form_type='Contact Enquiry' AND store_location IS NOT NULL
+//   status         — exact match on status (e.g. 'new', 'actioned')
+//   q              — case-insensitive ILIKE across name/email/phone/message
+//   date_from/date_to — ISO date strings; inclusive on the day
+function buildSubmissionsWhere(q) {
+  const vals = [];
+  const where = [];
+  if (q.form_type)  { vals.push(q.form_type); where.push(`form_type = $${vals.length}`); }
+  if (q.category === 'sample') {
+    where.push(`form_type = 'Sample Request'`);
+  } else if (q.category === 'contact') {
+    where.push(`form_type = 'Contact Enquiry' AND (store_location IS NULL OR store_location = '')`);
+  } else if (q.category === 'partner') {
+    where.push(`form_type = 'Contact Enquiry' AND store_location IS NOT NULL AND store_location <> ''`);
+  }
+  if (q.status) { vals.push(q.status); where.push(`status = $${vals.length}`); }
+  if (q.q) {
+    vals.push('%' + q.q + '%');
+    const i = vals.length;
+    where.push(`(name ILIKE $${i} OR email ILIKE $${i} OR phone ILIKE $${i} OR message ILIKE $${i} OR company ILIKE $${i})`);
+  }
+  if (q.date_from) { vals.push(q.date_from); where.push(`submitted_at >= $${vals.length}::date`); }
+  if (q.date_to)   { vals.push(q.date_to);   where.push(`submitted_at < ($${vals.length}::date + INTERVAL '1 day')`); }
+  return { vals, where: where.length ? ' WHERE ' + where.join(' AND ') : '' };
+}
+
 app.get('/api/admin/submissions', authMiddleware, async (req, res) => {
   try {
-    const { form_type, status, limit = 50, offset = 0 } = req.query;
-    let query = 'SELECT * FROM form_submissions';
-    const vals = [], where = [];
-    if (form_type) { vals.push(form_type); where.push(`form_type = $${vals.length}`); }
-    if (status)    { vals.push(status);    where.push(`status = $${vals.length}`); }
-    if (where.length) query += ' WHERE ' + where.join(' AND ');
-    query += ` ORDER BY submitted_at DESC LIMIT $${vals.length+1} OFFSET $${vals.length+2}`;
-    vals.push(parseInt(limit), parseInt(offset));
-    const { rows } = await pool.query(query, vals);
-    const countQuery = 'SELECT COUNT(*) FROM form_submissions' +
-      (where.length ? ' WHERE ' + where.join(' AND ') : '');
-    const { rows: cr } = await pool.query(countQuery, vals.slice(0, vals.length-2));
-    res.json({ ok: true, submissions: rows, total: parseInt(cr[0].count) });
-  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
+    const { limit = 50, offset = 0 } = req.query;
+    const { vals, where } = buildSubmissionsWhere(req.query);
+
+    // Aggregate sample item names so the table can show stones at a glance
+    // without n+1 queries. STRING_AGG keeps order by the items' insert id.
+    const dataQ = `
+      SELECT s.*,
+             COALESCE(
+               (SELECT STRING_AGG(stone_name, ', ' ORDER BY id)
+                  FROM sample_request_items
+                 WHERE submission_id = s.id),
+               ''
+             ) AS samples,
+             (SELECT COUNT(*)::int FROM sample_request_items WHERE submission_id = s.id) AS sample_count
+        FROM form_submissions s
+        ${where}
+       ORDER BY submitted_at DESC
+       LIMIT $${vals.length+1} OFFSET $${vals.length+2}
+    `;
+    const dataVals = [...vals, parseInt(limit), parseInt(offset)];
+    const { rows } = await pool.query(dataQ, dataVals);
+
+    const { rows: cr } = await pool.query(
+      `SELECT COUNT(*) FROM form_submissions${where}`, vals
+    );
+
+    // Headline counts by category — useful for nav badges.
+    const { rows: counts } = await pool.query(`
+      SELECT
+        COUNT(*) FILTER (WHERE status='new')                                                         AS new_total,
+        COUNT(*) FILTER (WHERE form_type='Sample Request' AND status='new')                          AS new_sample,
+        COUNT(*) FILTER (WHERE form_type='Contact Enquiry' AND (store_location IS NULL OR store_location='') AND status='new') AS new_contact,
+        COUNT(*) FILTER (WHERE form_type='Contact Enquiry' AND store_location IS NOT NULL AND store_location<>'' AND status='new') AS new_partner
+      FROM form_submissions
+    `);
+
+    res.json({
+      ok: true,
+      submissions: rows,
+      total: parseInt(cr[0].count),
+      counts: counts[0]
+    });
+  } catch (err) {
+    console.error('[admin/submissions] error:', err.message);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Single submission with its sample items, for the detail drawer.
+app.get('/api/admin/submissions/:id', authMiddleware, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT * FROM form_submissions WHERE id = $1', [req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ ok: false, error: 'Not found' });
+    const submission = rows[0];
+
+    let items = [];
+    if (submission.form_type === 'Sample Request') {
+      const r = await pool.query(
+        'SELECT id, stone_slug, stone_name, collection FROM sample_request_items WHERE submission_id = $1 ORDER BY id',
+        [submission.id]
+      );
+      items = r.rows;
+    }
+
+    res.json({ ok: true, submission, sampleItems: items });
+  } catch (err) {
+    console.error('[admin/submissions/:id] error:', err.message);
+    res.status(500).json({ ok: false, error: err.message });
+  }
 });
 
 app.patch('/api/admin/submissions/:id', authMiddleware, async (req, res) => {
   try {
+    const allowed = ['new', 'actioned', 'archived'];
+    const status = req.body.status;
+    if (!allowed.includes(status)) {
+      return res.status(400).json({ ok: false, error: `status must be one of ${allowed.join(', ')}` });
+    }
     await pool.query('UPDATE form_submissions SET status = $1 WHERE id = $2',
-      [req.body.status, req.params.id]);
+      [status, req.params.id]);
     res.json({ ok: true });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
+// CSV export — respects the same filters as the list endpoint and includes
+// a 'samples' column with a comma-separated list of stone names so a Sample
+// Request export is actually fulfillable.
 app.get('/api/admin/submissions/export', authMiddleware, async (req, res) => {
   try {
-    const { form_type } = req.query;
-    const vals = [];
-    let query = 'SELECT * FROM form_submissions';
-    if (form_type) { vals.push(form_type); query += ' WHERE form_type = $1'; }
-    query += ' ORDER BY submitted_at DESC';
+    const { vals, where } = buildSubmissionsWhere(req.query);
+    const query = `
+      SELECT s.*,
+             COALESCE(
+               (SELECT STRING_AGG(stone_name, ' | ' ORDER BY id)
+                  FROM sample_request_items
+                 WHERE submission_id = s.id),
+               ''
+             ) AS samples
+        FROM form_submissions s
+        ${where}
+       ORDER BY submitted_at DESC
+    `;
     const { rows } = await pool.query(query, vals);
     const cols = ['id','form_type','submitted_at','name','email','phone',
-                  'state','postcode','store_location','message','status'];
+                  'company','state','postcode','store_location','source',
+                  'consent','message','samples','status'];
+    const escape = v => {
+      if (v == null) return '';
+      const s = v instanceof Date ? v.toISOString() : String(v);
+      return s.includes(',') || s.includes('"') || s.includes('\n')
+        ? `"${s.replace(/"/g,'""')}"` : s;
+    };
     const csv = [
       cols.join(','),
-      ...rows.map(r => cols.map(c => {
-        const v = r[c] == null ? '' : String(r[c]);
-        return v.includes(',') || v.includes('"') || v.includes('\n')
-          ? `"${v.replace(/"/g,'""')}"` : v;
-      }).join(','))
+      ...rows.map(r => cols.map(c => escape(r[c])).join(','))
     ].join('\n');
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', `attachment; filename="submissions-${Date.now()}.csv"`);
     res.send(csv);
+  } catch (err) {
+    console.error('[admin/submissions/export] error:', err.message);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// ─── Newsletter subscribers (separate table) ───
+function buildNewsletterWhere(q) {
+  const vals = [];
+  const where = [];
+  if (q.status) { vals.push(q.status); where.push(`status = $${vals.length}`); }
+  if (q.q) {
+    vals.push('%' + q.q + '%');
+    where.push(`email ILIKE $${vals.length}`);
+  }
+  if (q.date_from) { vals.push(q.date_from); where.push(`consent_timestamp_utc >= $${vals.length}::date`); }
+  if (q.date_to)   { vals.push(q.date_to);   where.push(`consent_timestamp_utc < ($${vals.length}::date + INTERVAL '1 day')`); }
+  return { vals, where: where.length ? ' WHERE ' + where.join(' AND ') : '' };
+}
+
+app.get('/api/admin/newsletter', authMiddleware, async (req, res) => {
+  try {
+    const { limit = 50, offset = 0 } = req.query;
+    const { vals, where } = buildNewsletterWhere(req.query);
+
+    const dataQ = `
+      SELECT id, email, consent_timestamp_utc, confirmed_timestamp_utc,
+             ip_address, user_agent, source_url, status,
+             unsubscribed_timestamp_utc, unsubscribe_method
+        FROM newsletter_subscribers
+        ${where}
+       ORDER BY consent_timestamp_utc DESC
+       LIMIT $${vals.length+1} OFFSET $${vals.length+2}
+    `;
+    const dataVals = [...vals, parseInt(limit), parseInt(offset)];
+    const { rows } = await pool.query(dataQ, dataVals);
+
+    const { rows: cr } = await pool.query(
+      `SELECT COUNT(*) FROM newsletter_subscribers${where}`, vals
+    );
+
+    const { rows: counts } = await pool.query(`
+      SELECT
+        COUNT(*) FILTER (WHERE status='active')        AS active,
+        COUNT(*) FILTER (WHERE status='unsubscribed')  AS unsubscribed,
+        COUNT(*) FILTER (WHERE status='pending')       AS pending,
+        COUNT(*)                                       AS total_all
+      FROM newsletter_subscribers
+    `);
+
+    res.json({
+      ok: true,
+      subscribers: rows,
+      total: parseInt(cr[0].count),
+      counts: counts[0]
+    });
+  } catch (err) {
+    console.error('[admin/newsletter] error:', err.message);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.get('/api/admin/newsletter/export', authMiddleware, async (req, res) => {
+  try {
+    const { vals, where } = buildNewsletterWhere(req.query);
+    const { rows } = await pool.query(`
+      SELECT id, email, consent_timestamp_utc, confirmed_timestamp_utc,
+             ip_address, user_agent, source_url, status,
+             unsubscribed_timestamp_utc, unsubscribe_method
+        FROM newsletter_subscribers
+        ${where}
+       ORDER BY consent_timestamp_utc DESC
+    `, vals);
+    const cols = ['id','email','consent_timestamp_utc','confirmed_timestamp_utc',
+                  'ip_address','source_url','status',
+                  'unsubscribed_timestamp_utc','unsubscribe_method'];
+    const escape = v => {
+      if (v == null) return '';
+      const s = v instanceof Date ? v.toISOString() : String(v);
+      return s.includes(',') || s.includes('"') || s.includes('\n')
+        ? `"${s.replace(/"/g,'""')}"` : s;
+    };
+    const csv = [
+      cols.join(','),
+      ...rows.map(r => cols.map(c => escape(r[c])).join(','))
+    ].join('\n');
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="newsletter-${Date.now()}.csv"`);
+    res.send(csv);
+  } catch (err) {
+    console.error('[admin/newsletter/export] error:', err.message);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.patch('/api/admin/newsletter/:id', authMiddleware, async (req, res) => {
+  try {
+    const allowed = ['active', 'unsubscribed', 'pending'];
+    const status = req.body.status;
+    if (!allowed.includes(status)) {
+      return res.status(400).json({ ok: false, error: `status must be one of ${allowed.join(', ')}` });
+    }
+    if (status === 'unsubscribed') {
+      await pool.query(
+        `UPDATE newsletter_subscribers
+            SET status='unsubscribed',
+                unsubscribed_timestamp_utc=NOW(),
+                unsubscribe_method='admin'
+          WHERE id=$1`, [req.params.id]
+      );
+    } else {
+      await pool.query(
+        'UPDATE newsletter_subscribers SET status=$1 WHERE id=$2',
+        [status, req.params.id]
+      );
+    }
+    res.json({ ok: true });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
