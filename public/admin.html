@@ -571,6 +571,187 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .notif-status.error{background:#fee2e2;border-color:#fecaca;color:#991b1b}
 .notif-status-ok{color:#166534;font-weight:500}
 .notif-status-bad{color:#991b1b;font-weight:500}
+
+/* ─────────────────────────────────────────────────────────────
+   LIGHT THEME — cream/white palette for the Alpha CMS.
+   Overrides the dark theme defined above. Keep this block at
+   the very end of the stylesheet so it wins via cascade.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --bg:#faf7f0;          /* warm cream page bg */
+  --surface:#ffffff;     /* card / panel bg */
+  --surface2:#f3efe5;    /* hovered / striped row */
+  --border:#e3ddcf;      /* subtle warm border */
+  --text:#1c1c1a;        /* near-black body text (≈14:1 on cream) */
+  --text2:#6b665d;       /* readable muted secondary */
+  --olive:#5C5A1E;       /* unchanged — works on light too */
+  --gold:#B8A472;        /* kept for backgrounds; links use olive */
+  --red:#b53224;
+  --green:#1d8348;
+}
+body{background:var(--bg);color:var(--text)}
+
+/* Surfaces / panels that hard-coded near-black hex values */
+.ai-diff-card,.ai-input,.ai-gen-result,.ai-gen-failed,.vh-card,
+.key-input,.sub-table th,.schema-fields-table th{
+  background:var(--surface)!important;
+  border-color:var(--border)!important;
+  color:var(--text)!important;
+}
+.sub-table th,.schema-fields-table th{background:var(--surface2)!important;color:var(--text2)!important}
+.key-input{background:var(--surface)!important}
+.key-input::placeholder{color:#a8a399!important}
+.key-input,.ai-input,.vh-card{border:1px solid var(--border)!important}
+.ai-footer-info{border-top:1px solid var(--border)!important}
+.vh-toast{background:#e8f5ec!important;border-color:#bce5c9!important;color:#1d8348!important}
+.vh-modal-overlay{background:rgba(0,0,0,.45)!important}
+
+/* Inputs — explicitly white on cream so they read as fields */
+.field input[type="text"],.field input[type="color"],.field textarea,.field select,
+.vh-checkpoint-form input,.sub-controls input,.sub-controls select,.schema-input,
+.settings-input-wrap input,.login-box input,.vh-card-label-input{
+  background:var(--surface)!important;
+  border:1px solid var(--border)!important;
+  color:var(--text)!important;
+}
+.field input:focus,.field textarea:focus,.field select:focus,
+.schema-input:focus,.settings-input-wrap input:focus,
+.sub-controls input:focus,.sub-controls select:focus,
+.login-box input:focus,.key-input:focus,.ai-input:focus{border-color:var(--olive)!important}
+.sub-controls input[type=date]{color-scheme:light!important}
+
+/* Sidebar — white panel, dark legible nav links */
+.sidebar{background:var(--surface)!important;border-right:1px solid var(--border)!important}
+.sidebar-brand h2{color:var(--text)!important}
+.sidebar-nav a{color:#3a3a36!important}
+.sidebar-nav a:hover,.sidebar-nav a.active{
+  background:rgba(92,90,30,.08)!important;
+  color:var(--olive)!important;
+  border-left-color:var(--olive)!important;
+}
+.sidebar-bottom{border-top:1px solid var(--border)!important}
+.sidebar-nav .divider{background:var(--border)!important}
+
+/* Main header / cards */
+.main-header{border-bottom-color:var(--border)!important}
+.card,.schema-card,.settings-group,.sub-controls,.sub-table-wrap{
+  background:var(--surface)!important;
+  border:1px solid var(--border)!important;
+}
+
+/* Login */
+.login-box{background:var(--surface)!important;border:1px solid var(--border)!important;box-shadow:0 4px 18px rgba(0,0,0,.04)}
+
+/* AI panel surfaces */
+.ai-cms-header,.ai-input-area,.ai-model-bar,.ai-gen-panel,.ai-gen-tab.active,.vh-tab.active,.btn-tab-switch.active{
+  background:var(--surface)!important;
+}
+.ai-key-banner{background:rgba(184,164,114,.14)!important;border-color:rgba(138,117,72,.4)!important}
+.ai-key-banner .banner-title,.ai-key-banner a,.ai-nav-link,
+.ai-msg-assistant .ai-label,.sidebar-brand span,.field-name,
+.ai-gen-tab.active,.vh-tab.active,.btn-tab-switch.active,
+.sub-drawer-section h4,.ai-msg-assistant .ai-bubble em,
+.ai-msg-assistant .ai-bubble code,.vh-checkpoint-btn,.vh-view-raw,
+.vh-card-id{color:var(--olive)!important}
+
+/* AI message bubbles */
+.ai-msg-user .ai-bubble{
+  background:rgba(92,90,30,.10)!important;
+  border-color:rgba(92,90,30,.28)!important;
+  color:#2e2c10!important;
+}
+.ai-msg-assistant .ai-bubble{color:var(--text)!important}
+.ai-msg-assistant .ai-bubble strong{color:var(--text)!important}
+.ai-msg-assistant .ai-bubble code{background:var(--surface2)!important}
+.ai-prompt-pill{background:var(--surface2)!important;border-color:var(--border)!important}
+
+/* Diff add/remove — readable on cream */
+.ai-diff-remove,.vh-diff-remove{color:#a92a23!important;background:rgba(181,50,36,.07)!important;text-decoration:line-through}
+.ai-diff-add,.vh-diff-add{color:#1d6b34!important;background:rgba(29,131,72,.08)!important}
+
+/* Buttons that sit on gold — keep gold bg, ensure dark text */
+.ai-send-btn,.ai-diff-apply,.ai-gen-apply,.ai-gen-submit,
+.vh-confirm-yes,.vh-checkpoint-save,.btn-save-schema,
+.sub-drawer-footer .primary,.sub-filter-btn.active{
+  background:var(--gold)!important;color:#1c1c1a!important;
+}
+
+/* Olive primary "Save" buttons — dark olive bg, white text */
+.btn-save,.keys-save-btn,.login-box button,.btn-save-group,.toggle.on{
+  background:var(--olive)!important;color:#fff!important;
+}
+
+/* Drawer / submission detail (the email + contact info area) */
+.sub-drawer-overlay{background:rgba(0,0,0,.35)!important}
+.sub-drawer{background:var(--surface)!important;box-shadow:-12px 0 32px rgba(0,0,0,.10)!important}
+.sub-drawer-footer{background:var(--surface2)!important;border-top:1px solid var(--border)!important}
+.sub-drawer-header{border-bottom:1px solid var(--border)!important}
+.sub-drawer-body .field-row{border-bottom:1px solid var(--border)!important}
+.sub-drawer-body .field-row .lbl{color:var(--text2)!important;font-weight:600}
+.sub-drawer-body .field-row .val{color:var(--text)!important;font-weight:500}
+/* THE KEY ONE — make emails / phone / website links pop */
+.sub-drawer-body .field-row .val a,
+.sub-drawer-body a,
+.sub-stones a,
+.key-row-help a,
+.notif-recipients a{
+  color:var(--olive)!important;
+  text-decoration:underline!important;
+  font-weight:500!important;
+  text-underline-offset:2px;
+}
+.sub-drawer-body .field-row .val a:hover,
+.sub-drawer-body a:hover{color:#3f3d12!important}
+.sub-stones li{background:var(--surface2)!important;border:1px solid var(--border)!important;color:var(--text)!important}
+.sub-stones .collection{color:var(--text2)!important}
+
+/* Status pills */
+.sub-status-new,.keys-status-pill.set{background:rgba(184,164,114,.20)!important;color:#5d4f30!important}
+.sub-status-actioned,.sub-status-active{background:rgba(29,131,72,.12)!important;color:#1d6b34!important}
+.sub-status-archived,.sub-status-unsubscribed,.sub-status-pending,.keys-status-pill.unset{
+  background:#ececec!important;color:var(--text2)!important;
+}
+
+/* Type & version-history badges */
+.sub-type-badge{color:#5d4f30!important;background:rgba(184,164,114,.22)!important}
+.sub-type-badge.partner{color:#5b3f8a!important;background:rgba(130,100,180,.16)!important}
+.sub-type-badge.contact{color:#2c5781!important;background:rgba(100,120,160,.18)!important}
+.sub-type-badge.newsletter{color:#3d6f2a!important;background:rgba(105,150,90,.18)!important}
+.vh-badge-nl-cms{background:rgba(184,164,114,.22)!important;color:#5d4f30!important;border-color:rgba(184,164,114,.4)!important}
+.vh-badge-cms-save{background:rgba(100,120,160,.16)!important;color:#2c5781!important;border-color:rgba(100,120,160,.35)!important}
+.vh-badge-checkpoint{background:rgba(92,90,30,.16)!important;color:var(--olive)!important;border-color:rgba(92,90,30,.4)!important}
+.vh-badge-restore{background:rgba(130,100,180,.14)!important;color:#5b3f8a!important;border-color:rgba(130,100,180,.35)!important}
+.vh-badge-startup{background:#f0ede5!important;color:#777!important;border-color:var(--border)!important}
+
+/* Toggles */
+.toggle{background:#cfc8b8!important}
+.toggle::after{box-shadow:0 1px 2px rgba(0,0,0,.18)}
+
+/* Sub-table rows */
+.sub-row:hover td{background:rgba(184,164,114,.08)!important}
+.sub-row.sub-row-new td{background:rgba(184,164,114,.10)!important}
+.sub-row.sub-row-active td{background:rgba(184,164,114,.18)!important}
+.sub-table td{border-bottom:1px solid var(--border)!important;color:var(--text)!important}
+
+/* Forms toast */
+.forms-toast{background:var(--surface)!important;color:var(--text)!important;border-color:var(--border)!important;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.forms-toast.success{background:#e8f5ec!important;color:#1d6b34!important;border-color:#bce5c9!important}
+.forms-toast.error{background:#fdecea!important;color:#a92a23!important;border-color:#f5c6c0!important}
+.forms-error{background:#fdecea!important;color:#a92a23!important;border-color:#f5c6c0!important}
+
+/* Notifications panel — already had partial light styling, normalise */
+.notif-channel{border-top-color:var(--border)!important}
+.notif-toggle,.notif-recipients td,.notif-status{color:var(--text)!important}
+.notif-recipients th{color:var(--text2)!important;border-bottom-color:var(--border)!important}
+.notif-recipients td{border-bottom-color:var(--border)!important}
+
+/* Danger button in drawer — readable red */
+.sub-drawer-footer .danger{color:#a92a23!important;border-color:rgba(181,50,36,.4)!important}
+.sub-drawer-footer .danger:hover{background:rgba(181,50,36,.08)!important;border-color:#a92a23!important}
+
+/* AI input bar text + placeholder */
+.ai-input,.ai-model-select{color:var(--text)!important}
+.ai-input::placeholder{color:var(--text2)!important}
 </style>
 </head>
 <body>
