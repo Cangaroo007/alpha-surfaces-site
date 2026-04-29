@@ -99,11 +99,13 @@ a { color: inherit; }
 }
 #flipbook {
   margin: 0 auto;
-  max-width: min(1200px, 96vw);
+  /* Constrain the spread so it doesn't fill ultra-wide displays */
+  max-width: min(1100px, 92vw);
   width: 100%;
   /* aspect-ratio set inline once manifest loads */
   background: transparent;
 }
+@media (min-width: 1400px) { #flipbook { max-width: 1100px; } }
 #flipbook .stf__block { box-shadow: 0 30px 80px -20px rgba(0,0,0,0.35); }
 #flipbook .page {
   background: #fff;
@@ -340,9 +342,10 @@ a { color: inherit; }
         height: baseH,
         size: 'stretch',
         minWidth: 280,
-        maxWidth: 1500,
+        // Per-page max ≈ 550 → spread max ≈ 1100, matches the CSS cap
+        maxWidth: 550,
         minHeight: 380,
-        maxHeight: 2200,
+        maxHeight: 800,
         showCover: true,
         usePortrait: true,
         autoSize: true,

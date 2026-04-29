@@ -2,107 +2,107 @@
   "slug": "install-manual",
   "title": "Fabrication & Installation Manual",
   "pageCount": 19,
-  "baseWidth": 1500,
-  "baseHeight": 2121,
-  "aspectRatio": 0.7072,
+  "baseWidth": 2400,
+  "baseHeight": 3393,
+  "aspectRatio": 0.7073,
   "pdfDownload": "/downloads/install-manual.pdf",
   "pages": [
     {
       "src": "pages/001.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/002.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/003.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/004.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/005.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/006.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/007.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/008.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/009.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/010.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/011.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/012.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/013.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/014.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/015.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/016.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/017.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/018.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     },
     {
       "src": "pages/019.webp",
-      "w": 1500,
-      "h": 2121
+      "w": 2400,
+      "h": 3393
     }
   ],
-  "totalImageBytes": 1575854,
-  "generatedAt": "2026-04-29T00:35:48.505Z"
+  "totalImageBytes": 3450500,
+  "generatedAt": "2026-04-29T18:59:12.036Z"
 }

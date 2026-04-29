@@ -57,11 +57,11 @@ for (const f of fs.readdirSync(PAGES_DIR)) {
 const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), `catalog-${slug}-`));
 const tmpPrefix = path.join(tmpDir, 'page');
 
-console.log(`→ Rendering ${path.basename(pdfPath)} at 200 DPI…`);
+console.log(`→ Rendering ${path.basename(pdfPath)} at 300 DPI…`);
 try {
   execFileSync(
     'pdftoppm',
-    ['-r', '200', '-jpeg', '-jpegopt', 'quality=92', pdfPath, tmpPrefix],
+    ['-r', '300', '-jpeg', '-jpegopt', 'quality=95', pdfPath, tmpPrefix],
     { stdio: ['ignore', 'inherit', 'inherit'] }
   );
 } catch (err) {
@@ -79,8 +79,9 @@ const rendered = fs
   });
 console.log(`  rendered ${rendered.length} pages`);
 
-// ── Convert to WebP at ≤1500px wide via ImageMagick ────────────────────────
-console.log(`→ Encoding to WebP (max 1500w, q78)…`);
+// ── Convert to WebP at ≤2400px wide via ImageMagick ────────────────────────
+// 2400w handles retina at ~1200px CSS spreads; q88 is visually lossless for text/photos.
+console.log(`→ Encoding to WebP (max 2400w, q88)…`);
 const pages = [];
 rendered.forEach((file, i) => {
   const num = String(i + 1).padStart(3, '0');
@@ -89,7 +90,15 @@ rendered.forEach((file, i) => {
   try {
     execFileSync(
       'convert',
-      [src, '-resize', '1500x>', '-quality', '78', '-strip', `webp:${dest}`],
+      [
+        src,
+        '-resize', '2400x>',
+        '-define', 'webp:method=6',     // slowest/best compression
+        '-define', 'webp:image-hint=photo',
+        '-quality', '88',
+        '-strip',
+        `webp:${dest}`,
+      ],
       { stdio: ['ignore', 'pipe', 'inherit'] }
     );
   } catch (err) {
