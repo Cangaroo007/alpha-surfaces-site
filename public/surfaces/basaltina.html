@@ -246,7 +246,7 @@ img { display: block; max-width: 100%; }
       var wt = stone.weight || 236;
       var warranty = stone.warranty || '15-Year Limited Warranty';
       textHTML += '<div class="intro-specs">';
-      textHTML += finish + ' finish';
+      textHTML += finish;
       if (stone.uv_stable) textHTML += '  |  UV stable';
       textHTML += '<br>';
       textHTML += 'Nominal slab size ' + w + ' x ' + h + 'mm<br>';
@@ -357,7 +357,7 @@ img { display: block; max-width: 100%; }
         info.className = 'stone-card-info';
         info.innerHTML =
           '<div class="stone-card-name">' + s.name + '</div>' +
-          '<div class="stone-card-finish">' + collection.name + '  |  ' + s.finish + ' Finish</div>';
+          '<div class="stone-card-finish">' + collection.name + '  |  ' + s.finish + '</div>';
         card.appendChild(info);
 
         grid.appendChild(card);
