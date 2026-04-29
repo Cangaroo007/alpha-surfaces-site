@@ -1,0 +1,48 @@
+{
+  "slug": "brochure",
+  "title": "Alpha Surfaces Brochure",
+  "pageCount": 7,
+  "baseWidth": 1500,
+  "baseHeight": 2128,
+  "aspectRatio": 0.7049,
+  "pdfDownload": "/downloads/brochure.pdf",
+  "pages": [
+    {
+      "src": "pages/001.webp",
+      "w": 1500,
+      "h": 2128
+    },
+    {
+      "src": "pages/002.webp",
+      "w": 1500,
+      "h": 2128
+    },
+    {
+      "src": "pages/003.webp",
+      "w": 1500,
+      "h": 1064
+    },
+    {
+      "src": "pages/004.webp",
+      "w": 1500,
+      "h": 1064
+    },
+    {
+      "src": "pages/005.webp",
+      "w": 1500,
+      "h": 751
+    },
+    {
+      "src": "pages/006.webp",
+      "w": 1500,
+      "h": 1064
+    },
+    {
+      "src": "pages/007.webp",
+      "w": 1500,
+      "h": 2128
+    }
+  ],
+  "totalImageBytes": 374086,
+  "generatedAt": "2026-04-29T00:35:28.425Z"
+}

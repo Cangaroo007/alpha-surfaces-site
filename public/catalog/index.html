@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catalogs | Alpha Surfaces</title>
+<style>
+@font-face { font-family: "Concrette S"; src: url("/fonts/Web/ConcretteS-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Concrette S"; src: url("/fonts/Web/ConcretteS-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Degular"; src: url("/fonts/Degular Normal/Degular/Web/Degular-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Degular"; src: url("/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --olive: #564d22; --cream: #f3f1e6; --white: #fff; --black: #000; --border: rgba(0,0,0,0.1); --muted: rgba(0,0,0,0.55); }
+body { background: #f5f5f5; color: var(--black); font-family: "Degular", sans-serif; line-height: 1.4; }
+a { color: inherit; }
+
+.cat-header { background: var(--cream); padding: 80px 60px 48px; }
+.cat-header h1 { font-family: "Concrette S", serif; font-weight: 700; font-size: 36px; letter-spacing: 0.04em; }
+.cat-header p { font-size: 15px; color: var(--muted); margin-top: 10px; max-width: 580px; }
+
+.cat-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 40px 100px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 32px;
+}
+.cat-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  display: block;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cat-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px -16px rgba(0,0,0,0.2); }
+.cat-card .cover {
+  aspect-ratio: 3 / 4;
+  background: var(--cream) center/cover no-repeat;
+  border-bottom: 1px solid var(--border);
+}
+.cat-card .meta { padding: 18px 20px 22px; }
+.cat-card h2 { font-family: "Concrette S", serif; font-weight: 700; font-size: 18px; margin-bottom: 6px; }
+.cat-card .pages { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+
+.footer { background: var(--white); border-top: 1px solid var(--border); padding: 30px 60px 24px; text-align: center; }
+.footer p { font-size: 11px; letter-spacing: 0.46px; text-transform: uppercase; }
+
+@media (max-width: 768px) {
+  .cat-header { padding: 60px 24px 36px; }
+  .cat-grid { padding: 40px 24px 80px; gap: 24px; }
+  .footer { padding: 24px; }
+}
+</style>
+<link rel="stylesheet" href="/nav.css?v=18">
+<link rel="stylesheet" href="/mobile.css?v=18">
+</head>
+<body>
+<nav class="nav" id="main-nav"></nav>
+
+<header class="cat-header">
+  <h1>Catalogs</h1>
+  <p>Flip through our latest brochures, fabrication guides, and care references — straight from your browser.</p>
+</header>
+
+<main class="cat-grid" id="cat-grid">
+  <!-- Cards injected by script after fetching catalog manifests -->
+</main>
+
+<footer class="footer">
+  <p>COPYRIGHT &copy; 2026 ALPHA SURFACES &nbsp;|&nbsp; <a href="/privacy.html">PRIVACY POLICY</a></p>
+</footer>
+
+<script src="/nav.js?v=18"></script>
+<script>
+// List of catalog slugs to render. Adding a new catalog?
+// 1. Run: node scripts/build-catalog.js <pdf> <slug> "<title>"
+// 2. Add the slug to this array.
+const CATALOGS = ['brochure', 'install-manual'];
+const grid = document.getElementById('cat-grid');
+
+Promise.all(
+  CATALOGS.map((slug) =>
+    fetch(`/catalogs/${slug}/manifest.json`, { cache: 'no-cache' })
+      .then((r) => r.ok ? r.json() : null)
+      .catch(() => null)
+  )
+).then((manifests) => {
+  manifests.forEach((m, i) => {
+    if (!m) return;
+    const slug = CATALOGS[i];
+    const cover = m.pages && m.pages[0] ? `/catalogs/${slug}/${m.pages[0].src}` : '';
+    const card = document.createElement('a');
+    card.className = 'cat-card';
+    card.href = `/catalog/${slug}`;
+    card.innerHTML = `
+      <div class="cover" style="background-image:url('${cover}')"></div>
+      <div class="meta">
+        <h2>${m.title}</h2>
+        <div class="pages">${m.pageCount} pages</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  if (!grid.children.length) {
+    grid.innerHTML = '<p style="color:var(--muted);grid-column:1/-1;text-align:center;">No catalogs available yet.</p>';
+  }
+});
+</script>
+</body>
+</html>

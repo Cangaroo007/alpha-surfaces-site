@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Catalog | Alpha Surfaces</title>
+<style>
+@font-face { font-family: "Concrette S"; src: url("/fonts/Web/ConcretteS-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Concrette S"; src: url("/fonts/Web/ConcretteS-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Concrette S"; src: url("/fonts/Web/ConcretteS-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Degular"; src: url("/fonts/Degular Normal/Degular/Web/Degular-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Degular"; src: url("/fonts/Degular Normal/Degular/Web/Degular-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Degular"; src: url("/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --olive: #564d22;
+  --cream: #f3f1e6;
+  --white: #ffffff;
+  --black: #000000;
+  --border: rgba(0,0,0,0.1);
+  --muted: rgba(0,0,0,0.55);
+}
+html, body { height: 100%; }
+body {
+  background: #ebe7d8;
+  color: var(--black);
+  font-family: "Degular", sans-serif;
+  font-weight: 400;
+  line-height: 1.2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+a { color: inherit; }
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+.cat-header {
+  background: var(--cream);
+  padding: 60px 60px 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+.cat-header-text .breadcrumb {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.cat-header-text .breadcrumb a { text-decoration: none; }
+.cat-header-text .breadcrumb a:hover { color: var(--olive); }
+.cat-header h1 {
+  font-family: "Concrette S", serif;
+  font-weight: 700;
+  font-size: 36px;
+  letter-spacing: 0.04em;
+  color: var(--black);
+  margin: 0;
+}
+.cat-header-meta {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Degular", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--olive);
+  text-decoration: none;
+  border: 1px solid var(--olive);
+  padding: 12px 24px;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.download-btn::before { content: "↓"; font-size: 16px; }
+.download-btn:hover { background: var(--olive); color: white; }
+
+/* ── Flipbook stage ─────────────────────────────────────────────────── */
+.cat-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px 100px;
+  position: relative;
+}
+#flipbook {
+  margin: 0 auto;
+  max-width: min(1200px, 96vw);
+  width: 100%;
+  /* aspect-ratio set inline once manifest loads */
+  background: transparent;
+}
+#flipbook .stf__block { box-shadow: 0 30px 80px -20px rgba(0,0,0,0.35); }
+#flipbook .page {
+  background: #fff;
+  overflow: hidden;
+}
+#flipbook .page img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.cat-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── Toolbar ────────────────────────────────────────────────────────── */
+.cat-toolbar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 12px 30px -10px rgba(0,0,0,0.25);
+  z-index: 50;
+}
+.cat-toolbar button {
+  background: transparent;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--black);
+  transition: background 0.15s ease;
+}
+.cat-toolbar button:hover { background: rgba(0,0,0,0.06); }
+.cat-toolbar button:disabled { opacity: 0.3; cursor: default; }
+.cat-toolbar button svg { width: 16px; height: 16px; }
+.cat-page-indicator {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--black);
+  min-width: 80px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Floating "Order a Sample" CTA ──────────────────────────────────── */
+.cat-cta {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--olive);
+  color: var(--white);
+  text-decoration: none;
+  padding: 14px 22px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 12px 30px -10px rgba(86,77,34,0.55);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  z-index: 50;
+}
+.cat-cta:hover { transform: translateY(-2px); box-shadow: 0 16px 36px -10px rgba(86,77,34,0.6); }
+.cat-cta::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: var(--white);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3 7l9 6 9-6'/></svg>") center/contain no-repeat;
+          mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3 7l9 6 9-6'/></svg>") center/contain no-repeat;
+}
+
+/* ── Fullscreen ─────────────────────────────────────────────────────── */
+.cat-stage:fullscreen { background: #1a1815; padding-top: 60px; }
+.cat-stage:fullscreen #flipbook { max-width: 96vw; }
+
+/* ── Mobile ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .cat-header { padding: 40px 24px 28px; flex-direction: column; align-items: flex-start; }
+  .cat-header h1 { font-size: 28px; }
+  .cat-stage { padding: 16px 12px 110px; }
+  .cat-toolbar { bottom: 16px; padding: 6px 10px; }
+  .cat-toolbar button { width: 34px; height: 34px; }
+  .cat-cta {
+    bottom: auto;
+    top: 24px;
+    right: 16px;
+    padding: 10px 16px;
+    font-size: 11px;
+  }
+  /* Mobile: hide CTA in favour of toolbar (tap is constrained); CTA stays visible at top */
+}
+
+/* ── Footer (compact, since the viewer fills most of the screen) ────── */
+.footer { background: var(--white); border-top: 1px solid var(--border); padding: 30px 60px 24px; }
+.footer-bottom p { font-family: "Degular", sans-serif; font-weight: 400; font-size: 11px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); text-align: center; }
+@media (max-width: 768px) { .footer { padding: 24px 24px 20px; } }
+</style>
+<link rel="stylesheet" href="/nav.css?v=18">
+<link rel="stylesheet" href="/mobile.css?v=18">
+<!-- StPageFlip from jsDelivr (already allowed by site CSP) -->
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js" defer></script>
+</head>
+<body>
+<nav class="nav" id="main-nav"></nav>
+
+<header class="cat-header">
+  <div class="cat-header-text">
+    <div class="breadcrumb"><a href="/catalog">All Catalogs</a> &nbsp;/&nbsp; <span id="cat-crumb-title">Loading…</span></div>
+    <h1 id="cat-title">Loading…</h1>
+    <div class="cat-header-meta" id="cat-meta"></div>
+  </div>
+  <a id="cat-download" class="download-btn" href="#" download>Download PDF</a>
+</header>
+
+<main class="cat-stage" id="cat-stage">
+  <div id="flipbook" aria-label="Catalog flipbook"></div>
+  <div class="cat-loading" id="cat-loading">Loading catalog…</div>
+</main>
+
+<div class="cat-toolbar" role="toolbar" aria-label="Catalog navigation">
+  <button id="cat-prev" aria-label="Previous page" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <span class="cat-page-indicator" id="cat-indicator">— / —</span>
+  <button id="cat-next" aria-label="Next page" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <button id="cat-fullscreen" aria-label="Fullscreen" title="Fullscreen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V3h6"/><path d="M21 9V3h-6"/><path d="M3 15v6h6"/><path d="M21 15v6h-6"/></svg>
+  </button>
+</div>
+
+<a class="cat-cta" id="cat-cta" href="/order-sample.html">Order a Sample</a>
+
+<footer class="footer">
+  <div class="footer-bottom">
+    <p>COPYRIGHT &copy; 2026 ALPHA SURFACES &nbsp;|&nbsp; <a href="/privacy.html" style="text-decoration:underline;text-underline-offset:2px;">PRIVACY POLICY</a></p>
+  </div>
+</footer>
+
+<script src="/nav.js?v=18"></script>
+<script>
+(function () {
+  // Slug from /catalog/:slug
+  const parts = window.location.pathname.replace(/\/+$/, '').split('/');
+  const slug = parts[parts.length - 1];
+  if (!slug || slug === 'catalog') {
+    document.getElementById('cat-loading').textContent = 'No catalog selected.';
+    return;
+  }
+
+  const el = document.getElementById('flipbook');
+  const indicator = document.getElementById('cat-indicator');
+  const prevBtn = document.getElementById('cat-prev');
+  const nextBtn = document.getElementById('cat-next');
+  const fsBtn = document.getElementById('cat-fullscreen');
+  const titleEl = document.getElementById('cat-title');
+  const metaEl = document.getElementById('cat-meta');
+  const crumbEl = document.getElementById('cat-crumb-title');
+  const downloadEl = document.getElementById('cat-download');
+  const loading = document.getElementById('cat-loading');
+  const stage = document.getElementById('cat-stage');
+
+  function fmtPage(current, total, isPortrait) {
+    if (isPortrait || total < 2) return `${current + 1} / ${total}`;
+    // landscape spread: show the visible spread, e.g. "2-3 / 47"
+    const left = current;
+    const right = current + 1;
+    if (right >= total) return `${left + 1} / ${total}`;
+    return `${left + 1}–${right + 1} / ${total}`;
+  }
+
+  fetch(`/catalogs/${slug}/manifest.json`, { cache: 'no-cache' })
+    .then((r) => {
+      if (!r.ok) throw new Error('Catalog not found');
+      return r.json();
+    })
+    .then((manifest) => {
+      document.title = `${manifest.title} | Alpha Surfaces`;
+      titleEl.textContent = manifest.title;
+      crumbEl.textContent = manifest.title;
+      metaEl.textContent = `${manifest.pageCount} pages`;
+      if (manifest.pdfDownload) {
+        downloadEl.href = manifest.pdfDownload;
+      } else {
+        downloadEl.style.display = 'none';
+      }
+
+      const baseW = manifest.baseWidth || 800;
+      const baseH = manifest.baseHeight || 1132;
+      // Set CSS aspect-ratio so the flipbook reserves the right vertical space
+      el.style.aspectRatio = `${baseW * 2} / ${baseH}`;
+
+      const PageFlipCtor =
+        (window.St && window.St.PageFlip) ||
+        window.PageFlip ||
+        (window.pageFlip && window.pageFlip.PageFlip);
+      if (!PageFlipCtor) {
+        loading.textContent = 'Failed to load flipbook library.';
+        return;
+      }
+
+      const pageFlip = new PageFlipCtor(el, {
+        width: baseW,
+        height: baseH,
+        size: 'stretch',
+        minWidth: 280,
+        maxWidth: 1500,
+        minHeight: 380,
+        maxHeight: 2200,
+        showCover: true,
+        usePortrait: true,
+        autoSize: true,
+        flippingTime: 600,
+        maxShadowOpacity: 0.4,
+        drawShadow: true,
+        mobileScrollSupport: false,
+      });
+
+      const imgs = manifest.pages.map((p) => `/catalogs/${slug}/${p.src}`);
+      pageFlip.loadFromImages(imgs);
+
+      const total = imgs.length;
+      function syncIndicator() {
+        const cur = pageFlip.getCurrentPageIndex();
+        const portrait = pageFlip.getOrientation && pageFlip.getOrientation() === 'portrait';
+        indicator.textContent = fmtPage(cur, total, portrait);
+        prevBtn.disabled = cur <= 0;
+        nextBtn.disabled = cur >= total - 1;
+      }
+
+      pageFlip.on('flip', syncIndicator);
+      pageFlip.on('init', syncIndicator);
+      pageFlip.on('changeOrientation', syncIndicator);
+
+      prevBtn.addEventListener('click', () => pageFlip.flipPrev());
+      nextBtn.addEventListener('click', () => pageFlip.flipNext());
+      document.addEventListener('keydown', (e) => {
+        if (e.target && /input|textarea/i.test(e.target.tagName)) return;
+        if (e.key === 'ArrowLeft') pageFlip.flipPrev();
+        if (e.key === 'ArrowRight') pageFlip.flipNext();
+      });
+
+      fsBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          (stage.requestFullscreen || stage.webkitRequestFullscreen).call(stage);
+        } else {
+          (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        }
+      });
+
+      loading.style.display = 'none';
+      syncIndicator();
+    })
+    .catch((err) => {
+      console.error(err);
+      loading.textContent = 'Could not load this catalog.';
+    });
+})();
+</script>
+</body>
+</html>

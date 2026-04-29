@@ -1937,6 +1937,17 @@ app.get('/warranty', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'warranty.html'));
 });
 
+// ─── Digital catalog (flipbook viewer) ───
+app.get('/catalog', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'catalog', 'index.html'));
+});
+app.get('/catalog/:slug', (req, res) => {
+  const slug = (req.params.slug || '').replace(/[^a-z0-9-]/gi, '');
+  if (!slug) return res.redirect(302, '/catalog');
+  // The viewer reads the slug from window.location and fetches the matching manifest
+  res.sendFile(path.join(__dirname, 'public', 'catalog', 'viewer.html'));
+});
+
 // ─── Discontinued Alpha Zero stones — redirect to collections ───
 const discontinuedSlugs = [
   'silver-travertine', 'crystello', 'grande-glacier', 'basaltina',
