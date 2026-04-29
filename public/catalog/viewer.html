@@ -277,6 +277,16 @@ a { color: inherit; }
 
 <script src="/nav.js?v=18"></script>
 <script>
+// ── External-host catalogs (e.g. FlippingBook) ─────────────────────────────
+// Slugs listed here are rendered as a full-bleed iframe pointing at the URL,
+// so we keep the alphasurfaces.com.au URL while letting the host do the work.
+const EXTERNAL_CATALOGS = {
+  brochure: {
+    title: 'Alpha Surfaces Brochure',
+    url: 'https://online.flippingbook.com/view/541312945/',
+    pdf: '/downloads/brochure.pdf',
+  },
+};
 (function () {
   // Slug from /catalog/:slug
   const parts = window.location.pathname.replace(/\/+$/, '').split('/');
@@ -285,6 +295,33 @@ a { color: inherit; }
     document.getElementById('cat-loading').textContent = 'No catalog selected.';
     return;
   }
+
+  // ── External (FlippingBook etc.) — iframe mode ────────────────────────
+  if (EXTERNAL_CATALOGS[slug]) {
+    const ext = EXTERNAL_CATALOGS[slug];
+    document.title = `${ext.title} | Alpha Surfaces`;
+    document.getElementById('cat-title').textContent = ext.title;
+    document.getElementById('cat-crumb-title').textContent = ext.title;
+    document.getElementById('cat-meta').textContent = '';
+    const dl = document.getElementById('cat-download');
+    if (ext.pdf) { dl.href = ext.pdf; } else { dl.style.display = 'none'; }
+
+    const stage = document.getElementById('cat-stage');
+    stage.innerHTML = '';
+    stage.style.padding = '0';
+    const iframe = document.createElement('iframe');
+    iframe.src = ext.url;
+    iframe.allow = 'fullscreen; autoplay; clipboard-write';
+    iframe.allowFullscreen = true;
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.style.cssText = 'width:100%;height:min(85vh,1100px);border:0;display:block;background:#ebe7d8;';
+    iframe.title = ext.title;
+    stage.appendChild(iframe);
+    // FlippingBook has its own toolbar — hide ours
+    document.querySelector('.cat-toolbar').style.display = 'none';
+    return;
+  }
+  // ── Self-hosted (StPageFlip + WebP manifest) below ────────────────────
 
   const el = document.getElementById('flipbook');
   const indicator = document.getElementById('cat-indicator');
