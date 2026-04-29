@@ -1938,12 +1938,19 @@ app.get('/warranty', (req, res) => {
 });
 
 // ─── Digital catalog (flipbook viewer) ───
+// Slugs in EXTERNAL_CATALOGS are 302-redirected to a hosted viewer (FlippingBook
+// etc.) — used when the external service blocks iframe embedding. Other slugs
+// fall through to the self-hosted StPageFlip viewer.
+const EXTERNAL_CATALOGS = {
+  brochure: 'https://online.flippingbook.com/view/541312945/',
+};
 app.get('/catalog', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'catalog', 'index.html'));
 });
 app.get('/catalog/:slug', (req, res) => {
   const slug = (req.params.slug || '').replace(/[^a-z0-9-]/gi, '');
   if (!slug) return res.redirect(302, '/catalog');
+  if (EXTERNAL_CATALOGS[slug]) return res.redirect(302, EXTERNAL_CATALOGS[slug]);
   // The viewer reads the slug from window.location and fetches the matching manifest
   res.sendFile(path.join(__dirname, 'public', 'catalog', 'viewer.html'));
 });
