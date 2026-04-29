@@ -1,3 +1,4 @@
 node_modules/
 data/keys.json
 data/versions/
+data/notifications.json

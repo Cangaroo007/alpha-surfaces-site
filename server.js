@@ -1954,9 +1954,17 @@ const discontinuedSlugs = [
   'carbon', 'acropolis', 'glacier-grey', 'noosa', 'calacatta-oro', 'serena'
 ];
 
+// ─── Renamed stones — 301 to new slug ───
+const renamedSlugs = {
+  'viola-ligerra': 'viola-ligera'
+};
+
 // ─── Stone detail page ───
 app.get('/surfaces/:slug', (req, res) => {
   const slug = req.params.slug.replace(/[^a-z0-9-]/gi, '');
+  if (renamedSlugs[slug]) {
+    return res.redirect(301, '/surfaces/' + renamedSlugs[slug]);
+  }
   if (discontinuedSlugs.includes(slug)) {
     return res.redirect(301, '/collections#alpha-zero');
   }

@@ -575,16 +575,16 @@
           "slab": "/images/stones/venato-slab.webp"
         },
         {
-          "name": "Viola Ligerra",
+          "name": "Viola Ligera",
           "finish": "Polished Finish",
-          "slug": "viola-ligerra",
+          "slug": "viola-ligera",
           "uv_stable": false,
           "discontinued": false,
           "images_pending": false,
-          "image": "/images/stones/viola-ligerra.webp",
-          "thumbnail": "/images/stones/viola-ligerra-thumb.webp",
-          "swatch": "/images/stones/viola-ligerra-swatch.webp",
-          "slab": "/images/stones/viola-ligerra-slab.webp"
+          "image": "/images/stones/viola-ligera.webp",
+          "thumbnail": "/images/stones/viola-ligera-thumb.webp",
+          "swatch": "/images/stones/viola-ligera-swatch.webp",
+          "slab": "/images/stones/viola-ligera-slab.webp"
         }
       ]
     },

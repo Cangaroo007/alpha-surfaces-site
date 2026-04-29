@@ -27,7 +27,7 @@
     { id: 'collection-04', label: 'Collection 04', name: 'Dramatic & Noir',
       stones: ['Opal Mist','Calacatta Leggera','Metallic Grey','Statuario Gold','Eternity','White Cloud','Glacier','Arabescato'] },
     { id: 'collection-05', label: 'Collection 05', name: 'Urban & Minimal',
-      stones: ['Taj Mahal','Perla Mahal','Calacatta Viola','Autumn Gold','Emerald Haze','Crystal Mahal','Venato','Viola Ligerra'] },
+      stones: ['Taj Mahal','Perla Mahal','Calacatta Viola','Autumn Gold','Emerald Haze','Crystal Mahal','Venato','Viola Ligera'] },
     { id: 'alpha-zero', label: 'Alpha Zero', name: '',
       stones: ['Silver Travertine','Grande Glacier','Basaltina','Carbon','Acropolis','Glacier Grey','Noosa','Calacatta Oro','Serena','Venatino','Crystello','Travertino Classico','Dolomite','Infinity Gris','Statuario Grigio'] }
   ];
