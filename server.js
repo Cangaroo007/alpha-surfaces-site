@@ -705,6 +705,104 @@ app.get('/api/admin/submissions', authMiddleware, async (req, res) => {
   }
 });
 
+// CSV export — must be declared BEFORE /:id so Express doesn't match
+// "export" as the :id param (which then fails as a Postgres integer cast).
+// Supports an `ids` query param (comma-separated) for selective download
+// from the admin UI checkboxes; falls back to all rows otherwise.
+app.get('/api/admin/submissions/export', authMiddleware, async (req, res) => {
+  try {
+    const { form_type, ids } = req.query;
+    const vals = [];
+    const conditions = [];
+
+    if (ids) {
+      const idList = ids.split(',').map(Number).filter(n => !isNaN(n) && n > 0);
+      if (idList.length === 0) {
+        return res.status(400).json({ ok: false, error: 'No valid IDs provided' });
+      }
+      conditions.push(`id = ANY($${vals.length + 1}::int[])`);
+      vals.push(idList);
+    }
+
+    if (form_type) {
+      conditions.push(`form_type = $${vals.length + 1}`);
+      vals.push(form_type);
+    }
+
+    let query = 'SELECT * FROM form_submissions';
+    if (conditions.length > 0) query += ' WHERE ' + conditions.join(' AND ');
+    query += ' ORDER BY submitted_at DESC';
+
+    const { rows } = await pool.query(query, vals);
+
+    // Pull sample items for any Sample Request rows in the result set
+    const sampleRows = rows.filter(r => r.form_type === 'Sample Request');
+    const sampleMap = {};
+    if (sampleRows.length) {
+      const ids = sampleRows.map(r => r.id);
+      const sr = await pool.query(
+        `SELECT submission_id, stone_name FROM sample_request_items
+          WHERE submission_id = ANY($1::int[]) ORDER BY id`, [ids]
+      );
+      sr.rows.forEach(it => {
+        (sampleMap[it.submission_id] ||= []).push(it.stone_name);
+      });
+    }
+
+    const cols = ['id','form_type','submitted_at','name','email','phone',
+                  'company','role','reason','state','postcode','store_location',
+                  'stone_interest','message','source','consent','status'];
+
+    // Discover any keys in raw_data that don't have a dedicated column,
+    // so newly-added form fields surface in the CSV before a column exists.
+    const skip = new Set(['name','first_name','last_name','email','phone','company',
+                          'stone_interest','message','special_instructions','postcode',
+                          'state','store_location','source','consent','status',
+                          'i_am_a','role','type','reason','enquiry_reason',
+                          'sampleItems','samples']);
+    const extraKeys = new Set();
+    rows.forEach(r => {
+      if (r.raw_data && typeof r.raw_data === 'object') {
+        Object.keys(r.raw_data).forEach(k => {
+          if (!cols.includes(k) && !skip.has(k)) extraKeys.add(k);
+        });
+      }
+    });
+    const extraCols = [...extraKeys].sort();
+    const allCols = [...cols, ...extraCols, 'sample_items'];
+
+    const escapeCSV = (v) => {
+      if (v == null) return '';
+      const s = v instanceof Date ? v.toISOString() : String(v);
+      return (s.includes(',') || s.includes('"') || s.includes('\n'))
+        ? `"${s.replace(/"/g,'""')}"` : s;
+    };
+
+    const csv = [
+      allCols.join(','),
+      ...rows.map(r => {
+        const base = cols.map(c => escapeCSV(r[c]));
+        const extra = extraCols.map(k => escapeCSV(r.raw_data?.[k]));
+        const rawSamples = r.raw_data?.sampleItems || r.raw_data?.samples || [];
+        const dbSamples = sampleMap[r.id] || [];
+        const sampleStr = dbSamples.length
+          ? dbSamples.join('; ')
+          : Array.isArray(rawSamples)
+            ? rawSamples.map(s => typeof s === 'object' ? (s.name || s.slug || JSON.stringify(s)) : s).join('; ')
+            : '';
+        return [...base, ...extra, escapeCSV(sampleStr)].join(',');
+      })
+    ].join('\n');
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="submissions-${Date.now()}.csv"`);
+    res.send(csv);
+  } catch (err) {
+    console.error('[admin/submissions/export] error:', err.message);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // Single submission with its sample items, for the detail drawer.
 app.get('/api/admin/submissions/:id', authMiddleware, async (req, res) => {
   try {
@@ -741,47 +839,6 @@ app.patch('/api/admin/submissions/:id', authMiddleware, async (req, res) => {
       [status, req.params.id]);
     res.json({ ok: true });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
-});
-
-// CSV export — respects the same filters as the list endpoint and includes
-// a 'samples' column with a comma-separated list of stone names so a Sample
-// Request export is actually fulfillable.
-app.get('/api/admin/submissions/export', authMiddleware, async (req, res) => {
-  try {
-    const { vals, where } = buildSubmissionsWhere(req.query);
-    const query = `
-      SELECT s.*,
-             COALESCE(
-               (SELECT STRING_AGG(stone_name, ' | ' ORDER BY id)
-                  FROM sample_request_items
-                 WHERE submission_id = s.id),
-               ''
-             ) AS samples
-        FROM form_submissions s
-        ${where}
-       ORDER BY submitted_at DESC
-    `;
-    const { rows } = await pool.query(query, vals);
-    const cols = ['id','form_type','submitted_at','name','email','phone',
-                  'company','state','postcode','store_location','source',
-                  'consent','message','samples','status'];
-    const escape = v => {
-      if (v == null) return '';
-      const s = v instanceof Date ? v.toISOString() : String(v);
-      return s.includes(',') || s.includes('"') || s.includes('\n')
-        ? `"${s.replace(/"/g,'""')}"` : s;
-    };
-    const csv = [
-      cols.join(','),
-      ...rows.map(r => cols.map(c => escape(r[c])).join(','))
-    ].join('\n');
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="submissions-${Date.now()}.csv"`);
-    res.send(csv);
-  } catch (err) {
-    console.error('[admin/submissions/export] error:', err.message);
-    res.status(500).json({ ok: false, error: err.message });
-  }
 });
 
 // ─── Newsletter subscribers (separate table) ───

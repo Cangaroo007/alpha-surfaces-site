@@ -133,8 +133,7 @@
       '<div class="sub-toolbar">' +
         '<div class="sub-filters">' + filterButtons + '</div>' +
         '<div class="sub-actions">' +
-          '<button class="btn-export" id="sub-export">↓ Export filtered (CSV)</button>' +
-          '<button class="btn-export-secondary" id="sub-export-all">↓ All</button>' +
+          '<button class="btn-export" id="sub-export">↓ Export All</button>' +
         '</div>' +
       '</div>';
 
@@ -165,6 +164,7 @@
         ? '<button class="btn-action" data-mark="' + s.id + '">Mark actioned</button>'
         : '';
       return '<tr class="sub-row ' + (s.status === 'new' ? 'sub-row-new' : '') + '" data-id="' + s.id + '">' +
+        '<td class="sub-check"><input type="checkbox" class="submission-checkbox" value="' + s.id + '"></td>' +
         '<td class="sub-id">#' + s.id + '</td>' +
         '<td><span class="sub-type-badge ' + typeClass + '">' + typeLabel + '</span>' + samplesHtml + '</td>' +
         '<td>' + escapeHtml(s.name || '—') + '</td>' +
@@ -180,6 +180,7 @@
     var table =
       '<div class="sub-table-wrap"><table class="sub-table">' +
         '<thead><tr>' +
+          '<th class="sub-check"><input type="checkbox" id="sub-select-all"></th>' +
           '<th>#</th><th>Type</th><th>Name</th><th>Email</th><th>Phone</th>' +
           '<th>Location</th><th>Submitted</th><th>Status</th><th></th>' +
         '</tr></thead>' +
@@ -236,14 +237,25 @@
     };
 
     var exportEl = document.getElementById('sub-export');
-    if (exportEl) exportEl.onclick = function () { exportSubmissions(false); };
-    var exportAllEl = document.getElementById('sub-export-all');
-    if (exportAllEl) exportAllEl.onclick = function () { exportSubmissions(true); };
+    if (exportEl) exportEl.onclick = exportSubmissions;
+
+    var selectAll = document.getElementById('sub-select-all');
+    if (selectAll) selectAll.onchange = function () {
+      document.querySelectorAll('.submission-checkbox').forEach(function (cb) {
+        cb.checked = selectAll.checked;
+      });
+      updateExportButton();
+    };
+    document.querySelectorAll('.submission-checkbox').forEach(function (cb) {
+      cb.onchange = updateExportButton;
+      // Don't open the drawer when toggling the row's checkbox
+      cb.onclick = function (e) { e.stopPropagation(); };
+    });
 
     document.querySelectorAll('#forms-tab-submissions .sub-row').forEach(function (row) {
       row.onclick = function (e) {
-        // ignore clicks on action buttons / phone / email links
-        if (e.target.closest('.btn-action') || e.target.closest('a')) return;
+        // ignore clicks on action buttons / phone / email links / checkboxes
+        if (e.target.closest('.btn-action') || e.target.closest('a') || e.target.closest('.sub-check')) return;
         openDrawer(parseInt(row.dataset.id));
       };
     });
@@ -262,17 +274,31 @@
     });
   }
 
-  function exportSubmissions(unfiltered) {
-    var params = new URLSearchParams();
-    if (!unfiltered) {
-      if (state.category && state.category !== 'all') params.set('category', state.category);
-      if (state.status)   params.set('status',    state.status);
-      if (state.q)        params.set('q',         state.q);
-      if (state.dateFrom) params.set('date_from', state.dateFrom);
-      if (state.dateTo)   params.set('date_to',   state.dateTo);
+  function updateExportButton() {
+    var checked = document.querySelectorAll('.submission-checkbox:checked');
+    var btn = document.getElementById('sub-export');
+    if (!btn) return;
+    if (checked.length > 0) {
+      btn.textContent = '↓ Export Selected (' + checked.length + ')';
+      btn.classList.add('has-selection');
+    } else {
+      btn.textContent = '↓ Export All';
+      btn.classList.remove('has-selection');
     }
-    var qs = params.toString();
-    window.location.href = '/api/admin/submissions/export' + (qs ? '?' + qs : '');
+    // Keep the master checkbox in sync with the row state
+    var all = document.querySelectorAll('.submission-checkbox');
+    var selectAll = document.getElementById('sub-select-all');
+    if (selectAll) selectAll.checked = all.length > 0 && checked.length === all.length;
+  }
+
+  function exportSubmissions() {
+    var checked = document.querySelectorAll('.submission-checkbox:checked');
+    var url = '/api/admin/submissions/export';
+    if (checked.length > 0) {
+      var ids = Array.from(checked).map(function (cb) { return cb.value; });
+      url += '?ids=' + ids.join(',');
+    }
+    window.location.href = url;
   }
 
   // ─── Detail drawer ───────────────────────────────────────────────────────

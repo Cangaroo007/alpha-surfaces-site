@@ -47,11 +47,31 @@ async function initDB() {
         ON sample_request_items(submission_id);
     `);
 
+    // Idempotent column additions — safe to run on every startup. Older
+    // databases may be missing some of these; new ones already have them.
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS role VARCHAR(100)`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS reason TEXT`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS raw_data JSONB`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS company VARCHAR(255)`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS stone_interest VARCHAR(255)`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS source VARCHAR(100)`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS consent BOOLEAN DEFAULT FALSE`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS postcode VARCHAR(20)`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS state VARCHAR(50)`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS store_location VARCHAR(255)`);
+    console.log('[db] form_submissions migration complete');
+
+    // One-time backfill: populate role/reason on rows submitted before
+    // dedicated columns existed, by reading from the raw_data JSONB safety net.
     await client.query(`
-      ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS store_location VARCHAR(255);
-      ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS source VARCHAR(100);
-      ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS consent BOOLEAN DEFAULT FALSE;
+      UPDATE form_submissions
+      SET
+        role = COALESCE(role, raw_data->>'i_am_a', raw_data->>'role', raw_data->>'i_am', raw_data->>'type'),
+        reason = COALESCE(reason, raw_data->>'reason', raw_data->>'enquiry_reason')
+      WHERE raw_data IS NOT NULL
+        AND (role IS NULL OR reason IS NULL)
     `);
+    console.log('[db] Backfill from raw_data complete');
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS newsletter_subscribers (
@@ -95,25 +115,34 @@ async function saveSubmission(formType, fields, sampleItems = []) {
   try {
     await client.query('BEGIN');
 
+    const name = fields.name
+      || `${fields.first_name || ''} ${fields.last_name || ''}`.trim()
+      || null;
     const { rows } = await client.query(
       `INSERT INTO form_submissions
-    (form_type, name, email, phone, company, message, postcode,
-     state, store_location, source, consent)
-   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
-   RETURNING id, submitted_at`,
-  [
-    formType,
-    fields.name || `${fields.first_name || ''} ${fields.last_name || ''}`.trim() || null,
-    fields.email   || null,
-    fields.phone   || null,
-    fields.company || null,
-    fields.message || null,
-    fields.postcode|| null,
-    fields.state   || null,
-    fields.store_location || null,
-    fields.source  || null,
-    fields.consent ? true : false
-  ]
+         (form_type, name, email, phone, company, stone_interest, message,
+          postcode, state, store_location, source, consent, role, reason, raw_data)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+       RETURNING id, submitted_at`,
+      [
+        formType,
+        name,
+        fields.email          || null,
+        fields.phone          || null,
+        fields.company        || null,
+        fields.stone_interest || null,
+        fields.message        || fields.special_instructions || null,
+        fields.postcode       || null,
+        fields.state          || null,
+        fields.store_location || null,
+        fields.source         || null,
+        fields.consent ? true : false,
+        fields.i_am_a || fields.role || fields.type || null,
+        fields.reason || fields.enquiry_reason || null,
+        // ALWAYS store the full payload as a safety net, so any new form
+        // field surfaces immediately even before a dedicated column exists.
+        JSON.stringify(fields)
+      ]
     );
 
     const { id, submitted_at } = rows[0];
