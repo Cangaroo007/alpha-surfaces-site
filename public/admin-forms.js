@@ -350,6 +350,30 @@
     document.querySelectorAll('.sub-row').forEach(function (r) { r.classList.remove('sub-row-active'); });
   }
 
+  // Drawer field order. Anything in raw_data not listed here is shown
+  // under "Additional data" so newly-added form fields surface immediately.
+  var FIELD_DISPLAY_ORDER = [
+    { key: 'form_type',      label: 'Type' },
+    { key: 'submitted_at',   label: 'Submitted',   format: 'datetime' },
+    { key: 'status',         label: 'Status',      format: 'status' },
+    { key: 'name',           label: 'Name' },
+    { key: 'email',          label: 'Email',       link: 'mailto' },
+    { key: 'phone',          label: 'Phone',       link: 'tel' },
+    { key: 'company',        label: 'Company' },
+    { key: 'role',           label: 'Role / I am a' },
+    { key: 'reason',         label: 'Reason' },
+    { key: 'unit',           label: 'Unit' },
+    { key: 'street',         label: 'Street' },
+    { key: 'suburb',         label: 'Suburb' },
+    { key: 'postcode',       label: 'Postcode' },
+    { key: 'state',          label: 'State' },
+    { key: 'store_location', label: 'Store location' },
+    { key: 'stone_interest', label: 'Stone interest' },
+    { key: 'source',         label: 'Source' },
+    { key: 'consent',        label: 'Consent',     format: 'boolean' },
+    { key: 'message',        label: 'Message',     format: 'multiline' }
+  ];
+
   function renderDrawer(s, items) {
     var category = categoryFromSubmission(s);
     var typeLabel = category === 'partner' ? 'Partner Enquiry'
@@ -357,32 +381,68 @@
                   : category === 'sample'  ? 'Sample Request'
                   : s.form_type;
 
-    var fields = [
-      ['Type',           '<span class="sub-type-badge ' + (category === 'partner' ? 'partner' : category === 'contact' ? 'contact' : '') + '">' + escapeHtml(typeLabel) + '</span>'],
-      ['Submitted',      formatDateTime(s.submitted_at, true)],
-      ['Status',         '<span class="sub-status sub-status-' + s.status + '">' + s.status + '</span>'],
-      ['Name',           s.name || ''],
-      ['Email',          s.email ? '<a href="mailto:' + escapeAttr(s.email) + '">' + escapeHtml(s.email) + '</a>' : ''],
-      ['Phone',          s.phone ? '<a href="tel:' + escapeAttr(s.phone) + '">' + escapeHtml(s.phone) + '</a>' : ''],
-      ['Company',        s.company || ''],
-      ['Postcode',       s.postcode || ''],
-      ['State',          s.state || ''],
-      ['Store location', s.store_location || ''],
-      ['Source',         s.source || ''],
-      ['Consent',        s.consent ? '✓ Marketing emails' : '— No marketing consent'],
-      ['Message',        s.message ? escapeHtml(s.message).replace(/\n/g, '<br>') : '']
-    ];
-
-    var fieldRows = fields.map(function (f) {
-      var val = f[1];
-      if (val === '' || val == null) {
-        val = '<span class="muted">—</span>';
-      } else if (typeof val === 'string' && val.indexOf('<') !== 0) {
-        // not pre-escaped — escape it
-        val = escapeHtml(val);
+    function formatVal(key, val, format, link) {
+      if (key === 'form_type') {
+        return '<span class="sub-type-badge ' +
+          (category === 'partner' ? 'partner' : category === 'contact' ? 'contact' : '') +
+          '">' + escapeHtml(typeLabel) + '</span>';
       }
-      return '<div class="field-row"><div class="lbl">' + escapeHtml(f[0]) + '</div><div class="val">' + val + '</div></div>';
+      if (format === 'status') {
+        return '<span class="sub-status sub-status-' + escapeAttr(val) + '">' + escapeHtml(val) + '</span>';
+      }
+      if (format === 'boolean') {
+        return val ? '✓ Marketing emails' : '✗ Not consented';
+      }
+      if (format === 'datetime') {
+        return escapeHtml(formatDateTime(val, true));
+      }
+      if (val == null || val === '') return '<span class="muted">—</span>';
+      if (format === 'multiline') {
+        return escapeHtml(String(val)).replace(/\n/g, '<br>');
+      }
+      if (link === 'mailto') {
+        return '<a href="mailto:' + escapeAttr(val) + '">' + escapeHtml(val) + '</a>';
+      }
+      if (link === 'tel') {
+        return '<a href="tel:' + escapeAttr(val) + '">' + escapeHtml(val) + '</a>';
+      }
+      return escapeHtml(String(val));
+    }
+
+    var fieldRows = FIELD_DISPLAY_ORDER.map(function (f) {
+      var val = formatVal(f.key, s[f.key], f.format, f.link);
+      return '<div class="field-row"><div class="lbl">' + escapeHtml(f.label) + '</div><div class="val">' + val + '</div></div>';
     }).join('');
+
+    // Catch-all: any raw_data keys we haven't already rendered.
+    var extraSection = '';
+    if (s.raw_data && typeof s.raw_data === 'object') {
+      var known = {};
+      FIELD_DISPLAY_ORDER.forEach(function (f) { known[f.key] = true; });
+      // Aliases that we already merge into dedicated columns:
+      ['first_name','last_name','i_am_a','i_am','type','enquiry_reason',
+       'special_instructions','sampleItems','samples',
+       'stone_slug','stone_name','stone_collection'].forEach(function (k) { known[k] = true; });
+
+      var extras = Object.keys(s.raw_data)
+        .filter(function (k) { return !known[k]; })
+        .filter(function (k) {
+          var v = s.raw_data[k];
+          return v != null && v !== '' && !(Array.isArray(v) && v.length === 0);
+        });
+      if (extras.length) {
+        var extraRows = extras.map(function (k) {
+          var v = s.raw_data[k];
+          var disp = typeof v === 'object' ? JSON.stringify(v) : String(v);
+          return '<div class="field-row"><div class="lbl">' + escapeHtml(k) + '</div><div class="val">' + escapeHtml(disp) + '</div></div>';
+        }).join('');
+        extraSection =
+          '<div class="sub-drawer-section">' +
+            '<h4>Additional data</h4>' +
+            extraRows +
+          '</div>';
+      }
+    }
 
     var stonesSection = '';
     if (items && items.length) {
@@ -411,6 +471,7 @@
       '</div>' +
       '<div class="sub-drawer-body">' +
         fieldRows +
+        extraSection +
         stonesSection +
       '</div>' +
       '<div class="sub-drawer-footer">' +

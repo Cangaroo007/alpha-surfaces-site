@@ -750,7 +750,8 @@ app.get('/api/admin/submissions/export', authMiddleware, async (req, res) => {
     }
 
     const cols = ['id','form_type','submitted_at','name','email','phone',
-                  'company','role','reason','state','postcode','store_location',
+                  'company','role','reason',
+                  'unit','street','suburb','postcode','state','store_location',
                   'stone_interest','message','source','consent','status'];
 
     // Discover any keys in raw_data that don't have a dedicated column,
@@ -759,6 +760,7 @@ app.get('/api/admin/submissions/export', authMiddleware, async (req, res) => {
                           'stone_interest','message','special_instructions','postcode',
                           'state','store_location','source','consent','status',
                           'i_am_a','role','type','reason','enquiry_reason',
+                          'street','suburb','unit',
                           'sampleItems','samples']);
     const extraKeys = new Set();
     rows.forEach(r => {

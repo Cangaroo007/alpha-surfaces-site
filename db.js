@@ -59,17 +59,23 @@ async function initDB() {
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS postcode VARCHAR(20)`);
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS state VARCHAR(50)`);
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS store_location VARCHAR(255)`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS street VARCHAR(255)`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS suburb VARCHAR(255)`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS unit VARCHAR(100)`);
     console.log('[db] form_submissions migration complete');
 
-    // One-time backfill: populate role/reason on rows submitted before
-    // dedicated columns existed, by reading from the raw_data JSONB safety net.
+    // One-time backfill: populate dedicated cols on rows submitted before
+    // those cols existed, by reading from the raw_data JSONB safety net.
     await client.query(`
       UPDATE form_submissions
       SET
-        role = COALESCE(role, raw_data->>'i_am_a', raw_data->>'role', raw_data->>'i_am', raw_data->>'type'),
-        reason = COALESCE(reason, raw_data->>'reason', raw_data->>'enquiry_reason')
+        role   = COALESCE(role,   raw_data->>'i_am_a', raw_data->>'role', raw_data->>'i_am', raw_data->>'type'),
+        reason = COALESCE(reason, raw_data->>'reason', raw_data->>'enquiry_reason'),
+        street = COALESCE(street, raw_data->>'street'),
+        suburb = COALESCE(suburb, raw_data->>'suburb'),
+        unit   = COALESCE(unit,   raw_data->>'unit')
       WHERE raw_data IS NOT NULL
-        AND (role IS NULL OR reason IS NULL)
+        AND (role IS NULL OR reason IS NULL OR street IS NULL OR suburb IS NULL OR unit IS NULL)
     `);
     console.log('[db] Backfill from raw_data complete');
 
@@ -121,8 +127,9 @@ async function saveSubmission(formType, fields, sampleItems = []) {
     const { rows } = await client.query(
       `INSERT INTO form_submissions
          (form_type, name, email, phone, company, stone_interest, message,
-          postcode, state, store_location, source, consent, role, reason, raw_data)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+          postcode, state, store_location, source, consent, role, reason,
+          street, suburb, unit, raw_data)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
        RETURNING id, submitted_at`,
       [
         formType,
@@ -139,6 +146,9 @@ async function saveSubmission(formType, fields, sampleItems = []) {
         fields.consent ? true : false,
         fields.i_am_a || fields.role || fields.type || null,
         fields.reason || fields.enquiry_reason || null,
+        fields.street         || null,
+        fields.suburb         || null,
+        fields.unit           || null,
         // ALWAYS store the full payload as a safety net, so any new form
         // field surfaces immediately even before a dedicated column exists.
         JSON.stringify(fields)
