@@ -377,6 +377,53 @@ async function sendSubmissionEmail(submission) {
   }
 }
 
+// Forms-portal password reset email. `to` should match NOTIFY_EMAIL_TO so a
+// stolen forgot-password attempt by anyone else just bounces silently.
+async function sendFormsResetEmail(to, resetUrl) {
+  if (!configureSendgrid()) {
+    console.warn('[notify] SENDGRID_API_KEY not set — skipping forms reset email');
+    return false;
+  }
+  const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Forms password reset — Alpha Surfaces</title></head>
+<body style="margin:0;padding:0;background:#f3f1e6;font-family:'Helvetica Neue',Arial,sans-serif">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f3f1e6">
+  <tr><td align="center" style="padding:48px 16px">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+      <tr><td style="background:#564D22;padding:28px 32px">
+        <p style="margin:0;color:#f3f1e6;font-size:13px;letter-spacing:.12em;text-transform:uppercase">Alpha Surfaces</p>
+        <h1 style="margin:6px 0 0;color:#fff;font-size:22px;font-weight:600">Forms password reset</h1>
+      </td></tr>
+      <tr><td style="padding:32px">
+        <p style="margin:0 0 20px;color:#222;font-size:15px;line-height:1.6">Someone requested a password reset for the Alpha Surfaces forms portal.</p>
+        <p style="margin:0 0 28px;color:#222;font-size:15px;line-height:1.6">Click the button below to set a new password. This link expires in 1 hour and can only be used once.</p>
+        <p style="margin:0 0 28px"><a href="${escapeAttr(resetUrl)}" style="display:inline-block;background:#564D22;color:#fff;padding:14px 28px;text-decoration:none;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:4px">Reset password</a></p>
+        <p style="margin:0 0 8px;color:#777;font-size:13px;line-height:1.6">Or paste this link into your browser:</p>
+        <p style="margin:0 0 24px;color:#564D22;font-size:13px;line-height:1.5;word-break:break-all">${escapeHtml(resetUrl)}</p>
+        <p style="margin:0;color:#999;font-size:13px;line-height:1.6">If you didn't request this, you can ignore this email — your password won't change.</p>
+      </td></tr>
+      <tr><td style="padding:20px 32px;background:#f7f4e8;color:#999;font-size:12px;text-align:center">
+        This is an automated message from alphasurfaces.com.au
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>`;
+  try {
+    await sgMail.send({
+      to,
+      from: NOTIFY_EMAIL_FROM(),
+      subject: 'Alpha Surfaces — Forms Password Reset',
+      html
+    });
+    console.log('[notify] forms reset email sent to', to);
+    return true;
+  } catch (err) {
+    const detail = err.response?.body?.errors ? JSON.stringify(err.response.body.errors) : err.message;
+    console.error('[notify] forms reset email error:', detail);
+    return false;
+  }
+}
+
 async function notifyNewSubmission(submission) {
   if (!submission) return;
   const results = await Promise.allSettled([
@@ -560,5 +607,6 @@ module.exports = {
   // New env-driven single-recipient path:
   sendSubmissionSMS,
   sendSubmissionEmail,
-  notifyNewSubmission
+  notifyNewSubmission,
+  sendFormsResetEmail
 };

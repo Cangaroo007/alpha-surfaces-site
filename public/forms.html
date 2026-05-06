@@ -104,6 +104,38 @@
     text-align: center;
     min-height: 18px;
   }
+  .login-success {
+    color: var(--green);
+    font-size: 13px;
+    margin-top: 14px;
+    text-align: center;
+    min-height: 18px;
+  }
+  .login-link {
+    display: block;
+    text-align: center;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--olive);
+    text-decoration: none;
+  }
+  .login-link:hover { text-decoration: underline; }
+  .login-link.subtle { color: var(--muted); }
+  .login-link.subtle:hover { color: var(--olive); }
+  .login-card input[type=email],
+  .login-card input[type=password] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    font-size: 15px;
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .login-card input[type=email]:focus { border-color: var(--olive); }
+  .login-card .field { margin-bottom: 14px; }
+  .login-card .field:last-of-type { margin-bottom: 0; }
 
   /* ── App layout ── */
   .app { display: flex; flex-direction: column; min-height: 100vh; }
@@ -382,18 +414,60 @@
 </head>
 <body>
 
-<!-- Login screen -->
+<!-- Login / forgot / reset screens (only one visible at a time) -->
 <div class="login-wrap" id="login-wrap">
-  <div class="login-card">
+
+  <!-- Sign in -->
+  <div class="login-card" id="view-login">
     <div class="login-brand">Alpha Surfaces</div>
     <h1 class="login-title">Form Submissions</h1>
     <form id="login-form" autocomplete="off">
-      <label for="forms-pw">Password</label>
-      <input type="password" id="forms-pw" name="password" required autocomplete="current-password">
+      <div class="field">
+        <label for="forms-pw">Password</label>
+        <input type="password" id="forms-pw" name="password" required autocomplete="current-password">
+      </div>
       <button type="submit" id="login-btn">Sign in</button>
       <div class="login-error" id="login-error" aria-live="polite"></div>
+      <a href="#" class="login-link subtle" id="link-to-forgot">Forgot password?</a>
     </form>
   </div>
+
+  <!-- Forgot password -->
+  <div class="login-card" id="view-forgot" style="display:none">
+    <div class="login-brand">Alpha Surfaces</div>
+    <h1 class="login-title">Reset Password</h1>
+    <form id="forgot-form" autocomplete="off">
+      <div class="field">
+        <label for="forgot-email">Email address</label>
+        <input type="email" id="forgot-email" name="email" required autocomplete="email">
+      </div>
+      <button type="submit" id="forgot-btn">Send Reset Link</button>
+      <div class="login-error" id="forgot-error" aria-live="polite"></div>
+      <div class="login-success" id="forgot-success" aria-live="polite"></div>
+      <a href="#" class="login-link" id="link-to-login">← Back to sign in</a>
+    </form>
+  </div>
+
+  <!-- Set new password (only when ?token= is present) -->
+  <div class="login-card" id="view-reset" style="display:none">
+    <div class="login-brand">Alpha Surfaces</div>
+    <h1 class="login-title">Set New Password</h1>
+    <form id="reset-form" autocomplete="off">
+      <div class="field">
+        <label for="new-password">New password</label>
+        <input type="password" id="new-password" name="password" required autocomplete="new-password" minlength="8">
+      </div>
+      <div class="field">
+        <label for="confirm-password">Confirm password</label>
+        <input type="password" id="confirm-password" name="confirm" required autocomplete="new-password" minlength="8">
+      </div>
+      <button type="submit" id="reset-btn">Update Password</button>
+      <div class="login-error" id="reset-error" aria-live="polite"></div>
+      <div class="login-success" id="reset-success" aria-live="polite"></div>
+      <a href="/forms" class="login-link" id="link-from-reset" style="display:none">Sign in with your new password</a>
+    </form>
+  </div>
+
 </div>
 
 <!-- App -->
@@ -442,22 +516,52 @@
   var loginBtn = document.getElementById('login-btn');
   var loginErr = document.getElementById('login-error');
 
+  var viewLogin  = document.getElementById('view-login');
+  var viewForgot = document.getElementById('view-forgot');
+  var viewReset  = document.getElementById('view-reset');
+
+  function showLoginView() {
+    loginWrap.style.display = 'flex';
+    appEl.style.display = 'none';
+    viewLogin.style.display  = 'block';
+    viewForgot.style.display = 'none';
+    viewReset.style.display  = 'none';
+    loginErr.textContent = '';
+  }
+  function showForgotView() {
+    viewLogin.style.display  = 'none';
+    viewForgot.style.display = 'block';
+    viewReset.style.display  = 'none';
+    document.getElementById('forgot-error').textContent = '';
+    document.getElementById('forgot-success').textContent = '';
+  }
+  function showResetView() {
+    loginWrap.style.display = 'flex';
+    appEl.style.display = 'none';
+    viewLogin.style.display  = 'none';
+    viewForgot.style.display = 'none';
+    viewReset.style.display  = 'block';
+  }
   function showApp() {
     loginWrap.style.display = 'none';
     appEl.style.display = 'flex';
     loadList();
   }
   function showLogin(msg) {
-    loginWrap.style.display = 'flex';
-    appEl.style.display = 'none';
+    showLoginView();
     if (msg) loginErr.textContent = msg;
   }
 
-  // Auth bootstrap — if already logged in, skip the login screen
-  fetch('/api/forms-auth-check', { credentials: 'include' })
-    .then(function (r) { return r.json(); })
-    .then(function (data) { if (data && data.authenticated) showApp(); })
-    .catch(function () {});
+  // ── Bootstrap: ?token= overrides everything (user clicked email link)
+  var resetToken = new URLSearchParams(location.search).get('token');
+  if (resetToken) {
+    showResetView();
+  } else {
+    fetch('/api/forms-auth-check', { credentials: 'include' })
+      .then(function (r) { return r.json(); })
+      .then(function (data) { if (data && data.authenticated) showApp(); })
+      .catch(function () {});
+  }
 
   loginForm.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -489,6 +593,82 @@
     await fetch('/api/forms-logout', { method: 'POST', credentials: 'include' }).catch(function () {});
     showLogin();
     document.getElementById('forms-pw').value = '';
+  });
+
+  // ── Forgot password ──
+  document.getElementById('link-to-forgot').addEventListener('click', function (e) {
+    e.preventDefault();
+    showForgotView();
+  });
+  document.getElementById('link-to-login').addEventListener('click', function (e) {
+    e.preventDefault();
+    showLoginView();
+  });
+
+  document.getElementById('forgot-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn = document.getElementById('forgot-btn');
+    var errEl = document.getElementById('forgot-error');
+    var okEl  = document.getElementById('forgot-success');
+    errEl.textContent = '';
+    okEl.textContent = '';
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    try {
+      var email = document.getElementById('forgot-email').value.trim();
+      var res = await fetch('/api/forms-forgot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email: email })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok && res.status !== 200) throw new Error(data.error || ('HTTP ' + res.status));
+      okEl.textContent = data.message || 'Check your inbox — if that email is registered, a reset link has been sent.';
+    } catch (err) {
+      errEl.textContent = err.message || 'Could not send reset email.';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send Reset Link';
+    }
+  });
+
+  // ── Reset password (from email link) ──
+  document.getElementById('reset-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn = document.getElementById('reset-btn');
+    var errEl = document.getElementById('reset-error');
+    var okEl  = document.getElementById('reset-success');
+    var signInLink = document.getElementById('link-from-reset');
+    errEl.textContent = '';
+    okEl.textContent = '';
+    var pw = document.getElementById('new-password').value;
+    var confirm = document.getElementById('confirm-password').value;
+    if (pw.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; return; }
+    if (pw !== confirm) { errEl.textContent = 'Passwords do not match.'; return; }
+    btn.disabled = true;
+    btn.textContent = 'Updating…';
+    try {
+      var res = await fetch('/api/forms-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ token: resetToken, password: pw })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || ('HTTP ' + res.status));
+      }
+      okEl.textContent = data.message || 'Password updated successfully.';
+      signInLink.style.display = 'block';
+      btn.style.display = 'none';
+      document.getElementById('new-password').disabled = true;
+      document.getElementById('confirm-password').disabled = true;
+    } catch (err) {
+      errEl.textContent = err.message || 'Could not update password.';
+      btn.disabled = false;
+      btn.textContent = 'Update Password';
+    }
   });
 
   // ── List rendering ──
