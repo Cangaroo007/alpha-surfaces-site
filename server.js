@@ -15,7 +15,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const versions = require('./lib/versions');
 const { initDB, saveSubmission, saveSubscriber, unsubscribeEmail, pool } = require('./db');
 const notifications = require('./notifications');
-const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, readSettings: readNotifSettings, writeSettings: writeNotifSettings } = notifications;
+const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, readSettings: readNotifSettings, writeSettings: writeNotifSettings, notifyNewSubmission } = notifications;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -114,6 +114,9 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 *
 
 // Active sessions (in-memory, resets on restart)
 const sessions = new Map();
+// Separate session store for the forms-only portal (/forms). Forms users
+// never get access to the full admin even if their session is replayed.
+const formsSessions = new Map();
 
 // ─── Middleware ───
 app.use(express.json({ limit: '25mb' }));
@@ -175,8 +178,19 @@ function authMiddleware(req, res, next) {
   res.status(401).json({ error: 'Unauthorized' });
 }
 
+// Forms-portal middleware: accepts EITHER an admin session or a forms-only
+// session. Use this to share read/update endpoints for submissions between
+// the full admin and the standalone /forms portal.
+function requireFormsOrAdmin(req, res, next) {
+  const adminToken = req.cookies?.alpha_session;
+  if (adminToken && sessions.has(adminToken)) return next();
+  const formsToken = req.cookies?.forms_session;
+  if (formsToken && formsSessions.has(formsToken)) return next();
+  res.status(401).json({ error: 'Unauthorized' });
+}
+
 // ─── Public Form API ───
-async function handleForm(req, res, formType, handler) {
+async function handleForm(req, res, formType) {
   try {
     const fields = req.body;
     if (!fields.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
@@ -198,8 +212,19 @@ async function handleForm(req, res, formType, handler) {
         collection: fields.stone_collection || ''
       });
     }
-    const { id, submitted_at } = await saveSubmission(formType, fields, sampleItems);
-    handler(fields, sampleItems, id, submitted_at).catch(err =>
+    const { id } = await saveSubmission(formType, fields, sampleItems);
+
+    // Re-fetch the full row so the notification email gets every populated
+    // column (id, name, role, reason, address, raw_data, etc.). Build a
+    // synthetic stone_interest from the picked sample items so the email
+    // and SMS surface what was actually requested.
+    const { rows } = await pool.query('SELECT * FROM form_submissions WHERE id = $1', [id]);
+    const submission = rows[0] || {};
+    if (sampleItems.length && !submission.stone_interest) {
+      submission.stone_interest = sampleItems.map(s => s.name).filter(Boolean).join(', ');
+    }
+
+    notifyNewSubmission(submission).catch(err =>
       console.error(`[notify] ${formType} notification error:`, err.message)
     );
     return res.json({ ok: true, id });
@@ -209,17 +234,8 @@ async function handleForm(req, res, formType, handler) {
   }
 }
 
-app.post('/api/order-sample', (req, res) =>
-  handleForm(req, res, 'Sample Request', (fields, samples, id, ts) =>
-    notifyOrderSample(fields, samples, id, ts)
-  )
-);
-
-app.post('/api/contact', (req, res) =>
-  handleForm(req, res, 'Contact Enquiry', (fields, _samples, id, ts) =>
-    notifyContact(fields, id, ts)
-  )
-);
+app.post('/api/order-sample', (req, res) => handleForm(req, res, 'Sample Request'));
+app.post('/api/contact',      (req, res) => handleForm(req, res, 'Contact Enquiry'));
 
 function generateUnsubscribeUrl(email) {
   const secret  = process.env.SESSION_SECRET || 'alpha-surfaces-secret';
@@ -328,6 +344,46 @@ app.post('/api/logout', (req, res) => {
 app.get('/api/auth-check', (req, res) => {
   const token = req.cookies?.alpha_session;
   res.json({ authenticated: !!(token && sessions.has(token)) });
+});
+
+// ─── Forms-only portal auth ───
+// Standalone /forms portal — read/update submissions only, no CMS access.
+// Uses its own password (FORMS_PASSWORD) and its own cookie (forms_session)
+// so an admin compromise doesn't leak the forms portal and vice versa.
+app.post('/api/forms-login', loginLimiter, async (req, res) => {
+  const { password } = req.body;
+  const stored = process.env.FORMS_PASSWORD;
+  if (!stored) {
+    console.warn('[forms-login] FORMS_PASSWORD not set');
+    return res.status(503).json({ error: 'Forms login not configured' });
+  }
+  let valid = false;
+  try { valid = await bcrypt.compare(password || '', stored); } catch { valid = false; }
+  if (!valid && !stored.startsWith('$2')) valid = password === stored;
+  if (!valid) return res.status(401).json({ error: 'Wrong password' });
+  const token = crypto.randomBytes(32).toString('hex');
+  formsSessions.set(token, { created: Date.now() });
+  res.cookie('forms_session', token, {
+    httpOnly: true, sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production', maxAge: 86400000
+  });
+  res.json({ ok: true });
+});
+
+app.post('/api/forms-logout', (req, res) => {
+  const token = req.cookies?.forms_session;
+  if (token) formsSessions.delete(token);
+  res.clearCookie('forms_session');
+  res.json({ ok: true });
+});
+
+app.get('/api/forms-auth-check', (req, res) => {
+  const token = req.cookies?.forms_session;
+  res.json({ authenticated: !!(token && formsSessions.has(token)) });
+});
+
+app.get('/forms', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'forms.html'));
 });
 
 // ─── Content API (public read, auth write) ───
@@ -655,7 +711,7 @@ function buildSubmissionsWhere(q) {
   return { vals, where: where.length ? ' WHERE ' + where.join(' AND ') : '' };
 }
 
-app.get('/api/admin/submissions', authMiddleware, async (req, res) => {
+app.get('/api/admin/submissions', requireFormsOrAdmin, async (req, res) => {
   try {
     const { limit = 50, offset = 0 } = req.query;
     const { vals, where } = buildSubmissionsWhere(req.query);
@@ -709,7 +765,7 @@ app.get('/api/admin/submissions', authMiddleware, async (req, res) => {
 // "export" as the :id param (which then fails as a Postgres integer cast).
 // Supports an `ids` query param (comma-separated) for selective download
 // from the admin UI checkboxes; falls back to all rows otherwise.
-app.get('/api/admin/submissions/export', authMiddleware, async (req, res) => {
+app.get('/api/admin/submissions/export', requireFormsOrAdmin, async (req, res) => {
   try {
     const { form_type, ids } = req.query;
     const vals = [];
@@ -806,7 +862,7 @@ app.get('/api/admin/submissions/export', authMiddleware, async (req, res) => {
 });
 
 // Single submission with its sample items, for the detail drawer.
-app.get('/api/admin/submissions/:id', authMiddleware, async (req, res) => {
+app.get('/api/admin/submissions/:id', requireFormsOrAdmin, async (req, res) => {
   try {
     const { rows } = await pool.query(
       'SELECT * FROM form_submissions WHERE id = $1', [req.params.id]
@@ -830,7 +886,7 @@ app.get('/api/admin/submissions/:id', authMiddleware, async (req, res) => {
   }
 });
 
-app.patch('/api/admin/submissions/:id', authMiddleware, async (req, res) => {
+app.patch('/api/admin/submissions/:id', requireFormsOrAdmin, async (req, res) => {
   try {
     const allowed = ['new', 'actioned', 'archived'];
     const status = req.body.status;

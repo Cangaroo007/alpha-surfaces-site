@@ -17,7 +17,34 @@ const fs         = require('fs');
 const path       = require('path');
 const nodemailer = require('nodemailer');
 const twilio     = require('twilio');
+const sgMail     = require('@sendgrid/mail');
 const crypto     = require('crypto');
+
+// ─── Single-recipient instant notification (env-driven, fires on every submit)
+//
+// Required Railway env vars:
+//   TWILIO_ACCOUNT_SID  - Twilio Account SID
+//   TWILIO_AUTH_TOKEN   - Twilio Auth Token
+//   TWILIO_FROM         - Twilio sending number (e.g. +19784876059)
+//   NOTIFY_SMS_TO       - SMS recipient (default +61417764689)
+//   SENDGRID_API_KEY    - SendGrid API key
+//   NOTIFY_EMAIL_TO     - Email recipient (default hello@alphasurfaces.com.au)
+//   NOTIFY_EMAIL_FROM   - Verified SendGrid sender (default noreply@alphasurfaces.com.au)
+//   SITE_URL            - Base URL for admin links in emails (default https://alphasurfaces.com.au)
+
+const NOTIFY_SMS_TO     = () => process.env.NOTIFY_SMS_TO     || '+61417764689';
+const NOTIFY_EMAIL_TO   = () => process.env.NOTIFY_EMAIL_TO   || 'hello@alphasurfaces.com.au';
+const NOTIFY_EMAIL_FROM = () => process.env.NOTIFY_EMAIL_FROM || 'noreply@alphasurfaces.com.au';
+
+let sendgridConfigured = false;
+function configureSendgrid() {
+  if (sendgridConfigured) return true;
+  const key = process.env.SENDGRID_API_KEY;
+  if (!key) return false;
+  sgMail.setApiKey(key);
+  sendgridConfigured = true;
+  return true;
+}
 
 // ─── Settings I/O ─────────────────────────────────────────────────────────
 let SETTINGS_PATH = null;
@@ -306,6 +333,221 @@ async function sendDailyDigest({ pool }) {
   return { ok: true, sent, formsCovered: Object.keys(byFormId).length };
 }
 
+// ─── Single-recipient instant notification helpers ──────────────────────
+// These fire on every form submit regardless of admin-configured per-form
+// recipients. Used by the form POST handlers in server.js. Failures never
+// throw — every external call is wrapped so the form response is unaffected.
+
+async function sendSubmissionSMS(submission) {
+  const client = getSMSClient();
+  if (!client) { console.warn('[notify] Twilio not configured — skipping submission SMS'); return false; }
+  if (!process.env.TWILIO_FROM) { console.warn('[notify] TWILIO_FROM not set — skipping submission SMS'); return false; }
+  const body = buildSubmissionSMSBody(submission);
+  try {
+    await client.messages.create({ body, from: process.env.TWILIO_FROM, to: NOTIFY_SMS_TO() });
+    console.log('[notify] submission SMS sent to', NOTIFY_SMS_TO());
+    return true;
+  } catch (err) {
+    console.error('[notify] submission SMS error:', err.message);
+    return false;
+  }
+}
+
+async function sendSubmissionEmail(submission) {
+  if (!configureSendgrid()) {
+    console.warn('[notify] SENDGRID_API_KEY not set — skipping submission email');
+    return false;
+  }
+  const subject = `New ${formatFormType(submission.form_type)} — ${submission.name || submission.email || 'Anonymous'} — Alpha Surfaces`;
+  const html = buildSubmissionEmailHTML(submission);
+  try {
+    await sgMail.send({
+      to: NOTIFY_EMAIL_TO(),
+      from: NOTIFY_EMAIL_FROM(),
+      subject,
+      html
+    });
+    console.log('[notify] submission email sent to', NOTIFY_EMAIL_TO());
+    return true;
+  } catch (err) {
+    // SendGrid wraps the upstream error message inside response.body
+    const detail = err.response?.body?.errors ? JSON.stringify(err.response.body.errors) : err.message;
+    console.error('[notify] submission email error:', detail);
+    return false;
+  }
+}
+
+async function notifyNewSubmission(submission) {
+  if (!submission) return;
+  const results = await Promise.allSettled([
+    sendSubmissionSMS(submission),
+    sendSubmissionEmail(submission)
+  ]);
+  results.forEach((r, i) => {
+    if (r.status === 'rejected') {
+      console.error(`[notify] notifyNewSubmission [${i === 0 ? 'sms' : 'email'}] rejected:`, r.reason && r.reason.message);
+    }
+  });
+}
+
+// SMS body — must stay under 160 chars to land as a single segment.
+function buildSubmissionSMSBody(s) {
+  const formLabel = formatFormType(s.form_type);
+  const name = s.name || [s.first_name, s.last_name].filter(Boolean).join(' ') || 'Anonymous';
+  const phone = s.phone || 'No phone';
+  const tail = s.stone_interest
+    ? s.stone_interest
+    : (s.message || '').slice(0, 30);
+  const lines = [`🔔 Alpha Surfaces`, `New ${formLabel}`, `${name} · ${phone}`];
+  if (tail) lines.push(tail);
+  let body = lines.join('\n');
+  if (body.length > 160) body = body.slice(0, 157) + '...';
+  return body;
+}
+
+function formatFormType(t) {
+  if (!t) return 'submission';
+  // Existing DB values are e.g. "Sample Request", "Contact Enquiry" — keep
+  // them as-is; for snake_case incoming ('sample_request') humanise.
+  if (/[a-z]_[a-z]/.test(t)) {
+    return t.split('_').map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
+  }
+  return t;
+}
+
+function formatAEST(ts) {
+  if (!ts) return '—';
+  try {
+    const d = new Date(ts);
+    return d.toLocaleString('en-AU', {
+      timeZone: 'Australia/Brisbane',
+      day: 'numeric', month: 'long', year: 'numeric',
+      hour: 'numeric', minute: '2-digit', hour12: true
+    }).replace(/\s?(am|pm)/i, m => m.toLowerCase().trim()) + ' AEST';
+  } catch { return String(ts); }
+}
+
+// HTML email — every populated column from form_submissions, grouped.
+function buildSubmissionEmailHTML(s) {
+  const groups = [
+    { title: 'Enquiry Details', keys: [
+      ['form_type',      'Form type',     v => formatFormType(v)],
+      ['submitted_at',   'Submitted',     v => formatAEST(v)],
+      ['source',         'Source'],
+      ['reason',         'Reason'],
+      ['status',         'Status']
+    ]},
+    { title: 'Contact Information', keys: [
+      ['name',           'Name'],
+      ['email',          'Email',         v => `<a href="mailto:${escapeAttr(v)}" style="color:#564D22">${escapeHtml(v)}</a>`],
+      ['phone',          'Phone',         v => `<a href="tel:${escapeAttr(v)}" style="color:#564D22">${escapeHtml(v)}</a>`],
+      ['company',        'Company'],
+      ['role',           'Role / I am a']
+    ]},
+    { title: 'Address', keys: [
+      ['unit',           'Unit / House no.'],
+      ['street',         'Street'],
+      ['suburb',         'Suburb'],
+      ['postcode',       'Postcode'],
+      ['state',          'State'],
+      ['store_location', 'Store location']
+    ]},
+    { title: 'Request Details', keys: [
+      ['stone_interest', 'Stone interest', v => formatStoneInterest(v)],
+      ['message',        'Message',        v => escapeHtml(String(v)).replace(/\n/g, '<br>')],
+      ['consent',        'Consent',        v => v ? '✓ Marketing consent given' : '— No marketing consent']
+    ]}
+  ];
+
+  const knownKeys = new Set([
+    'id','form_type','submitted_at','name','email','phone','company','role',
+    'reason','unit','street','suburb','postcode','state','store_location',
+    'stone_interest','message','source','consent','status','raw_data'
+  ]);
+
+  const rows = (entries) => entries.map(([key, label, formatter]) => {
+    const val = s[key];
+    if (val == null || val === '' || (typeof val === 'boolean' && key !== 'consent' && val === false)) return '';
+    const formatted = formatter ? formatter(val) : escapeHtml(String(val));
+    return `<tr>
+      <td style="padding:10px 16px 10px 0;color:#777;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;width:160px;vertical-align:top">${escapeHtml(label)}</td>
+      <td style="padding:10px 0;color:#222;font-size:15px;line-height:1.5;vertical-align:top">${formatted}</td>
+    </tr>`;
+  }).filter(Boolean).join('');
+
+  const sections = groups.map(g => {
+    const r = rows(g.keys);
+    if (!r) return '';
+    return `<tr><td style="padding:24px 32px 8px 32px">
+      <h2 style="margin:0 0 8px;color:#564D22;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid #e8e3d3;padding-bottom:8px">${escapeHtml(g.title)}</h2>
+      <table cellpadding="0" cellspacing="0" border="0" width="100%">${r}</table>
+    </td></tr>`;
+  }).filter(Boolean).join('');
+
+  // Additional data — anything in raw_data not already in a known column,
+  // and aliases like first_name/last_name that we already merged into `name`.
+  let extraSection = '';
+  if (s.raw_data && typeof s.raw_data === 'object') {
+    const aliases = new Set(['first_name','last_name','i_am_a','i_am','type','enquiry_reason',
+      'special_instructions','sampleItems','samples','stone_slug','stone_name','stone_collection']);
+    const extras = Object.entries(s.raw_data).filter(([k, v]) => {
+      if (knownKeys.has(k) || aliases.has(k)) return false;
+      if (v == null || v === '') return false;
+      if (Array.isArray(v) && v.length === 0) return false;
+      return true;
+    });
+    if (extras.length) {
+      const extraRows = extras.map(([k, v]) => {
+        const disp = typeof v === 'object' ? JSON.stringify(v) : String(v);
+        return `<tr>
+          <td style="padding:10px 16px 10px 0;color:#777;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;width:160px;vertical-align:top">${escapeHtml(k)}</td>
+          <td style="padding:10px 0;color:#222;font-size:15px;line-height:1.5;vertical-align:top">${escapeHtml(disp)}</td>
+        </tr>`;
+      }).join('');
+      extraSection = `<tr><td style="padding:24px 32px 8px 32px">
+        <h2 style="margin:0 0 8px;color:#564D22;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid #e8e3d3;padding-bottom:8px">Additional data</h2>
+        <table cellpadding="0" cellspacing="0" border="0" width="100%">${extraRows}</table>
+      </td></tr>`;
+    }
+  }
+
+  const formsUrl = (process.env.SITE_URL || 'https://alphasurfaces.com.au') + '/forms';
+
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>New submission — Alpha Surfaces</title></head>
+<body style="margin:0;padding:0;background:#f3f1e6;font-family:'Helvetica Neue',Arial,sans-serif">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f3f1e6">
+  <tr><td align="center" style="padding:32px 16px">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:640px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+      <tr><td style="background:#564D22;padding:28px 32px">
+        <p style="margin:0;color:#f3f1e6;font-size:13px;letter-spacing:.12em;text-transform:uppercase">Alpha Surfaces</p>
+        <h1 style="margin:6px 0 0;color:#fff;font-size:22px;font-weight:600">New ${escapeHtml(formatFormType(s.form_type))} #${s.id || ''}</h1>
+      </td></tr>
+      ${sections}
+      ${extraSection}
+      <tr><td style="padding:24px 32px 32px 32px">
+        <a href="${escapeAttr(formsUrl)}" style="display:inline-block;background:#564D22;color:#fff;padding:12px 24px;text-decoration:none;font-size:13px;letter-spacing:.06em;text-transform:uppercase;border-radius:4px">View in admin</a>
+      </td></tr>
+      <tr><td style="padding:20px 32px;background:#f7f4e8;color:#999;font-size:12px;text-align:center">
+        This is an automated notification from alphasurfaces.com.au
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>`;
+}
+
+function formatStoneInterest(v) {
+  if (!v) return '—';
+  if (Array.isArray(v)) return v.map(escapeHtml).join(', ');
+  return escapeHtml(String(v));
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function escapeAttr(s) { return escapeHtml(s); }
+
 module.exports = {
   setSettingsPath,
   readSettings,
@@ -314,5 +556,9 @@ module.exports = {
   notifyContact,
   notifySubscribe,
   sendTestForForm,
-  sendDailyDigest
+  sendDailyDigest,
+  // New env-driven single-recipient path:
+  sendSubmissionSMS,
+  sendSubmissionEmail,
+  notifyNewSubmission
 };

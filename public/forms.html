@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Form Submissions — Alpha Surfaces</title>
+<style>
+  :root {
+    --olive: #564D22;
+    --olive-dark: #3f3819;
+    --cream: #F3F1E6;
+    --cream-light: #f8f6ec;
+    --white: #ffffff;
+    --black: #1a1a1a;
+    --text: #2a2a2a;
+    --muted: #777;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.16);
+    --row-alt: #faf9f3;
+    --green: #2d6a4f;
+    --green-bg: rgba(45,106,79,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--cream);
+    color: var(--text);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  a { color: var(--olive); }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ── Login ── */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .login-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 48px 40px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  }
+  .login-brand {
+    color: var(--olive);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .login-title {
+    color: var(--black);
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 28px;
+  }
+  .login-card label {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .login-card input[type=password] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    font-size: 15px;
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .login-card input[type=password]:focus { border-color: var(--olive); }
+  .login-card button {
+    width: 100%;
+    padding: 12px;
+    background: var(--olive);
+    color: var(--white);
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-top: 18px;
+    transition: background 0.15s;
+  }
+  .login-card button:hover { background: var(--olive-dark); }
+  .login-card button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .login-error {
+    color: #b3261e;
+    font-size: 13px;
+    margin-top: 14px;
+    text-align: center;
+    min-height: 18px;
+  }
+
+  /* ── App layout ── */
+  .app { display: flex; flex-direction: column; min-height: 100vh; }
+  .app-header {
+    background: var(--olive);
+    color: var(--white);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .app-header .brand {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cream);
+  }
+  .app-header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .app-header button {
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid rgba(255,255,255,0.32);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .app-header button:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.6); }
+
+  .app-main { flex: 1; padding: 24px 28px; }
+
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .toolbar input[type=search] {
+    flex: 1;
+    min-width: 220px;
+    padding: 9px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    font-size: 14px;
+    background: var(--white);
+    outline: none;
+  }
+  .toolbar input[type=search]:focus { border-color: var(--olive); }
+  .toolbar select {
+    padding: 9px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    font-size: 14px;
+    background: var(--white);
+    outline: none;
+  }
+  .btn-export {
+    padding: 9px 18px;
+    background: var(--white);
+    color: var(--olive);
+    border: 1px solid var(--olive);
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transition: all 0.15s;
+  }
+  .btn-export:hover { background: var(--olive); color: var(--white); }
+  .btn-export.has-selection {
+    background: var(--green-bg);
+    color: var(--green);
+    border-color: var(--green);
+  }
+  .btn-export.has-selection:hover { background: var(--green); color: var(--white); }
+
+  /* ── Table ── */
+  .table-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    overflow-x: auto;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left;
+    padding: 12px 14px;
+    background: var(--cream-light);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    font-size: 14px;
+  }
+  tbody tr { cursor: pointer; transition: background 0.1s; }
+  tbody tr:hover { background: var(--cream-light); }
+  tbody tr.row-active { background: var(--cream); }
+  tbody tr:nth-child(even) { background: rgba(243,241,230,0.35); }
+  tbody tr:nth-child(even):hover { background: var(--cream-light); }
+  th.col-check, td.col-check { width: 36px; padding: 12px 8px 12px 14px; }
+  td.col-check input, th.col-check input { cursor: pointer; accent-color: var(--olive); }
+
+  .badge-type {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: var(--cream);
+    color: var(--olive);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .status-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: rgba(45,106,79,0.12);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .status-pill.status-actioned { background: rgba(0,0,0,0.06); color: var(--muted); }
+  .status-pill.status-archived { background: rgba(0,0,0,0.04); color: var(--muted); opacity: 0.7; }
+  .row-new { font-weight: 600; }
+
+  .empty {
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .pagination {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 18px;
+  }
+  .pagination button {
+    padding: 7px 14px;
+    background: var(--white);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text);
+    transition: border-color 0.15s;
+  }
+  .pagination button:hover { border-color: var(--olive); }
+  .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── Drawer ── */
+  .drawer-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 90;
+  }
+  .drawer-overlay.open { display: block; }
+  .drawer {
+    display: none;
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 100%;
+    max-width: 540px;
+    background: var(--white);
+    box-shadow: -8px 0 32px rgba(0,0,0,0.12);
+    z-index: 100;
+    flex-direction: column;
+  }
+  .drawer.open { display: flex; }
+  .drawer-header {
+    background: var(--olive);
+    color: var(--white);
+    padding: 22px 28px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .drawer-header h2 { font-size: 17px; font-weight: 600; margin-bottom: 2px; }
+  .drawer-header .meta { font-size: 12px; color: var(--cream); opacity: 0.8; }
+  .drawer-close {
+    background: transparent;
+    color: var(--white);
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    padding: 4px 8px;
+  }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .field-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    padding: 10px 28px;
+    gap: 16px;
+  }
+  .field-row .lbl {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding-top: 2px;
+  }
+  .field-row .val { font-size: 14px; word-break: break-word; }
+  .field-row .val a { color: var(--olive); }
+  .muted { color: var(--muted); }
+  .drawer-section {
+    margin-top: 12px;
+    padding: 18px 28px 6px;
+    border-top: 1px solid var(--border);
+  }
+  .drawer-section h3 {
+    color: var(--olive);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .drawer-footer {
+    border-top: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .drawer-footer button {
+    padding: 9px 18px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border: 1px solid var(--border-strong);
+    background: var(--white);
+    color: var(--text);
+    transition: all 0.15s;
+  }
+  .drawer-footer button.primary { background: var(--olive); color: var(--white); border-color: var(--olive); }
+  .drawer-footer button.primary:hover { background: var(--olive-dark); }
+  .drawer-footer button:hover { border-color: var(--olive); }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--olive); color: var(--white);
+    padding: 10px 18px; border-radius: 4px; font-size: 13px;
+    z-index: 200; opacity: 0; transition: opacity 0.2s;
+  }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 720px) {
+    .app-header { padding: 14px 16px; }
+    .app-main { padding: 16px; }
+    thead th { font-size: 10px; padding: 10px 10px; }
+    tbody td { font-size: 13px; padding: 10px 10px; }
+    .field-row { grid-template-columns: 1fr; gap: 4px; padding: 10px 18px; }
+    .drawer { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Login screen -->
+<div class="login-wrap" id="login-wrap">
+  <div class="login-card">
+    <div class="login-brand">Alpha Surfaces</div>
+    <h1 class="login-title">Form Submissions</h1>
+    <form id="login-form" autocomplete="off">
+      <label for="forms-pw">Password</label>
+      <input type="password" id="forms-pw" name="password" required autocomplete="current-password">
+      <button type="submit" id="login-btn">Sign in</button>
+      <div class="login-error" id="login-error" aria-live="polite"></div>
+    </form>
+  </div>
+</div>
+
+<!-- App -->
+<div class="app" id="app" style="display:none">
+  <header class="app-header">
+    <div>
+      <div class="brand">Alpha Surfaces</div>
+      <h1>Form Submissions</h1>
+    </div>
+    <button id="logout-btn" type="button">Sign out</button>
+  </header>
+
+  <main class="app-main">
+    <div class="toolbar">
+      <input type="search" id="search" placeholder="Search name, email, phone, message…">
+      <select id="status">
+        <option value="">All statuses</option>
+        <option value="new">New</option>
+        <option value="actioned">Actioned</option>
+        <option value="archived">Archived</option>
+      </select>
+      <button class="btn-export" id="btn-export-submissions" type="button">↓ Export All</button>
+    </div>
+    <div id="results"></div>
+  </main>
+</div>
+
+<!-- Drawer -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"></aside>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var PAGE_SIZE = 25;
+  var state = { offset: 0, q: '', status: '', total: 0 };
+  var searchDebounce = null;
+
+  // ── Login flow ──
+  var loginWrap = document.getElementById('login-wrap');
+  var appEl = document.getElementById('app');
+  var loginForm = document.getElementById('login-form');
+  var loginBtn = document.getElementById('login-btn');
+  var loginErr = document.getElementById('login-error');
+
+  function showApp() {
+    loginWrap.style.display = 'none';
+    appEl.style.display = 'flex';
+    loadList();
+  }
+  function showLogin(msg) {
+    loginWrap.style.display = 'flex';
+    appEl.style.display = 'none';
+    if (msg) loginErr.textContent = msg;
+  }
+
+  // Auth bootstrap — if already logged in, skip the login screen
+  fetch('/api/forms-auth-check', { credentials: 'include' })
+    .then(function (r) { return r.json(); })
+    .then(function (data) { if (data && data.authenticated) showApp(); })
+    .catch(function () {});
+
+  loginForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    loginErr.textContent = '';
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Signing in…';
+    try {
+      var pw = document.getElementById('forms-pw').value;
+      var res = await fetch('/api/forms-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ password: pw })
+      });
+      if (!res.ok) {
+        var err = await res.json().catch(function () { return {}; });
+        throw new Error(err.error || ('HTTP ' + res.status));
+      }
+      showApp();
+    } catch (err) {
+      loginErr.textContent = err.message || 'Login failed';
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Sign in';
+    }
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', async function () {
+    await fetch('/api/forms-logout', { method: 'POST', credentials: 'include' }).catch(function () {});
+    showLogin();
+    document.getElementById('forms-pw').value = '';
+  });
+
+  // ── List rendering ──
+  async function loadList() {
+    var results = document.getElementById('results');
+    results.innerHTML = '<div class="empty">Loading…</div>';
+    try {
+      var params = new URLSearchParams({ limit: PAGE_SIZE, offset: state.offset });
+      if (state.status) params.set('status', state.status);
+      if (state.q)      params.set('q', state.q);
+      var res = await fetch('/api/admin/submissions?' + params, { credentials: 'include' });
+      if (res.status === 401) { showLogin('Session expired — please sign in again.'); return; }
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed to load');
+      state.total = data.total || 0;
+      results.innerHTML = renderTable(data.submissions || []);
+      wireTable();
+    } catch (err) {
+      results.innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function renderTable(rows) {
+    if (!rows.length) {
+      return '<div class="empty">No submissions match the current filters.</div>';
+    }
+    var trs = rows.map(function (r) {
+      var typeLabel = labelForFormType(r.form_type, r.store_location);
+      var locked = r.status === 'new' ? 'row-new' : '';
+      return '<tr class="row-' + escapeAttr(r.status) + ' ' + locked + '" data-id="' + r.id + '">' +
+        '<td class="col-check"><input type="checkbox" class="row-check" value="' + r.id + '"></td>' +
+        '<td>#' + r.id + '</td>' +
+        '<td><span class="badge-type">' + escapeHtml(typeLabel) + '</span></td>' +
+        '<td>' + escapeHtml(r.name || '—') + '</td>' +
+        '<td>' + (r.email ? '<a href="mailto:' + escapeAttr(r.email) + '" onclick="event.stopPropagation()">' + escapeHtml(r.email) + '</a>' : '—') + '</td>' +
+        '<td>' + (r.phone ? '<a href="tel:' + escapeAttr(r.phone) + '" onclick="event.stopPropagation()">' + escapeHtml(r.phone) + '</a>' : '—') + '</td>' +
+        '<td>' + escapeHtml(r.store_location || r.state || '—') + '</td>' +
+        '<td>' + formatDate(r.submitted_at) + '</td>' +
+        '<td><span class="status-pill status-' + escapeAttr(r.status) + '">' + escapeHtml(r.status) + '</span></td>' +
+      '</tr>';
+    }).join('');
+    var pages =
+      '<div class="pagination">' +
+        '<button id="prev-page" ' + (state.offset === 0 ? 'disabled' : '') + '>← Previous</button>' +
+        '<span style="padding:8px 12px;color:var(--muted);font-size:12px">' +
+          (state.offset + 1) + '–' + Math.min(state.offset + rows.length, state.total) + ' of ' + state.total +
+        '</span>' +
+        '<button id="next-page" ' + (state.offset + rows.length >= state.total ? 'disabled' : '') + '>Next →</button>' +
+      '</div>';
+    return '<div class="table-wrap"><table>' +
+      '<thead><tr>' +
+        '<th class="col-check"><input type="checkbox" id="select-all"></th>' +
+        '<th>#</th><th>Type</th><th>Name</th><th>Email</th><th>Phone</th>' +
+        '<th>Location</th><th>Submitted</th><th>Status</th>' +
+      '</tr></thead><tbody>' + trs + '</tbody></table></div>' + pages;
+  }
+
+  function wireTable() {
+    document.querySelectorAll('tbody tr[data-id]').forEach(function (tr) {
+      tr.addEventListener('click', function (e) {
+        if (e.target.closest('a') || e.target.closest('input')) return;
+        openDrawer(parseInt(tr.dataset.id, 10));
+      });
+    });
+    document.querySelectorAll('.row-check').forEach(function (cb) {
+      cb.addEventListener('change', updateExportButton);
+      cb.addEventListener('click', function (e) { e.stopPropagation(); });
+    });
+    var sa = document.getElementById('select-all');
+    if (sa) sa.addEventListener('change', function () {
+      document.querySelectorAll('.row-check').forEach(function (cb) { cb.checked = sa.checked; });
+      updateExportButton();
+    });
+    var prev = document.getElementById('prev-page');
+    if (prev) prev.addEventListener('click', function () {
+      state.offset = Math.max(0, state.offset - PAGE_SIZE); loadList();
+    });
+    var next = document.getElementById('next-page');
+    if (next) next.addEventListener('click', function () {
+      state.offset += PAGE_SIZE; loadList();
+    });
+  }
+
+  // ── Search / status / export ──
+  document.getElementById('search').addEventListener('input', function (e) {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(function () {
+      state.q = e.target.value.trim();
+      state.offset = 0;
+      loadList();
+    }, 250);
+  });
+  document.getElementById('status').addEventListener('change', function (e) {
+    state.status = e.target.value;
+    state.offset = 0;
+    loadList();
+  });
+
+  function updateExportButton() {
+    var checked = document.querySelectorAll('.row-check:checked');
+    var btn = document.getElementById('btn-export-submissions');
+    if (checked.length > 0) {
+      btn.textContent = '↓ Export Selected (' + checked.length + ')';
+      btn.classList.add('has-selection');
+    } else {
+      btn.textContent = '↓ Export All';
+      btn.classList.remove('has-selection');
+    }
+    var sa = document.getElementById('select-all');
+    var all = document.querySelectorAll('.row-check');
+    if (sa) sa.checked = all.length > 0 && checked.length === all.length;
+  }
+  document.getElementById('btn-export-submissions').addEventListener('click', function () {
+    var checked = document.querySelectorAll('.row-check:checked');
+    var url = '/api/admin/submissions/export';
+    if (checked.length > 0) {
+      var ids = Array.from(checked).map(function (cb) { return cb.value; });
+      url += '?ids=' + ids.join(',');
+    }
+    window.location.href = url;
+  });
+
+  // ── Drawer ──
+  var drawer = document.getElementById('drawer');
+  var overlay = document.getElementById('drawer-overlay');
+  overlay.addEventListener('click', closeDrawer);
+
+  var FIELD_ORDER = [
+    { key: 'form_type',      label: 'Type',           format: 'type' },
+    { key: 'submitted_at',   label: 'Submitted',      format: 'datetime' },
+    { key: 'status',         label: 'Status',         format: 'status' },
+    { key: 'name',           label: 'Name' },
+    { key: 'email',          label: 'Email',          link: 'mailto' },
+    { key: 'phone',          label: 'Phone',          link: 'tel' },
+    { key: 'company',        label: 'Company' },
+    { key: 'role',           label: 'Role / I am a' },
+    { key: 'reason',         label: 'Reason' },
+    { key: 'unit',           label: 'Unit' },
+    { key: 'street',         label: 'Street' },
+    { key: 'suburb',         label: 'Suburb' },
+    { key: 'postcode',       label: 'Postcode' },
+    { key: 'state',          label: 'State' },
+    { key: 'store_location', label: 'Store location' },
+    { key: 'stone_interest', label: 'Stone interest' },
+    { key: 'source',         label: 'Source' },
+    { key: 'consent',        label: 'Consent',        format: 'boolean' },
+    { key: 'message',        label: 'Message',        format: 'multiline' }
+  ];
+
+  async function openDrawer(id) {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    drawer.innerHTML = '<div class="empty">Loading…</div>';
+    document.querySelectorAll('tbody tr').forEach(function (r) { r.classList.remove('row-active'); });
+    var rowEl = document.querySelector('tbody tr[data-id="' + id + '"]');
+    if (rowEl) rowEl.classList.add('row-active');
+    try {
+      var res = await fetch('/api/admin/submissions/' + id, { credentials: 'include' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      drawer.innerHTML = renderDrawer(data.submission, data.sampleItems || []);
+      wireDrawer(data.submission);
+    } catch (err) {
+      drawer.innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+  function closeDrawer() {
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+    document.querySelectorAll('tbody tr').forEach(function (r) { r.classList.remove('row-active'); });
+  }
+
+  function renderDrawer(s, items) {
+    var typeLabel = labelForFormType(s.form_type, s.store_location);
+
+    var rows = FIELD_ORDER.map(function (f) {
+      var v = s[f.key];
+      var html;
+      if (f.format === 'type') html = '<span class="badge-type">' + escapeHtml(typeLabel) + '</span>';
+      else if (f.format === 'status') html = '<span class="status-pill status-' + escapeAttr(v) + '">' + escapeHtml(v) + '</span>';
+      else if (f.format === 'boolean') html = v ? '✓ Marketing emails' : '✗ Not consented';
+      else if (f.format === 'datetime') html = escapeHtml(formatDate(v, true));
+      else if (v == null || v === '') html = '<span class="muted">—</span>';
+      else if (f.format === 'multiline') html = escapeHtml(String(v)).replace(/\n/g, '<br>');
+      else if (f.link === 'mailto') html = '<a href="mailto:' + escapeAttr(v) + '">' + escapeHtml(v) + '</a>';
+      else if (f.link === 'tel') html = '<a href="tel:' + escapeAttr(v) + '">' + escapeHtml(v) + '</a>';
+      else html = escapeHtml(String(v));
+      return '<div class="field-row"><div class="lbl">' + escapeHtml(f.label) + '</div><div class="val">' + html + '</div></div>';
+    }).join('');
+
+    // Catch-all: any raw_data keys that don't have a dedicated column.
+    var extra = '';
+    if (s.raw_data && typeof s.raw_data === 'object') {
+      var aliases = ['first_name','last_name','i_am_a','i_am','type','enquiry_reason',
+        'special_instructions','sampleItems','samples','stone_slug','stone_name','stone_collection'];
+      var known = {};
+      FIELD_ORDER.forEach(function (f) { known[f.key] = true; });
+      aliases.forEach(function (k) { known[k] = true; });
+      var keys = Object.keys(s.raw_data).filter(function (k) {
+        if (known[k]) return false;
+        var v = s.raw_data[k];
+        return v != null && v !== '' && !(Array.isArray(v) && v.length === 0);
+      });
+      if (keys.length) {
+        extra = '<div class="drawer-section"><h3>Additional data</h3>' +
+          keys.map(function (k) {
+            var v = s.raw_data[k];
+            var disp = typeof v === 'object' ? JSON.stringify(v) : String(v);
+            return '<div class="field-row"><div class="lbl">' + escapeHtml(k) + '</div><div class="val">' + escapeHtml(disp) + '</div></div>';
+          }).join('') +
+        '</div>';
+      }
+    }
+
+    var stones = '';
+    if (items && items.length) {
+      stones = '<div class="drawer-section"><h3>Stones requested (' + items.length + ')</h3>' +
+        items.map(function (it) {
+          return '<div class="field-row"><div class="lbl">' + escapeHtml(it.collection || '—') + '</div>' +
+                 '<div class="val">' + escapeHtml(it.stone_name) + ' <span class="muted" style="font-size:12px">(' + escapeHtml(it.stone_slug) + ')</span></div></div>';
+        }).join('') +
+      '</div>';
+    }
+
+    var actions = s.status === 'new'
+      ? '<button class="primary" id="drw-action">Mark actioned</button>'
+      : '<button id="drw-reopen">Reopen (mark new)</button>';
+
+    return '' +
+      '<div class="drawer-header">' +
+        '<div><h2>' + escapeHtml(typeLabel) + ' #' + s.id + '</h2>' +
+          '<div class="meta">' + escapeHtml(formatDate(s.submitted_at, true)) + '</div></div>' +
+        '<button class="drawer-close" id="drw-close" aria-label="Close">✕</button>' +
+      '</div>' +
+      '<div class="drawer-body">' + rows + extra + stones + '</div>' +
+      '<div class="drawer-footer">' +
+        actions +
+        (s.status !== 'archived' ? '<button id="drw-archive">Archive</button>' : '') +
+        (s.email ? '<button id="drw-copy">Copy email</button>' : '') +
+      '</div>';
+  }
+
+  function wireDrawer(s) {
+    document.getElementById('drw-close').addEventListener('click', closeDrawer);
+    var act = document.getElementById('drw-action');
+    if (act) act.addEventListener('click', function () { setStatus(s.id, 'actioned'); });
+    var ro = document.getElementById('drw-reopen');
+    if (ro) ro.addEventListener('click', function () { setStatus(s.id, 'new'); });
+    var ar = document.getElementById('drw-archive');
+    if (ar) ar.addEventListener('click', function () { setStatus(s.id, 'archived'); });
+    var cp = document.getElementById('drw-copy');
+    if (cp) cp.addEventListener('click', function () {
+      navigator.clipboard.writeText(s.email).then(function () { toast('Email copied'); });
+    });
+  }
+
+  async function setStatus(id, status) {
+    try {
+      var res = await fetch('/api/admin/submissions/' + id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: status })
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      toast('Status updated');
+      closeDrawer();
+      loadList();
+    } catch (err) {
+      toast('Failed: ' + err.message);
+    }
+  }
+
+  // ── Helpers ──
+  function labelForFormType(t, storeLocation) {
+    if (t === 'Sample Request') return 'Sample';
+    if (t === 'Contact Enquiry') return storeLocation ? 'Partner' : 'Contact';
+    return t || '—';
+  }
+  function formatDate(s, withTime) {
+    if (!s) return '—';
+    try {
+      var d = new Date(s);
+      var opts = { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Australia/Brisbane' };
+      if (withTime) { opts.hour = 'numeric'; opts.minute = '2-digit'; opts.hour12 = true; }
+      return d.toLocaleString('en-AU', opts);
+    } catch { return s; }
+  }
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+  function toast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function () { t.classList.remove('show'); }, 1800);
+  }
+})();
+</script>
+
+</body>
+</html>
