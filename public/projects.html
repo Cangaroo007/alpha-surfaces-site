@@ -53,12 +53,78 @@
   .login-brand { color: var(--olive); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; }
   .login-title { color: var(--black); font-size: 22px; font-weight: 700; margin-bottom: 28px; }
   .login-card label { display: block; color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
-  .login-card input[type=password] { width: 100%; padding: 12px 14px; border: 1px solid var(--border-strong); border-radius: 6px; font-size: 15px; background: var(--white); outline: none; transition: border-color 0.15s; }
-  .login-card input[type=password]:focus { border-color: var(--olive); }
+  .login-card input[type=password], .login-card input[type=email], .login-card input[type=text] { width: 100%; padding: 12px 14px; border: 1px solid var(--border-strong); border-radius: 6px; font-size: 15px; background: var(--white); outline: none; transition: border-color 0.15s; font-family: inherit; }
+  .login-card input:focus { border-color: var(--olive); }
+  .login-card .field { margin-bottom: 14px; }
+  .login-card .field:last-of-type { margin-bottom: 0; }
   .login-card button { width: 100%; padding: 12px; background: var(--olive); color: var(--white); border: none; border-radius: 6px; font-size: 14px; font-weight: 600; letter-spacing: 0.05em; margin-top: 18px; transition: background 0.15s; }
   .login-card button:hover { background: var(--olive-dark); }
   .login-card button:disabled { opacity: 0.6; cursor: not-allowed; }
   .login-error { color: #b3261e; font-size: 13px; margin-top: 14px; text-align: center; min-height: 18px; }
+  .login-success { color: var(--pri-low-fg); font-size: 13px; margin-top: 14px; text-align: center; min-height: 18px; }
+  .login-link { display: block; text-align: center; margin-top: 14px; font-size: 13px; color: var(--olive); text-decoration: none; }
+  .login-link:hover { text-decoration: underline; }
+  .login-link.subtle { color: var(--muted); }
+  .login-link.subtle:hover { color: var(--olive); }
+
+  /* Header user chip */
+  .user-chip { display: inline-flex; align-items: center; gap: 8px; color: var(--cream); font-size: 13px; padding: 0 4px; }
+  .user-chip .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--cream); color: var(--olive); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+
+  /* Drawer tabs */
+  .tabs { display: flex; border-bottom: 1px solid var(--border); margin: 0 -28px 18px; padding: 0 28px; }
+  .tabs button { background: transparent; border: none; padding: 10px 0; margin-right: 22px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; }
+  .tabs button.active { color: var(--olive); border-bottom-color: var(--olive); }
+
+  /* Activity feed */
+  .activity-list { display: flex; flex-direction: column; gap: 14px; }
+  .activity-item { display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: flex-start; }
+  .activity-item .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--olive); color: var(--white); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+  .activity-text { font-size: 14px; line-height: 1.45; color: var(--text); }
+  .activity-text .who { font-weight: 600; color: var(--text); }
+  .activity-text .what { color: var(--muted); }
+  .activity-quote { margin-top: 4px; padding: 8px 10px; background: var(--cream-light); border-left: 3px solid var(--olive); border-radius: 0 4px 4px 0; font-size: 13.5px; color: var(--text); white-space: pre-wrap; }
+  .activity-when { font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: 0.04em; }
+  .activity-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 22px 0; }
+
+  /* Notes block */
+  .note-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+  .note { background: var(--cream-light); border-left: 3px solid var(--olive); border-radius: 0 4px 4px 0; padding: 10px 12px; font-size: 13.5px; line-height: 1.5; }
+  .note .note-meta { font-size: 11px; color: var(--muted); margin-bottom: 4px; letter-spacing: 0.04em; }
+  .note .note-meta strong { color: var(--olive); font-weight: 700; }
+  .add-note-row { display: flex; gap: 8px; }
+  .add-note-row input { flex: 1; padding: 9px 11px; border: 1px solid var(--border-strong); border-radius: 4px; font-size: 14px; font-family: inherit; outline: none; }
+  .add-note-row input:focus { border-color: var(--olive); }
+  .add-note-row button { padding: 9px 16px; background: var(--olive); color: var(--white); border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+  /* Admin panel modal */
+  .admin-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 110; align-items: center; justify-content: center; padding: 24px; }
+  .admin-modal.open { display: flex; }
+  .admin-card { background: var(--white); border-radius: 10px; max-width: 760px; width: 100%; max-height: 86vh; display: flex; flex-direction: column; overflow: hidden; }
+  .admin-card-head { padding: 18px 24px; background: var(--olive); color: var(--white); display: flex; justify-content: space-between; align-items: center; }
+  .admin-card-head h2 { font-size: 18px; font-weight: 700; color: var(--white); }
+  .admin-card-head button { background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,0.3); padding: 7px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+  .admin-card-body { padding: 18px 24px; overflow-y: auto; }
+  .admin-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .admin-table th { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .admin-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
+  .admin-table tr.inactive td { opacity: 0.5; }
+  .role-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(86,77,34,0.10); color: var(--olive); }
+  .role-pill.admin { background: var(--pri-high-bg); color: var(--pri-high-fg); }
+  .role-pill.viewer { background: var(--pri-low-bg); color: var(--pri-low-fg); }
+  .icon-btn { background: transparent; border: 1px solid rgba(255,255,255,0.32); color: var(--cream); padding: 6px 10px; border-radius: 4px; font-size: 14px; cursor: pointer; }
+  .icon-btn:hover { background: rgba(255,255,255,0.12); }
+
+  /* Read-only mode for viewers */
+  body.role-viewer .card { cursor: default; }
+  body.role-viewer .col.drag-over { background: transparent; border-color: var(--border); }
+  body.role-viewer .drawer-footer .primary,
+  body.role-viewer .drawer-footer .danger,
+  body.role-viewer .add-note-row,
+  body.role-viewer #btn-new { display: none !important; }
+  body.role-viewer .drawer-body input,
+  body.role-viewer .drawer-body select,
+  body.role-viewer .drawer-body textarea { pointer-events: none; opacity: 0.7; }
 
   /* ── App layout ── */
   .app { display: flex; flex-direction: column; min-height: 100vh; }
@@ -169,18 +235,61 @@
 </head>
 <body>
 
-<!-- Login -->
+<!-- Login / forgot / reset (only one visible at a time) -->
 <div class="login-wrap" id="login-wrap">
-  <div class="login-card">
+
+  <div class="login-card" id="view-login">
     <div class="login-brand">Alpha Surfaces</div>
     <h1 class="login-title">Project Tracker</h1>
     <form id="login-form" autocomplete="off">
-      <label for="projects-pw">Password</label>
-      <input type="password" id="projects-pw" name="password" required autocomplete="current-password">
+      <div class="field">
+        <label for="projects-email">Email</label>
+        <input type="email" id="projects-email" name="email" required autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="projects-pw">Password</label>
+        <input type="password" id="projects-pw" name="password" required autocomplete="current-password">
+      </div>
       <button type="submit" id="login-btn">Sign in</button>
       <div class="login-error" id="login-error" aria-live="polite"></div>
+      <a href="#" class="login-link subtle" id="link-to-forgot">Forgot password?</a>
     </form>
   </div>
+
+  <div class="login-card" id="view-forgot" style="display:none">
+    <div class="login-brand">Alpha Surfaces</div>
+    <h1 class="login-title">Reset Password</h1>
+    <form id="forgot-form" autocomplete="off">
+      <div class="field">
+        <label for="forgot-email">Email address</label>
+        <input type="email" id="forgot-email" name="email" required autocomplete="email">
+      </div>
+      <button type="submit" id="forgot-btn">Send Reset Link</button>
+      <div class="login-error" id="forgot-error" aria-live="polite"></div>
+      <div class="login-success" id="forgot-success" aria-live="polite"></div>
+      <a href="#" class="login-link" id="link-to-login">← Back to sign in</a>
+    </form>
+  </div>
+
+  <div class="login-card" id="view-reset" style="display:none">
+    <div class="login-brand">Alpha Surfaces</div>
+    <h1 class="login-title">Set New Password</h1>
+    <form id="reset-form" autocomplete="off">
+      <div class="field">
+        <label for="new-password">New password</label>
+        <input type="password" id="new-password" name="password" required autocomplete="new-password" minlength="8">
+      </div>
+      <div class="field">
+        <label for="confirm-password">Confirm password</label>
+        <input type="password" id="confirm-password" name="confirm" required autocomplete="new-password" minlength="8">
+      </div>
+      <button type="submit" id="reset-btn">Update Password</button>
+      <div class="login-error" id="reset-error" aria-live="polite"></div>
+      <div class="login-success" id="reset-success" aria-live="polite"></div>
+      <a href="/projects" class="login-link" id="link-from-reset" style="display:none">Sign in with your new password</a>
+    </form>
+  </div>
+
 </div>
 
 <!-- App -->
@@ -197,6 +306,11 @@
         <button id="view-list"  type="button">List</button>
       </div>
       <button id="btn-export" type="button">↓ Export CSV</button>
+      <button id="btn-admin" class="icon-btn" type="button" title="User management" style="display:none">⚙</button>
+      <span class="user-chip" id="user-chip" style="display:none">
+        <span class="avatar" id="user-avatar"></span>
+        <span id="user-name"></span>
+      </span>
       <button id="btn-logout" type="button">Sign out</button>
     </div>
   </header>
@@ -252,6 +366,9 @@
 <div class="drawer-overlay" id="drawer-overlay"></div>
 <aside class="drawer" id="drawer" aria-hidden="true"></aside>
 
+<!-- Admin user-management modal -->
+<div class="admin-modal" id="admin-modal" role="dialog" aria-hidden="true"></div>
+
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -277,24 +394,80 @@
     sort: 'updated_at',
     order: 'desc',
     filters: { search: '', category: '', priority: '', assigned_to: '' },
-    tickets: []
+    tickets: [],
+    user: null   // { email, name, role, initials }
   };
   var searchDebounce = null;
 
-  // ── Auth bootstrap ──
+  // ── View-switching helpers ──
   var loginWrap = document.getElementById('login-wrap');
   var appEl = document.getElementById('app');
+  var viewLogin  = document.getElementById('view-login');
+  var viewForgot = document.getElementById('view-forgot');
+  var viewReset  = document.getElementById('view-reset');
   var loginForm = document.getElementById('login-form');
   var loginBtn = document.getElementById('login-btn');
   var loginErr = document.getElementById('login-error');
 
-  function showApp() { loginWrap.style.display = 'none'; appEl.style.display = 'flex'; loadAll(); }
-  function showLogin(msg) { loginWrap.style.display = 'flex'; appEl.style.display = 'none'; if (msg) loginErr.textContent = msg; }
+  function showLoginView() {
+    loginWrap.style.display = 'flex';
+    appEl.style.display = 'none';
+    viewLogin.style.display  = 'block';
+    viewForgot.style.display = 'none';
+    viewReset.style.display  = 'none';
+    loginErr.textContent = '';
+  }
+  function showForgotView() {
+    viewLogin.style.display  = 'none';
+    viewForgot.style.display = 'block';
+    viewReset.style.display  = 'none';
+    document.getElementById('forgot-error').textContent = '';
+    document.getElementById('forgot-success').textContent = '';
+  }
+  function showResetView() {
+    loginWrap.style.display = 'flex';
+    appEl.style.display = 'none';
+    viewLogin.style.display  = 'none';
+    viewForgot.style.display = 'none';
+    viewReset.style.display  = 'block';
+  }
+  function showApp(user) {
+    if (user) applyUser(user);
+    loginWrap.style.display = 'none';
+    appEl.style.display = 'flex';
+    loadAll();
+  }
+  function showLogin(msg) {
+    showLoginView();
+    if (msg) loginErr.textContent = msg;
+  }
 
-  fetch('/api/projects-auth-check', { credentials: 'include' })
-    .then(function (r) { return r.json(); })
-    .then(function (d) { if (d && d.authenticated) showApp(); })
-    .catch(function () {});
+  function applyUser(user) {
+    state.user = user;
+    var chip = document.getElementById('user-chip');
+    chip.style.display = 'inline-flex';
+    document.getElementById('user-name').textContent = user.name || '';
+    document.getElementById('user-avatar').textContent = user.initials || initialsOf(user.name);
+    // Admin gear visibility
+    var adminBtn = document.getElementById('btn-admin');
+    adminBtn.style.display = user.role === 'admin' ? 'inline-block' : 'none';
+    // Body class drives viewer-mode CSS
+    document.body.classList.toggle('role-viewer', user.role === 'viewer');
+  }
+  function initialsOf(name) {
+    return String(name || '').trim().split(/\s+/).map(function (w) { return w[0] || ''; }).join('').slice(0, 2).toUpperCase();
+  }
+
+  // ── Bootstrap: ?token= → reset view; otherwise check session ──
+  var resetToken = new URLSearchParams(location.search).get('token');
+  if (resetToken) {
+    showResetView();
+  } else {
+    fetch('/api/projects-auth-check', { credentials: 'include' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (d && d.authenticated && d.user) showApp(d.user); })
+      .catch(function () {});
+  }
 
   loginForm.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -302,18 +475,17 @@
     loginBtn.disabled = true;
     loginBtn.textContent = 'Signing in…';
     try {
+      var email = document.getElementById('projects-email').value.trim();
       var pw = document.getElementById('projects-pw').value;
       var res = await fetch('/api/projects-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ password: pw })
+        body: JSON.stringify({ email: email, password: pw })
       });
-      if (!res.ok) {
-        var err = await res.json().catch(function () { return {}; });
-        throw new Error(err.error || ('HTTP ' + res.status));
-      }
-      showApp();
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+      showApp(data.user || { name: email, role: 'member', initials: initialsOf(email) });
     } catch (err) {
       loginErr.textContent = err.message || 'Login failed';
     } finally {
@@ -324,8 +496,78 @@
 
   document.getElementById('btn-logout').addEventListener('click', async function () {
     await fetch('/api/projects-logout', { method: 'POST', credentials: 'include' }).catch(function () {});
+    document.getElementById('projects-email').value = '';
     document.getElementById('projects-pw').value = '';
+    document.body.classList.remove('role-viewer');
+    state.user = null;
+    document.getElementById('user-chip').style.display = 'none';
+    document.getElementById('btn-admin').style.display = 'none';
     showLogin();
+  });
+
+  // ── Forgot password ──
+  document.getElementById('link-to-forgot').addEventListener('click', function (e) {
+    e.preventDefault();
+    showForgotView();
+  });
+  document.getElementById('link-to-login').addEventListener('click', function (e) {
+    e.preventDefault();
+    showLoginView();
+  });
+  document.getElementById('forgot-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn = document.getElementById('forgot-btn');
+    var errEl = document.getElementById('forgot-error');
+    var okEl  = document.getElementById('forgot-success');
+    errEl.textContent = ''; okEl.textContent = '';
+    btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+      var email = document.getElementById('forgot-email').value.trim();
+      var res = await fetch('/api/projects-forgot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email: email })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok && res.status !== 200) throw new Error(data.error || ('HTTP ' + res.status));
+      okEl.textContent = data.message || 'Check your inbox — if that email is registered, a reset link has been sent.';
+    } catch (err) {
+      errEl.textContent = err.message || 'Could not send reset email.';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Send Reset Link';
+    }
+  });
+  document.getElementById('reset-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn = document.getElementById('reset-btn');
+    var errEl = document.getElementById('reset-error');
+    var okEl  = document.getElementById('reset-success');
+    var signInLink = document.getElementById('link-from-reset');
+    errEl.textContent = ''; okEl.textContent = '';
+    var pw = document.getElementById('new-password').value;
+    var confirm = document.getElementById('confirm-password').value;
+    if (pw.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; return; }
+    if (pw !== confirm) { errEl.textContent = 'Passwords do not match.'; return; }
+    btn.disabled = true; btn.textContent = 'Updating…';
+    try {
+      var res = await fetch('/api/projects-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ token: resetToken, password: pw })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok || !data.ok) throw new Error(data.error || 'HTTP ' + res.status);
+      okEl.textContent = data.message || 'Password updated successfully.';
+      signInLink.style.display = 'block';
+      btn.style.display = 'none';
+      document.getElementById('new-password').disabled = true;
+      document.getElementById('confirm-password').disabled = true;
+    } catch (err) {
+      errEl.textContent = err.message || 'Could not update password.';
+      btn.disabled = false; btn.textContent = 'Update Password';
+    }
   });
 
   // ── Data loading ──
@@ -445,17 +687,24 @@
 
   // ── Drag-and-drop ──
   function wireBoard() {
+    var canWrite = state.user && state.user.role !== 'viewer';
     var draggingId = null;
     document.querySelectorAll('.card').forEach(function (card) {
-      card.addEventListener('dragstart', function (e) {
-        draggingId = card.dataset.id;
-        card.classList.add('dragging');
-        try { e.dataTransfer.setData('text/plain', draggingId); } catch (_) {}
-        e.dataTransfer.effectAllowed = 'move';
-      });
-      card.addEventListener('dragend', function () { card.classList.remove('dragging'); });
+      if (canWrite) {
+        card.setAttribute('draggable', 'true');
+        card.addEventListener('dragstart', function (e) {
+          draggingId = card.dataset.id;
+          card.classList.add('dragging');
+          try { e.dataTransfer.setData('text/plain', draggingId); } catch (_) {}
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        card.addEventListener('dragend', function () { card.classList.remove('dragging'); });
+      } else {
+        card.setAttribute('draggable', 'false');
+      }
       card.addEventListener('click', function () { openDrawer(card.dataset.id); });
     });
+    if (!canWrite) return;
     document.querySelectorAll('.col').forEach(function (col) {
       col.addEventListener('dragover', function (e) { e.preventDefault(); col.classList.add('drag-over'); });
       col.addEventListener('dragleave', function () { col.classList.remove('drag-over'); });
@@ -560,31 +809,36 @@
         '<button class="drawer-close" id="drw-close" aria-label="Close">✕</button>' +
       '</div>' +
       '<div class="drawer-body">' +
-        '<div class="field"><label>Title</label><input type="text" id="f-title" value="' + escapeAttr(t.title || '') + '"></div>' +
-        '<div class="field"><label>Description</label><textarea id="f-description" rows="4">' + escapeHtml(t.description || '') + '</textarea></div>' +
-        '<div class="field-grid">' +
-          '<div class="field"><label>Status</label><select id="f-status">' +
-            selectOptions(['backlog','in_progress','review','done','archived'], t.status) +
-          '</select></div>' +
-          '<div class="field"><label>Priority</label><select id="f-priority">' +
-            selectOptions(['high','medium','low'], t.priority) +
-          '</select></div>' +
+        '<div class="tabs">' +
+          '<button class="active" data-tab="details">Details</button>' +
+          '<button data-tab="activity">Activity</button>' +
         '</div>' +
-        '<div class="field-grid">' +
-          '<div class="field"><label>Category</label><select id="f-category"><option value="">—</option>' +
-            selectOptions(CATEGORIES, t.category) +
-          '</select></div>' +
-          '<div class="field"><label>Assigned to</label><select id="f-assigned"><option value="">—</option>' +
-            selectOptions(ASSIGNEES, t.assigned_to) +
-          '</select></div>' +
+        '<div id="tab-details">' +
+          '<div class="field"><label>Title</label><input type="text" id="f-title" value="' + escapeAttr(t.title || '') + '"></div>' +
+          '<div class="field"><label>Description</label><textarea id="f-description" rows="4">' + escapeHtml(t.description || '') + '</textarea></div>' +
+          '<div class="field-grid">' +
+            '<div class="field"><label>Status</label><select id="f-status">' +
+              selectOptions(['backlog','in_progress','review','done','archived'], t.status) + '</select></div>' +
+            '<div class="field"><label>Priority</label><select id="f-priority">' +
+              selectOptions(['high','medium','low'], t.priority) + '</select></div>' +
+          '</div>' +
+          '<div class="field-grid">' +
+            '<div class="field"><label>Category</label><select id="f-category"><option value="">—</option>' +
+              selectOptions(CATEGORIES, t.category) + '</select></div>' +
+            '<div class="field"><label>Assigned to</label><select id="f-assigned"><option value="">—</option>' +
+              selectOptions(ASSIGNEES, t.assigned_to) + '</select></div>' +
+          '</div>' +
+          '<div class="field-grid">' +
+            '<div class="field"><label>Requested by</label><input type="text" id="f-requested" value="' + escapeAttr(t.requested_by || '') + '"></div>' +
+            '<div class="field"><label>Due date</label><input type="date" id="f-due" value="' + escapeAttr(t.due_date ? String(t.due_date).slice(0,10) : '') + '"></div>' +
+          '</div>' +
+          '<div class="field"><label>Notes</label>' +
+            '<div class="note-list" id="note-list">' + renderNotes(t.notes) + '</div>' +
+            '<div class="add-note-row"><input type="text" id="f-note-new" placeholder="Add a note as ' + escapeAttr(state.user ? state.user.name : '') + '…" autocomplete="off"><button type="button" id="f-note-add">Add</button></div>' +
+          '</div>' +
         '</div>' +
-        '<div class="field-grid">' +
-          '<div class="field"><label>Requested by</label><input type="text" id="f-requested" value="' + escapeAttr(t.requested_by || '') + '"></div>' +
-          '<div class="field"><label>Due date</label><input type="date" id="f-due" value="' + escapeAttr(t.due_date ? t.due_date.slice(0,10) : '') + '"></div>' +
-        '</div>' +
-        '<div class="field"><label>Notes (append-only log)</label>' +
-          '<textarea id="f-notes" rows="6">' + escapeHtml(t.notes || '') + '</textarea>' +
-          '<div style="display:flex;gap:8px;margin-top:8px"><input type="text" id="f-note-new" placeholder="Add a note…" style="flex:1;padding:8px 11px;border:1px solid var(--border-strong);border-radius:4px;font-size:14px;font-family:inherit;outline:none"><button type="button" id="f-note-add" style="padding:8px 14px;background:var(--olive);color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:600">Append</button></div>' +
+        '<div id="tab-activity" style="display:none">' +
+          '<div class="activity-list" id="activity-list"><div class="activity-empty">Loading…</div></div>' +
         '</div>' +
       '</div>' +
       '<div class="drawer-footer">' +
@@ -594,18 +848,80 @@
       '</div>';
   }
 
+  // Parse the notes column (each line is "[stamp] Name: text") into per-note
+  // blocks with attribution. Lines that don't match the format render as
+  // continuations of the previous note.
+  function renderNotes(raw) {
+    if (!raw) return '<div class="activity-empty">No notes yet.</div>';
+    var notes = [];
+    var noteRe = /^\[([^\]]+)\]\s+([^:]+?):\s*(.*)$/;
+    String(raw).split('\n').forEach(function (line) {
+      var m = line.match(noteRe);
+      if (m) {
+        notes.push({ stamp: m[1], who: m[2], text: m[3] });
+      } else if (notes.length) {
+        notes[notes.length - 1].text += '\n' + line;
+      } else if (line.trim()) {
+        notes.push({ stamp: '', who: '', text: line });
+      }
+    });
+    if (!notes.length) return '<div class="activity-empty">No notes yet.</div>';
+    return notes.map(function (n) {
+      return '<div class="note">' +
+        (n.who || n.stamp
+          ? '<div class="note-meta"><strong>' + escapeHtml(n.who || 'Unknown') + '</strong> · ' + escapeHtml(n.stamp) + '</div>'
+          : '') +
+        escapeHtml(n.text) +
+      '</div>';
+    }).join('');
+  }
+
   function wireEditDrawer(t) {
     document.getElementById('drw-close').addEventListener('click', closeDrawer);
     document.getElementById('drw-cancel').addEventListener('click', closeDrawer);
-    document.getElementById('f-note-add').addEventListener('click', function () {
+
+    // Tabs
+    var detailsPane  = document.getElementById('tab-details');
+    var activityPane = document.getElementById('tab-activity');
+    var activityLoaded = false;
+    document.querySelectorAll('.tabs button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('.tabs button').forEach(function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        if (b.dataset.tab === 'activity') {
+          detailsPane.style.display = 'none';
+          activityPane.style.display = 'block';
+          if (!activityLoaded) { loadActivity(t.id); activityLoaded = true; }
+        } else {
+          detailsPane.style.display = 'block';
+          activityPane.style.display = 'none';
+        }
+      });
+    });
+
+    // Append a note via dedicated endpoint so the activity log captures it.
+    var addBtn = document.getElementById('f-note-add');
+    if (addBtn) addBtn.addEventListener('click', async function () {
       var input = document.getElementById('f-note-new');
       var msg = input.value.trim();
       if (!msg) return;
-      var ta = document.getElementById('f-notes');
-      var stamp = new Date().toLocaleString('en-AU', { timeZone: 'Australia/Brisbane' });
-      ta.value = (ta.value ? ta.value + '\n' : '') + '[' + stamp + '] ' + msg;
-      input.value = '';
+      addBtn.disabled = true;
+      try {
+        var res = await fetch('/api/projects/tickets/' + t.id + '/notes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ message: msg })
+        });
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok || !data.ok) throw new Error(data.error || 'HTTP ' + res.status);
+        document.getElementById('note-list').innerHTML = renderNotes(data.ticket.notes);
+        input.value = '';
+        activityLoaded = false; // Force refetch next time the tab opens
+      } catch (err) { toast('Failed: ' + err.message); }
+      finally { addBtn.disabled = false; }
     });
+
     document.getElementById('drw-save').addEventListener('click', async function () {
       var btn = this; btn.disabled = true; btn.textContent = 'Saving…';
       try {
@@ -617,18 +933,15 @@
           category:    document.getElementById('f-category').value || null,
           assigned_to: document.getElementById('f-assigned').value || null,
           requested_by: document.getElementById('f-requested').value.trim() || null,
-          due_date:    document.getElementById('f-due').value || null,
-          notes:       document.getElementById('f-notes').value || null
+          due_date:    document.getElementById('f-due').value || null
+          // notes intentionally omitted — append via dedicated /notes endpoint
         };
         await updateTicket(t.id, payload);
         toast('Saved');
         closeDrawer();
         loadAll();
-      } catch (err) {
-        toast('Failed: ' + err.message);
-      } finally {
-        btn.disabled = false; btn.textContent = 'Save changes';
-      }
+      } catch (err) { toast('Failed: ' + err.message); }
+      finally { btn.disabled = false; btn.textContent = 'Save changes'; }
     });
     document.getElementById('drw-archive').addEventListener('click', async function () {
       if (!confirm('Archive ticket ' + t.ticket_id + '?')) return;
@@ -640,6 +953,53 @@
         loadAll();
       } catch (err) { toast('Failed: ' + err.message); }
     });
+  }
+
+  async function loadActivity(ticketId) {
+    var list = document.getElementById('activity-list');
+    list.innerHTML = '<div class="activity-empty">Loading…</div>';
+    try {
+      var res = await fetch('/api/projects/tickets/' + ticketId + '/activity', { credentials: 'include' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      if (!data.activity.length) { list.innerHTML = '<div class="activity-empty">No activity yet.</div>'; return; }
+      list.innerHTML = data.activity.map(function (a) {
+        var who = a.user_name || 'Unknown';
+        var verb;
+        switch (a.action) {
+          case 'created':         verb = 'created this ticket'; break;
+          case 'status_changed':  verb = 'changed the status'; break;
+          case 'priority_changed':verb = 'changed priority'; break;
+          case 'assigned':        verb = 'updated assignment'; break;
+          case 'note_added':      verb = 'added a note'; break;
+          case 'archived':        verb = 'archived this ticket'; break;
+          default:                verb = (a.action || 'updated') + ' the ticket';
+        }
+        var quote = (a.action === 'note_added' && a.detail) ? '<div class="activity-quote">' + escapeHtml(a.detail) + '</div>' : '';
+        var detail = (a.action !== 'note_added' && a.detail) ? '<div class="activity-quote">' + escapeHtml(a.detail) + '</div>' : '';
+        return '<div class="activity-item">' +
+          '<span class="avatar" title="' + escapeAttr(who) + '">' + initialsOf(who) + '</span>' +
+          '<div>' +
+            '<div class="activity-text"><span class="who">' + escapeHtml(who) + '</span> <span class="what">' + escapeHtml(verb) + '</span></div>' +
+            quote + detail +
+            '<div class="activity-when">' + relativeTime(a.created_at) + ' · ' + formatDate(a.created_at, true) + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    } catch (err) {
+      list.innerHTML = '<div class="activity-empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function relativeTime(s) {
+    if (!s) return '—';
+    var diff = (Date.now() - new Date(s).getTime()) / 1000;
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+    return formatDate(s);
   }
 
   function renderCreateDrawer() {
@@ -713,6 +1073,132 @@
     var data = await res.json().catch(function () { return {}; });
     if (!res.ok || !data.ok) throw new Error(data.error || 'HTTP ' + res.status);
     return data.ticket;
+  }
+
+  // ── Admin: user management ──
+  document.getElementById('btn-admin').addEventListener('click', openAdminModal);
+  var adminModal = document.getElementById('admin-modal');
+  adminModal.addEventListener('click', function (e) {
+    if (e.target === adminModal) closeAdminModal();
+  });
+
+  async function openAdminModal() {
+    if (!state.user || state.user.role !== 'admin') return;
+    adminModal.innerHTML = '<div class="admin-card">' +
+      '<div class="admin-card-head"><h2>User management</h2>' +
+        '<div style="display:flex;gap:8px"><button id="adm-add">＋ Add User</button>' +
+        '<button id="adm-close">Close</button></div></div>' +
+      '<div class="admin-card-body" id="adm-body">Loading…</div></div>';
+    adminModal.classList.add('open');
+    document.getElementById('adm-close').addEventListener('click', closeAdminModal);
+    document.getElementById('adm-add').addEventListener('click', addUserPrompt);
+    await loadUsers();
+  }
+  function closeAdminModal() { adminModal.classList.remove('open'); adminModal.innerHTML = ''; }
+
+  async function loadUsers() {
+    var body = document.getElementById('adm-body');
+    try {
+      var res = await fetch('/api/projects/users', { credentials: 'include' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      var rows = data.users.map(function (u) {
+        return '<tr class="' + (u.active ? '' : 'inactive') + '" data-id="' + u.id + '">' +
+          '<td><strong>' + escapeHtml(u.name) + '</strong></td>' +
+          '<td>' + escapeHtml(u.email) + '</td>' +
+          '<td><span class="role-pill ' + escapeAttr(u.role) + '">' + escapeHtml(u.role) + '</span></td>' +
+          '<td>' + (u.last_login ? formatDate(u.last_login, true) : '<span class="muted">Never</span>') + '</td>' +
+          '<td>' + (u.active ? 'Active' : '<span class="muted">Inactive</span>') + '</td>' +
+          '<td style="text-align:right"><button class="adm-edit" data-id="' + u.id + '">Edit</button></td>' +
+        '</tr>';
+      }).join('');
+      body.innerHTML = '<table class="admin-table"><thead><tr>' +
+        '<th>Name</th><th>Email</th><th>Role</th><th>Last Login</th><th>Status</th><th></th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table>';
+      body.querySelectorAll('.adm-edit').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var u = data.users.find(function (x) { return String(x.id) === String(btn.dataset.id); });
+          if (u) editUserPrompt(u);
+        });
+      });
+    } catch (err) {
+      body.innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  async function addUserPrompt() {
+    var email = prompt('Email address:');
+    if (!email) return;
+    var name = prompt('Full name:');
+    if (!name) return;
+    var role = prompt('Role (admin / member / viewer):', 'member');
+    if (!role) return;
+    role = role.trim().toLowerCase();
+    if (!['admin','member','viewer'].includes(role)) { toast('Invalid role'); return; }
+    try {
+      var res = await fetch('/api/projects/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email: email.trim(), name: name.trim(), role: role })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok || !data.ok) throw new Error(data.error || 'HTTP ' + res.status);
+      alert('User created.\n\nTemporary password: ' + data.temporary_password +
+            '\n\nShare this securely. They can change it after first login.');
+      loadUsers();
+    } catch (err) {
+      toast('Failed: ' + err.message);
+    }
+  }
+
+  async function editUserPrompt(u) {
+    var choice = prompt(
+      'Edit ' + u.name + ' (' + u.email + ')\n\n' +
+      'Type one of:\n' +
+      '  rename <new name>\n' +
+      '  role admin|member|viewer\n' +
+      '  ' + (u.active ? 'deactivate' : 'activate') + '\n' +
+      '  reset-password\n',
+      ''
+    );
+    if (!choice) return;
+    var payload = {};
+    var trimmed = choice.trim();
+    if (/^rename\s+(.+)$/i.test(trimmed)) {
+      payload.name = trimmed.replace(/^rename\s+/i, '').trim();
+    } else if (/^role\s+(admin|member|viewer)$/i.test(trimmed)) {
+      payload.role = trimmed.split(/\s+/)[1].toLowerCase();
+    } else if (/^deactivate$/i.test(trimmed)) {
+      payload.active = false;
+    } else if (/^activate$/i.test(trimmed)) {
+      payload.active = true;
+    } else if (/^reset-password$/i.test(trimmed)) {
+      payload.reset_password = true;
+    } else {
+      toast('Unrecognised command');
+      return;
+    }
+    try {
+      var res = await fetch('/api/projects/users/' + u.id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok || !data.ok) throw new Error(data.error || 'HTTP ' + res.status);
+      if (data.temporary_password) {
+        alert('New temporary password for ' + u.email + ':\n\n' + data.temporary_password +
+              '\n\nShare this securely.');
+      } else {
+        toast('Updated');
+      }
+      loadUsers();
+    } catch (err) {
+      toast('Failed: ' + err.message);
+    }
   }
 
   // ── Helpers ──
