@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Project Tracker — Alpha Surfaces</title>
+<style>
+  @font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+  @font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Medium.woff2')  format('woff2'); font-weight: 500; font-display: swap; }
+  @font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Bold.woff2')    format('woff2'); font-weight: 700; font-display: swap; }
+  @font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Regular.woff2')  format('woff2'); font-weight: 400; font-display: swap; }
+  @font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Medium.woff2')   format('woff2'); font-weight: 500; font-display: swap; }
+  @font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+
+  :root {
+    --olive: #564D22;
+    --olive-dark: #3f3819;
+    --cream: #F3F1E6;
+    --cream-light: #f8f6ec;
+    --white: #ffffff;
+    --black: #1a1a1a;
+    --text: #2a2a2a;
+    --muted: #777;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.16);
+
+    --pri-high-bg: rgba(193,55,55,0.10); --pri-high-fg: #b3261e;
+    --pri-med-bg:  rgba(212,144,30,0.12); --pri-med-fg: #b07020;
+    --pri-low-bg:  rgba(45,106,79,0.12);  --pri-low-fg: #2d6a4f;
+
+    --col-backlog-bg:    #efece1;  --col-backlog-fg:    #6c6857;
+    --col-progress-bg:   #e1e9f3;  --col-progress-fg:   #2c5e9a;
+    --col-review-bg:     #f4ecdc;  --col-review-fg:     #a07419;
+    --col-done-bg:       #dfeede;  --col-done-fg:       #2d6a4f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--cream);
+    color: var(--text);
+    font-family: 'Degular', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  h1, h2, h3, h4 { font-family: 'Concrette S', Georgia, serif; }
+  a { color: var(--olive); }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ── Login ── */
+  .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .login-card { background: var(--white); border-radius: 12px; padding: 48px 40px; max-width: 420px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
+  .login-brand { color: var(--olive); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; }
+  .login-title { color: var(--black); font-size: 22px; font-weight: 700; margin-bottom: 28px; }
+  .login-card label { display: block; color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+  .login-card input[type=password] { width: 100%; padding: 12px 14px; border: 1px solid var(--border-strong); border-radius: 6px; font-size: 15px; background: var(--white); outline: none; transition: border-color 0.15s; }
+  .login-card input[type=password]:focus { border-color: var(--olive); }
+  .login-card button { width: 100%; padding: 12px; background: var(--olive); color: var(--white); border: none; border-radius: 6px; font-size: 14px; font-weight: 600; letter-spacing: 0.05em; margin-top: 18px; transition: background 0.15s; }
+  .login-card button:hover { background: var(--olive-dark); }
+  .login-card button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .login-error { color: #b3261e; font-size: 13px; margin-top: 14px; text-align: center; min-height: 18px; }
+
+  /* ── App layout ── */
+  .app { display: flex; flex-direction: column; min-height: 100vh; }
+  .app-header { background: var(--olive); color: var(--white); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .app-header .brand-block { flex: 0 0 auto; }
+  .app-header .brand { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--cream); }
+  .app-header h1 { font-size: 18px; font-weight: 700; margin-top: 2px; color: var(--white); }
+  .app-header .tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .app-header button, .app-header .btn-link { background: transparent; color: var(--cream); border: 1px solid rgba(255,255,255,0.32); padding: 7px 14px; border-radius: 4px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; transition: background 0.15s, border-color 0.15s; text-decoration: none; }
+  .app-header button:hover, .app-header .btn-link:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.6); }
+  .app-header button.primary { background: var(--cream); color: var(--olive); border-color: var(--cream); }
+  .app-header button.primary:hover { background: var(--white); }
+
+  .app-main { flex: 1; padding: 22px 28px 60px; }
+
+  /* ── Stats ── */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; }
+  .stat-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+  .stat-value { font-family: 'Concrette S', Georgia, serif; font-weight: 700; font-size: 28px; color: var(--olive); }
+  .stat-card.high .stat-value { color: var(--pri-high-fg); }
+  .stat-card.green .stat-value { color: var(--pri-low-fg); }
+
+  /* ── Toolbar ── */
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+  .toolbar input[type=search], .toolbar select {
+    padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: 4px; font-size: 14px;
+    background: var(--white); outline: none; font-family: inherit;
+  }
+  .toolbar input[type=search]:focus, .toolbar select:focus { border-color: var(--olive); }
+  .toolbar input[type=search] { flex: 1; min-width: 200px; }
+  .view-toggle { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 4px; overflow: hidden; }
+  .view-toggle button { padding: 8px 14px; background: var(--white); border: none; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .view-toggle button.active { background: var(--olive); color: var(--white); }
+
+  /* ── Kanban ── */
+  .board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .col { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px; min-height: 320px; display: flex; flex-direction: column; transition: background 0.15s; }
+  .col.drag-over { background: var(--cream-light); border-color: var(--olive); }
+  .col-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .col-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 12px; }
+  .col-count { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .col-title.s-backlog     { background: var(--col-backlog-bg);  color: var(--col-backlog-fg); }
+  .col-title.s-in_progress { background: var(--col-progress-bg); color: var(--col-progress-fg); }
+  .col-title.s-review      { background: var(--col-review-bg);   color: var(--col-review-fg); }
+  .col-title.s-done        { background: var(--col-done-bg);     color: var(--col-done-fg); }
+  .col-cards { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+
+  .card { background: var(--cream-light); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; cursor: grab; transition: box-shadow 0.15s, transform 0.05s; }
+  .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+  .card:active { cursor: grabbing; }
+  .card.dragging { opacity: 0.5; transform: scale(0.98); }
+  .card-id { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; font-weight: 600; }
+  .card-title { font-size: 14px; color: var(--text); margin: 4px 0 8px; line-height: 1.35; }
+  .card-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .pill.pri-high   { background: var(--pri-high-bg); color: var(--pri-high-fg); }
+  .pill.pri-medium { background: var(--pri-med-bg);  color: var(--pri-med-fg); }
+  .pill.pri-low    { background: var(--pri-low-bg);  color: var(--pri-low-fg); }
+  .pill.cat        { background: rgba(86,77,34,0.10); color: var(--olive); }
+  .avatar { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--olive); color: var(--white); font-size: 10px; font-weight: 700; margin-left: auto; }
+
+  /* ── List view ── */
+  .table-wrap { background: var(--white); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { text-align: left; padding: 11px 14px; background: var(--cream-light); border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; cursor: pointer; user-select: none; }
+  thead th .sort-arrow { color: var(--olive); margin-left: 4px; }
+  tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 13.5px; }
+  tbody tr { cursor: pointer; transition: background 0.1s; }
+  tbody tr:hover { background: var(--cream-light); }
+
+  .empty { padding: 50px 20px; text-align: center; color: var(--muted); }
+
+  /* ── Drawer ── */
+  .drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 90; }
+  .drawer-overlay.open { display: block; }
+  .drawer { display: none; position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 560px; background: var(--white); box-shadow: -8px 0 32px rgba(0,0,0,0.12); z-index: 100; flex-direction: column; }
+  .drawer.open { display: flex; }
+  .drawer-header { background: var(--olive); color: var(--white); padding: 22px 28px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .drawer-header h2 { font-size: 18px; font-weight: 700; margin-bottom: 2px; color: var(--white); }
+  .drawer-header .meta { font-size: 12px; color: var(--cream); opacity: 0.85; letter-spacing: 0.06em; }
+  .drawer-close { background: transparent; color: var(--white); border: none; font-size: 22px; line-height: 1; padding: 4px 8px; }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 22px 28px 12px; }
+  .drawer-body .field { margin-bottom: 16px; }
+  .drawer-body label { display: block; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+  .drawer-body input[type=text], .drawer-body input[type=date], .drawer-body select, .drawer-body textarea {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--border-strong); border-radius: 4px;
+    font-size: 14px; font-family: inherit; background: var(--white); outline: none; transition: border-color 0.15s;
+  }
+  .drawer-body input:focus, .drawer-body select:focus, .drawer-body textarea:focus { border-color: var(--olive); }
+  .drawer-body textarea { resize: vertical; min-height: 80px; }
+  .drawer-body .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .drawer-footer { border-top: 1px solid var(--border); padding: 14px 28px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .drawer-footer button { padding: 9px 18px; border-radius: 4px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; border: 1px solid var(--border-strong); background: var(--white); color: var(--text); transition: all 0.15s; }
+  .drawer-footer button.primary { background: var(--olive); color: var(--white); border-color: var(--olive); }
+  .drawer-footer button.primary:hover { background: var(--olive-dark); }
+  .drawer-footer button.danger  { color: #b3261e; border-color: rgba(179,38,30,0.4); margin-left: auto; }
+  .drawer-footer button.danger:hover { background: rgba(179,38,30,0.08); }
+  .drawer-footer button:hover { border-color: var(--olive); }
+  .timestamps { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--olive); color: var(--white); padding: 10px 18px; border-radius: 4px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.2s; }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 1080px) { .stats { grid-template-columns: repeat(2, 1fr); } .board { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  @media (max-width: 720px)  { .stats { grid-template-columns: 1fr; } .board { grid-template-columns: 1fr; } .app-header { padding: 14px 16px; } .app-main { padding: 16px; } .toolbar input[type=search] { width: 100%; } .drawer { max-width: 100%; } .drawer-body .field-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="login-wrap" id="login-wrap">
+  <div class="login-card">
+    <div class="login-brand">Alpha Surfaces</div>
+    <h1 class="login-title">Project Tracker</h1>
+    <form id="login-form" autocomplete="off">
+      <label for="projects-pw">Password</label>
+      <input type="password" id="projects-pw" name="password" required autocomplete="current-password">
+      <button type="submit" id="login-btn">Sign in</button>
+      <div class="login-error" id="login-error" aria-live="polite"></div>
+    </form>
+  </div>
+</div>
+
+<!-- App -->
+<div class="app" id="app" style="display:none">
+  <header class="app-header">
+    <div class="brand-block">
+      <div class="brand">Alpha Surfaces</div>
+      <h1>Project Tracker</h1>
+    </div>
+    <div class="tools">
+      <button id="btn-new" class="primary" type="button">＋ New Ticket</button>
+      <div class="view-toggle" role="tablist">
+        <button id="view-board" class="active" type="button">Kanban</button>
+        <button id="view-list"  type="button">List</button>
+      </div>
+      <button id="btn-export" type="button">↓ Export CSV</button>
+      <button id="btn-logout" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card"><div class="stat-label">Total Open</div><div class="stat-value" id="stat-open">0</div></div>
+      <div class="stat-card high"><div class="stat-label">High Priority</div><div class="stat-value" id="stat-high">0</div></div>
+      <div class="stat-card"><div class="stat-label">In Progress</div><div class="stat-value" id="stat-progress">0</div></div>
+      <div class="stat-card green"><div class="stat-label">Completed This Week</div><div class="stat-value" id="stat-done">0</div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="toolbar">
+      <input type="search" id="filter-search" placeholder="Search title, description, ticket id…">
+      <select id="filter-category">
+        <option value="">All categories</option>
+        <option value="website">Website</option>
+        <option value="content">Content</option>
+        <option value="integration">Integration</option>
+        <option value="consulting">Consulting</option>
+        <option value="showroom">Showroom</option>
+        <option value="print">Print</option>
+        <option value="process">Process</option>
+        <option value="meeting">Meeting</option>
+        <option value="feature">Feature</option>
+      </select>
+      <select id="filter-priority">
+        <option value="">All priorities</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+      <select id="filter-assignee">
+        <option value="">All assignees</option>
+        <option value="Sean">Sean</option>
+        <option value="Belinda">Belinda</option>
+        <option value="Jess">Jess</option>
+        <option value="Sam">Sam</option>
+        <option value="Jay">Jay</option>
+        <option value="Jana">Jana</option>
+        <option value="Kate">Kate</option>
+        <option value="Pam">Pam</option>
+      </select>
+    </div>
+
+    <div id="results"></div>
+  </main>
+</div>
+
+<!-- Drawer -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"></aside>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STATUSES = [
+    { key: 'backlog',     label: 'Backlog' },
+    { key: 'in_progress', label: 'In Progress' },
+    { key: 'review',      label: 'Review' },
+    { key: 'done',        label: 'Done' }
+  ];
+  var PRIORITIES = [
+    { key: 'high',   label: 'High' },
+    { key: 'medium', label: 'Medium' },
+    { key: 'low',    label: 'Low' }
+  ];
+  var CATEGORIES = ['website','content','integration','consulting','showroom','print','process','meeting','feature'];
+  var ASSIGNEES  = ['Sean','Belinda','Jess','Sam','Jay','Jana','Kate','Pam'];
+
+  var state = {
+    view: 'board',
+    sort: 'updated_at',
+    order: 'desc',
+    filters: { search: '', category: '', priority: '', assigned_to: '' },
+    tickets: []
+  };
+  var searchDebounce = null;
+
+  // ── Auth bootstrap ──
+  var loginWrap = document.getElementById('login-wrap');
+  var appEl = document.getElementById('app');
+  var loginForm = document.getElementById('login-form');
+  var loginBtn = document.getElementById('login-btn');
+  var loginErr = document.getElementById('login-error');
+
+  function showApp() { loginWrap.style.display = 'none'; appEl.style.display = 'flex'; loadAll(); }
+  function showLogin(msg) { loginWrap.style.display = 'flex'; appEl.style.display = 'none'; if (msg) loginErr.textContent = msg; }
+
+  fetch('/api/projects-auth-check', { credentials: 'include' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) { if (d && d.authenticated) showApp(); })
+    .catch(function () {});
+
+  loginForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    loginErr.textContent = '';
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Signing in…';
+    try {
+      var pw = document.getElementById('projects-pw').value;
+      var res = await fetch('/api/projects-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ password: pw })
+      });
+      if (!res.ok) {
+        var err = await res.json().catch(function () { return {}; });
+        throw new Error(err.error || ('HTTP ' + res.status));
+      }
+      showApp();
+    } catch (err) {
+      loginErr.textContent = err.message || 'Login failed';
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Sign in';
+    }
+  });
+
+  document.getElementById('btn-logout').addEventListener('click', async function () {
+    await fetch('/api/projects-logout', { method: 'POST', credentials: 'include' }).catch(function () {});
+    document.getElementById('projects-pw').value = '';
+    showLogin();
+  });
+
+  // ── Data loading ──
+  async function loadAll() {
+    await Promise.all([loadStats(), loadTickets()]);
+  }
+  async function loadStats() {
+    try {
+      var res = await fetch('/api/projects/stats', { credentials: 'include' });
+      if (res.status === 401) { showLogin('Session expired — please sign in again.'); return; }
+      if (!res.ok) return;
+      var data = await res.json();
+      if (!data.ok) return;
+      document.getElementById('stat-open').textContent = data.totalOpen;
+      document.getElementById('stat-high').textContent = data.highPriority;
+      document.getElementById('stat-progress').textContent = data.inProgress;
+      document.getElementById('stat-done').textContent = data.completedThisWeek;
+    } catch (err) { /* ignore */ }
+  }
+  async function loadTickets() {
+    var results = document.getElementById('results');
+    results.innerHTML = '<div class="empty">Loading…</div>';
+    try {
+      var params = new URLSearchParams();
+      // For board view we want all non-archived tickets so every column populates.
+      if (state.view === 'board') {
+        params.set('status', 'backlog,in_progress,review,done');
+      }
+      Object.keys(state.filters).forEach(function (k) {
+        if (state.filters[k]) params.set(k === 'search' ? 'search' : k, state.filters[k]);
+      });
+      params.set('sort', state.sort);
+      params.set('order', state.order);
+      var res = await fetch('/api/projects/tickets?' + params.toString(), { credentials: 'include' });
+      if (res.status === 401) { showLogin('Session expired — please sign in again.'); return; }
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      state.tickets = data.tickets || [];
+      render();
+    } catch (err) {
+      results.innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function render() {
+    var results = document.getElementById('results');
+    if (!state.tickets.length) {
+      results.innerHTML = '<div class="empty">No tickets match the current filters.</div>';
+      return;
+    }
+    results.innerHTML = state.view === 'board' ? renderBoard(state.tickets) : renderList(state.tickets);
+    if (state.view === 'board') wireBoard();
+    else wireList();
+  }
+
+  function renderBoard(tickets) {
+    var byStatus = { backlog: [], in_progress: [], review: [], done: [] };
+    tickets.forEach(function (t) { if (byStatus[t.status]) byStatus[t.status].push(t); });
+    return '<div class="board">' + STATUSES.map(function (s) {
+      var list = byStatus[s.key] || [];
+      var cards = list.map(renderCard).join('') ||
+        '<div class="empty" style="padding:24px 12px;font-size:12px">Drop tickets here</div>';
+      return '<div class="col" data-status="' + s.key + '">' +
+        '<div class="col-head"><span class="col-title s-' + s.key + '">' + escapeHtml(s.label) + '</span>' +
+        '<span class="col-count">' + list.length + '</span></div>' +
+        '<div class="col-cards">' + cards + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
+  function renderCard(t) {
+    var initials = (t.assigned_to || '').split(/\s+/).map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
+    return '<div class="card" draggable="true" data-id="' + t.id + '" data-ticket-id="' + escapeAttr(t.ticket_id) + '">' +
+      '<div class="card-id">' + escapeHtml(t.ticket_id) + '</div>' +
+      '<div class="card-title">' + escapeHtml(t.title) + '</div>' +
+      '<div class="card-meta">' +
+        '<span class="pill pri-' + escapeAttr(t.priority || 'medium') + '">' + escapeHtml(t.priority || 'medium') + '</span>' +
+        (t.category ? '<span class="pill cat">' + escapeHtml(t.category) + '</span>' : '') +
+        (initials ? '<span class="avatar" title="' + escapeAttr(t.assigned_to) + '">' + initials + '</span>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderList(tickets) {
+    var headers = [
+      { key: 'ticket_id',   label: '#' },
+      { key: 'title',       label: 'Title' },
+      { key: 'category',    label: 'Category' },
+      { key: 'priority',    label: 'Priority' },
+      { key: 'status',      label: 'Status' },
+      { key: 'assigned_to', label: 'Assigned' },
+      { key: 'due_date',    label: 'Due' },
+      { key: 'updated_at',  label: 'Updated' }
+    ];
+    var ths = headers.map(function (h) {
+      var arrow = state.sort === h.key ? (state.order === 'asc' ? ' ▲' : ' ▼') : '';
+      return '<th data-sort="' + h.key + '">' + escapeHtml(h.label) + '<span class="sort-arrow">' + arrow + '</span></th>';
+    }).join('');
+    var trs = tickets.map(function (t) {
+      return '<tr data-id="' + t.id + '">' +
+        '<td>' + escapeHtml(t.ticket_id) + '</td>' +
+        '<td>' + escapeHtml(t.title) + '</td>' +
+        '<td>' + (t.category ? '<span class="pill cat">' + escapeHtml(t.category) + '</span>' : '—') + '</td>' +
+        '<td><span class="pill pri-' + escapeAttr(t.priority || 'medium') + '">' + escapeHtml(t.priority || 'medium') + '</span></td>' +
+        '<td><span class="pill" style="background:var(--col-' + (t.status === 'in_progress' ? 'progress' : t.status) + '-bg);color:var(--col-' + (t.status === 'in_progress' ? 'progress' : t.status) + '-fg)">' + escapeHtml(t.status) + '</span></td>' +
+        '<td>' + escapeHtml(t.assigned_to || '—') + '</td>' +
+        '<td>' + (t.due_date ? formatDate(t.due_date) : '—') + '</td>' +
+        '<td>' + formatDate(t.updated_at) + '</td>' +
+      '</tr>';
+    }).join('');
+    return '<div class="table-wrap"><table>' +
+      '<thead><tr>' + ths + '</tr></thead>' +
+      '<tbody>' + trs + '</tbody>' +
+    '</table></div>';
+  }
+
+  // ── Drag-and-drop ──
+  function wireBoard() {
+    var draggingId = null;
+    document.querySelectorAll('.card').forEach(function (card) {
+      card.addEventListener('dragstart', function (e) {
+        draggingId = card.dataset.id;
+        card.classList.add('dragging');
+        try { e.dataTransfer.setData('text/plain', draggingId); } catch (_) {}
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      card.addEventListener('dragend', function () { card.classList.remove('dragging'); });
+      card.addEventListener('click', function () { openDrawer(card.dataset.id); });
+    });
+    document.querySelectorAll('.col').forEach(function (col) {
+      col.addEventListener('dragover', function (e) { e.preventDefault(); col.classList.add('drag-over'); });
+      col.addEventListener('dragleave', function () { col.classList.remove('drag-over'); });
+      col.addEventListener('drop', function (e) {
+        e.preventDefault();
+        col.classList.remove('drag-over');
+        var id = draggingId || (e.dataTransfer && e.dataTransfer.getData('text/plain'));
+        if (!id) return;
+        var newStatus = col.dataset.status;
+        var t = state.tickets.find(function (x) { return String(x.id) === String(id); });
+        if (!t || t.status === newStatus) return;
+        // Optimistic move so the UI feels instant
+        t.status = newStatus;
+        render();
+        updateTicket(id, { status: newStatus }).then(loadStats);
+      });
+    });
+  }
+
+  function wireList() {
+    document.querySelectorAll('thead th[data-sort]').forEach(function (th) {
+      th.addEventListener('click', function () {
+        var key = th.dataset.sort;
+        if (state.sort === key) state.order = state.order === 'asc' ? 'desc' : 'asc';
+        else { state.sort = key; state.order = 'asc'; }
+        loadTickets();
+      });
+    });
+    document.querySelectorAll('tbody tr[data-id]').forEach(function (tr) {
+      tr.addEventListener('click', function () { openDrawer(tr.dataset.id); });
+    });
+  }
+
+  // ── Toolbar wiring ──
+  document.getElementById('view-board').addEventListener('click', function () { setView('board'); });
+  document.getElementById('view-list').addEventListener('click',  function () { setView('list');  });
+  function setView(v) {
+    state.view = v;
+    document.getElementById('view-board').classList.toggle('active', v === 'board');
+    document.getElementById('view-list').classList.toggle('active',  v === 'list');
+    loadTickets();
+  }
+
+  document.getElementById('filter-search').addEventListener('input', function (e) {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(function () { state.filters.search = e.target.value.trim(); loadTickets(); }, 250);
+  });
+  document.getElementById('filter-category').addEventListener('change', function (e) { state.filters.category = e.target.value; loadTickets(); });
+  document.getElementById('filter-priority').addEventListener('change', function (e) { state.filters.priority = e.target.value; loadTickets(); });
+  document.getElementById('filter-assignee').addEventListener('change', function (e) { state.filters.assigned_to = e.target.value; loadTickets(); });
+
+  document.getElementById('btn-export').addEventListener('click', function () {
+    window.location.href = '/api/projects/tickets/export';
+  });
+  document.getElementById('btn-new').addEventListener('click', function () { openCreateDrawer(); });
+
+  // ── Drawer ──
+  var drawer = document.getElementById('drawer');
+  var overlay = document.getElementById('drawer-overlay');
+  overlay.addEventListener('click', closeDrawer);
+
+  function closeDrawer() {
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+  }
+
+  async function openDrawer(id) {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    drawer.innerHTML = '<div class="empty">Loading…</div>';
+    try {
+      var res = await fetch('/api/projects/tickets/' + id, { credentials: 'include' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      drawer.innerHTML = renderEditDrawer(data.ticket);
+      wireEditDrawer(data.ticket);
+    } catch (err) {
+      drawer.innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function openCreateDrawer() {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    drawer.innerHTML = renderCreateDrawer();
+    wireCreateDrawer();
+  }
+
+  function selectOptions(values, selected) {
+    return values.map(function (v) {
+      var sel = (selected != null && String(selected) === String(v)) ? ' selected' : '';
+      return '<option value="' + escapeAttr(v) + '"' + sel + '>' + escapeHtml(v) + '</option>';
+    }).join('');
+  }
+
+  function renderEditDrawer(t) {
+    return '' +
+      '<div class="drawer-header">' +
+        '<div><h2>' + escapeHtml(t.ticket_id) + ' — ' + escapeHtml(t.title) + '</h2>' +
+          '<div class="meta">Created ' + formatDate(t.created_at, true) + ' · Updated ' + formatDate(t.updated_at, true) + '</div></div>' +
+        '<button class="drawer-close" id="drw-close" aria-label="Close">✕</button>' +
+      '</div>' +
+      '<div class="drawer-body">' +
+        '<div class="field"><label>Title</label><input type="text" id="f-title" value="' + escapeAttr(t.title || '') + '"></div>' +
+        '<div class="field"><label>Description</label><textarea id="f-description" rows="4">' + escapeHtml(t.description || '') + '</textarea></div>' +
+        '<div class="field-grid">' +
+          '<div class="field"><label>Status</label><select id="f-status">' +
+            selectOptions(['backlog','in_progress','review','done','archived'], t.status) +
+          '</select></div>' +
+          '<div class="field"><label>Priority</label><select id="f-priority">' +
+            selectOptions(['high','medium','low'], t.priority) +
+          '</select></div>' +
+        '</div>' +
+        '<div class="field-grid">' +
+          '<div class="field"><label>Category</label><select id="f-category"><option value="">—</option>' +
+            selectOptions(CATEGORIES, t.category) +
+          '</select></div>' +
+          '<div class="field"><label>Assigned to</label><select id="f-assigned"><option value="">—</option>' +
+            selectOptions(ASSIGNEES, t.assigned_to) +
+          '</select></div>' +
+        '</div>' +
+        '<div class="field-grid">' +
+          '<div class="field"><label>Requested by</label><input type="text" id="f-requested" value="' + escapeAttr(t.requested_by || '') + '"></div>' +
+          '<div class="field"><label>Due date</label><input type="date" id="f-due" value="' + escapeAttr(t.due_date ? t.due_date.slice(0,10) : '') + '"></div>' +
+        '</div>' +
+        '<div class="field"><label>Notes (append-only log)</label>' +
+          '<textarea id="f-notes" rows="6">' + escapeHtml(t.notes || '') + '</textarea>' +
+          '<div style="display:flex;gap:8px;margin-top:8px"><input type="text" id="f-note-new" placeholder="Add a note…" style="flex:1;padding:8px 11px;border:1px solid var(--border-strong);border-radius:4px;font-size:14px;font-family:inherit;outline:none"><button type="button" id="f-note-add" style="padding:8px 14px;background:var(--olive);color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:600">Append</button></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="drawer-footer">' +
+        '<button class="primary" id="drw-save">Save changes</button>' +
+        '<button id="drw-cancel">Cancel</button>' +
+        '<button class="danger" id="drw-archive">Archive</button>' +
+      '</div>';
+  }
+
+  function wireEditDrawer(t) {
+    document.getElementById('drw-close').addEventListener('click', closeDrawer);
+    document.getElementById('drw-cancel').addEventListener('click', closeDrawer);
+    document.getElementById('f-note-add').addEventListener('click', function () {
+      var input = document.getElementById('f-note-new');
+      var msg = input.value.trim();
+      if (!msg) return;
+      var ta = document.getElementById('f-notes');
+      var stamp = new Date().toLocaleString('en-AU', { timeZone: 'Australia/Brisbane' });
+      ta.value = (ta.value ? ta.value + '\n' : '') + '[' + stamp + '] ' + msg;
+      input.value = '';
+    });
+    document.getElementById('drw-save').addEventListener('click', async function () {
+      var btn = this; btn.disabled = true; btn.textContent = 'Saving…';
+      try {
+        var payload = {
+          title:       document.getElementById('f-title').value.trim(),
+          description: document.getElementById('f-description').value,
+          status:      document.getElementById('f-status').value,
+          priority:    document.getElementById('f-priority').value,
+          category:    document.getElementById('f-category').value || null,
+          assigned_to: document.getElementById('f-assigned').value || null,
+          requested_by: document.getElementById('f-requested').value.trim() || null,
+          due_date:    document.getElementById('f-due').value || null,
+          notes:       document.getElementById('f-notes').value || null
+        };
+        await updateTicket(t.id, payload);
+        toast('Saved');
+        closeDrawer();
+        loadAll();
+      } catch (err) {
+        toast('Failed: ' + err.message);
+      } finally {
+        btn.disabled = false; btn.textContent = 'Save changes';
+      }
+    });
+    document.getElementById('drw-archive').addEventListener('click', async function () {
+      if (!confirm('Archive ticket ' + t.ticket_id + '?')) return;
+      try {
+        var res = await fetch('/api/projects/tickets/' + t.id, { method: 'DELETE', credentials: 'include' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        toast('Archived');
+        closeDrawer();
+        loadAll();
+      } catch (err) { toast('Failed: ' + err.message); }
+    });
+  }
+
+  function renderCreateDrawer() {
+    return '' +
+      '<div class="drawer-header">' +
+        '<div><h2>New ticket</h2><div class="meta">Will be assigned the next AS-XXX id on save.</div></div>' +
+        '<button class="drawer-close" id="drw-close" aria-label="Close">✕</button>' +
+      '</div>' +
+      '<div class="drawer-body">' +
+        '<div class="field"><label>Title *</label><input type="text" id="f-title" required></div>' +
+        '<div class="field"><label>Description</label><textarea id="f-description" rows="4"></textarea></div>' +
+        '<div class="field-grid">' +
+          '<div class="field"><label>Category</label><select id="f-category"><option value="">—</option>' + selectOptions(CATEGORIES) + '</select></div>' +
+          '<div class="field"><label>Priority</label><select id="f-priority">' + selectOptions(['high','medium','low'], 'medium') + '</select></div>' +
+        '</div>' +
+        '<div class="field-grid">' +
+          '<div class="field"><label>Assigned to</label><select id="f-assigned"><option value="">—</option>' + selectOptions(ASSIGNEES) + '</select></div>' +
+          '<div class="field"><label>Due date</label><input type="date" id="f-due"></div>' +
+        '</div>' +
+        '<div class="field"><label>Notes</label><textarea id="f-notes" rows="3"></textarea></div>' +
+      '</div>' +
+      '<div class="drawer-footer">' +
+        '<button class="primary" id="drw-create">Create ticket</button>' +
+        '<button id="drw-cancel">Cancel</button>' +
+      '</div>';
+  }
+
+  function wireCreateDrawer() {
+    document.getElementById('drw-close').addEventListener('click', closeDrawer);
+    document.getElementById('drw-cancel').addEventListener('click', closeDrawer);
+    document.getElementById('drw-create').addEventListener('click', async function () {
+      var title = document.getElementById('f-title').value.trim();
+      if (!title) { toast('Title is required'); return; }
+      var btn = this; btn.disabled = true; btn.textContent = 'Creating…';
+      try {
+        var payload = {
+          title: title,
+          description: document.getElementById('f-description').value,
+          category: document.getElementById('f-category').value || null,
+          priority: document.getElementById('f-priority').value,
+          assigned_to: document.getElementById('f-assigned').value || null,
+          due_date: document.getElementById('f-due').value || null,
+          notes: document.getElementById('f-notes').value || null
+        };
+        var res = await fetch('/api/projects/tickets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok || !data.ok) throw new Error(data.error || 'HTTP ' + res.status);
+        toast('Created ' + data.ticket.ticket_id);
+        closeDrawer();
+        loadAll();
+      } catch (err) {
+        toast('Failed: ' + err.message);
+      } finally {
+        btn.disabled = false; btn.textContent = 'Create ticket';
+      }
+    });
+  }
+
+  async function updateTicket(id, payload) {
+    var res = await fetch('/api/projects/tickets/' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(payload)
+    });
+    var data = await res.json().catch(function () { return {}; });
+    if (!res.ok || !data.ok) throw new Error(data.error || 'HTTP ' + res.status);
+    return data.ticket;
+  }
+
+  // ── Helpers ──
+  function formatDate(s, withTime) {
+    if (!s) return '—';
+    try {
+      var d = new Date(s);
+      var opts = { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Australia/Brisbane' };
+      if (withTime) { opts.hour = 'numeric'; opts.minute = '2-digit'; opts.hour12 = true; }
+      return d.toLocaleString('en-AU', opts);
+    } catch { return s; }
+  }
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+  function toast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function () { t.classList.remove('show'); }, 1800);
+  }
+})();
+</script>
+
+</body>
+</html>

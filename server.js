@@ -481,6 +481,9 @@ app.get('/forms', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'forms.html'));
 });
 
+// ─── Projects ticket tracker (self-contained module) ───
+require('./projects-routes')(app, { pool, sessions, loginLimiter });
+
 // ─── Content API (public read, auth write) ───
 app.get('/api/content', (req, res) => {
   res.json(loadContent());
