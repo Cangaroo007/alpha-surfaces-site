@@ -177,6 +177,47 @@
   body.role-viewer .card-clock { display: none !important; }
   /* #view-time-btn visibility is driven by JS in applyUser() — super_admin only. */
 
+  /* ── Track E: consultant timesheet ── */
+  .timesheet-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 24px 28px; margin-bottom: 20px; }
+  .timesheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 16px; flex-wrap: wrap; }
+  .timesheet-name { font-size: 17px; font-weight: 700; color: var(--text); }
+  .timesheet-month { font-size: 13px; color: var(--muted); margin-top: 2px; letter-spacing: 0.04em; }
+  .timesheet-meta { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; }
+  .timesheet-progress-wrap { margin-bottom: 22px; }
+  .timesheet-section-title { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 14px 0 8px; }
+
+  .cat-stack { display: flex; width: 100%; height: 18px; background: var(--cream-light); border-radius: 4px; overflow: hidden; margin-bottom: 14px; }
+  .cat-stack-seg { display: inline-block; height: 100%; transition: opacity 0.15s; }
+  .cat-stack-seg:hover { opacity: 0.85; }
+  .cat-legend { display: grid; gap: 6px; }
+  .cat-legend-row { display: grid; grid-template-columns: 1fr 180px 80px 50px; gap: 12px; align-items: center; font-size: 13px; }
+  .cat-bar { display: block; height: 14px; background: var(--cream-light); border-radius: 3px; overflow: hidden; }
+  .cat-bar-fill { display: block; height: 100%; }
+  .cat-legend-label { display: inline-flex; align-items: center; gap: 8px; color: var(--text); }
+  .cat-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .cat-legend-hours { font-variant-numeric: tabular-nums; color: var(--text); }
+  .cat-legend-pct { font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; }
+  @media (max-width: 720px) {
+    .cat-legend-row { grid-template-columns: 1fr 100px 60px; }
+    .cat-legend-row .cat-bar { display: none; }
+  }
+
+  .daily-log { display: flex; flex-direction: column; gap: 14px; }
+  .day-block { background: var(--white); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .day-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--cream-light); border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; color: var(--olive); letter-spacing: 0.04em; }
+  .day-total { font-variant-numeric: tabular-nums; }
+  .entry-row { display: grid; grid-template-columns: 130px 80px 1fr; gap: 12px; align-items: baseline; padding: 9px 14px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+  .day-block .entry-row:last-child { border-bottom: none; }
+  .entry-cat { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .entry-cat-label { white-space: nowrap; }
+  .entry-dur { font-variant-numeric: tabular-nums; color: var(--muted); }
+  .entry-desc { color: var(--text); line-height: 1.45; word-break: break-word; }
+  .ticket-ref { color: var(--olive); text-decoration: none; }
+  .ticket-ref:hover { text-decoration: underline; }
+  @media (max-width: 720px) {
+    .entry-row { grid-template-columns: 90px 70px 1fr; gap: 8px; }
+  }
+
   .time-summary-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; margin-bottom: 18px; }
   .time-summary-head { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
   .time-summary-head h2 { font-size: 17px; font-weight: 700; color: var(--text); }
@@ -614,7 +655,8 @@
         <select id="time-user-select" style="display:none">
           <option value="">All users (super_admin)</option>
         </select>
-        <button class="btn-export-forms" id="btn-export-time" type="button">↓ Export Timesheet</button>
+        <button class="btn-export-forms" id="btn-export-time" type="button">↓ Export CSV</button>
+        <button class="btn-export-forms" id="btn-report-time" type="button">📄 Export Report</button>
       </div>
       <div id="time-results"><div class="empty">Loading…</div></div>
     </div>
@@ -639,6 +681,10 @@
             <label for="time-log-minutes">Minutes</label>
             <input type="number" id="time-log-minutes" min="1" step="1" required placeholder="e.g. 30">
           </div>
+        </div>
+        <div class="time-modal-row">
+          <label for="time-log-category">Category</label>
+          <select id="time-log-category"></select>
         </div>
         <div class="time-modal-row">
           <label for="time-log-desc">Description (optional)</label>
@@ -2449,8 +2495,54 @@
   // ── Time tracking: dashboard, month nav, quick-log popover ──
   var timeState = {
     month: currentMonthStr(),
-    selectedUserId: null   // super_admin only — null means "show all-users summary"
+    selectedUserId: null,  // super_admin only — null means "show all-users summary"
+    categories: null       // populated lazily from /time/categories
   };
+
+  // Mirrors TIME_CATEGORIES on the server. Used as a fallback so the modal
+  // and dashboard render even before the /time/categories fetch lands.
+  var FALLBACK_TIME_CATEGORIES = [
+    { key: 'development',    label: 'Development',    short: 'Dev',    color: '#564D22' },
+    { key: 'infrastructure', label: 'Infrastructure', short: 'Infra',  color: '#4A6741' },
+    { key: 'design',         label: 'Design',         short: 'Design', color: '#8B6914' },
+    { key: 'communications', label: 'Communications', short: 'Comms',  color: '#2563EB' },
+    { key: 'planning',       label: 'Planning',       short: 'Plan',   color: '#7C3AED' },
+    { key: 'project-mgmt',   label: 'Project Mgmt',   short: 'PM',     color: '#6B7280' }
+  ];
+
+  function timeCategories() {
+    return (timeState.categories && timeState.categories.length)
+      ? timeState.categories
+      : FALLBACK_TIME_CATEGORIES;
+  }
+  function timeCategoryByKey(key) {
+    var k = key || 'development';
+    var cats = timeCategories();
+    for (var i = 0; i < cats.length; i++) if (cats[i].key === k) return cats[i];
+    return cats[0];
+  }
+  async function ensureTimeCategories() {
+    if (timeState.categories) return;
+    try {
+      var res = await fetch('/api/projects/time/categories', { credentials: 'include' });
+      if (!res.ok) return;
+      var data = await res.json();
+      if (data && data.ok && Array.isArray(data.categories)) {
+        timeState.categories = data.categories;
+      }
+    } catch (_) { /* fall back to local list */ }
+  }
+
+  // Wrap any AS-XXX references in description text so they navigate to the
+  // ticket on click. Run AFTER escapeHtml so the regex sees safe text.
+  function linkifyTicketRefs(safeHtml) {
+    return safeHtml.replace(/(AS-\d{3,})/g, '<a href="#" class="ticket-ref" data-ticket-id="$1">$1</a>');
+  }
+  function fmtHM(mins) {
+    var h = Math.floor(mins / 60);
+    var m = mins % 60;
+    return h + 'h ' + (m < 10 ? '0' + m : m) + 'm';
+  }
 
   function currentMonthStr() {
     var d = new Date();
@@ -2491,12 +2583,30 @@
     }
     window.location.href = url;
   });
+  // Printable timesheet report — opens in a new tab so window.print() in the
+  // page can be invoked without losing the project tracker.
+  document.getElementById('btn-report-time').addEventListener('click', function () {
+    var role = state.user ? state.user.role : '';
+    var userId = role === 'super_admin'
+      ? (timeState.selectedUserId || (state.user && state.user.userId))
+      : (state.user && state.user.userId);
+    if (!userId) {
+      toast('Pick a user first');
+      return;
+    }
+    var url = '/api/projects/time/report?month=' + encodeURIComponent(timeState.month) +
+              '&user_id=' + userId;
+    window.open(url, '_blank', 'noopener');
+  });
 
   async function loadTimeView() {
     document.getElementById('time-month-label').textContent = monthLabel(timeState.month);
     var results = document.getElementById('time-results');
     results.innerHTML = '<div class="empty">Loading…</div>';
     try {
+      // Pull the category taxonomy in parallel with the first dashboard
+      // render so colours + labels are ready when the view paints.
+      ensureTimeCategories();
       var role = state.user ? state.user.role : '';
       // Super_admin without a selected user → show all-users dashboard.
       if (role === 'super_admin' && !timeState.selectedUserId) {
@@ -2569,57 +2679,136 @@
     if (!res.ok) throw new Error('HTTP ' + res.status);
     var data = await res.json();
     if (!data.ok) throw new Error(data.error || 'Failed');
+    // Hydrate the category taxonomy from the response when present — saves
+    // a round-trip if the user lands here before /time/categories returns.
+    if (Array.isArray(data.categories) && data.categories.length) {
+      timeState.categories = data.categories;
+    }
     var u = data.user;
     var pct = data.percent || 0;
     var pcls = progressClass(pct);
+    var totalMin = data.total_minutes || 0;
+
+    // ── Top: monthly summary card with stacked-bar category breakdown ──
+    var byCat = (data.by_category || []).filter(function (c) { return c.minutes > 0; });
+    var stacked = byCat.length
+      ? '<div class="cat-stack">' + byCat.map(function (c) {
+          return '<span class="cat-stack-seg" style="width:' + c.percent + '%;background:' + c.color + '" title="' + escapeAttr(c.label + ' · ' + fmtHours(c.hours) + ' hrs · ' + c.percent + '%') + '"></span>';
+        }).join('') + '</div>'
+      : '';
+    var legend = byCat.length
+      ? '<div class="cat-legend">' + byCat.map(function (c) {
+          return '<div class="cat-legend-row">' +
+            '<span class="cat-bar"><span class="cat-bar-fill" style="width:' + Math.max(c.percent, 2) + '%;background:' + c.color + '"></span></span>' +
+            '<span class="cat-legend-label"><span class="cat-dot" style="background:' + c.color + '"></span>' + escapeHtml(c.label) + '</span>' +
+            '<span class="cat-legend-hours">' + fmtHM(c.minutes) + '</span>' +
+            '<span class="cat-legend-pct">' + c.percent + '%</span>' +
+          '</div>';
+        }).join('') + '</div>'
+      : '<div class="empty" style="padding:18px;font-size:13px">No time logged this month yet.</div>';
+
     var head = '' +
-      '<div class="time-summary-card">' +
-        '<div class="time-summary-head">' +
-          '<h2>' + escapeHtml(u.name) + ' · ' + escapeHtml(monthLabel(data.month)) + '</h2>' +
-          '<span class="meta">Cap ' + u.monthly_hours_cap + ' hrs · Warn at ' + u.warning_hours + ' hrs · Alerts → ' + escapeHtml(u.alert_email) + '</span>' +
+      '<div class="timesheet-card">' +
+        '<div class="timesheet-head">' +
+          '<div>' +
+            '<div class="timesheet-name">' + escapeHtml(u.name) + ' · Consulting Timesheet</div>' +
+            '<div class="timesheet-month">' + escapeHtml(monthLabel(data.month)) + '</div>' +
+          '</div>' +
+          '<div class="timesheet-meta">Cap ' + u.monthly_hours_cap + ' hrs · Warn at ' + u.warning_hours + ' hrs</div>' +
         '</div>' +
-        '<div class="time-progress ' + pcls + '"><div class="time-progress-fill" style="width:' + Math.min(pct, 100) + '%"></div></div>' +
-        '<div class="time-progress-label"><strong>' + fmtHours(data.total_hours) + ' hrs</strong> of ' + u.monthly_hours_cap + ' hrs · ' + pct + '%</div>' +
+        '<div class="timesheet-progress-wrap">' +
+          '<div class="time-progress ' + pcls + '"><div class="time-progress-fill" style="width:' + Math.min(pct, 100) + '%"></div></div>' +
+          '<div class="time-progress-label"><strong>' + fmtHours(data.total_hours) + ' / ' + u.monthly_hours_cap + ' hrs</strong> · ' + pct + '%</div>' +
+        '</div>' +
+        '<div class="timesheet-section-title">Category Breakdown</div>' +
+        stacked +
+        legend +
       '</div>';
 
-    var byDay = data.by_day && data.by_day.length
-      ? data.by_day.map(function (d) {
-          return '<tr><td>' + formatDate(d.date) + '</td>' +
-                 '<td class="num">' + fmtHours(d.hours) + ' hrs</td></tr>';
-        }).join('')
-      : '<tr><td colspan="2" class="empty" style="padding:18px">No entries this month.</td></tr>';
+    // ── Middle: daily activity log grouped by date ──
+    // Group entries by their date (YYYY-MM-DD). Entries from the API are
+    // already ordered DESC, so the per-day item order is preserved.
+    var entries = data.entries || [];
+    var byDate = {};
+    var dateKeys = [];
+    entries.forEach(function (e) {
+      var iso = (e.date instanceof Date) ? e.date.toISOString().slice(0, 10) : String(e.date).slice(0, 10);
+      if (!byDate[iso]) { byDate[iso] = []; dateKeys.push(iso); }
+      byDate[iso].push(e);
+    });
+    dateKeys.sort().reverse();
 
-    var byTicket = data.by_ticket && data.by_ticket.length
-      ? data.by_ticket.map(function (r) {
-          return '<tr><td>' + (r.ticket_id ? escapeHtml(r.ticket_id) : '<span style="color:var(--muted)">—</span>') + '</td>' +
-                 '<td>' + escapeHtml(r.title || (r.ticket_id ? '(ticket missing)' : 'No ticket — general logging')) + '</td>' +
-                 '<td class="num">' + fmtHours(r.hours) + ' hrs</td></tr>';
+    var dailyHtml = dateKeys.length
+      ? dateKeys.map(function (iso) {
+          var rows = byDate[iso];
+          var dayMin = rows.reduce(function (s, r) { return s + r.minutes; }, 0);
+          var items = rows.map(function (r) {
+            var cat = timeCategoryByKey(r.category);
+            var ticketLink = r.ticket_id
+              ? '<a href="#" class="ticket-ref" data-ticket-id="' + escapeAttr(r.ticket_id) + '"><strong>' + escapeHtml(r.ticket_id) + '</strong></a> '
+              : '';
+            var descSafe = linkifyTicketRefs(escapeHtml(r.description || (r.ticket_title || '')));
+            return '<div class="entry-row">' +
+              '<span class="entry-cat" title="' + escapeAttr(cat.label) + '">' +
+                '<span class="cat-dot" style="background:' + cat.color + '"></span>' +
+                '<span class="entry-cat-label">' + escapeHtml(cat.short || cat.label) + '</span>' +
+              '</span>' +
+              '<span class="entry-dur">' + fmtHM(r.minutes) + '</span>' +
+              '<span class="entry-desc">' + ticketLink + descSafe + '</span>' +
+            '</div>';
+          }).join('');
+          return '<div class="day-block">' +
+            '<div class="day-head">' +
+              '<span>' + escapeHtml(formatDayLabel(iso)) + '</span>' +
+              '<span class="day-total">' + fmtHM(dayMin) + '</span>' +
+            '</div>' +
+            items +
+          '</div>';
         }).join('')
-      : '<tr><td colspan="3" class="empty" style="padding:18px">No entries this month.</td></tr>';
+      : '<div class="empty" style="padding:32px;font-size:13px">No entries this month.</div>';
 
-    var entries = data.entries && data.entries.length
-      ? data.entries.map(function (e) {
-          var hrs = (e.minutes / 60);
-          return '<tr>' +
-            '<td>' + formatDate(e.date) + '</td>' +
-            '<td>' + (e.ticket_id ? escapeHtml(e.ticket_id) : '<span style="color:var(--muted)">—</span>') + '</td>' +
-            '<td>' + escapeHtml(e.ticket_title || '') + '</td>' +
-            '<td class="num">' + fmtHours(hrs) + '</td>' +
-            '<td>' + escapeHtml(e.description || '') + '</td>' +
-          '</tr>';
-        }).join('')
-      : '<tr><td colspan="5" class="empty" style="padding:18px">No entries this month.</td></tr>';
+    // ── Bottom: per-ticket breakdown table ──
+    var perTicket = (data.by_ticket || []).map(function (r) {
+      var label = r.ticket_id
+        ? '<a href="#" class="ticket-ref" data-ticket-id="' + escapeAttr(r.ticket_id) + '"><strong>' + escapeHtml(r.ticket_id) + '</strong></a>'
+        : '<span style="color:var(--muted)">—</span>';
+      var pctOfTotal = totalMin > 0 ? Math.round((r.minutes / totalMin) * 100) : 0;
+      return '<tr>' +
+        '<td>' + label + '</td>' +
+        '<td>' + escapeHtml(r.title || (r.ticket_id ? '(ticket missing)' : 'general / no ticket')) + '</td>' +
+        '<td class="num">' + fmtHM(r.minutes) + '</td>' +
+        '<td class="num">' + pctOfTotal + '%</td>' +
+      '</tr>';
+    }).join('') || '<tr><td colspan="4" class="empty" style="padding:18px">No entries this month.</td></tr>';
 
     results.innerHTML = head +
-      '<div class="time-section"><h3>Daily breakdown</h3>' +
-        '<table class="time-table"><thead><tr><th>Date</th><th class="num">Hours</th></tr></thead><tbody>' + byDay + '</tbody></table>' +
+      '<div class="time-section"><h3>Daily Activity Log</h3>' +
+        '<div class="daily-log">' + dailyHtml + '</div>' +
       '</div>' +
-      '<div class="time-section"><h3>Per-ticket breakdown</h3>' +
-        '<table class="time-table"><thead><tr><th>Ticket</th><th>Title</th><th class="num">Hours</th></tr></thead><tbody>' + byTicket + '</tbody></table>' +
-      '</div>' +
-      '<div class="time-section"><h3>Entries</h3>' +
-        '<table class="time-table"><thead><tr><th>Date</th><th>Ticket</th><th>Title</th><th class="num">Hours</th><th>Description</th></tr></thead><tbody>' + entries + '</tbody></table>' +
+      '<div class="time-section"><h3>Per-ticket Breakdown</h3>' +
+        '<table class="time-table"><thead><tr><th>Ticket</th><th>Title</th><th class="num">Hours</th><th class="num">%</th></tr></thead><tbody>' + perTicket + '</tbody></table>' +
       '</div>';
+
+    // Wire ticket-ref clicks → jump back to the kanban with that ticket open.
+    results.querySelectorAll('a.ticket-ref').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var tid = a.dataset.ticketId;
+        if (!tid) return;
+        setView('board');
+        // Wait one tick for board data to load, then open the drawer for the
+        // matching ticket. openDrawer accepts both numeric id and ticket_id.
+        setTimeout(function () { openDrawer(tid); }, 250);
+      });
+    });
+  }
+
+  // "Thu 8 May 2026" — used in the daily activity log headers.
+  function formatDayLabel(iso) {
+    var d = new Date(iso + 'T00:00:00Z');
+    return d.toLocaleString('en-AU', {
+      weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'
+    });
   }
 
   // ── Quick-log time modal (anchored from card clock + drawer-future) ──
@@ -2628,10 +2817,21 @@
   var timeLogTitle    = document.getElementById('time-log-title');
   var timeLogDate     = document.getElementById('time-log-date');
   var timeLogMinutes  = document.getElementById('time-log-minutes');
+  var timeLogCategory = document.getElementById('time-log-category');
   var timeLogDesc     = document.getElementById('time-log-desc');
   var timeLogError    = document.getElementById('time-log-error');
   var timeLogSubmit   = document.getElementById('time-log-submit');
   var pendingLogTicket = null; // { id, title }
+
+  function populateCategorySelect() {
+    if (!timeLogCategory) return;
+    var cats = timeCategories();
+    var current = timeLogCategory.value || 'development';
+    timeLogCategory.innerHTML = cats.map(function (c) {
+      return '<option value="' + escapeAttr(c.key) + '">' + escapeHtml(c.label) + '</option>';
+    }).join('');
+    timeLogCategory.value = cats.some(function (c) { return c.key === current; }) ? current : 'development';
+  }
 
   function openTimeLogModal(ticketId, ticketTitle) {
     pendingLogTicket = ticketId ? { id: ticketId, title: ticketTitle || '' } : null;
@@ -2644,6 +2844,9 @@
     timeLogError.textContent = '';
     timeLogSubmit.disabled = false;
     timeLogSubmit.textContent = 'Log Time';
+    populateCategorySelect();
+    // Async refresh in case the categories endpoint hasn't been hit yet.
+    ensureTimeCategories().then(populateCategorySelect);
     timeLogModal.classList.add('open');
     setTimeout(function () { timeLogMinutes.focus(); }, 50);
   }
@@ -2667,7 +2870,8 @@
     timeLogSubmit.disabled = true;
     timeLogSubmit.textContent = 'Saving…';
     try {
-      var body = { minutes: minutes, date: date, description: desc };
+      var category = (timeLogCategory && timeLogCategory.value) || 'development';
+      var body = { minutes: minutes, date: date, description: desc, category: category };
       if (pendingLogTicket && pendingLogTicket.id) body.ticket_id = pendingLogTicket.id;
       var res = await fetch('/api/projects/time/entries', {
         method: 'POST',

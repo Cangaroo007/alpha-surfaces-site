@@ -62,6 +62,20 @@ const ALLOWED_CATEGORIES = ['website','content','integration','consulting','show
 const ALLOWED_ROLES      = ['super_admin', 'operator', 'viewer'];
 const ALLOWED_DEFAULT_VIEWS = ['kanban', 'list', 'forms', 'time'];
 
+// Track E: work-category taxonomy for time entries. Server-side enforces
+// allowed values; the front-end mirrors this list with labels + colours.
+const TIME_CATEGORIES = [
+  { key: 'development',    label: 'Development',    short: 'Dev',    color: '#564D22' },
+  { key: 'infrastructure', label: 'Infrastructure', short: 'Infra',  color: '#4A6741' },
+  { key: 'design',         label: 'Design',         short: 'Design', color: '#8B6914' },
+  { key: 'communications', label: 'Communications', short: 'Comms',  color: '#2563EB' },
+  { key: 'planning',       label: 'Planning',       short: 'Plan',   color: '#7C3AED' },
+  { key: 'project-mgmt',   label: 'Project Mgmt',   short: 'PM',     color: '#6B7280' }
+];
+const ALLOWED_TIME_CATEGORIES = TIME_CATEGORIES.map(c => c.key);
+const TIME_CATEGORY_LABEL = TIME_CATEGORIES.reduce((acc, c) => { acc[c.key] = c.label; return acc; }, {});
+const TIME_CATEGORY_COLOR = TIME_CATEGORIES.reduce((acc, c) => { acc[c.key] = c.color; return acc; }, {});
+
 const UPDATABLE_TICKET_COLS = [
   'title','description','category','priority','status',
   'assigned_to','requested_by','due_date','source',
@@ -297,6 +311,40 @@ async function initSchema(pool) {
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_time_user   ON time_entries(user_id)`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_time_ticket ON time_entries(ticket_id)`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_time_date   ON time_entries(date)`);
+
+  // Track E: per-entry work category for the consultant timesheet view.
+  // Default is 'development' so legacy entries without a category still
+  // render in the dashboard. Allowed values are enforced in the route layer
+  // (see ALLOWED_TIME_CATEGORIES) — keeping the column unconstrained leaves
+  // room to add new categories without a migration round-trip.
+  await pool.query(`ALTER TABLE time_entries ADD COLUMN IF NOT EXISTS category VARCHAR(30) DEFAULT 'development'`);
+
+  // One-shot backfill for the seeded May 2026 entries + early Track E/F/G
+  // work. Each UPDATE is gated on category IS NULL OR category = 'development'
+  // (the default) so it's idempotent and never overwrites a manual choice.
+  const BACKFILL_RULES = [
+    { cat: 'infrastructure', patterns: ['%Railway%', '%infrastructure%planning%'] },
+    { cat: 'infrastructure', patterns: ['%Twilio%', '%notification architecture%'] },
+    { cat: 'infrastructure', patterns: ['%SendGrid DNS%', '%Cloudflare%DNS%'] },
+    { cat: 'infrastructure', patterns: ['%Postgres%', '%form handler%'] },
+    { cat: 'communications', patterns: ['%Stakeholder%', '%email comms%'] },
+    { cat: 'development',    patterns: ['%notifications build%', '%forms portal%'] },
+    { cat: 'development',    patterns: ['%Project tracker%', '%Kanban%'] },
+    { cat: 'development',    patterns: ['%Track G%', '%Prompt A%', '%Track F%'] },
+    { cat: 'infrastructure', patterns: ['%SendGrid API key rotation%'] },
+    { cat: 'project-mgmt',   patterns: ['%Ticket pipeline%', '%Project management%'] },
+    { cat: 'planning',       patterns: ['%Architecture%spec writing%', '%Prompt D%', '%Prompt B%'] }
+  ];
+  for (const rule of BACKFILL_RULES) {
+    const ors = rule.patterns.map((_, i) => `description ILIKE $${i + 2}`).join(' OR ');
+    await pool.query(
+      `UPDATE time_entries
+          SET category = $1
+        WHERE (category IS NULL OR category = 'development')
+          AND (${ors})`,
+      [rule.cat, ...rule.patterns]
+    );
+  }
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS user_time_settings (
@@ -1254,6 +1302,13 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     return req.user.userId || -1; // -1 sentinel never matches a real id
   }
 
+  // GET: time-entry category taxonomy. super_admin only (matches the rest of
+  // the time API). Surfaces the labels + colours so the front-end doesn't
+  // duplicate the list.
+  router.get('/time/categories', requireRole('super_admin'), (req, res) => {
+    res.json({ ok: true, categories: TIME_CATEGORIES });
+  });
+
   // POST: log a time entry. super_admin only — time tracking is scoped to
   // Sean's consulting hours against a monthly cap. Operators / viewers don't
   // have access. The ticket_id visibility check below is harmless under this
@@ -1280,11 +1335,13 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         }
       }
       const desc = b.description ? String(b.description).trim() : null;
+      const category = b.category && ALLOWED_TIME_CATEGORIES.includes(b.category)
+        ? b.category : 'development';
       const { rows } = await pool.query(
-        `INSERT INTO time_entries (ticket_id, user_id, date, minutes, description)
-         VALUES ($1, $2, $3, $4, $5)
+        `INSERT INTO time_entries (ticket_id, user_id, date, minutes, description, category)
+         VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING *`,
-        [ticketId, req.user.userId, date, minutes, desc]
+        [ticketId, req.user.userId, date, minutes, desc, category]
       );
       const entry = rows[0];
       // Mirror the entry into the ticket activity feed so it surfaces in the
@@ -1327,6 +1384,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       const whereSql = where.length ? ' WHERE ' + where.join(' AND ') : '';
       const { rows } = await pool.query(
         `SELECT te.id, te.ticket_id, te.user_id, te.date, te.minutes, te.description, te.created_at,
+                COALESCE(te.category, 'development') AS category,
                 u.name AS user_name, u.email AS user_email,
                 t.title AS ticket_title
            FROM time_entries te
@@ -1435,8 +1493,20 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
           GROUP BY te.ticket_id, t.title ORDER BY minutes DESC`,
         [userId, range.start, range.end]
       );
+      // Per-category breakdown for the timesheet stacked-bar chart. COALESCE
+      // collapses NULL category rows into 'development' (the default).
+      const byCategoryQ = await pool.query(
+        `SELECT COALESCE(category, 'development') AS category,
+                COALESCE(SUM(minutes), 0)::int AS minutes
+           FROM time_entries
+          WHERE user_id = $1 AND date >= $2::date AND date < $3::date
+          GROUP BY COALESCE(category, 'development')
+          ORDER BY minutes DESC`,
+        [userId, range.start, range.end]
+      );
       const entriesQ = await pool.query(
         `SELECT te.id, te.ticket_id, te.date, te.minutes, te.description, te.created_at,
+                COALESCE(te.category, 'development') AS category,
                 t.title AS ticket_title
            FROM time_entries te
            LEFT JOIN tickets t ON t.ticket_id = te.ticket_id
@@ -1463,6 +1533,15 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
           ticket_id: r.ticket_id, title: r.title,
           minutes: r.minutes, hours: Math.round((r.minutes / 60) * 100) / 100
         })),
+        by_category: byCategoryQ.rows.map(r => ({
+          category: r.category,
+          label: TIME_CATEGORY_LABEL[r.category] || r.category,
+          color: TIME_CATEGORY_COLOR[r.category] || '#6B7280',
+          minutes: r.minutes,
+          hours: Math.round((r.minutes / 60) * 100) / 100,
+          percent: totalMinutes > 0 ? Math.round((r.minutes / totalMinutes) * 100) : 0
+        })),
+        categories: TIME_CATEGORIES,
         entries: entriesQ.rows
       });
     } catch (err) {
@@ -1483,7 +1562,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       if (scopeUserId != null) { vals.push(scopeUserId); where.push(`te.user_id = $${vals.length}`); }
       const { rows } = await pool.query(
         `SELECT te.date, u.name AS user_name, te.ticket_id,
-                t.title AS ticket_title, te.minutes, te.description
+                t.title AS ticket_title, te.minutes, te.description,
+                COALESCE(te.category, 'development') AS category
            FROM time_entries te
            LEFT JOIN project_users u ON u.id = te.user_id
            LEFT JOIN tickets t       ON t.ticket_id = te.ticket_id
@@ -1497,13 +1577,14 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         return (s.includes(',') || s.includes('"') || s.includes('\n'))
           ? `"${s.replace(/"/g, '""')}"` : s;
       };
-      const header = ['Date','User','Ticket ID','Ticket Title','Hours','Description'];
+      const header = ['Date','Category','Ticket ID','Ticket Title','Hours','Minutes','Description'];
       const lines = rows.map(r => [
         escapeCSV(r.date),
-        escapeCSV(r.user_name),
+        escapeCSV(TIME_CATEGORY_LABEL[r.category] || r.category),
         escapeCSV(r.ticket_id),
         escapeCSV(r.ticket_title),
         escapeCSV((r.minutes / 60).toFixed(2)),
+        escapeCSV(r.minutes),
         escapeCSV(r.description)
       ].join(','));
       const csv = [header.join(','), ...lines].join('\n');
@@ -1513,6 +1594,198 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     } catch (err) {
       console.error('[projects/time] export error:', err.message);
       res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // GET: branded printable timesheet report. Renders an HTML page with the
+  // letterhead, monthly summary, category breakdown, and full daily activity
+  // log. Opens in a new tab and is print-friendly (`@media print` strips the
+  // page background but keeps the olive header bar so it still reads as
+  // Alpha Surfaces stationery).
+  router.get('/time/report', requireRole('super_admin'), async (req, res) => {
+    try {
+      const month = req.query.month || currentMonth();
+      const range = monthRange(month);
+      if (!range) return res.status(400).json({ ok: false, error: 'month must be YYYY-MM' });
+      const userId = parseInt(req.query.user_id, 10);
+      if (!Number.isFinite(userId)) {
+        return res.status(400).json({ ok: false, error: 'user_id required' });
+      }
+      const userQ = await pool.query(
+        `SELECT u.id, u.name, u.email,
+                COALESCE(s.monthly_hours_cap, 20) AS monthly_hours_cap
+           FROM project_users u
+           LEFT JOIN user_time_settings s ON s.user_id = u.id
+          WHERE u.id = $1`,
+        [userId]
+      );
+      if (!userQ.rows.length) return res.status(404).send('User not found');
+      const user = userQ.rows[0];
+
+      const entriesQ = await pool.query(
+        `SELECT te.date, te.minutes, te.description,
+                COALESCE(te.category, 'development') AS category,
+                te.ticket_id, t.title AS ticket_title
+           FROM time_entries te
+           LEFT JOIN tickets t ON t.ticket_id = te.ticket_id
+          WHERE te.user_id = $1 AND te.date >= $2::date AND te.date < $3::date
+          ORDER BY te.date DESC, te.id DESC`,
+        [userId, range.start, range.end]
+      );
+
+      const totalMinutes = entriesQ.rows.reduce((s, r) => s + r.minutes, 0);
+      const totalHours = totalMinutes / 60;
+      const cap = user.monthly_hours_cap;
+      const percent = cap > 0 ? Math.round((totalHours / cap) * 100) : 0;
+
+      // Category aggregation
+      const catTotals = {};
+      entriesQ.rows.forEach(r => {
+        catTotals[r.category] = (catTotals[r.category] || 0) + r.minutes;
+      });
+      const categoryRows = Object.keys(catTotals).map(k => ({
+        key: k,
+        label: TIME_CATEGORY_LABEL[k] || k,
+        color: TIME_CATEGORY_COLOR[k] || '#6B7280',
+        minutes: catTotals[k],
+        hours: catTotals[k] / 60,
+        percent: totalMinutes > 0 ? Math.round((catTotals[k] / totalMinutes) * 100) : 0
+      })).sort((a, b) => b.minutes - a.minutes);
+
+      // Group entries by date for the activity log section.
+      const byDate = {};
+      entriesQ.rows.forEach(r => {
+        const d = r.date instanceof Date ? r.date.toISOString().slice(0, 10) : String(r.date).slice(0, 10);
+        (byDate[d] = byDate[d] || []).push(r);
+      });
+      const dateKeys = Object.keys(byDate).sort().reverse();
+
+      const monthLabel = new Date(`${range.start}T00:00:00Z`).toLocaleString('en-AU', {
+        month: 'long', year: 'numeric', timeZone: 'UTC'
+      });
+      const fmtHM = (mins) => {
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+        return `${h}h ${String(m).padStart(2, '0')}m`;
+      };
+      const fmtDate = (iso) => {
+        const d = new Date(`${iso}T00:00:00Z`);
+        return d.toLocaleString('en-AU', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+      };
+      const generatedAt = new Date().toLocaleString('en-AU', {
+        timeZone: 'Australia/Brisbane', day: 'numeric', month: 'long', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: false
+      });
+
+      // Stacked bar — one segment per category, in descending size order.
+      const stackedBar = categoryRows.map(c =>
+        `<span style="display:inline-block;width:${c.percent}%;height:18px;background:${c.color}" title="${esc(c.label)} ${c.percent}%"></span>`
+      ).join('');
+
+      const categoryBreakdown = categoryRows.map(c => `
+        <tr>
+          <td style="padding:8px 12px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${c.color};margin-right:8px;vertical-align:middle"></span>${esc(c.label)}</td>
+          <td style="padding:8px 12px;text-align:right;font-variant-numeric:tabular-nums">${fmtHM(c.minutes)}</td>
+          <td style="padding:8px 12px;text-align:right;font-variant-numeric:tabular-nums;color:#666">${c.percent}%</td>
+        </tr>
+      `).join('');
+
+      const dailyLog = dateKeys.map(d => {
+        const rows = byDate[d];
+        const dayMin = rows.reduce((s, r) => s + r.minutes, 0);
+        const items = rows.map(r => `
+          <tr class="entry-row">
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;white-space:nowrap">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${TIME_CATEGORY_COLOR[r.category] || '#6B7280'};margin-right:6px;vertical-align:middle"></span>
+              ${esc(TIME_CATEGORY_LABEL[r.category] || r.category)}
+            </td>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;font-variant-numeric:tabular-nums;white-space:nowrap">${fmtHM(r.minutes)}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee">
+              ${r.ticket_id ? `<strong style="color:#564D22;margin-right:6px">${esc(r.ticket_id)}</strong>` : ''}
+              ${esc(r.description || (r.ticket_title ? r.ticket_title : '—'))}
+            </td>
+          </tr>
+        `).join('');
+        return `
+          <table style="width:100%;border-collapse:collapse;margin:0 0 18px;background:#fff">
+            <thead>
+              <tr style="background:#f7f4e8">
+                <th colspan="2" style="text-align:left;padding:10px 12px;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:#564D22;border-bottom:1px solid #ddd">${esc(fmtDate(d))}</th>
+                <th style="text-align:right;padding:10px 12px;font-size:13px;color:#564D22;font-variant-numeric:tabular-nums;border-bottom:1px solid #ddd">${fmtHM(dayMin)}</th>
+              </tr>
+            </thead>
+            <tbody>${items}</tbody>
+          </table>
+        `;
+      }).join('');
+
+      const html = `<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Consulting Timesheet — ${esc(user.name)} — ${esc(monthLabel)}</title>
+<style>
+  body { margin: 0; padding: 0; background: #f3f1e6; font-family: 'Helvetica Neue', Arial, sans-serif; color: #222; }
+  .sheet { max-width: 880px; margin: 0 auto; padding: 32px 28px 60px; }
+  .letterhead { background: #564D22; color: #fff; padding: 24px 28px; border-radius: 6px 6px 0 0; }
+  .letterhead .brand { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #f3f1e6; opacity: 0.9; }
+  .letterhead h1 { margin: 4px 0 2px; font-size: 22px; font-weight: 700; }
+  .letterhead .meta { font-size: 13px; color: #f3f1e6; opacity: 0.85; }
+  .body { background: #fff; padding: 28px; border-radius: 0 0 6px 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .summary { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #e8e5d3; }
+  .summary h2 { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #888; margin-bottom: 10px; }
+  .total-line { font-size: 18px; font-weight: 700; color: #222; margin-bottom: 10px; }
+  .total-line .pct { color: #888; font-weight: 400; font-size: 14px; margin-left: 8px; }
+  .stacked-bar { width: 100%; height: 18px; background: #f3f1e6; border-radius: 3px; overflow: hidden; display: flex; }
+  .legend { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+  .section { margin: 28px 0 16px; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #888; }
+  .footer { margin-top: 36px; padding-top: 18px; border-top: 1px solid #e8e5d3; font-size: 12px; color: #999; text-align: center; }
+  .toolbar { max-width: 880px; margin: 16px auto 0; padding: 0 28px; text-align: right; }
+  .toolbar button { background: #564D22; color: #fff; border: none; padding: 9px 18px; border-radius: 4px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; cursor: pointer; font-family: inherit; }
+  .toolbar button:hover { background: #3f3819; }
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none; }
+    .sheet { padding: 0; }
+    .body { box-shadow: none; padding: 18px 0; }
+    .letterhead { -webkit-print-color-adjust: exact; print-color-adjust: exact; border-radius: 0; }
+    .stacked-bar span, .legend td span { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head><body>
+<div class="toolbar"><button type="button" onclick="window.print()">Print / Save as PDF</button></div>
+<div class="sheet">
+  <div class="letterhead">
+    <div class="brand">Alpha Surfaces</div>
+    <h1>Consulting Timesheet — ${esc(user.name)}</h1>
+    <div class="meta">${esc(monthLabel)} · ${esc(user.email || '')}</div>
+  </div>
+  <div class="body">
+    <div class="summary">
+      <h2>Monthly Summary</h2>
+      <div class="total-line">${totalHours.toFixed(1)} / ${cap} hrs <span class="pct">(${percent}%)</span></div>
+      <div class="stacked-bar">${stackedBar}</div>
+      <table class="legend">
+        <thead>
+          <tr style="border-bottom:1px solid #e8e5d3">
+            <th style="text-align:left;padding:10px 12px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#888;font-weight:700">Category</th>
+            <th style="text-align:right;padding:10px 12px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#888;font-weight:700">Hours</th>
+            <th style="text-align:right;padding:10px 12px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#888;font-weight:700">%</th>
+          </tr>
+        </thead>
+        <tbody>${categoryBreakdown || '<tr><td colspan="3" style="padding:14px;color:#999;text-align:center">No time logged this month.</td></tr>'}</tbody>
+      </table>
+    </div>
+    <div class="section">Daily Activity Log</div>
+    ${dailyLog || '<div style="padding:14px;color:#999;text-align:center">No entries.</div>'}
+    <div class="footer">Generated from Alpha Surfaces Project Tracker on ${esc(generatedAt)} AEST</div>
+  </div>
+</div>
+</body></html>`;
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.send(html);
+    } catch (err) {
+      console.error('[projects/time] report error:', err.message);
+      res.status(500).send('Report generation failed: ' + err.message);
     }
   });
 
