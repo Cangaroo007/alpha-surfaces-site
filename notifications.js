@@ -537,6 +537,186 @@ async function checkAndSendTimeAlert(pool, userId, month) {
   }
 }
 
+// ─── Review/approval workflow emails (Track F · review/approval) ─────────
+//
+// All four helpers share the same Alpha Surfaces template chrome and the same
+// {to, subject, html} dispatch path. They look up email addresses from
+// project_users by name (case-insensitive) — names come from the ticket's
+// reviewers[] / approver / assigned_to fields. Failures are logged but never
+// thrown; review/approval workflow continues even if SendGrid is down.
+
+async function lookupEmailsByNames(pool, names) {
+  if (!pool || !Array.isArray(names) || !names.length) return [];
+  const cleaned = names.map(n => String(n || '').trim()).filter(Boolean);
+  if (!cleaned.length) return [];
+  // ILIKE matches both 'Jay' (first name) and 'Jana Zemanova' (full name) —
+  // mirrors the existing ticketRoleFilter logic in projects-routes.js.
+  const { rows } = await pool.query(
+    `SELECT name, email FROM project_users
+      WHERE active = TRUE
+        AND (name = ANY($1::text[])
+          OR LOWER(SPLIT_PART(name, ' ', 1)) = ANY(SELECT LOWER(unnest($1::text[]))))`,
+    [cleaned]
+  );
+  return rows;
+}
+
+function reviewEmailChrome({ headerLabel, headerColor, ticket, body, ctaUrl }) {
+  const base = process.env.SITE_URL || 'https://alphasurfaces.com.au';
+  const url  = ctaUrl || `${base}/projects?ticket=${encodeURIComponent(ticket.ticket_id)}`;
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f3f1e6;font-family:'Helvetica Neue',Arial,sans-serif">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f3f1e6">
+  <tr><td align="center" style="padding:48px 16px">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:580px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+      <tr><td style="background:${headerColor || '#564D22'};padding:24px 32px">
+        <p style="margin:0;color:#fff;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.85">Alpha Surfaces · Project Tracker</p>
+        <h1 style="margin:6px 0 0;color:#fff;font-size:21px;font-weight:600">${escapeHtml(headerLabel)}</h1>
+        <p style="margin:6px 0 0;color:#fff;font-size:14px;opacity:.9">${escapeHtml(ticket.ticket_id)} — ${escapeHtml(ticket.title)}</p>
+      </td></tr>
+      <tr><td style="padding:28px 32px;color:#222;font-size:15px;line-height:1.6">
+        ${body}
+        <p style="margin:24px 0 0">
+          <a href="${escapeAttr(url)}" style="display:inline-block;background:#564D22;color:#fff;padding:11px 22px;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:4px">
+            Open ticket
+          </a>
+        </p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>`;
+}
+
+async function dispatchReviewEmails(recipients, subject, html) {
+  if (!configureSendgrid()) {
+    console.warn('[notify/review] SENDGRID_API_KEY not set — skipping review emails');
+    return;
+  }
+  const from = NOTIFY_EMAIL_FROM();
+  await Promise.all(recipients.map(async r => {
+    if (!r || !r.email) return;
+    try {
+      await sgMail.send({ to: r.email, from, subject, html });
+      console.log('[notify/review] sent to', r.email);
+    } catch (err) {
+      const detail = err.response?.body?.errors ? JSON.stringify(err.response.body.errors) : err.message;
+      console.error('[notify/review] send error to', r.email, ':', detail);
+    }
+  }));
+}
+
+// Fired when a ticket enters 'pending_review'. Reviewers can leave advisory
+// feedback or do nothing — the ticket auto-advances after 24h either way.
+async function notifyReviewersRequested(pool, ticket, submitterName) {
+  const reviewers = Array.isArray(ticket.reviewers) ? ticket.reviewers : [];
+  if (!reviewers.length) return;
+  const recipients = await lookupEmailsByNames(pool, reviewers);
+  if (!recipients.length) {
+    console.log('[notify/review] no reviewer emails resolved for', ticket.ticket_id);
+    return;
+  }
+  const body = `
+    <p style="margin:0 0 14px"><strong>${escapeHtml(submitterName || 'Someone')}</strong> has submitted this ticket for review.</p>
+    ${ticket.description ? `<p style="margin:0 0 14px;color:#555;white-space:pre-wrap">${escapeHtml(ticket.description)}</p>` : ''}
+    <p style="margin:0 0 14px;color:#555;font-size:13px">
+      You are an <strong>advisory reviewer</strong>. Leave feedback if you want, or do nothing — this ticket
+      will auto-advance to the approver after 24 hours.
+    </p>
+    ${ticket.approver ? `<p style="margin:0 0 14px;color:#555;font-size:13px">Final approver: <strong>${escapeHtml(ticket.approver)}</strong></p>` : ''}
+  `;
+  const subject = `[${ticket.ticket_id}] Ready for review — ${ticket.title}`;
+  const html = reviewEmailChrome({ headerLabel: 'Ready for review', headerColor: '#564D22', ticket, body });
+  await dispatchReviewEmails(recipients, subject, html);
+}
+
+// Fired when a ticket enters 'pending_approval' (after reviewer feedback or
+// after the 24h auto-advance, or directly if no reviewers were set).
+async function notifyApproverRequested(pool, ticket, reviewSummary) {
+  if (!ticket.approver) return;
+  const recipients = await lookupEmailsByNames(pool, [ticket.approver]);
+  if (!recipients.length) {
+    console.log('[notify/review] approver email not resolved for', ticket.approver);
+    return;
+  }
+  const body = `
+    <p style="margin:0 0 14px">This ticket is ready for your final approval.</p>
+    ${ticket.description ? `<p style="margin:0 0 14px;color:#555;white-space:pre-wrap">${escapeHtml(ticket.description)}</p>` : ''}
+    ${reviewSummary ? `<div style="margin:0 0 14px;padding:12px 14px;background:#f7f4e8;border-left:3px solid #564D22;font-size:13px;color:#444">
+      <strong style="display:block;margin-bottom:6px">Reviewer feedback</strong>${reviewSummary}
+    </div>` : ''}
+    <p style="margin:0 0 14px;color:#555;font-size:13px">Approve to mark the ticket done, or request changes to send it back to the assignee.</p>
+  `;
+  const subject = `[${ticket.ticket_id}] Ready for approval — ${ticket.title}`;
+  const html = reviewEmailChrome({ headerLabel: 'Ready for approval', headerColor: '#564D22', ticket, body });
+  await dispatchReviewEmails(recipients, subject, html);
+}
+
+// Fired when the approver clicks Approve. Notifies the assignee, every active
+// super_admin, and the ticket's reviewers.
+async function notifyApproved(pool, ticket, approverName, approverFeedback) {
+  const targets = new Set();
+  if (ticket.assigned_to) targets.add(ticket.assigned_to);
+  if (Array.isArray(ticket.reviewers)) ticket.reviewers.forEach(r => targets.add(r));
+  // Super_admins by role — explicit listing keeps the "all super_admins" promise
+  // honest even if names change.
+  let superAdmins = [];
+  try {
+    const { rows } = await pool.query(
+      `SELECT name, email FROM project_users WHERE active = TRUE AND role = 'super_admin'`
+    );
+    superAdmins = rows;
+  } catch (err) {
+    console.error('[notify/review] super_admin lookup error:', err.message);
+  }
+  const named = await lookupEmailsByNames(pool, [...targets]);
+  // Dedupe by email — a reviewer who is also a super_admin should only get one mail.
+  const byEmail = new Map();
+  [...named, ...superAdmins].forEach(r => { if (r && r.email) byEmail.set(r.email.toLowerCase(), r); });
+  const recipients = [...byEmail.values()];
+  if (!recipients.length) return;
+  const body = `
+    <p style="margin:0 0 14px"><strong>${escapeHtml(approverName || ticket.approver || 'The approver')}</strong> has approved this ticket. It's now marked as done.</p>
+    ${approverFeedback ? `<div style="margin:0 0 14px;padding:12px 14px;background:#eef5ee;border-left:3px solid #2e7d32;font-size:13px;color:#284428">${escapeHtml(approverFeedback)}</div>` : ''}
+    ${ticket.assigned_to ? `<p style="margin:0 0 14px;color:#555">Assignee: <strong>${escapeHtml(ticket.assigned_to)}</strong></p>` : ''}
+  `;
+  const subject = `[${ticket.ticket_id}] Approved ✅ — ${ticket.title}`;
+  const html = reviewEmailChrome({ headerLabel: 'Approved', headerColor: '#2e7d32', ticket, body });
+  await dispatchReviewEmails(recipients, subject, html);
+}
+
+// Fired when the approver clicks "Request changes". Sends the assignee back
+// to the work — feedback is mandatory in this case (validated server-side).
+async function notifyChangesRequested(pool, ticket, approverName, feedback) {
+  if (!ticket.assigned_to) return;
+  const recipients = await lookupEmailsByNames(pool, [ticket.assigned_to]);
+  if (!recipients.length) return;
+  const body = `
+    <p style="margin:0 0 14px"><strong>${escapeHtml(approverName || ticket.approver || 'The approver')}</strong> has requested changes on this ticket.</p>
+    <div style="margin:0 0 14px;padding:12px 14px;background:#fbeee0;border-left:3px solid #b07020;font-size:14px;color:#5a3a10;white-space:pre-wrap">${escapeHtml(feedback || '(no feedback note)')}</div>
+    <p style="margin:0 0 14px;color:#555;font-size:13px">The ticket is back in your queue. Address the feedback and move it to "Review" again to restart the cycle.</p>
+  `;
+  const subject = `[${ticket.ticket_id}] Changes requested — ${ticket.title}`;
+  const html = reviewEmailChrome({ headerLabel: 'Changes requested', headerColor: '#b07020', ticket, body });
+  await dispatchReviewEmails(recipients, subject, html);
+}
+
+// Fired when a reviewer leaves advisory feedback. Goes to the assignee so they
+// can react during the review window — does NOT change the ticket status.
+async function notifyReviewerFeedback(pool, ticket, reviewerName, feedback) {
+  if (!ticket.assigned_to) return;
+  const recipients = await lookupEmailsByNames(pool, [ticket.assigned_to]);
+  if (!recipients.length) return;
+  const body = `
+    <p style="margin:0 0 14px"><strong>${escapeHtml(reviewerName || 'A reviewer')}</strong> left feedback on this ticket.</p>
+    <div style="margin:0 0 14px;padding:12px 14px;background:#f7f4e8;border-left:3px solid #564D22;font-size:14px;color:#3a3320;white-space:pre-wrap">${escapeHtml(feedback || '(no note)')}</div>
+    <p style="margin:0 0 14px;color:#555;font-size:13px">This is advisory — the ticket continues toward final approval.</p>
+  `;
+  const subject = `[${ticket.ticket_id}] Reviewer feedback from ${reviewerName || 'reviewer'}`;
+  const html = reviewEmailChrome({ headerLabel: 'Reviewer feedback', headerColor: '#564D22', ticket, body });
+  await dispatchReviewEmails(recipients, subject, html);
+}
+
 async function notifyNewSubmission(submission) {
   if (!submission) return;
   const results = await Promise.allSettled([
@@ -722,5 +902,11 @@ module.exports = {
   sendSubmissionEmail,
   notifyNewSubmission,
   sendFormsResetEmail,
-  checkAndSendTimeAlert
+  checkAndSendTimeAlert,
+  // Review/approval workflow
+  notifyReviewersRequested,
+  notifyApproverRequested,
+  notifyApproved,
+  notifyChangesRequested,
+  notifyReviewerFeedback
 };

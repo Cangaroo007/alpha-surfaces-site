@@ -26,8 +26,30 @@ try { sgMail = require('@sendgrid/mail'); } catch { /* email is optional */ }
 // Time-tracking alert helper lives in notifications.js so it can share the
 // SendGrid client + branded email template with the rest of the system.
 let checkAndSendTimeAlert = null;
-try { ({ checkAndSendTimeAlert } = require('./notifications')); }
+let notifyReviewersRequested = null;
+let notifyApproverRequested  = null;
+let notifyApproved           = null;
+let notifyChangesRequested   = null;
+let notifyReviewerFeedback   = null;
+try {
+  ({
+    checkAndSendTimeAlert,
+    notifyReviewersRequested,
+    notifyApproverRequested,
+    notifyApproved,
+    notifyChangesRequested,
+    notifyReviewerFeedback
+  } = require('./notifications'));
+}
 catch { /* notifications module is optional in tests */ }
+
+// Cloudinary is configured globally in server.js. We re-require the singleton
+// here for ticket attachment uploads — config persists across the require
+// boundary, so this is safe.
+let cloudinary = null;
+try { cloudinary = require('cloudinary').v2; } catch { /* optional in tests */ }
+let multer = null;
+try { multer = require('multer'); } catch { /* optional in tests */ }
 
 // ─── Static config ────────────────────────────────────────────────────────
 const ALLOWED_STATUSES   = ['backlog', 'in_progress', 'review', 'done', 'archived'];
@@ -41,10 +63,20 @@ const ALLOWED_ROLES      = ['super_admin', 'operator', 'viewer'];
 
 const UPDATABLE_TICKET_COLS = [
   'title','description','category','priority','status',
-  'assigned_to','requested_by','due_date','source'
+  'assigned_to','requested_by','due_date','source',
+  'reviewers','approver'
   // 'notes' is NOT in this list — notes are append-only via dedicated endpoint
+  // 'approval_status' is set by status transitions and the review endpoint, not by users
 ];
-const TRACKED_COLS = ['title','description','category','priority','status','assigned_to','requested_by','due_date'];
+const TRACKED_COLS = ['title','description','category','priority','status','assigned_to','requested_by','due_date','reviewers','approver'];
+
+// Defaults for new tickets — Jay + Jana review (advisory), Belinda approves
+// (blocking). Creators can override or clear per ticket.
+const DEFAULT_REVIEWERS = ['Jay', 'Jana'];
+const DEFAULT_APPROVER  = 'Belinda';
+// 24h after entering pending_review, the ticket auto-advances to the approver
+// even if no reviewer left feedback. Reviewers are advisory, not blocking.
+const REVIEW_AUTO_ADVANCE_MS = 24 * 60 * 60 * 1000;
 
 const DEFAULT_USER_PASSWORD = 'AlphaSurfaces2026';
 
@@ -121,6 +153,56 @@ async function initSchema(pool) {
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_tickets_status   ON tickets(status)`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_tickets_priority ON tickets(priority)`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_tickets_assigned ON tickets(assigned_to)`);
+
+  // Track C/F: review + approval workflow columns. Idempotent — each column is
+  // ADD COLUMN IF NOT EXISTS. reviewers is a text array so a single ticket can
+  // route to multiple advisory reviewers (Jay + Jana by default); approver is a
+  // single name (Belinda by default) and is the only blocking sign-off.
+  // approval_status: NULL (not in review), 'pending_review', 'pending_approval',
+  // 'approved', 'changes_requested'.
+  await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS reviewers       TEXT[] DEFAULT '{}'`);
+  await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS approver        VARCHAR(100)`);
+  await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS approval_status VARCHAR(20)`);
+  await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS review_started_at TIMESTAMPTZ`);
+
+  // Per-action audit trail for review cycles. Captures both reviewer notes
+  // (advisory) and approver decisions (binding). One row per action — multiple
+  // rounds of changes_requested produce multiple rows so the full history is
+  // preserved.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ticket_reviews (
+      id            SERIAL PRIMARY KEY,
+      ticket_id     VARCHAR(10) NOT NULL REFERENCES tickets(ticket_id) ON DELETE CASCADE,
+      reviewer_id   INTEGER REFERENCES project_users(id) ON DELETE SET NULL,
+      reviewer_name VARCHAR(100) NOT NULL,
+      action        VARCHAR(20) NOT NULL,
+      feedback      TEXT,
+      role          VARCHAR(20) NOT NULL,
+      created_at    TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_reviews_ticket ON ticket_reviews(ticket_id)`);
+
+  // File attachments on tickets. Files are uploaded to Cloudinary (already
+  // configured in server.js) and only the URL is stored here. context lets
+  // us distinguish a casual drag-drop ('general') from a file attached
+  // alongside a review note ('review_feedback') or pulled in from inbound
+  // email ('email_import', wired in Track C).
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ticket_attachments (
+      id          SERIAL PRIMARY KEY,
+      ticket_id   VARCHAR(10) NOT NULL REFERENCES tickets(ticket_id) ON DELETE CASCADE,
+      user_id     INTEGER REFERENCES project_users(id) ON DELETE SET NULL,
+      user_name   VARCHAR(100) NOT NULL,
+      filename    VARCHAR(255) NOT NULL,
+      url         TEXT NOT NULL,
+      mime_type   VARCHAR(100),
+      size_bytes  INTEGER,
+      context     VARCHAR(30) DEFAULT 'general',
+      created_at  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_attachments_ticket ON ticket_attachments(ticket_id)`);
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS project_users (
@@ -433,20 +515,59 @@ function describeFieldChange(col, oldVal, newVal) {
   const labelMap = {
     status: 'Status', priority: 'Priority', assigned_to: 'Assigned',
     title: 'Title', description: 'Description', due_date: 'Due date',
-    requested_by: 'Requested by', category: 'Category'
+    requested_by: 'Requested by', category: 'Category',
+    reviewers: 'Reviewers', approver: 'Approver'
   };
   const label = labelMap[col] || col;
   // Long fields (description) — collapse to "Updated description"
   if (col === 'description' || col === 'title') {
     return { action: 'edited', detail: `Updated ${label.toLowerCase()}` };
   }
-  const before = oldVal == null || oldVal === '' ? '—' : String(oldVal);
-  const after  = newVal == null || newVal === '' ? '—' : String(newVal);
+  const fmt = (v) => {
+    if (v == null || v === '') return '—';
+    if (Array.isArray(v)) return v.length ? v.join(', ') : '—';
+    return String(v);
+  };
+  const before = fmt(oldVal);
+  const after  = fmt(newVal);
   let action = 'edited';
   if (col === 'status') action = 'status_changed';
   else if (col === 'priority') action = 'priority_changed';
   else if (col === 'assigned_to') action = 'assigned';
+  else if (col === 'reviewers' || col === 'approver') action = 'review_routing_changed';
   return { action, detail: `${label}: ${before} → ${after}` };
+}
+
+// Normalise the reviewers field — accepts an array, comma-separated string, or
+// null. Returns a clean string array (deduped, trimmed) or null when the
+// caller wants to clear it.
+function normaliseReviewers(input) {
+  if (input == null) return [];
+  let arr = input;
+  if (typeof input === 'string') {
+    arr = input.split(',');
+  }
+  if (!Array.isArray(arr)) return [];
+  const seen = new Set();
+  const out = [];
+  for (const v of arr) {
+    const s = String(v || '').trim();
+    if (!s) continue;
+    const k = s.toLowerCase();
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(s);
+  }
+  return out;
+}
+
+// Did the reviewers array actually change? Postgres returns text[] as JS array.
+function reviewersEqual(a, b) {
+  const aa = Array.isArray(a) ? [...a].map(String).sort() : [];
+  const bb = Array.isArray(b) ? [...b].map(String).sort() : [];
+  if (aa.length !== bb.length) return false;
+  for (let i = 0; i < aa.length; i++) if (aa[i] !== bb[i]) return false;
+  return true;
 }
 
 // ─── Module factory ───────────────────────────────────────────────────────
@@ -1409,6 +1530,9 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
 
   // ── Tickets list ─────────────────────────────────────────────────────
   router.get('/tickets', async (req, res) => {
+    // Lazy sweep — rate-limited internally so it's fine to fire on every
+    // request. Runs in the background; we don't await it.
+    autoAdvanceReviews().catch(() => {});
     try {
       const where = [];
       const vals = [];
@@ -1518,12 +1642,22 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       if (b.status && !ALLOWED_STATUSES.includes(b.status)) {
         return res.status(400).json({ ok: false, error: 'Invalid status.' });
       }
+      // Reviewers + approver — explicit null/empty array clears the defaults,
+      // anything else falls back to Jay+Jana / Belinda. Distinguish "not
+      // supplied" from "supplied empty" so the create form can opt out.
+      const reviewers = Object.prototype.hasOwnProperty.call(b, 'reviewers')
+        ? normaliseReviewers(b.reviewers)
+        : DEFAULT_REVIEWERS.slice();
+      const approver = Object.prototype.hasOwnProperty.call(b, 'approver')
+        ? (b.approver ? String(b.approver).trim() : null)
+        : DEFAULT_APPROVER;
       const ticketId = await nextTicketId(pool);
       const { rows } = await pool.query(
         `INSERT INTO tickets
            (ticket_id, title, description, category, priority, status,
-            assigned_to, requested_by, due_date, notes, source)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+            assigned_to, requested_by, due_date, notes, source,
+            reviewers, approver)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
          RETURNING *`,
         [
           ticketId,
@@ -1536,7 +1670,9 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
           b.requested_by || req.user.name || null,
           b.due_date || null,
           null,
-          b.source || 'internal'
+          b.source || 'internal',
+          reviewers,
+          approver || null
         ]
       );
       const ticket = rows[0];
@@ -1623,13 +1759,15 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       const changed = [];
       for (const col of UPDATABLE_TICKET_COLS) {
         if (req.body && Object.prototype.hasOwnProperty.call(req.body, col)) {
-          const newVal = req.body[col] === '' ? null : req.body[col];
+          let newVal = req.body[col] === '' ? null : req.body[col];
           if (col === 'priority' && newVal && !ALLOWED_PRIORITIES.includes(newVal)) {
             return res.status(400).json({ ok: false, error: 'Invalid priority.' });
           }
           if (col === 'status' && newVal && !ALLOWED_STATUSES.includes(newVal)) {
             return res.status(400).json({ ok: false, error: 'Invalid status.' });
           }
+          if (col === 'reviewers') newVal = normaliseReviewers(newVal);
+          if (col === 'approver' && newVal != null) newVal = String(newVal).trim() || null;
           // Normalise dates for comparison — Postgres returns Date objects.
           let oldVal = oldRow[col];
           let normNew = newVal;
@@ -1638,13 +1776,89 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
             normNew = newVal ? String(newVal).slice(0, 10) : null;
             normOld = oldVal ? new Date(oldVal).toISOString().slice(0, 10) : null;
           }
-          if ((normOld || '') !== (normNew || '')) {
+          // Reviewers compare as sets — unchanged order shouldn't log an edit.
+          let didChange;
+          if (col === 'reviewers') {
+            didChange = !reviewersEqual(normOld, normNew);
+          } else {
+            didChange = (normOld || '') !== (normNew || '');
+          }
+          if (didChange) {
             changed.push({ col, oldVal: normOld, newVal: normNew });
           }
           vals.push(newVal);
           sets.push(`${col} = $${vals.length}`);
         }
       }
+
+      // Status transition → review/approval state machine. Only run when
+      // status itself is in the patch payload — otherwise the existing
+      // approval_status stays as-is. The request must reflect the *current*
+      // ticket including any reviewers/approver edits in this same call, so
+      // we look at the in-flight values rather than oldRow.
+      const statusInPatch = Object.prototype.hasOwnProperty.call(req.body, 'status');
+      const newStatus = statusInPatch ? req.body.status : oldRow.status;
+      const oldStatus = oldRow.status;
+      const effectiveReviewers = Object.prototype.hasOwnProperty.call(req.body, 'reviewers')
+        ? normaliseReviewers(req.body.reviewers)
+        : (Array.isArray(oldRow.reviewers) ? oldRow.reviewers : []);
+      const effectiveApprover = Object.prototype.hasOwnProperty.call(req.body, 'approver')
+        ? (req.body.approver ? String(req.body.approver).trim() : null)
+        : oldRow.approver;
+      const hasReviewRouting = effectiveReviewers.length > 0 || !!effectiveApprover;
+
+      // Block direct backlog/in_progress → done when an approver is set and
+      // the ticket hasn't been approved yet. The only path to done in that
+      // case is via the review endpoint.
+      if (statusInPatch && newStatus === 'done' && newStatus !== oldStatus
+          && effectiveApprover && oldRow.approval_status !== 'approved') {
+        return res.status(400).json({
+          ok: false,
+          error: `This ticket has an approver (${effectiveApprover}). Move it to "review" first — ${effectiveApprover} must approve before it can be marked done.`
+        });
+      }
+
+      // Approval status side-effects driven by the status transition.
+      let nextApprovalStatus = oldRow.approval_status;
+      let triggerReviewerEmail = false;
+      let triggerApproverEmail = false;
+      let setReviewStartedAt = false;
+      if (statusInPatch && newStatus !== oldStatus) {
+        if (newStatus === 'review' && hasReviewRouting) {
+          if (effectiveReviewers.length) {
+            nextApprovalStatus = 'pending_review';
+            triggerReviewerEmail = true;
+            setReviewStartedAt = true;
+          } else {
+            // No reviewers — go straight to the approver.
+            nextApprovalStatus = 'pending_approval';
+            triggerApproverEmail = true;
+          }
+        } else if (newStatus === 'review' && !hasReviewRouting) {
+          // No reviewers and no approver — ticket sits in review with no
+          // workflow attached. Clear any prior approval_status state.
+          nextApprovalStatus = null;
+        } else if (newStatus === 'in_progress' || newStatus === 'backlog') {
+          // Pulling back out of review/done → reset workflow state.
+          nextApprovalStatus = null;
+        } else if (newStatus === 'done') {
+          // Reaching done means we either had no approver, or the approver
+          // approved (gate above). Either way, mark the cycle finished.
+          nextApprovalStatus = oldRow.approval_status === 'approved' ? 'approved' : null;
+        }
+
+        if (nextApprovalStatus !== oldRow.approval_status) {
+          vals.push(nextApprovalStatus);
+          sets.push(`approval_status = $${vals.length}`);
+        }
+        if (setReviewStartedAt) {
+          sets.push(`review_started_at = NOW()`);
+        } else if (newStatus !== 'review') {
+          // Clear the auto-advance timer once we leave review.
+          sets.push(`review_started_at = NULL`);
+        }
+      }
+
       if (!sets.length) return res.status(400).json({ ok: false, error: 'No updatable fields supplied.' });
       sets.push(`updated_at = NOW()`);
       vals.push(oldRow.id);
@@ -1669,12 +1883,350 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         );
       }
 
+      // Review/approval emails — fire-and-forget, never block the response.
+      if (triggerReviewerEmail && notifyReviewersRequested) {
+        notifyReviewersRequested(pool, newRow, req.user.name)
+          .catch(err => console.error('[projects/review] reviewer email dispatch:', err.message));
+        logActivity(pool, newRow.ticket_id, req.user, 'review_requested',
+          `Submitted for review — notified ${effectiveReviewers.join(', ')}`);
+      }
+      if (triggerApproverEmail && notifyApproverRequested) {
+        notifyApproverRequested(pool, newRow, null)
+          .catch(err => console.error('[projects/review] approver email dispatch:', err.message));
+        logActivity(pool, newRow.ticket_id, req.user, 'approval_requested',
+          `Sent to ${effectiveApprover} for approval`);
+      }
+
       res.json({ ok: true, ticket: newRow });
     } catch (err) {
       console.error('[projects] update error:', err.message);
       res.status(500).json({ ok: false, error: err.message });
     }
   });
+
+  // ── Review/approval action ───────────────────────────────────────────
+  //
+  // POST /api/projects/tickets/:id/review
+  // Body: { action: 'approve'|'request_changes'|'reviewer_feedback', feedback }
+  //
+  // - 'approve' is approver-only and ends the cycle (sets status='done').
+  // - 'request_changes' is approver-only and sends the ticket back to
+  //   in_progress for the assignee to address.
+  // - 'reviewer_feedback' is a non-blocking advisory note from a reviewer.
+  //
+  // The current user must match the role they're acting in: only the named
+  // approver can approve/request_changes; only a named reviewer (or super_admin)
+  // can leave reviewer_feedback. Super_admin can act in any role to keep
+  // operations unblocked when someone is OOO.
+  router.post('/tickets/:id/review', requireWrite, async (req, res) => {
+    try {
+      const id = req.params.id;
+      const tk = /^\d+$/.test(id)
+        ? await pool.query('SELECT * FROM tickets WHERE id = $1', [parseInt(id, 10)])
+        : await pool.query('SELECT * FROM tickets WHERE ticket_id = $1', [id]);
+      if (!tk.rows.length) return res.status(404).json({ ok: false, error: 'Ticket not found' });
+      const ticket = tk.rows[0];
+      // Visibility check — anyone who can see the ticket can act on it if
+      // they hold the relevant role; viewers blocked at requireWrite already.
+      if (!canAccessTicket(req.user, ticket) && req.user.role !== 'super_admin') {
+        return res.status(403).json({ ok: false, error: 'You cannot act on this ticket.' });
+      }
+      const action = String(req.body?.action || '').trim();
+      const feedback = req.body?.feedback ? String(req.body.feedback).trim() : '';
+      const isApproveAction = action === 'approve' || action === 'request_changes';
+      const isReviewerAction = action === 'reviewer_feedback';
+      if (!isApproveAction && !isReviewerAction) {
+        return res.status(400).json({ ok: false, error: 'Invalid action.' });
+      }
+      // Feedback is mandatory for changes_requested — assignee needs to know
+      // what's wrong. Optional for approve and reviewer_feedback.
+      if (action === 'request_changes' && !feedback) {
+        return res.status(400).json({ ok: false, error: 'Feedback is required when requesting changes.' });
+      }
+
+      // Role check — match against the ticket's named approver/reviewers.
+      const userName = (req.user.name || '').trim();
+      const userFirst = userName.split(/\s+/)[0] || userName;
+      const matchesName = (label) => {
+        if (!label) return false;
+        const t = String(label).trim().toLowerCase();
+        return t && (t === userName.toLowerCase() || t === userFirst.toLowerCase());
+      };
+      const isApprover = matchesName(ticket.approver) || req.user.role === 'super_admin';
+      const isReviewer = (Array.isArray(ticket.reviewers) && ticket.reviewers.some(matchesName))
+                         || req.user.role === 'super_admin';
+      if (isApproveAction && !isApprover) {
+        return res.status(403).json({ ok: false, error: 'Only the named approver can perform this action.' });
+      }
+      if (isReviewerAction && !isReviewer) {
+        return res.status(403).json({ ok: false, error: 'Only a named reviewer can leave reviewer feedback.' });
+      }
+
+      const role = isApproveAction ? 'approver' : 'reviewer';
+      const reviewAction = action === 'approve' ? 'approved'
+                         : action === 'request_changes' ? 'changes_requested'
+                         : 'feedback';
+
+      // Insert the audit row first — never lose history even if downstream
+      // status update fails.
+      await pool.query(
+        `INSERT INTO ticket_reviews (ticket_id, reviewer_id, reviewer_name, action, feedback, role)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [ticket.ticket_id, req.user.userId || null, req.user.name || 'Unknown', reviewAction, feedback || null, role]
+      );
+
+      let updated = ticket;
+      if (action === 'approve') {
+        const upd = await pool.query(
+          `UPDATE tickets SET status = 'done', approval_status = 'approved',
+                              review_started_at = NULL, updated_at = NOW()
+            WHERE id = $1 RETURNING *`,
+          [ticket.id]
+        );
+        updated = upd.rows[0];
+        logActivity(pool, ticket.ticket_id, req.user, 'approved',
+          feedback ? `Approved: ${feedback}` : 'Approved — moved to done');
+        if (notifyApproved) {
+          notifyApproved(pool, updated, req.user.name, feedback)
+            .catch(err => console.error('[projects/review] approved email dispatch:', err.message));
+        }
+      } else if (action === 'request_changes') {
+        const upd = await pool.query(
+          `UPDATE tickets SET status = 'in_progress', approval_status = 'changes_requested',
+                              review_started_at = NULL, updated_at = NOW()
+            WHERE id = $1 RETURNING *`,
+          [ticket.id]
+        );
+        updated = upd.rows[0];
+        logActivity(pool, ticket.ticket_id, req.user, 'changes_requested', feedback);
+        if (notifyChangesRequested) {
+          notifyChangesRequested(pool, updated, req.user.name, feedback)
+            .catch(err => console.error('[projects/review] changes_requested email dispatch:', err.message));
+        }
+      } else {
+        // reviewer_feedback: advisory only, doesn't change status. But it
+        // does advance pending_review → pending_approval per the spec
+        // ("after 24h OR when any reviewer leaves feedback, whichever first").
+        if (ticket.approval_status === 'pending_review' && ticket.approver) {
+          const upd = await pool.query(
+            `UPDATE tickets SET approval_status = 'pending_approval',
+                                review_started_at = NULL, updated_at = NOW()
+              WHERE id = $1 RETURNING *`,
+            [ticket.id]
+          );
+          updated = upd.rows[0];
+          logActivity(pool, ticket.ticket_id, req.user, 'reviewer_feedback',
+            `${req.user.name} left feedback — advanced to ${ticket.approver} for approval`);
+          // Pass the feedback into the approver's email so they have context.
+          if (notifyApproverRequested) {
+            const summary = `<strong>${esc(req.user.name)}:</strong> ${esc(feedback)}`;
+            notifyApproverRequested(pool, updated, summary)
+              .catch(err => console.error('[projects/review] approver email dispatch:', err.message));
+          }
+        } else {
+          logActivity(pool, ticket.ticket_id, req.user, 'reviewer_feedback', feedback);
+        }
+        if (notifyReviewerFeedback) {
+          notifyReviewerFeedback(pool, updated, req.user.name, feedback)
+            .catch(err => console.error('[projects/review] reviewer feedback email:', err.message));
+        }
+      }
+
+      res.json({ ok: true, ticket: updated });
+    } catch (err) {
+      console.error('[projects] review error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // ── List reviews for a ticket ────────────────────────────────────────
+  router.get('/tickets/:id/reviews', async (req, res) => {
+    try {
+      const id = req.params.id;
+      const tk = /^\d+$/.test(id)
+        ? await pool.query('SELECT * FROM tickets WHERE id = $1', [parseInt(id, 10)])
+        : await pool.query('SELECT * FROM tickets WHERE ticket_id = $1', [id]);
+      if (!tk.rows.length) return res.status(404).json({ ok: false, error: 'Ticket not found' });
+      if (!canAccessTicket(req.user, tk.rows[0])) {
+        return res.status(404).json({ ok: false, error: 'Ticket not found' });
+      }
+      const ticketId = tk.rows[0].ticket_id;
+      const { rows } = await pool.query(
+        `SELECT id, ticket_id, reviewer_id, reviewer_name, action, feedback, role, created_at
+           FROM ticket_reviews WHERE ticket_id = $1
+          ORDER BY created_at DESC, id DESC`,
+        [ticketId]
+      );
+      // Pull the attachments tagged as review_feedback so the UI can
+      // surface them inline with the corresponding review entry. Matching
+      // is done by created_at proximity (within 5s) to keep the schema flat.
+      const att = await pool.query(
+        `SELECT id, ticket_id, user_name, filename, url, mime_type, size_bytes, context, created_at
+           FROM ticket_attachments WHERE ticket_id = $1 AND context = 'review_feedback'`,
+        [ticketId]
+      );
+      res.json({ ok: true, reviews: rows, review_attachments: att.rows });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // ── Attachments ──────────────────────────────────────────────────────
+  // Reuse the same memoryStorage + 10MB limit pattern used elsewhere in the
+  // codebase. multer/cloudinary may not be available in test contexts —
+  // the upload routes degrade to a 503 when so.
+  const attachmentUpload = multer
+    ? multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
+    : null;
+
+  router.post('/tickets/:id/attachments',
+    requireWrite,
+    (req, res, next) => {
+      if (!attachmentUpload) return res.status(503).json({ ok: false, error: 'File upload not available.' });
+      attachmentUpload.single('file')(req, res, next);
+    },
+    async (req, res) => {
+      try {
+        if (!cloudinary) return res.status(503).json({ ok: false, error: 'Cloudinary not configured.' });
+        if (!req.file) return res.status(400).json({ ok: false, error: 'No file uploaded.' });
+        const id = req.params.id;
+        const tk = /^\d+$/.test(id)
+          ? await pool.query('SELECT * FROM tickets WHERE id = $1', [parseInt(id, 10)])
+          : await pool.query('SELECT * FROM tickets WHERE ticket_id = $1', [id]);
+        if (!tk.rows.length) return res.status(404).json({ ok: false, error: 'Ticket not found' });
+        if (!canAccessTicket(req.user, tk.rows[0])) {
+          return res.status(403).json({ ok: false, error: 'You cannot attach files to this ticket.' });
+        }
+        const ticketId = tk.rows[0].ticket_id;
+        const context = ['general', 'review_feedback', 'email_import'].includes(req.body?.context)
+          ? req.body.context : 'general';
+
+        // resource_type: 'auto' lets Cloudinary pick image/video/raw based on
+        // MIME — handles screenshots, PDFs, docs uniformly.
+        const result = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream({
+            folder: `alpha-surfaces/tickets/${ticketId}`,
+            resource_type: 'auto',
+            use_filename: true,
+            unique_filename: true
+          }, (err, r) => err ? reject(err) : resolve(r));
+          stream.end(req.file.buffer);
+        });
+
+        const ins = await pool.query(
+          `INSERT INTO ticket_attachments
+             (ticket_id, user_id, user_name, filename, url, mime_type, size_bytes, context)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+          [ticketId, req.user.userId || null, req.user.name || 'Unknown',
+           req.file.originalname || 'file', result.secure_url,
+           req.file.mimetype || null, req.file.size || null, context]
+        );
+        logActivity(pool, ticketId, req.user, 'attachment_added',
+          `Attached ${req.file.originalname || 'file'} (${context})`);
+        res.json({ ok: true, attachment: ins.rows[0] });
+      } catch (err) {
+        console.error('[projects] attachment upload error:', err.message);
+        res.status(500).json({ ok: false, error: err.message });
+      }
+    }
+  );
+
+  router.get('/tickets/:id/attachments', async (req, res) => {
+    try {
+      const id = req.params.id;
+      const tk = /^\d+$/.test(id)
+        ? await pool.query('SELECT * FROM tickets WHERE id = $1', [parseInt(id, 10)])
+        : await pool.query('SELECT * FROM tickets WHERE ticket_id = $1', [id]);
+      if (!tk.rows.length) return res.status(404).json({ ok: false, error: 'Ticket not found' });
+      if (!canAccessTicket(req.user, tk.rows[0])) {
+        return res.status(404).json({ ok: false, error: 'Ticket not found' });
+      }
+      const { rows } = await pool.query(
+        `SELECT id, ticket_id, user_id, user_name, filename, url, mime_type,
+                size_bytes, context, created_at
+           FROM ticket_attachments WHERE ticket_id = $1
+          ORDER BY created_at DESC, id DESC`,
+        [tk.rows[0].ticket_id]
+      );
+      res.json({ ok: true, attachments: rows });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.delete('/tickets/:id/attachments/:attachmentId',
+    requireRole('super_admin'),
+    async (req, res) => {
+      try {
+        const att = parseInt(req.params.attachmentId, 10);
+        if (!att) return res.status(400).json({ ok: false, error: 'Invalid attachment id.' });
+        const { rows } = await pool.query(
+          `DELETE FROM ticket_attachments WHERE id = $1 RETURNING ticket_id, filename`,
+          [att]
+        );
+        if (!rows.length) return res.status(404).json({ ok: false, error: 'Attachment not found.' });
+        logActivity(pool, rows[0].ticket_id, req.user, 'attachment_removed',
+          `Removed ${rows[0].filename}`);
+        res.json({ ok: true });
+      } catch (err) {
+        res.status(500).json({ ok: false, error: err.message });
+      }
+    }
+  );
+
+  // ── Auto-advance from pending_review to pending_approval ─────────────
+  //
+  // Lazy sweep — runs on each tickets-list call but rate-limited to once
+  // every 60 seconds across the whole process. Idempotent: any ticket whose
+  // review_started_at is older than 24h and is still in 'pending_review'
+  // gets moved to 'pending_approval' and the approver is emailed.
+  let lastSweep = 0;
+  async function autoAdvanceReviews() {
+    const now = Date.now();
+    if (now - lastSweep < 60_000) return;
+    lastSweep = now;
+    try {
+      const cutoff = new Date(now - REVIEW_AUTO_ADVANCE_MS);
+      const { rows } = await pool.query(
+        `UPDATE tickets
+            SET approval_status = 'pending_approval',
+                review_started_at = NULL,
+                updated_at = NOW()
+          WHERE approval_status = 'pending_review'
+            AND review_started_at IS NOT NULL
+            AND review_started_at < $1
+            AND approver IS NOT NULL AND approver <> ''
+          RETURNING *`,
+        [cutoff]
+      );
+      for (const ticket of rows) {
+        logActivity(pool, ticket.ticket_id,
+          { userId: null, name: 'System' },
+          'auto_advanced_to_approver',
+          `24h elapsed without reviewer feedback — sent to ${ticket.approver}`);
+        if (notifyApproverRequested) {
+          notifyApproverRequested(pool, ticket, '<em>Auto-advanced after 24h with no reviewer feedback.</em>')
+            .catch(err => console.error('[projects/review] auto-advance approver email:', err.message));
+        }
+      }
+      // Tickets in pending_review with no approver are stranded — clear
+      // their approval_status so they don't loop forever. Rare edge case
+      // (someone removed the approver after submitting for review).
+      await pool.query(
+        `UPDATE tickets
+            SET approval_status = NULL, review_started_at = NULL, updated_at = NOW()
+          WHERE approval_status = 'pending_review'
+            AND review_started_at < $1
+            AND (approver IS NULL OR approver = '')`,
+        [cutoff]
+      );
+    } catch (err) {
+      console.error('[projects/review] auto-advance sweep error:', err.message);
+    }
+  }
+  // Run once at module start so we don't wait 60s for the first sweep,
+  // then on every tickets-list request (rate-limited internally).
+  setTimeout(() => autoAdvanceReviews(), 5_000);
 
   // ── Soft delete (super_admin only) ──────────────────────────────────
   router.delete('/tickets/:id', requireRole('super_admin'), async (req, res) => {

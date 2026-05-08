@@ -304,6 +304,67 @@
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--olive); color: var(--white); padding: 10px 18px; border-radius: 4px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.2s; }
   .toast.show { opacity: 1; }
 
+  /* ── Review/approval workflow ── */
+  .review-action-bar { background: #fbf7e8; border: 1px solid rgba(176,112,32,0.3); border-radius: 6px; padding: 14px 16px; margin-bottom: 18px; }
+  .review-action-bar.is-approver { background: #f0f7ed; border-color: rgba(46,125,50,0.3); }
+  .review-action-bar h4 { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--olive); margin-bottom: 8px; }
+  .review-action-bar.is-approver h4 { color: #2e7d32; }
+  .review-action-bar p { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+  .review-action-bar textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--border-strong); border-radius: 4px; font-size: 14px; font-family: inherit; background: var(--white); outline: none; min-height: 70px; margin-bottom: 10px; }
+  .review-action-bar textarea:focus { border-color: var(--olive); }
+  .review-actions-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .review-actions-row button { padding: 9px 18px; border-radius: 4px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; border: 1px solid var(--border-strong); background: var(--white); cursor: pointer; }
+  .review-actions-row button.btn-approve { background: #2e7d32; color: #fff; border-color: #2e7d32; }
+  .review-actions-row button.btn-approve:hover { background: #246426; }
+  .review-actions-row button.btn-changes  { background: #b07020; color: #fff; border-color: #b07020; }
+  .review-actions-row button.btn-changes:hover  { background: #905a18; }
+  .review-actions-row button.btn-feedback { background: var(--olive); color: #fff; border-color: var(--olive); }
+  .review-actions-row button.btn-attach   { background: var(--white); }
+  .review-actions-row button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .review-status-banner { padding: 10px 14px; border-radius: 4px; font-size: 13px; margin-bottom: 14px; background: var(--cream-light); border-left: 3px solid var(--olive); color: var(--text); }
+  .review-status-banner.changes  { background: #fbeee0; border-left-color: #b07020; color: #5a3a10; }
+  .review-status-banner.approved { background: #eef5ee; border-left-color: #2e7d32; color: #284428; }
+
+  .review-history { display: flex; flex-direction: column; gap: 12px; }
+  .review-row { padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--white); }
+  .review-row.is-approved { background: #f7fbf7; border-color: rgba(46,125,50,0.25); }
+  .review-row.is-changes  { background: #fdf6ec; border-color: rgba(176,112,32,0.30); }
+  .review-row.is-feedback { background: var(--cream-light); }
+  .review-row .review-meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .review-row .review-meta strong { color: var(--text); font-weight: 700; }
+  .review-row .review-text { font-size: 13.5px; line-height: 1.5; white-space: pre-wrap; color: var(--text); }
+  .review-row .review-icon { font-weight: 700; margin-right: 4px; }
+  .review-row.is-approved .review-icon { color: #2e7d32; }
+  .review-row.is-changes  .review-icon { color: #b07020; }
+
+  .reviewer-multi { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border: 1px solid var(--border-strong); border-radius: 4px; background: var(--white); min-height: 40px; align-items: flex-start; }
+  .reviewer-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 4px 3px 10px; background: var(--cream-light); border: 1px solid var(--border); border-radius: 12px; font-size: 12px; }
+  .reviewer-chip button { background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 14px; line-height: 1; padding: 0 4px; }
+  .reviewer-chip button:hover { color: #b3261e; }
+  .reviewer-multi select { flex: 1; min-width: 120px; border: none; padding: 4px 6px; font-size: 13px; outline: none; background: transparent; }
+  .reviewer-help { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+  /* Attachments */
+  .attachment-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+  .attachment-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px; background: var(--white); font-size: 13px; }
+  .attachment-row .att-icon { width: 28px; height: 28px; border-radius: 4px; background: var(--cream-light); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .attachment-row .att-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+  .attachment-row .att-info { flex: 1; min-width: 0; overflow: hidden; }
+  .attachment-row .att-name { color: var(--olive); text-decoration: none; font-weight: 600; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .attachment-row .att-name:hover { text-decoration: underline; }
+  .attachment-row .att-meta { font-size: 11px; color: var(--muted); }
+  .attachment-row .att-remove { background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; }
+  .attachment-row .att-remove:hover { color: #b3261e; }
+  .attachment-empty { font-size: 12px; color: var(--muted); padding: 10px; text-align: center; }
+
+  /* Kanban card review/approval indicators */
+  .card-review-row { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
+  .card-review-row .review-mini { font-size: 10px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; }
+  .card-review-row .avatar { width: 20px; height: 20px; font-size: 9px; margin-left: 0; }
+  .card-review-row .avatar.approver { background: var(--cream); color: var(--olive); border: 1px solid var(--olive); }
+  .card-changes-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: #fbeee0; color: #b07020; margin-top: 6px; }
+  .card-pending-text { font-size: 11px; color: var(--muted); margin-top: 4px; font-style: italic; }
+
   @media (max-width: 1080px) { .stats { grid-template-columns: repeat(2, 1fr); } .board { grid-template-columns: repeat(2, minmax(0,1fr)); } }
   @media (max-width: 720px)  { .stats { grid-template-columns: 1fr; } .board { grid-template-columns: 1fr; } .app-header { padding: 14px 16px; } .app-main { padding: 16px; } .toolbar input[type=search] { width: 100%; } .drawer { max-width: 100%; } .drawer-body .field-grid { grid-template-columns: 1fr; } }
 </style>
@@ -559,6 +620,10 @@
   ];
   var CATEGORIES = ['website','content','integration','consulting','showroom','print','process','meeting','feature'];
   var ASSIGNEES  = ['Sean','Belinda','Jess','Sam','Jay','Jana','Pam'];
+  // Default routing for new tickets — kept in sync with projects-routes.js
+  // DEFAULT_REVIEWERS / DEFAULT_APPROVER. Sean can override per ticket.
+  var DEFAULT_REVIEWERS = ['Jay','Jana'];
+  var DEFAULT_APPROVER  = 'Belinda';
 
   var state = {
     view: 'board',
@@ -920,6 +985,38 @@
 
   function renderCard(t) {
     var initials = (t.assigned_to || '').split(/\s+/).map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
+    var reviewRow = '';
+    var changesBadge = '';
+    var pendingText = '';
+    // Surface review/approval state on the card so the board reflects who's
+    // blocking. Reviewers render as olive-on-olive avatars, approver as a
+    // cream chip with an olive border to mark them as the binding role.
+    if (t.status === 'review' || t.approval_status === 'changes_requested') {
+      var avatars = [];
+      if (Array.isArray(t.reviewers)) {
+        t.reviewers.forEach(function (r) {
+          var i = String(r || '').split(/\s+/).map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
+          if (i) avatars.push('<span class="avatar" title="Reviewer: ' + escapeAttr(r) + '">' + i + '</span>');
+        });
+      }
+      if (t.approver) {
+        var ai = String(t.approver).split(/\s+/).map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
+        if (ai) avatars.push('<span class="avatar approver" title="Approver: ' + escapeAttr(t.approver) + '">' + ai + '</span>');
+      }
+      if (avatars.length) {
+        reviewRow = '<div class="card-review-row">' +
+          '<span class="review-mini">' + (t.approval_status === 'pending_approval' ? 'Awaiting approver' : 'Review') + '</span>' +
+          avatars.join('') +
+        '</div>';
+      }
+      if (t.approval_status === 'changes_requested') {
+        changesBadge = '<div class="card-changes-badge">Changes Requested</div>';
+      } else if (t.approval_status === 'pending_approval' && t.approver) {
+        pendingText = '<div class="card-pending-text">Awaiting ' + escapeHtml(t.approver) + '</div>';
+      } else if (t.approval_status === 'pending_review') {
+        pendingText = '<div class="card-pending-text">In review</div>';
+      }
+    }
     return '<div class="card" draggable="true" data-id="' + t.id + '" data-ticket-id="' + escapeAttr(t.ticket_id) + '">' +
       '<button type="button" class="card-clock" data-ticket-id="' + escapeAttr(t.ticket_id) + '" data-ticket-title="' + escapeAttr(t.title) + '" title="Log time on this ticket">⏱</button>' +
       '<div class="card-id">' + escapeHtml(t.ticket_id) + '</div>' +
@@ -929,6 +1026,9 @@
         (t.category ? '<span class="pill cat">' + escapeHtml(t.category) + '</span>' : '') +
         (initials ? '<span class="avatar" title="' + escapeAttr(t.assigned_to) + '">' + initials + '</span>' : '') +
       '</div>' +
+      changesBadge +
+      pendingText +
+      reviewRow +
     '</div>';
   }
 
@@ -1100,6 +1200,8 @@
   }
 
   function renderEditDrawer(t) {
+    var reviewers = Array.isArray(t.reviewers) ? t.reviewers : [];
+    var inReview = t.status === 'review';
     return '' +
       '<div class="drawer-header">' +
         '<div><h2>' + escapeHtml(t.ticket_id) + ' — ' + escapeHtml(t.title) + '</h2>' +
@@ -1109,6 +1211,8 @@
       '<div class="drawer-body">' +
         '<div class="tabs">' +
           '<button class="active" data-tab="details">Details</button>' +
+          '<button data-tab="review">Review' + (inReview ? ' •' : '') + '</button>' +
+          '<button data-tab="files">Files</button>' +
           '<button data-tab="activity">Activity</button>' +
         '</div>' +
         '<div id="tab-details">' +
@@ -1130,10 +1234,26 @@
             '<div class="field"><label>Requested by</label><input type="text" id="f-requested" value="' + escapeAttr(t.requested_by || '') + '"></div>' +
             '<div class="field"><label>Due date</label><input type="date" id="f-due" value="' + escapeAttr(t.due_date ? String(t.due_date).slice(0,10) : '') + '"></div>' +
           '</div>' +
+          '<div class="field"><label>Reviewers</label>' +
+            renderReviewerMulti('f-reviewers', reviewers) +
+            '<div class="reviewer-help">Reviewers are notified and can leave feedback. They do <strong>not</strong> block — the ticket auto-advances to the approver after 24h.</div>' +
+          '</div>' +
+          '<div class="field"><label>Approver</label>' +
+            '<select id="f-approver"><option value="">— None (skip approval)</option>' +
+              selectOptions(ASSIGNEES, t.approver) +
+            '</select>' +
+            '<div class="reviewer-help">The approver must sign off before the ticket can be marked done. Leave both clear to skip review entirely.</div>' +
+          '</div>' +
           '<div class="field"><label>Notes</label>' +
             '<div class="note-list" id="note-list">' + renderNotes(t.notes) + '</div>' +
             '<div class="add-note-row"><input type="text" id="f-note-new" placeholder="Add a note as ' + escapeAttr(state.user ? state.user.name : '') + '…" autocomplete="off"><button type="button" id="f-note-add">Add</button></div>' +
           '</div>' +
+        '</div>' +
+        '<div id="tab-review" style="display:none">' +
+          '<div id="review-pane"><div class="activity-empty">Loading…</div></div>' +
+        '</div>' +
+        '<div id="tab-files" style="display:none">' +
+          '<div id="files-pane"><div class="activity-empty">Loading…</div></div>' +
         '</div>' +
         '<div id="tab-activity" style="display:none">' +
           '<div class="activity-list" id="activity-list"><div class="activity-empty">Loading…</div></div>' +
@@ -1144,6 +1264,71 @@
         '<button id="drw-cancel">Cancel</button>' +
         '<button class="danger" id="drw-archive">Archive</button>' +
       '</div>';
+  }
+
+  // Multi-select for reviewers — chips for selected names + a select to add
+  // more. State lives on the container's dataset.value as a JSON array so
+  // the save handler can read it back without DOM scraping.
+  function renderReviewerMulti(id, current) {
+    var sel = Array.isArray(current) ? current.slice() : [];
+    var available = ASSIGNEES.filter(function (n) { return sel.indexOf(n) === -1; });
+    var chips = sel.map(function (n) {
+      return '<span class="reviewer-chip" data-name="' + escapeAttr(n) + '">' +
+        escapeHtml(n) +
+        '<button type="button" class="rm-reviewer" data-name="' + escapeAttr(n) + '" aria-label="Remove">×</button>' +
+      '</span>';
+    }).join('');
+    var addOpts = '<option value="">+ add reviewer…</option>' +
+      available.map(function (n) { return '<option value="' + escapeAttr(n) + '">' + escapeHtml(n) + '</option>'; }).join('');
+    return '<div class="reviewer-multi" id="' + id + '" data-value=\'' + JSON.stringify(sel).replace(/'/g, '&#39;') + '\'>' +
+      chips +
+      '<select class="rm-add-select">' + addOpts + '</select>' +
+    '</div>';
+  }
+
+  function wireReviewerMulti(id) {
+    var box = document.getElementById(id);
+    if (!box) return;
+    function readValue() {
+      try { return JSON.parse(box.dataset.value || '[]'); } catch (e) { return []; }
+    }
+    function writeValue(arr) {
+      box.dataset.value = JSON.stringify(arr);
+      // Re-render chips while preserving the same container element.
+      var sel = arr.slice();
+      var available = ASSIGNEES.filter(function (n) { return sel.indexOf(n) === -1; });
+      var chips = sel.map(function (n) {
+        return '<span class="reviewer-chip" data-name="' + escapeAttr(n) + '">' +
+          escapeHtml(n) +
+          '<button type="button" class="rm-reviewer" data-name="' + escapeAttr(n) + '" aria-label="Remove">×</button>' +
+        '</span>';
+      }).join('');
+      var addOpts = '<option value="">+ add reviewer…</option>' +
+        available.map(function (n) { return '<option value="' + escapeAttr(n) + '">' + escapeHtml(n) + '</option>'; }).join('');
+      box.innerHTML = chips + '<select class="rm-add-select">' + addOpts + '</select>';
+      attach();
+    }
+    function attach() {
+      box.querySelectorAll('.rm-reviewer').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var name = btn.dataset.name;
+          var v = readValue().filter(function (x) { return x !== name; });
+          writeValue(v);
+        });
+      });
+      var add = box.querySelector('.rm-add-select');
+      if (add) add.addEventListener('change', function () {
+        var v = readValue();
+        var n = add.value;
+        if (n && v.indexOf(n) === -1) v.push(n);
+        writeValue(v);
+      });
+    }
+    attach();
+    return {
+      get: readValue,
+      set: writeValue
+    };
   }
 
   // Parse the notes column (each line is "[stamp] Name: text") into per-note
@@ -1178,22 +1363,29 @@
     document.getElementById('drw-close').addEventListener('click', closeDrawer);
     document.getElementById('drw-cancel').addEventListener('click', closeDrawer);
 
+    // Reviewer multi-select
+    var reviewersCtrl = wireReviewerMulti('f-reviewers');
+
     // Tabs
     var detailsPane  = document.getElementById('tab-details');
+    var reviewPane   = document.getElementById('tab-review');
+    var filesPane    = document.getElementById('tab-files');
     var activityPane = document.getElementById('tab-activity');
     var activityLoaded = false;
+    var reviewLoaded   = false;
+    var filesLoaded    = false;
     document.querySelectorAll('.tabs button').forEach(function (b) {
       b.addEventListener('click', function () {
         document.querySelectorAll('.tabs button').forEach(function (x) { x.classList.remove('active'); });
         b.classList.add('active');
-        if (b.dataset.tab === 'activity') {
-          detailsPane.style.display = 'none';
-          activityPane.style.display = 'block';
-          if (!activityLoaded) { loadActivity(t.id); activityLoaded = true; }
-        } else {
-          detailsPane.style.display = 'block';
-          activityPane.style.display = 'none';
-        }
+        var tab = b.dataset.tab;
+        detailsPane.style.display  = tab === 'details'  ? 'block' : 'none';
+        reviewPane.style.display   = tab === 'review'   ? 'block' : 'none';
+        filesPane.style.display    = tab === 'files'    ? 'block' : 'none';
+        activityPane.style.display = tab === 'activity' ? 'block' : 'none';
+        if (tab === 'activity' && !activityLoaded) { loadActivity(t.id); activityLoaded = true; }
+        if (tab === 'review'   && !reviewLoaded)   { loadReviewPane(t);  reviewLoaded   = true; }
+        if (tab === 'files'    && !filesLoaded)    { loadFilesPane(t);   filesLoaded    = true; }
       });
     });
 
@@ -1231,7 +1423,9 @@
           category:    document.getElementById('f-category').value || null,
           assigned_to: document.getElementById('f-assigned').value || null,
           requested_by: document.getElementById('f-requested').value.trim() || null,
-          due_date:    document.getElementById('f-due').value || null
+          due_date:    document.getElementById('f-due').value || null,
+          reviewers:   reviewersCtrl ? reviewersCtrl.get() : [],
+          approver:    document.getElementById('f-approver').value || null
           // notes intentionally omitted — append via dedicated /notes endpoint
         };
         await updateTicket(t.id, payload);
@@ -1300,6 +1494,308 @@
     return formatDate(s);
   }
 
+  // ── Review pane ─────────────────────────────────────────────────────
+  // Determines whether the current user is acting as approver, reviewer, or
+  // bystander on this ticket and renders the matching action bar + history.
+  function userActsAs(t, user) {
+    if (!user) return 'bystander';
+    var name = (user.name || '').trim();
+    var first = name.split(/\s+/)[0] || name;
+    function matches(label) {
+      if (!label) return false;
+      var l = String(label).trim().toLowerCase();
+      return l === name.toLowerCase() || l === first.toLowerCase();
+    }
+    var isApprover = matches(t.approver) || user.role === 'super_admin';
+    var isReviewer = (Array.isArray(t.reviewers) && t.reviewers.some(matches));
+    if (t.approval_status === 'pending_approval' && isApprover) return 'approver_active';
+    if (t.approval_status === 'pending_review'   && isReviewer) return 'reviewer_active';
+    if (isApprover) return 'approver_passive';
+    if (isReviewer) return 'reviewer_passive';
+    return 'bystander';
+  }
+
+  async function loadReviewPane(t) {
+    var pane = document.getElementById('review-pane');
+    pane.innerHTML = '<div class="activity-empty">Loading…</div>';
+    try {
+      var res = await fetch('/api/projects/tickets/' + t.id + '/reviews', { credentials: 'include' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      pane.innerHTML = renderReviewPane(t, data.reviews || []);
+      wireReviewPane(t);
+    } catch (err) {
+      pane.innerHTML = '<div class="activity-empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function renderReviewPane(t, reviews) {
+    var role = userActsAs(t, state.user);
+    var hasRouting = (Array.isArray(t.reviewers) && t.reviewers.length) || !!t.approver;
+
+    // Status banner
+    var banner = '';
+    if (t.approval_status === 'changes_requested') {
+      banner = '<div class="review-status-banner changes"><strong>Changes requested.</strong> Address the feedback below and move to "Review" again to restart the cycle.</div>';
+    } else if (t.approval_status === 'pending_review') {
+      var rs = (t.reviewers || []).join(', ');
+      banner = '<div class="review-status-banner">Awaiting review from <strong>' + escapeHtml(rs || '—') + '</strong>. Auto-advances to ' + escapeHtml(t.approver || 'approver') + ' after 24h.</div>';
+    } else if (t.approval_status === 'pending_approval') {
+      banner = '<div class="review-status-banner">Awaiting approval from <strong>' + escapeHtml(t.approver || '—') + '</strong>.</div>';
+    } else if (t.approval_status === 'approved') {
+      banner = '<div class="review-status-banner approved">Approved by ' + escapeHtml(t.approver || 'approver') + '.</div>';
+    } else if (!hasRouting) {
+      banner = '<div class="review-status-banner">No reviewers or approver set — this ticket skips the review workflow. Add them in the Details tab to enable review.</div>';
+    }
+
+    // Action bar — only when the current user can take an action *now*.
+    var actionBar = '';
+    if (role === 'approver_active') {
+      actionBar = '' +
+        '<div class="review-action-bar is-approver">' +
+          '<h4>Final approval</h4>' +
+          '<p>Approve to mark this ticket done, or request changes to send it back to the assignee. ' +
+             'Feedback is required when requesting changes.</p>' +
+          '<textarea id="rv-feedback" placeholder="Optional note for the assignee (required when requesting changes)…"></textarea>' +
+          '<div id="rv-attachments-pending" class="attachment-list"></div>' +
+          '<div class="review-actions-row">' +
+            '<button type="button" class="btn-approve" data-act="approve">✅ Approve</button>' +
+            '<button type="button" class="btn-changes" data-act="request_changes">🔄 Request changes</button>' +
+            '<button type="button" class="btn-attach"  data-act="attach">📎 Attach file</button>' +
+            '<input type="file" id="rv-file" style="display:none">' +
+          '</div>' +
+        '</div>';
+    } else if (role === 'reviewer_active') {
+      actionBar = '' +
+        '<div class="review-action-bar">' +
+          '<h4>Reviewer feedback</h4>' +
+          '<p>Leave feedback for the assignee. Your feedback is <strong>advisory</strong> — leaving any feedback advances the ticket to ' + escapeHtml(t.approver || 'the approver') + ' immediately. Otherwise it auto-advances after 24 hours.</p>' +
+          '<textarea id="rv-feedback" placeholder="What did you check? Any concerns?"></textarea>' +
+          '<div id="rv-attachments-pending" class="attachment-list"></div>' +
+          '<div class="review-actions-row">' +
+            '<button type="button" class="btn-feedback" data-act="reviewer_feedback">Submit feedback</button>' +
+            '<button type="button" class="btn-attach"   data-act="attach">📎 Attach file</button>' +
+            '<input type="file" id="rv-file" style="display:none">' +
+          '</div>' +
+        '</div>';
+    }
+
+    // Read-only view for everyone else (bystanders, passive approver/reviewer
+    // when the ticket isn't in their queue).
+    var passiveText = '';
+    if (!actionBar && hasRouting && t.status === 'review') {
+      var who = t.approval_status === 'pending_approval'
+        ? ('approval from ' + (t.approver || '—'))
+        : ('review from ' + (t.reviewers || []).join(', '));
+      passiveText = '<p style="font-size:13px;color:var(--muted);margin-bottom:14px">Awaiting ' + escapeHtml(who) + '.</p>';
+    }
+
+    // History
+    var history = '';
+    if (reviews && reviews.length) {
+      history = '<div class="drawer-section"><h3>Review history</h3>' +
+        '<div class="review-history">' +
+          reviews.map(function (r) {
+            var cls = r.action === 'approved' ? 'is-approved'
+                    : r.action === 'changes_requested' ? 'is-changes'
+                    : 'is-feedback';
+            var icon = r.action === 'approved' ? '✅'
+                     : r.action === 'changes_requested' ? '🔄'
+                     : '💬';
+            var label = r.action === 'approved' ? 'Approved'
+                      : r.action === 'changes_requested' ? 'Changes requested'
+                      : 'Feedback';
+            return '<div class="review-row ' + cls + '">' +
+              '<div class="review-meta">' +
+                '<span class="review-icon">' + icon + '</span> ' +
+                '<strong>' + escapeHtml(r.reviewer_name) + '</strong> ' +
+                '<span style="text-transform:capitalize">(' + escapeHtml(r.role) + ')</span> · ' +
+                escapeHtml(label) + ' · ' + formatDate(r.created_at, true) +
+              '</div>' +
+              (r.feedback ? '<div class="review-text">' + escapeHtml(r.feedback) + '</div>' : '') +
+            '</div>';
+          }).join('') +
+        '</div></div>';
+    } else {
+      history = '<div class="drawer-section"><h3>Review history</h3>' +
+        '<div class="activity-empty">No reviews yet.</div></div>';
+    }
+
+    return banner + actionBar + passiveText + history;
+  }
+
+  function wireReviewPane(t) {
+    var pendingAttachments = [];
+    var pendingList = document.getElementById('rv-attachments-pending');
+    var fileInput = document.getElementById('rv-file');
+    function renderPending() {
+      if (!pendingList) return;
+      pendingList.innerHTML = pendingAttachments.map(function (a, i) {
+        return '<div class="attachment-row">' +
+          '<div class="att-icon">📎</div>' +
+          '<div class="att-info"><a class="att-name" href="' + escapeAttr(a.url) + '" target="_blank">' + escapeHtml(a.filename) + '</a>' +
+            '<div class="att-meta">' + formatBytes(a.size_bytes) + '</div></div>' +
+          '<button class="att-remove" data-idx="' + i + '">✕</button>' +
+        '</div>';
+      }).join('');
+      pendingList.querySelectorAll('.att-remove').forEach(function (b) {
+        b.addEventListener('click', function () {
+          pendingAttachments.splice(parseInt(b.dataset.idx, 10), 1);
+          renderPending();
+        });
+      });
+    }
+    document.querySelectorAll('#review-pane [data-act="attach"]').forEach(function (b) {
+      b.addEventListener('click', function () { fileInput && fileInput.click(); });
+    });
+    if (fileInput) fileInput.addEventListener('change', async function () {
+      var f = fileInput.files && fileInput.files[0];
+      if (!f) return;
+      try {
+        var fd = new FormData();
+        fd.append('file', f);
+        fd.append('context', 'review_feedback');
+        var res = await fetch('/api/projects/tickets/' + t.id + '/attachments', {
+          method: 'POST', credentials: 'include', body: fd
+        });
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok || !data.ok) throw new Error(data.error || 'HTTP ' + res.status);
+        pendingAttachments.push(data.attachment);
+        renderPending();
+        toast('Attached ' + f.name);
+      } catch (err) {
+        toast('Upload failed: ' + err.message);
+      } finally {
+        fileInput.value = '';
+      }
+    });
+
+    document.querySelectorAll('#review-pane [data-act="approve"], #review-pane [data-act="request_changes"], #review-pane [data-act="reviewer_feedback"]').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        var action = btn.dataset.act;
+        var fb = (document.getElementById('rv-feedback') || {}).value || '';
+        if (action === 'request_changes' && !fb.trim()) {
+          toast('Feedback is required when requesting changes.');
+          return;
+        }
+        btn.disabled = true;
+        try {
+          var res = await fetch('/api/projects/tickets/' + t.id + '/review', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ action: action, feedback: fb })
+          });
+          var data = await res.json().catch(function () { return {}; });
+          if (!res.ok || !data.ok) throw new Error(data.error || 'HTTP ' + res.status);
+          toast(action === 'approve' ? 'Approved ✓'
+              : action === 'request_changes' ? 'Changes requested'
+              : 'Feedback submitted');
+          closeDrawer();
+          loadAll();
+        } catch (err) {
+          toast('Failed: ' + err.message);
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    });
+  }
+
+  // ── Files pane (attachments) ──────────────────────────────────────────
+  async function loadFilesPane(t) {
+    var pane = document.getElementById('files-pane');
+    pane.innerHTML = '<div class="activity-empty">Loading…</div>';
+    try {
+      var res = await fetch('/api/projects/tickets/' + t.id + '/attachments', { credentials: 'include' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      pane.innerHTML = renderFilesPane(t, data.attachments || []);
+      wireFilesPane(t);
+    } catch (err) {
+      pane.innerHTML = '<div class="activity-empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function renderFilesPane(t, attachments) {
+    var canDelete = state.user && state.user.role === 'super_admin';
+    var rows = (attachments || []).map(function (a) {
+      var isImage = (a.mime_type || '').indexOf('image/') === 0;
+      var icon = isImage
+        ? '<img src="' + escapeAttr(a.url) + '" alt="">'
+        : '<span style="font-size:14px">📄</span>';
+      return '<div class="attachment-row">' +
+        '<div class="att-icon">' + icon + '</div>' +
+        '<div class="att-info">' +
+          '<a class="att-name" href="' + escapeAttr(a.url) + '" target="_blank" rel="noopener">' + escapeHtml(a.filename) + '</a>' +
+          '<div class="att-meta">' + escapeHtml(a.user_name || '') + ' · ' + formatBytes(a.size_bytes) +
+            (a.context && a.context !== 'general' ? ' · <em>' + escapeHtml(a.context.replace(/_/g, ' ')) + '</em>' : '') +
+            ' · ' + formatDate(a.created_at, true) +
+          '</div>' +
+        '</div>' +
+        (canDelete ? '<button class="att-remove" data-id="' + a.id + '" title="Remove">✕</button>' : '') +
+      '</div>';
+    }).join('');
+    if (!rows) rows = '<div class="attachment-empty">No attachments yet.</div>';
+    return '' +
+      '<div class="attachment-list" id="files-list">' + rows + '</div>' +
+      '<div class="add-note-row" style="margin-top:8px">' +
+        '<input type="file" id="files-upload" style="flex:1">' +
+        '<button type="button" id="files-upload-btn">Upload</button>' +
+      '</div>' +
+      '<div class="reviewer-help" style="margin-top:6px">Max 10MB per file. Images, PDFs, and docs accepted.</div>';
+  }
+
+  function wireFilesPane(t) {
+    var btn = document.getElementById('files-upload-btn');
+    var input = document.getElementById('files-upload');
+    if (btn && input) btn.addEventListener('click', async function () {
+      var f = input.files && input.files[0];
+      if (!f) { toast('Pick a file first'); return; }
+      btn.disabled = true; btn.textContent = 'Uploading…';
+      try {
+        var fd = new FormData();
+        fd.append('file', f);
+        fd.append('context', 'general');
+        var res = await fetch('/api/projects/tickets/' + t.id + '/attachments', {
+          method: 'POST', credentials: 'include', body: fd
+        });
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok || !data.ok) throw new Error(data.error || 'HTTP ' + res.status);
+        toast('Uploaded');
+        loadFilesPane(t);
+      } catch (err) {
+        toast('Upload failed: ' + err.message);
+      } finally {
+        btn.disabled = false; btn.textContent = 'Upload';
+        input.value = '';
+      }
+    });
+    document.querySelectorAll('#files-pane .att-remove').forEach(function (b) {
+      b.addEventListener('click', async function () {
+        if (!confirm('Remove this attachment?')) return;
+        try {
+          var res = await fetch('/api/projects/tickets/' + t.id + '/attachments/' + b.dataset.id, {
+            method: 'DELETE', credentials: 'include'
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          loadFilesPane(t);
+        } catch (err) {
+          toast('Failed: ' + err.message);
+        }
+      });
+    });
+  }
+
+  function formatBytes(b) {
+    if (!b) return '';
+    if (b < 1024) return b + ' B';
+    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+    return (b / 1024 / 1024).toFixed(1) + ' MB';
+  }
+
   function renderCreateDrawer() {
     return '' +
       '<div class="drawer-header">' +
@@ -1317,6 +1813,14 @@
           '<div class="field"><label>Assigned to</label><select id="f-assigned"><option value="">—</option>' + selectOptions(ASSIGNEES) + '</select></div>' +
           '<div class="field"><label>Due date</label><input type="date" id="f-due"></div>' +
         '</div>' +
+        '<div class="field"><label>Reviewers</label>' +
+          renderReviewerMulti('f-reviewers', DEFAULT_REVIEWERS) +
+          '<div class="reviewer-help">Notified when status moves to "Review". Advisory only — they don\'t block. Clear chips to opt out.</div>' +
+        '</div>' +
+        '<div class="field"><label>Approver</label>' +
+          '<select id="f-approver"><option value="">— None (skip approval)</option>' + selectOptions(ASSIGNEES, DEFAULT_APPROVER) + '</select>' +
+          '<div class="reviewer-help">Must sign off before the ticket can be marked done. Leave both clear to skip review entirely.</div>' +
+        '</div>' +
         '<div class="field"><label>Notes</label><textarea id="f-notes" rows="3"></textarea></div>' +
       '</div>' +
       '<div class="drawer-footer">' +
@@ -1328,6 +1832,7 @@
   function wireCreateDrawer() {
     document.getElementById('drw-close').addEventListener('click', closeDrawer);
     document.getElementById('drw-cancel').addEventListener('click', closeDrawer);
+    var reviewersCtrl = wireReviewerMulti('f-reviewers');
     document.getElementById('drw-create').addEventListener('click', async function () {
       var title = document.getElementById('f-title').value.trim();
       if (!title) { toast('Title is required'); return; }
@@ -1340,7 +1845,9 @@
           priority: document.getElementById('f-priority').value,
           assigned_to: document.getElementById('f-assigned').value || null,
           due_date: document.getElementById('f-due').value || null,
-          notes: document.getElementById('f-notes').value || null
+          notes: document.getElementById('f-notes').value || null,
+          reviewers: reviewersCtrl ? reviewersCtrl.get() : DEFAULT_REVIEWERS,
+          approver:  document.getElementById('f-approver').value || null
         };
         var res = await fetch('/api/projects/tickets', {
           method: 'POST',
