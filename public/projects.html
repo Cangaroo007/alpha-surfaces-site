@@ -110,8 +110,9 @@
   .admin-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
   .admin-table tr.inactive td { opacity: 0.5; }
   .role-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(86,77,34,0.10); color: var(--olive); }
-  .role-pill.admin { background: var(--pri-high-bg); color: var(--pri-high-fg); }
-  .role-pill.viewer { background: var(--pri-low-bg); color: var(--pri-low-fg); }
+  .role-pill.super_admin { background: var(--pri-high-bg); color: var(--pri-high-fg); }
+  .role-pill.operator    { background: rgba(86,77,34,0.10); color: var(--olive); }
+  .role-pill.viewer      { background: var(--pri-low-bg); color: var(--pri-low-fg); }
   .icon-btn { background: transparent; border: 1px solid rgba(255,255,255,0.32); color: var(--cream); padding: 6px 10px; border-radius: 4px; font-size: 14px; cursor: pointer; }
   .icon-btn:hover { background: rgba(255,255,255,0.12); }
 
@@ -121,10 +122,34 @@
   body.role-viewer .drawer-footer .primary,
   body.role-viewer .drawer-footer .danger,
   body.role-viewer .add-note-row,
-  body.role-viewer #btn-new { display: none !important; }
+  body.role-viewer #btn-new,
+  body.role-viewer #btn-export,
+  body.role-viewer #view-forms-btn { display: none !important; }
   body.role-viewer .drawer-body input,
   body.role-viewer .drawer-body select,
   body.role-viewer .drawer-body textarea { pointer-events: none; opacity: 0.7; }
+
+  /* ── Forms view ── */
+  .badge-type { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(86,77,34,0.10); color: var(--olive); }
+  .status-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(0,0,0,0.06); color: var(--muted); }
+  .status-pill.status-new      { background: var(--pri-high-bg); color: var(--pri-high-fg); }
+  .status-pill.status-read     { background: var(--pri-med-bg);  color: var(--pri-med-fg); }
+  .status-pill.status-actioned { background: var(--pri-low-bg);  color: var(--pri-low-fg); }
+  .status-pill.status-archived { background: rgba(0,0,0,0.04);   color: var(--muted); opacity: 0.7; }
+  .col-check { width: 32px; padding-right: 0; }
+  tbody tr.row-active { background: var(--cream-light); box-shadow: inset 3px 0 0 var(--olive); }
+  tbody tr.row-new td:first-of-type::before { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--pri-high-fg); border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+  .pagination { display: flex; align-items: center; gap: 4px; margin-top: 14px; }
+  .pagination button { padding: 8px 14px; border: 1px solid var(--border-strong); background: var(--white); border-radius: 4px; font-size: 12px; letter-spacing: 0.04em; }
+  .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .field-row { display: grid; grid-template-columns: 130px 1fr; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--border); align-items: baseline; }
+  .field-row .lbl { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .field-row .val { font-size: 14px; color: var(--text); word-break: break-word; }
+  .field-row .val .muted { color: var(--muted); }
+  .drawer-section { margin-top: 22px; }
+  .drawer-section h3 { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .btn-export-forms { padding: 9px 14px; border: 1px solid var(--border-strong); background: var(--white); border-radius: 4px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text); }
+  .btn-export-forms.has-selection { background: var(--pri-low-bg); color: var(--pri-low-fg); border-color: var(--pri-low-fg); }
 
   /* ── App layout ── */
   .app { display: flex; flex-direction: column; min-height: 100vh; }
@@ -325,6 +350,7 @@
       <div class="view-toggle" role="tablist">
         <button id="view-board" class="active" type="button">Kanban</button>
         <button id="view-list"  type="button">List</button>
+        <button id="view-forms-btn" type="button">Forms</button>
       </div>
       <button id="btn-export" type="button">↓ Export CSV</button>
       <button id="btn-admin" class="icon-btn" type="button" title="User management" style="display:none">⚙</button>
@@ -337,49 +363,73 @@
   </header>
 
   <main class="app-main">
-    <!-- Stats -->
-    <div class="stats">
-      <div class="stat-card"><div class="stat-label">Total Open</div><div class="stat-value" id="stat-open">0</div></div>
-      <div class="stat-card high"><div class="stat-label">High Priority</div><div class="stat-value" id="stat-high">0</div></div>
-      <div class="stat-card"><div class="stat-label">In Progress</div><div class="stat-value" id="stat-progress">0</div></div>
-      <div class="stat-card green"><div class="stat-label">Completed This Week</div><div class="stat-value" id="stat-done">0</div></div>
+    <!-- Tickets view (default) -->
+    <div id="tickets-view">
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat-card"><div class="stat-label">Total Open</div><div class="stat-value" id="stat-open">0</div></div>
+        <div class="stat-card high"><div class="stat-label">High Priority</div><div class="stat-value" id="stat-high">0</div></div>
+        <div class="stat-card"><div class="stat-label">In Progress</div><div class="stat-value" id="stat-progress">0</div></div>
+        <div class="stat-card green"><div class="stat-label">Completed This Week</div><div class="stat-value" id="stat-done">0</div></div>
+      </div>
+
+      <!-- Filters -->
+      <div class="toolbar">
+        <input type="search" id="filter-search" placeholder="Search title, description, ticket id…">
+        <select id="filter-category">
+          <option value="">All categories</option>
+          <option value="website">Website</option>
+          <option value="content">Content</option>
+          <option value="integration">Integration</option>
+          <option value="consulting">Consulting</option>
+          <option value="showroom">Showroom</option>
+          <option value="print">Print</option>
+          <option value="process">Process</option>
+          <option value="meeting">Meeting</option>
+          <option value="feature">Feature</option>
+        </select>
+        <select id="filter-priority">
+          <option value="">All priorities</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <select id="filter-assignee">
+          <option value="">All assignees</option>
+          <option value="Sean">Sean</option>
+          <option value="Belinda">Belinda</option>
+          <option value="Jess">Jess</option>
+          <option value="Sam">Sam</option>
+          <option value="Jay">Jay</option>
+          <option value="Jana">Jana</option>
+          <option value="Pam">Pam</option>
+        </select>
+      </div>
+
+      <div id="results"></div>
     </div>
 
-    <!-- Filters -->
-    <div class="toolbar">
-      <input type="search" id="filter-search" placeholder="Search title, description, ticket id…">
-      <select id="filter-category">
-        <option value="">All categories</option>
-        <option value="website">Website</option>
-        <option value="content">Content</option>
-        <option value="integration">Integration</option>
-        <option value="consulting">Consulting</option>
-        <option value="showroom">Showroom</option>
-        <option value="print">Print</option>
-        <option value="process">Process</option>
-        <option value="meeting">Meeting</option>
-        <option value="feature">Feature</option>
-      </select>
-      <select id="filter-priority">
-        <option value="">All priorities</option>
-        <option value="high">High</option>
-        <option value="medium">Medium</option>
-        <option value="low">Low</option>
-      </select>
-      <select id="filter-assignee">
-        <option value="">All assignees</option>
-        <option value="Sean">Sean</option>
-        <option value="Belinda">Belinda</option>
-        <option value="Jess">Jess</option>
-        <option value="Sam">Sam</option>
-        <option value="Jay">Jay</option>
-        <option value="Jana">Jana</option>
-        <option value="Kate">Kate</option>
-        <option value="Pam">Pam</option>
-      </select>
+    <!-- Forms view -->
+    <div id="forms-view" style="display:none">
+      <div class="toolbar">
+        <input type="search" id="forms-search" placeholder="Search name, email, phone, message…">
+        <select id="forms-status">
+          <option value="">All statuses</option>
+          <option value="new">New</option>
+          <option value="read">Read</option>
+          <option value="actioned">Actioned</option>
+          <option value="archived">Archived</option>
+        </select>
+        <select id="forms-category">
+          <option value="">All types</option>
+          <option value="sample">Sample</option>
+          <option value="contact">Contact</option>
+          <option value="partner">Partner</option>
+        </select>
+        <button class="btn-export-forms" id="btn-export-forms" type="button">↓ Export All</button>
+      </div>
+      <div id="forms-results"></div>
     </div>
-
-    <div id="results"></div>
   </main>
 </div>
 
@@ -408,7 +458,7 @@
     { key: 'low',    label: 'Low' }
   ];
   var CATEGORIES = ['website','content','integration','consulting','showroom','print','process','meeting','feature'];
-  var ASSIGNEES  = ['Sean','Belinda','Jess','Sam','Jay','Jana','Kate','Pam'];
+  var ASSIGNEES  = ['Sean','Belinda','Jess','Sam','Jay','Jana','Pam'];
 
   var state = {
     view: 'board',
@@ -479,7 +529,15 @@
     if (user) applyUser(user);
     loginWrap.style.display = 'none';
     appEl.style.display = 'flex';
-    loadAll();
+    // Honour ?view=forms in the URL — landing on /projects?view=forms (e.g.
+    // from the legacy /forms 301 redirect) should drop straight into the
+    // forms tab rather than the kanban.
+    var qsView = new URLSearchParams(location.search).get('view');
+    if (qsView === 'forms' && state.user && state.user.role !== 'viewer') {
+      setView('forms');
+    } else {
+      loadAll();
+    }
   }
   function showLogin(msg) {
     showLoginView();
@@ -492,10 +550,13 @@
     chip.style.display = 'inline-flex';
     document.getElementById('user-name').textContent = user.name || '';
     document.getElementById('user-avatar').textContent = user.initials || initialsOf(user.name);
-    // Admin gear visibility
+    // Admin (gear) → user management. Super_admin only.
     var adminBtn = document.getElementById('btn-admin');
-    adminBtn.style.display = user.role === 'admin' ? 'inline-block' : 'none';
-    // Body class drives viewer-mode CSS
+    adminBtn.style.display = user.role === 'super_admin' ? 'inline-block' : 'none';
+    // Forms tab — viewers don't get forms access at all.
+    var formsBtn = document.getElementById('view-forms-btn');
+    if (formsBtn) formsBtn.style.display = user.role === 'viewer' ? 'none' : '';
+    // Body class drives the read-only CSS rules.
     document.body.classList.toggle('role-viewer', user.role === 'viewer');
   }
   function initialsOf(name) {
@@ -543,7 +604,7 @@
       });
       var data = await res.json().catch(function () { return {}; });
       if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
-      var user = data.user || { name: email, role: 'member', initials: initialsOf(email) };
+      var user = data.user || { name: email, role: 'operator', initials: initialsOf(email) };
       if (!user.initials) user.initials = initialsOf(user.name || email);
       if (data.must_change_password) {
         // Hold the just-entered password so /change-password can verify it.
@@ -852,11 +913,23 @@
   // ── Toolbar wiring ──
   document.getElementById('view-board').addEventListener('click', function () { setView('board'); });
   document.getElementById('view-list').addEventListener('click',  function () { setView('list');  });
+  document.getElementById('view-forms-btn').addEventListener('click', function () { setView('forms'); });
   function setView(v) {
     state.view = v;
+    var isForms = v === 'forms';
     document.getElementById('view-board').classList.toggle('active', v === 'board');
     document.getElementById('view-list').classList.toggle('active',  v === 'list');
-    loadTickets();
+    document.getElementById('view-forms-btn').classList.toggle('active', isForms);
+    document.getElementById('tickets-view').style.display = isForms ? 'none' : 'block';
+    document.getElementById('forms-view').style.display   = isForms ? 'block' : 'none';
+    // Header buttons that are ticket-only.
+    document.getElementById('btn-new').style.display    = isForms ? 'none' : '';
+    document.getElementById('btn-export').style.display = isForms ? 'none' : '';
+    // Close any open drawer when crossing view boundaries — content is
+    // domain-specific (ticket vs submission) and shouldn't bleed across.
+    closeDrawer();
+    if (isForms) loadForms();
+    else loadTickets();
   }
 
   document.getElementById('filter-search').addEventListener('input', function (e) {
@@ -1194,7 +1267,7 @@
   });
 
   async function openAdminModal() {
-    if (!state.user || state.user.role !== 'admin') return;
+    if (!state.user || state.user.role !== 'super_admin') return;
     adminModal.innerHTML = '<div class="admin-card">' +
       '<div class="admin-card-head"><h2>User management</h2>' +
         '<div style="display:flex;gap:8px"><button id="adm-add">＋ Add User</button>' +
@@ -1243,10 +1316,10 @@
     if (!email) return;
     var name = prompt('Full name:');
     if (!name) return;
-    var role = prompt('Role (admin / member / viewer):', 'member');
+    var role = prompt('Role (super_admin / operator / viewer):', 'operator');
     if (!role) return;
     role = role.trim().toLowerCase();
-    if (!['admin','member','viewer'].includes(role)) { toast('Invalid role'); return; }
+    if (!['super_admin','operator','viewer'].includes(role)) { toast('Invalid role'); return; }
     try {
       var res = await fetch('/api/projects/users', {
         method: 'POST',
@@ -1269,7 +1342,7 @@
       'Edit ' + u.name + ' (' + u.email + ')\n\n' +
       'Type one of:\n' +
       '  rename <new name>\n' +
-      '  role admin|member|viewer\n' +
+      '  role super_admin|operator|viewer\n' +
       '  ' + (u.active ? 'deactivate' : 'activate') + '\n' +
       '  reset-password\n',
       ''
@@ -1279,7 +1352,7 @@
     var trimmed = choice.trim();
     if (/^rename\s+(.+)$/i.test(trimmed)) {
       payload.name = trimmed.replace(/^rename\s+/i, '').trim();
-    } else if (/^role\s+(admin|member|viewer)$/i.test(trimmed)) {
+    } else if (/^role\s+(super_admin|operator|viewer)$/i.test(trimmed)) {
       payload.role = trimmed.split(/\s+/)[1].toLowerCase();
     } else if (/^deactivate$/i.test(trimmed)) {
       payload.active = false;
@@ -1307,6 +1380,262 @@
         toast('Updated');
       }
       loadUsers();
+    } catch (err) {
+      toast('Failed: ' + err.message);
+    }
+  }
+
+  // ── Forms tab: list + drawer + status updates ──
+  var FORMS_PAGE_SIZE = 25;
+  var formsState = { offset: 0, q: '', status: '', category: '', total: 0 };
+  var formsSearchDebounce = null;
+
+  function labelForFormType(t, storeLocation) {
+    if (t === 'Sample Request') return 'Sample';
+    if (t === 'Contact Enquiry') return storeLocation ? 'Partner' : 'Contact';
+    return t || '—';
+  }
+
+  async function loadForms() {
+    var results = document.getElementById('forms-results');
+    results.innerHTML = '<div class="empty">Loading…</div>';
+    try {
+      var params = new URLSearchParams({ limit: FORMS_PAGE_SIZE, offset: formsState.offset });
+      if (formsState.status)   params.set('status',   formsState.status);
+      if (formsState.q)        params.set('q',        formsState.q);
+      if (formsState.category) params.set('category', formsState.category);
+      var res = await fetch('/api/projects/forms?' + params, { credentials: 'include' });
+      if (res.status === 401) { showLogin('Session expired — please sign in again.'); return; }
+      if (res.status === 403) {
+        results.innerHTML = '<div class="empty">Forms access not permitted for your role.</div>';
+        return;
+      }
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed to load');
+      formsState.total = data.total || 0;
+      results.innerHTML = renderFormsTable(data.submissions || []);
+      wireFormsTable();
+    } catch (err) {
+      results.innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function renderFormsTable(rows) {
+    if (!rows.length) {
+      return '<div class="empty">No submissions match the current filters.</div>';
+    }
+    var trs = rows.map(function (r) {
+      var typeLabel = labelForFormType(r.form_type, r.store_location);
+      var newCls = r.status === 'new' ? 'row-new' : '';
+      return '<tr class="' + newCls + '" data-id="' + r.id + '">' +
+        '<td class="col-check"><input type="checkbox" class="forms-row-check" value="' + r.id + '"></td>' +
+        '<td>#' + r.id + '</td>' +
+        '<td><span class="badge-type">' + escapeHtml(typeLabel) + '</span></td>' +
+        '<td>' + escapeHtml(r.name || '—') + '</td>' +
+        '<td>' + (r.email ? '<a href="mailto:' + escapeAttr(r.email) + '" onclick="event.stopPropagation()">' + escapeHtml(r.email) + '</a>' : '—') + '</td>' +
+        '<td>' + (r.phone ? '<a href="tel:' + escapeAttr(r.phone) + '" onclick="event.stopPropagation()">' + escapeHtml(r.phone) + '</a>' : '—') + '</td>' +
+        '<td>' + escapeHtml(r.store_location || r.state || '—') + '</td>' +
+        '<td>' + formatDate(r.submitted_at) + '</td>' +
+        '<td><span class="status-pill status-' + escapeAttr(r.status) + '">' + escapeHtml(r.status) + '</span></td>' +
+      '</tr>';
+    }).join('');
+    var pages =
+      '<div class="pagination">' +
+        '<button id="forms-prev" ' + (formsState.offset === 0 ? 'disabled' : '') + '>← Previous</button>' +
+        '<span style="padding:8px 12px;color:var(--muted);font-size:12px">' +
+          (formsState.offset + 1) + '–' + Math.min(formsState.offset + rows.length, formsState.total) + ' of ' + formsState.total +
+        '</span>' +
+        '<button id="forms-next" ' + (formsState.offset + rows.length >= formsState.total ? 'disabled' : '') + '>Next →</button>' +
+      '</div>';
+    return '<div class="table-wrap"><table>' +
+      '<thead><tr>' +
+        '<th class="col-check"><input type="checkbox" id="forms-select-all"></th>' +
+        '<th>#</th><th>Type</th><th>Name</th><th>Email</th><th>Phone</th>' +
+        '<th>Location</th><th>Submitted</th><th>Status</th>' +
+      '</tr></thead><tbody>' + trs + '</tbody></table></div>' + pages;
+  }
+
+  function wireFormsTable() {
+    document.querySelectorAll('#forms-results tbody tr[data-id]').forEach(function (tr) {
+      tr.addEventListener('click', function (e) {
+        if (e.target.closest('a') || e.target.closest('input')) return;
+        openFormsDrawer(parseInt(tr.dataset.id, 10));
+      });
+    });
+    document.querySelectorAll('.forms-row-check').forEach(function (cb) {
+      cb.addEventListener('change', updateFormsExportButton);
+      cb.addEventListener('click', function (e) { e.stopPropagation(); });
+    });
+    var sa = document.getElementById('forms-select-all');
+    if (sa) sa.addEventListener('change', function () {
+      document.querySelectorAll('.forms-row-check').forEach(function (cb) { cb.checked = sa.checked; });
+      updateFormsExportButton();
+    });
+    var prev = document.getElementById('forms-prev');
+    if (prev) prev.addEventListener('click', function () {
+      formsState.offset = Math.max(0, formsState.offset - FORMS_PAGE_SIZE); loadForms();
+    });
+    var next = document.getElementById('forms-next');
+    if (next) next.addEventListener('click', function () {
+      formsState.offset += FORMS_PAGE_SIZE; loadForms();
+    });
+  }
+
+  function updateFormsExportButton() {
+    var checked = document.querySelectorAll('.forms-row-check:checked');
+    var btn = document.getElementById('btn-export-forms');
+    if (checked.length > 0) {
+      btn.textContent = '↓ Export Selected (' + checked.length + ')';
+      btn.classList.add('has-selection');
+    } else {
+      btn.textContent = '↓ Export All';
+      btn.classList.remove('has-selection');
+    }
+    var sa = document.getElementById('forms-select-all');
+    var all = document.querySelectorAll('.forms-row-check');
+    if (sa) sa.checked = all.length > 0 && checked.length === all.length;
+  }
+
+  document.getElementById('forms-search').addEventListener('input', function (e) {
+    clearTimeout(formsSearchDebounce);
+    formsSearchDebounce = setTimeout(function () {
+      formsState.q = e.target.value.trim(); formsState.offset = 0; loadForms();
+    }, 250);
+  });
+  document.getElementById('forms-status').addEventListener('change', function (e) {
+    formsState.status = e.target.value; formsState.offset = 0; loadForms();
+  });
+  document.getElementById('forms-category').addEventListener('change', function (e) {
+    formsState.category = e.target.value; formsState.offset = 0; loadForms();
+  });
+  document.getElementById('btn-export-forms').addEventListener('click', function () {
+    var checked = document.querySelectorAll('.forms-row-check:checked');
+    var url = '/api/projects/forms/export';
+    if (checked.length > 0) {
+      url += '?ids=' + Array.from(checked).map(function (cb) { return cb.value; }).join(',');
+    }
+    window.location.href = url;
+  });
+
+  var FORMS_FIELD_ORDER = [
+    { key: 'form_type',      label: 'Type',           format: 'type' },
+    { key: 'submitted_at',   label: 'Submitted',      format: 'datetime' },
+    { key: 'status',         label: 'Status',         format: 'status' },
+    { key: 'name',           label: 'Name' },
+    { key: 'email',          label: 'Email',          link: 'mailto' },
+    { key: 'phone',          label: 'Phone',          link: 'tel' },
+    { key: 'company',        label: 'Company' },
+    { key: 'role',           label: 'Role / I am a' },
+    { key: 'reason',         label: 'Reason' },
+    { key: 'unit',           label: 'Unit' },
+    { key: 'street',         label: 'Street' },
+    { key: 'suburb',         label: 'Suburb' },
+    { key: 'postcode',       label: 'Postcode' },
+    { key: 'state',          label: 'State' },
+    { key: 'store_location', label: 'Store location' },
+    { key: 'stone_interest', label: 'Stone interest' },
+    { key: 'source',         label: 'Source' },
+    { key: 'consent',        label: 'Consent',        format: 'boolean' },
+    { key: 'message',        label: 'Message',        format: 'multiline' }
+  ];
+
+  async function openFormsDrawer(id) {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    drawer.innerHTML = '<div class="empty">Loading…</div>';
+    document.querySelectorAll('#forms-results tbody tr').forEach(function (r) { r.classList.remove('row-active'); });
+    var rowEl = document.querySelector('#forms-results tbody tr[data-id="' + id + '"]');
+    if (rowEl) rowEl.classList.add('row-active');
+    try {
+      var res = await fetch('/api/projects/forms/' + id, { credentials: 'include' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      drawer.innerHTML = renderFormsDrawer(data.submission, data.sampleItems || []);
+      wireFormsDrawer(data.submission);
+    } catch (err) {
+      drawer.innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function renderFormsDrawer(s, items) {
+    var typeLabel = labelForFormType(s.form_type, s.store_location);
+    var rows = FORMS_FIELD_ORDER.map(function (f) {
+      var v = s[f.key];
+      var html;
+      if (f.format === 'type') html = '<span class="badge-type">' + escapeHtml(typeLabel) + '</span>';
+      else if (f.format === 'status') html = '<span class="status-pill status-' + escapeAttr(v) + '">' + escapeHtml(v) + '</span>';
+      else if (f.format === 'boolean') html = v ? '✓ Marketing emails' : '✗ Not consented';
+      else if (f.format === 'datetime') html = escapeHtml(formatDate(v, true));
+      else if (v == null || v === '') html = '<span class="muted">—</span>';
+      else if (f.format === 'multiline') html = escapeHtml(String(v)).replace(/\n/g, '<br>');
+      else if (f.link === 'mailto') html = '<a href="mailto:' + escapeAttr(v) + '">' + escapeHtml(v) + '</a>';
+      else if (f.link === 'tel') html = '<a href="tel:' + escapeAttr(v) + '">' + escapeHtml(v) + '</a>';
+      else html = escapeHtml(String(v));
+      return '<div class="field-row"><div class="lbl">' + escapeHtml(f.label) + '</div><div class="val">' + html + '</div></div>';
+    }).join('');
+
+    var stones = '';
+    if (items && items.length) {
+      stones = '<div class="drawer-section"><h3>Stones requested (' + items.length + ')</h3>' +
+        items.map(function (it) {
+          return '<div class="field-row"><div class="lbl">' + escapeHtml(it.collection || '—') + '</div>' +
+                 '<div class="val">' + escapeHtml(it.stone_name) + ' <span class="muted" style="font-size:12px">(' + escapeHtml(it.stone_slug) + ')</span></div></div>';
+        }).join('') +
+      '</div>';
+    }
+
+    var statusBtns = '';
+    if (s.status !== 'read')     statusBtns += '<button id="frm-mark-read">Mark read</button>';
+    if (s.status !== 'actioned') statusBtns += '<button class="primary" id="frm-mark-actioned">Mark actioned</button>';
+    if (s.status === 'archived') statusBtns += '<button id="frm-reopen">Reopen (mark new)</button>';
+    else                          statusBtns += '<button id="frm-archive">Archive</button>';
+
+    return '' +
+      '<div class="drawer-header">' +
+        '<div><h2>' + escapeHtml(typeLabel) + ' #' + s.id + '</h2>' +
+          '<div class="meta">' + escapeHtml(formatDate(s.submitted_at, true)) + '</div></div>' +
+        '<button class="drawer-close" id="frm-close" aria-label="Close">✕</button>' +
+      '</div>' +
+      '<div class="drawer-body" style="padding:18px 28px">' + rows + stones + '</div>' +
+      '<div class="drawer-footer">' +
+        statusBtns +
+        (s.email ? '<button id="frm-copy">Copy email</button>' : '') +
+      '</div>';
+  }
+
+  function wireFormsDrawer(s) {
+    document.getElementById('frm-close').addEventListener('click', closeDrawer);
+    var byId = function (id, status) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('click', function () { setFormsStatus(s.id, status); });
+    };
+    byId('frm-mark-read',     'read');
+    byId('frm-mark-actioned', 'actioned');
+    byId('frm-archive',       'archived');
+    byId('frm-reopen',        'new');
+    var cp = document.getElementById('frm-copy');
+    if (cp) cp.addEventListener('click', function () {
+      navigator.clipboard.writeText(s.email).then(function () { toast('Email copied'); });
+    });
+  }
+
+  async function setFormsStatus(id, status) {
+    try {
+      var res = await fetch('/api/projects/forms/' + id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: status })
+      });
+      if (!res.ok) {
+        var err = await res.json().catch(function () { return {}; });
+        throw new Error(err.error || ('HTTP ' + res.status));
+      }
+      toast('Status updated');
+      closeDrawer();
+      loadForms();
     } catch (err) {
       toast('Failed: ' + err.message);
     }

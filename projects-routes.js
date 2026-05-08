@@ -27,7 +27,11 @@ try { sgMail = require('@sendgrid/mail'); } catch { /* email is optional */ }
 const ALLOWED_STATUSES   = ['backlog', 'in_progress', 'review', 'done', 'archived'];
 const ALLOWED_PRIORITIES = ['high', 'medium', 'low'];
 const ALLOWED_CATEGORIES = ['website','content','integration','consulting','showroom','print','process','meeting','feature'];
-const ALLOWED_ROLES      = ['admin', 'member', 'viewer'];
+// Role hierarchy:
+//   super_admin → full access (tickets, forms, /admin CMS, user management)
+//   operator    → assigned tickets only + full forms access (no CMS, no users)
+//   viewer      → assigned tickets only, read-only, no forms
+const ALLOWED_ROLES      = ['super_admin', 'operator', 'viewer'];
 
 const UPDATABLE_TICKET_COLS = [
   'title','description','category','priority','status',
@@ -57,16 +61,36 @@ const SEED_TICKETS = [
   { title: 'Forms-only login portal at /forms', category: 'feature', priority: 'high', status: 'done', requested_by: 'Sean', assigned_to: 'Sean', source: 'internal', description: 'Separate login for viewing/managing form submissions without admin access.' }
 ];
 
+// NOTE: Pam is seeded with pam@thisisikon.com.au — flip to pam@alphasurfaces.com.au
+// once we've actually confirmed the address with her. Until then leave it
+// to avoid silently locking her out.
 const SEED_USERS = [
-  { email: 'sean@cangaroo.ai',                name: 'Sean Stone',      role: 'admin' },
-  { email: 'belinda@alphasurfaces.com.au',    name: 'Belinda Kelaher', role: 'admin' },
-  { email: 'jay@alphasurfaces.com.au',        name: 'Jay',             role: 'member' },
-  { email: 'jana@northcoaststone.com.au',     name: 'Jana Zemanova',   role: 'member' },
-  { email: 'hello@alphasurfaces.com.au',      name: 'Jess Connelly',   role: 'member' },
-  { email: 'sam@alphasurfaces.com.au',        name: 'Sam Southam',     role: 'member' },
-  { email: 'kate@thisisikon.com.au',          name: 'Kate',            role: 'viewer' },
-  { email: 'pam@thisisikon.com.au',           name: 'Pam',             role: 'viewer' }
+  { email: 'sean@cangaroo.ai',                name: 'Sean Stone',      role: 'super_admin' },
+  { email: 'belinda@alphasurfaces.com.au',    name: 'Belinda Kelaher', role: 'super_admin' },
+  { email: 'jay@alphasurfaces.com.au',        name: 'Jay',             role: 'super_admin' },
+  { email: 'jana@northcoaststone.com.au',     name: 'Jana Zemanova',   role: 'super_admin' },
+  { email: 'hello@alphasurfaces.com.au',      name: 'Jess Connelly',   role: 'operator' },
+  { email: 'sam@alphasurfaces.com.au',        name: 'Sam Southam',     role: 'operator' },
+  { email: 'pam@thisisikon.com.au',           name: 'Pam',             role: 'operator' }
 ];
+
+// One-time role + active flag re-mapping for production rows that predate the
+// role overhaul. Idempotent: each query is a no-op once the data already
+// matches. Kate's row is deactivated rather than deleted so we keep her
+// activity-log attribution.
+const ROLE_REMAP_SUPER_ADMIN = [
+  'sean@cangaroo.ai',
+  'belinda@alphasurfaces.com.au',
+  'jay@alphasurfaces.com.au',
+  'jana@northcoaststone.com.au'
+];
+const ROLE_REMAP_OPERATOR = [
+  'hello@alphasurfaces.com.au',
+  'sam@alphasurfaces.com.au',
+  'pam@alphasurfaces.com.au',
+  'pam@thisisikon.com.au'
+];
+const DEACTIVATE_EMAILS = ['kate@thisisikon.com.au'];
 
 // ─── DB migration + seed ──────────────────────────────────────────────────
 async function initSchema(pool) {
@@ -113,6 +137,25 @@ async function initSchema(pool) {
        ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT TRUE`
   );
 
+  // Role overhaul: re-map legacy roles (admin/member/viewer) to the new
+  // hierarchy. Idempotent — once rows match the new values, these UPDATEs
+  // change nothing.
+  await pool.query(
+    `UPDATE project_users SET role = 'super_admin'
+      WHERE role <> 'super_admin' AND LOWER(email) = ANY($1::text[])`,
+    [ROLE_REMAP_SUPER_ADMIN]
+  );
+  await pool.query(
+    `UPDATE project_users SET role = 'operator'
+      WHERE role <> 'operator' AND LOWER(email) = ANY($1::text[])`,
+    [ROLE_REMAP_OPERATOR]
+  );
+  await pool.query(
+    `UPDATE project_users SET active = FALSE
+      WHERE active = TRUE AND LOWER(email) = ANY($1::text[])`,
+    [DEACTIVATE_EMAILS]
+  );
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS ticket_activity (
       id          SERIAL PRIMARY KEY,
@@ -126,6 +169,21 @@ async function initSchema(pool) {
   `);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_activity_ticket ON ticket_activity(ticket_id)`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_activity_user   ON ticket_activity(user_id)`);
+
+  // Audit trail for form submissions — who changed status, who exported, etc.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS form_activity (
+      id            SERIAL PRIMARY KEY,
+      submission_id INTEGER NOT NULL,
+      user_id       INTEGER REFERENCES project_users(id) ON DELETE SET NULL,
+      user_name     VARCHAR(100) NOT NULL,
+      action        VARCHAR(50)  NOT NULL,
+      detail        TEXT,
+      created_at    TIMESTAMPTZ  DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_form_activity_submission ON form_activity(submission_id)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_form_activity_user       ON form_activity(user_id)`);
 
   // Seed tickets — only when table is empty.
   const tk = await pool.query('SELECT COUNT(*)::int AS c FROM tickets');
@@ -326,9 +384,28 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     const adminToken = req.cookies?.alpha_session;
     if (adminToken && sessions.has(adminToken)) {
       // Admin session — pseudo-user for activity attribution
-      return { userId: null, email: '', name: 'Admin', role: 'admin', source: 'admin_session' };
+      return { userId: null, email: '', name: 'Admin', role: 'super_admin', source: 'admin_session' };
     }
     return null;
+  }
+
+  // Build the role-aware visibility filter for tickets. Returns a SQL fragment
+  // and an array of values to be appended to the caller's `vals`. The fragment
+  // is empty for super_admin (full visibility). Operators also see unassigned
+  // tickets so they can pick work up off the backlog.
+  function ticketRoleFilter(user, startIndex) {
+    if (!user || user.role === 'super_admin') return { sql: '', vals: [] };
+    const fullName  = (user.name  || '').trim();
+    const firstName = fullName.split(/\s+/)[0] || fullName;
+    const email     = (user.email || '').trim();
+    const vals = [];
+    const orParts = [];
+    if (firstName) { vals.push(firstName); orParts.push(`assigned_to ILIKE $${startIndex + vals.length - 1}`); }
+    if (fullName && fullName !== firstName) { vals.push(fullName); orParts.push(`assigned_to ILIKE $${startIndex + vals.length - 1}`); }
+    if (email)     { vals.push(email);     orParts.push(`assigned_to ILIKE $${startIndex + vals.length - 1}`); }
+    if (user.role === 'operator') orParts.push('assigned_to IS NULL');
+    if (!orParts.length) return { sql: '1=0', vals: [] };
+    return { sql: '(' + orParts.join(' OR ') + ')', vals };
   }
 
   function requireAuth(req, res, next) {
@@ -397,7 +474,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       if (!valid && !master.startsWith('$2')) valid = supplied === master;
       if (valid) {
         return issueSession(res, {
-          userId: null, email: 'admin@alphasurfaces.com.au', name: 'Admin', role: 'admin', source: 'master',
+          userId: null, email: 'admin@alphasurfaces.com.au', name: 'Admin', role: 'super_admin', source: 'master',
           must_change_password: false
         });
       }
@@ -550,7 +627,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
   });
 
   // ── User management (admin only) ─────────────────────────────────────
-  router.get('/users', requireRole('admin'), async (req, res) => {
+  router.get('/users', requireRole('super_admin'), async (req, res) => {
     try {
       const { rows } = await pool.query(
         `SELECT id, email, name, role, last_login, created_at, active
@@ -562,7 +639,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     }
   });
 
-  router.post('/users', requireRole('admin'), async (req, res) => {
+  router.post('/users', requireRole('super_admin'), async (req, res) => {
     try {
       const { email, name, role, password } = req.body || {};
       if (!email || !name) return res.status(400).json({ ok: false, error: 'Email and name are required.' });
@@ -587,7 +664,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     }
   });
 
-  router.patch('/users/:id', requireRole('admin'), async (req, res) => {
+  router.patch('/users/:id', requireRole('super_admin'), async (req, res) => {
     try {
       const id = parseInt(req.params.id, 10);
       if (!id) return res.status(400).json({ ok: false, error: 'Invalid user id.' });
@@ -630,7 +707,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     }
   });
 
-  router.delete('/users/:id', requireRole('admin'), async (req, res) => {
+  router.delete('/users/:id', requireRole('super_admin'), async (req, res) => {
     try {
       const id = parseInt(req.params.id, 10);
       if (!id) return res.status(400).json({ ok: false, error: 'Invalid user id.' });
@@ -649,16 +726,243 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     }
   });
 
+  // ── Form submissions (gated to super_admin + operator) ───────────────
+  // Viewer is denied. Status changes and exports are written to form_activity
+  // for audit. Routes intentionally mirror /api/admin/submissions in server.js
+  // so the embedded UI in projects.html doesn't need a separate code path,
+  // but the auth surface here is the project_users session — once /forms is
+  // deprecated, the server.js /api/admin/submissions routes can be retired.
+  const ALLOWED_SUBMISSION_STATUSES = ['new', 'read', 'actioned', 'archived'];
+
+  function requireFormsAccess(req, res, next) {
+    if (!req.user) return res.status(401).json({ ok: false, error: 'Unauthorized' });
+    if (req.user.role === 'viewer') {
+      return res.status(403).json({ ok: false, error: 'Forms access not permitted for read-only users.' });
+    }
+    next();
+  }
+
+  async function logFormActivity(submissionId, user, action, detail) {
+    try {
+      await pool.query(
+        `INSERT INTO form_activity (submission_id, user_id, user_name, action, detail)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [submissionId, user.userId || null, user.name || 'Unknown', action, detail || null]
+      );
+    } catch (err) {
+      console.error('[projects/forms] activity log error:', err.message);
+    }
+  }
+
+  router.get('/forms', requireFormsAccess, async (req, res) => {
+    try {
+      const limit  = Math.min(parseInt(req.query.limit  || '50', 10) || 50, 200);
+      const offset = Math.max(parseInt(req.query.offset || '0',  10) || 0,  0);
+      const vals = [];
+      const where = [];
+      if (req.query.form_type) { vals.push(req.query.form_type); where.push(`form_type = $${vals.length}`); }
+      if (req.query.category === 'sample') {
+        where.push(`form_type = 'Sample Request'`);
+      } else if (req.query.category === 'contact') {
+        where.push(`form_type = 'Contact Enquiry' AND (store_location IS NULL OR store_location = '')`);
+      } else if (req.query.category === 'partner') {
+        where.push(`form_type = 'Contact Enquiry' AND store_location IS NOT NULL AND store_location <> ''`);
+      }
+      if (req.query.status) { vals.push(req.query.status); where.push(`status = $${vals.length}`); }
+      if (req.query.q) {
+        vals.push('%' + req.query.q + '%');
+        const i = vals.length;
+        where.push(`(name ILIKE $${i} OR email ILIKE $${i} OR phone ILIKE $${i} OR message ILIKE $${i} OR company ILIKE $${i})`);
+      }
+      const whereSql = where.length ? ' WHERE ' + where.join(' AND ') : '';
+      const dataQ = `
+        SELECT s.*,
+               COALESCE(
+                 (SELECT STRING_AGG(stone_name, ', ' ORDER BY id)
+                    FROM sample_request_items WHERE submission_id = s.id),
+                 ''
+               ) AS samples,
+               (SELECT COUNT(*)::int FROM sample_request_items WHERE submission_id = s.id) AS sample_count
+          FROM form_submissions s${whereSql}
+         ORDER BY submitted_at DESC
+         LIMIT $${vals.length+1} OFFSET $${vals.length+2}
+      `;
+      const { rows } = await pool.query(dataQ, [...vals, limit, offset]);
+      const { rows: cr } = await pool.query(
+        `SELECT COUNT(*) FROM form_submissions${whereSql}`, vals
+      );
+      const { rows: counts } = await pool.query(`
+        SELECT
+          COUNT(*) FILTER (WHERE status='new') AS new_total,
+          COUNT(*) FILTER (WHERE form_type='Sample Request' AND status='new') AS new_sample,
+          COUNT(*) FILTER (WHERE form_type='Contact Enquiry' AND (store_location IS NULL OR store_location='') AND status='new') AS new_contact,
+          COUNT(*) FILTER (WHERE form_type='Contact Enquiry' AND store_location IS NOT NULL AND store_location<>'' AND status='new') AS new_partner
+        FROM form_submissions
+      `);
+      res.json({
+        ok: true,
+        submissions: rows,
+        total: parseInt(cr[0].count, 10),
+        counts: counts[0]
+      });
+    } catch (err) {
+      console.error('[projects/forms] list error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // Export must come before /:id so Express doesn't match "export" as :id.
+  router.get('/forms/export', requireFormsAccess, async (req, res) => {
+    try {
+      const vals = [];
+      const conditions = [];
+      if (req.query.ids) {
+        const idList = String(req.query.ids).split(',').map(Number).filter(n => !isNaN(n) && n > 0);
+        if (!idList.length) return res.status(400).json({ ok: false, error: 'No valid IDs provided' });
+        vals.push(idList);
+        conditions.push(`id = ANY($${vals.length}::int[])`);
+      }
+      if (req.query.form_type) { vals.push(req.query.form_type); conditions.push(`form_type = $${vals.length}`); }
+      let query = 'SELECT * FROM form_submissions';
+      if (conditions.length) query += ' WHERE ' + conditions.join(' AND ');
+      query += ' ORDER BY submitted_at DESC';
+      const { rows } = await pool.query(query, vals);
+
+      const sampleRows = rows.filter(r => r.form_type === 'Sample Request');
+      const sampleMap = {};
+      if (sampleRows.length) {
+        const ids = sampleRows.map(r => r.id);
+        const sr = await pool.query(
+          `SELECT submission_id, stone_name FROM sample_request_items
+            WHERE submission_id = ANY($1::int[]) ORDER BY id`, [ids]
+        );
+        sr.rows.forEach(it => { (sampleMap[it.submission_id] ||= []).push(it.stone_name); });
+      }
+
+      const cols = ['id','form_type','submitted_at','name','email','phone',
+                    'company','role','reason',
+                    'unit','street','suburb','postcode','state','store_location',
+                    'stone_interest','message','source','consent','status'];
+      const skip = new Set(['name','first_name','last_name','email','phone','company',
+                            'stone_interest','message','special_instructions','postcode',
+                            'state','store_location','source','consent','status',
+                            'i_am_a','role','type','reason','enquiry_reason',
+                            'street','suburb','unit','sampleItems','samples']);
+      const extraKeys = new Set();
+      rows.forEach(r => {
+        if (r.raw_data && typeof r.raw_data === 'object') {
+          Object.keys(r.raw_data).forEach(k => {
+            if (!cols.includes(k) && !skip.has(k)) extraKeys.add(k);
+          });
+        }
+      });
+      const extraCols = [...extraKeys].sort();
+      const allCols = [...cols, ...extraCols, 'sample_items'];
+      const escapeCSV = (v) => {
+        if (v == null) return '';
+        const s = v instanceof Date ? v.toISOString() : String(v);
+        return (s.includes(',') || s.includes('"') || s.includes('\n'))
+          ? `"${s.replace(/"/g,'""')}"` : s;
+      };
+      const csv = [
+        allCols.join(','),
+        ...rows.map(r => {
+          const base = cols.map(c => escapeCSV(r[c]));
+          const extra = extraCols.map(k => escapeCSV(r.raw_data?.[k]));
+          const rawSamples = r.raw_data?.sampleItems || r.raw_data?.samples || [];
+          const dbSamples = sampleMap[r.id] || [];
+          const sampleStr = dbSamples.length
+            ? dbSamples.join('; ')
+            : Array.isArray(rawSamples)
+              ? rawSamples.map(s => typeof s === 'object' ? (s.name || s.slug || JSON.stringify(s)) : s).join('; ')
+              : '';
+          return [...base, ...extra, escapeCSV(sampleStr)].join(',');
+        })
+      ].join('\n');
+
+      // One audit row covering the whole export. submission_id is set to 0
+      // since the action spans multiple rows; the detail field captures the
+      // count and the id list when selective.
+      const detail = req.query.ids
+        ? `Exported ${rows.length} selected submissions (ids: ${req.query.ids})`
+        : `Exported ${rows.length} submissions`;
+      logFormActivity(0, req.user, 'export', detail);
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="submissions-${Date.now()}.csv"`);
+      res.send(csv);
+    } catch (err) {
+      console.error('[projects/forms] export error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.get('/forms/:id', requireFormsAccess, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (!id) return res.status(400).json({ ok: false, error: 'Invalid id' });
+      const { rows } = await pool.query('SELECT * FROM form_submissions WHERE id = $1', [id]);
+      if (!rows.length) return res.status(404).json({ ok: false, error: 'Not found' });
+      const submission = rows[0];
+      let items = [];
+      if (submission.form_type === 'Sample Request') {
+        const r = await pool.query(
+          'SELECT id, stone_slug, stone_name, collection FROM sample_request_items WHERE submission_id = $1 ORDER BY id',
+          [submission.id]
+        );
+        items = r.rows;
+      }
+      res.json({ ok: true, submission, sampleItems: items });
+    } catch (err) {
+      console.error('[projects/forms] detail error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.patch('/forms/:id', requireFormsAccess, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (!id) return res.status(400).json({ ok: false, error: 'Invalid id' });
+      const status = req.body?.status;
+      if (!ALLOWED_SUBMISSION_STATUSES.includes(status)) {
+        return res.status(400).json({ ok: false, error: `status must be one of ${ALLOWED_SUBMISSION_STATUSES.join(', ')}` });
+      }
+      const before = await pool.query('SELECT status FROM form_submissions WHERE id = $1', [id]);
+      if (!before.rows.length) return res.status(404).json({ ok: false, error: 'Not found' });
+      const oldStatus = before.rows[0].status;
+      if (oldStatus === status) return res.json({ ok: true, status, unchanged: true });
+      await pool.query('UPDATE form_submissions SET status = $1 WHERE id = $2', [status, id]);
+      logFormActivity(id, req.user, 'status_changed', `Status: ${oldStatus} → ${status}`);
+      res.json({ ok: true, status });
+    } catch (err) {
+      console.error('[projects/forms] patch error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
   // ── Stats ────────────────────────────────────────────────────────────
   router.get('/stats', async (req, res) => {
     try {
-      const byStatus = await pool.query(`SELECT status, COUNT(*)::int AS c FROM tickets GROUP BY status`);
+      const f = ticketRoleFilter(req.user, 1);
+      const baseFilter = f.sql ? ` WHERE ${f.sql}` : '';
+      const baseFilterAnd = f.sql ? ` AND ${f.sql}` : '';
+      const byStatus = await pool.query(
+        `SELECT status, COUNT(*)::int AS c FROM tickets${baseFilter} GROUP BY status`,
+        f.vals
+      );
       const byPriority = await pool.query(
-        `SELECT priority, COUNT(*)::int AS c FROM tickets WHERE status NOT IN ('done','archived') GROUP BY priority`
+        `SELECT priority, COUNT(*)::int AS c FROM tickets
+          WHERE status NOT IN ('done','archived')${baseFilterAnd} GROUP BY priority`,
+        f.vals
       );
       const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      // The role filter for the completed-this-week count starts at $2 since
+      // $1 is `since`; rebuild it to keep param numbering coherent.
+      const fWeek = ticketRoleFilter(req.user, 2);
       const completedThisWeek = await pool.query(
-        `SELECT COUNT(*)::int AS c FROM tickets WHERE status='done' AND updated_at >= $1`, [since]
+        `SELECT COUNT(*)::int AS c FROM tickets
+          WHERE status='done' AND updated_at >= $1${fWeek.sql ? ' AND ' + fWeek.sql : ''}`,
+        [since, ...fWeek.vals]
       );
       const counts = { status: {}, priority: {} };
       byStatus.rows.forEach(r   => { counts.status[r.status] = r.c; });
@@ -681,11 +985,17 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
   // ── CSV export ───────────────────────────────────────────────────────
   router.get('/tickets/export', async (req, res) => {
     try {
+      // Viewers can read but the spec doesn't grant them export — keep parity
+      // with the export button being hidden client-side.
+      if (req.user.role === 'viewer') return res.status(403).json({ ok: false, error: 'Export not permitted for read-only users.' });
+      const f = ticketRoleFilter(req.user, 1);
+      const filterClause = f.sql ? ` AND ${f.sql}` : '';
       const { rows } = await pool.query(
         `SELECT ticket_id, title, description, category, priority, status,
                 assigned_to, requested_by, due_date, source, created_at, updated_at, notes
-           FROM tickets WHERE status <> 'archived'
-          ORDER BY CAST(SUBSTRING(ticket_id FROM 4) AS INTEGER) ASC`
+           FROM tickets WHERE status <> 'archived'${filterClause}
+          ORDER BY CAST(SUBSTRING(ticket_id FROM 4) AS INTEGER) ASC`,
+        f.vals
       );
       const cols = ['ticket_id','title','description','category','priority','status',
                     'assigned_to','requested_by','due_date','source','created_at','updated_at','notes'];
@@ -726,6 +1036,9 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         const i = vals.length;
         where.push(`(title ILIKE $${i} OR description ILIKE $${i} OR notes ILIKE $${i} OR ticket_id ILIKE $${i})`);
       }
+      // Role-based visibility: operator/viewer only see their own tickets.
+      const f = ticketRoleFilter(req.user, vals.length + 1);
+      if (f.sql) { where.push(f.sql); vals.push(...f.vals); }
       const sortMap = {
         created_at: 'created_at', updated_at: 'updated_at', due_date: 'due_date',
         title: 'title',
@@ -745,6 +1058,22 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     }
   });
 
+  // Returns true when the user is allowed to see/touch the ticket. Operators
+  // and viewers are limited to their own assignments; operators may also
+  // touch unassigned tickets so they can pick up backlog work.
+  function canAccessTicket(user, ticket) {
+    if (!user || !ticket) return false;
+    if (user.role === 'super_admin') return true;
+    const assigned = (ticket.assigned_to || '').trim().toLowerCase();
+    if (!assigned) return user.role === 'operator';
+    const fullName  = (user.name  || '').trim().toLowerCase();
+    const firstName = fullName.split(/\s+/)[0] || fullName;
+    const email     = (user.email || '').trim().toLowerCase();
+    return (firstName && assigned.includes(firstName))
+        || (fullName  && assigned.includes(fullName))
+        || (email     && assigned.includes(email));
+  }
+
   // ── Ticket detail ────────────────────────────────────────────────────
   router.get('/tickets/:id', async (req, res) => {
     try {
@@ -753,6 +1082,9 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         ? await pool.query('SELECT * FROM tickets WHERE id = $1', [parseInt(id, 10)])
         : await pool.query('SELECT * FROM tickets WHERE ticket_id = $1', [id]);
       if (!rows.length) return res.status(404).json({ ok: false, error: 'Ticket not found' });
+      if (!canAccessTicket(req.user, rows[0])) {
+        return res.status(404).json({ ok: false, error: 'Ticket not found' });
+      }
       res.json({ ok: true, ticket: rows[0] });
     } catch (err) {
       res.status(500).json({ ok: false, error: err.message });
@@ -765,9 +1097,12 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       const id = req.params.id;
       // Resolve to ticket_id (supports both AS-XXX and numeric id)
       const tk = /^\d+$/.test(id)
-        ? await pool.query('SELECT ticket_id FROM tickets WHERE id = $1', [parseInt(id, 10)])
-        : await pool.query('SELECT ticket_id FROM tickets WHERE ticket_id = $1', [id]);
+        ? await pool.query('SELECT * FROM tickets WHERE id = $1', [parseInt(id, 10)])
+        : await pool.query('SELECT * FROM tickets WHERE ticket_id = $1', [id]);
       if (!tk.rows.length) return res.status(404).json({ ok: false, error: 'Ticket not found' });
+      if (!canAccessTicket(req.user, tk.rows[0])) {
+        return res.status(404).json({ ok: false, error: 'Ticket not found' });
+      }
       const ticketId = tk.rows[0].ticket_id;
       const { rows } = await pool.query(
         `SELECT id, ticket_id, user_id, user_name, action, detail, created_at
@@ -855,11 +1190,13 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       const id = req.params.id;
       const message = String(req.body?.message || '').trim();
       if (!message) return res.status(400).json({ ok: false, error: 'Note text is required.' });
-      // Resolve to ticket_id
       const tk = /^\d+$/.test(id)
-        ? await pool.query('SELECT ticket_id FROM tickets WHERE id = $1', [parseInt(id, 10)])
-        : await pool.query('SELECT ticket_id FROM tickets WHERE ticket_id = $1', [id]);
+        ? await pool.query('SELECT * FROM tickets WHERE id = $1', [parseInt(id, 10)])
+        : await pool.query('SELECT * FROM tickets WHERE ticket_id = $1', [id]);
       if (!tk.rows.length) return res.status(404).json({ ok: false, error: 'Ticket not found' });
+      if (!canAccessTicket(req.user, tk.rows[0])) {
+        return res.status(403).json({ ok: false, error: 'You can only add notes to tickets assigned to you.' });
+      }
       const ticket = await appendNote(pool, tk.rows[0].ticket_id, req.user, message);
       res.json({ ok: true, ticket });
     } catch (err) {
@@ -878,6 +1215,18 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         : await pool.query('SELECT * FROM tickets WHERE ticket_id = $1', [id]);
       if (!existing.rows.length) return res.status(404).json({ ok: false, error: 'Ticket not found' });
       const oldRow = existing.rows[0];
+      if (!canAccessTicket(req.user, oldRow)) {
+        return res.status(403).json({ ok: false, error: 'You can only edit tickets assigned to you.' });
+      }
+      // Operators can't reassign a ticket away from themselves — keeps audit
+      // trail honest.
+      if (req.user.role === 'operator' && Object.prototype.hasOwnProperty.call(req.body || {}, 'assigned_to')) {
+        const next = req.body.assigned_to == null ? null : String(req.body.assigned_to).trim();
+        const synthetic = { ...oldRow, assigned_to: next };
+        if (!canAccessTicket(req.user, synthetic)) {
+          return res.status(403).json({ ok: false, error: 'Operators cannot reassign tickets to another user.' });
+        }
+      }
 
       const sets = [];
       const vals = [];
@@ -937,8 +1286,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     }
   });
 
-  // ── Soft delete ──────────────────────────────────────────────────────
-  router.delete('/tickets/:id', requireWrite, async (req, res) => {
+  // ── Soft delete (super_admin only) ──────────────────────────────────
+  router.delete('/tickets/:id', requireRole('super_admin'), async (req, res) => {
     try {
       const id = req.params.id;
       const { rows } = /^\d+$/.test(id)
@@ -959,6 +1308,10 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
   });
 
   console.log('[projects] routes mounted (user auth + activity log)');
+
+  // Export the session resolver so server.js can extend admin/forms gating
+  // without duplicating the session map.
+  return { resolveUser };
 };
 
 module.exports.ALLOWED_STATUSES   = ALLOWED_STATUSES;

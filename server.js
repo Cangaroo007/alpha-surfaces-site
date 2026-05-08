@@ -15,7 +15,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const versions = require('./lib/versions');
 const { initDB, saveSubmission, saveSubscriber, unsubscribeEmail, pool } = require('./db');
 const notifications = require('./notifications');
-const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, readSettings: readNotifSettings, writeSettings: writeNotifSettings, notifyNewSubmission, sendFormsResetEmail } = notifications;
+const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, readSettings: readNotifSettings, writeSettings: writeNotifSettings, notifyNewSubmission } = notifications;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -114,33 +114,6 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 *
 
 // Active sessions (in-memory, resets on restart)
 const sessions = new Map();
-// Separate session store for the forms-only portal (/forms). Forms users
-// never get access to the full admin even if their session is replayed.
-const formsSessions = new Map();
-// One-time password reset tokens for the forms portal. In-memory is fine —
-// if the process restarts mid-flow, the user just clicks "Forgot password"
-// again. 1-hour TTL, deleted on successful use.
-const formsResetTokens = new Map();
-const FORMS_RESET_TTL_MS = 60 * 60 * 1000;
-const FORMS_PASSWORD_FILE = path.join(DATA_DIR, 'forms-password.json');
-
-function readFormsPasswordFile() {
-  try {
-    if (!fs.existsSync(FORMS_PASSWORD_FILE)) return null;
-    const data = JSON.parse(fs.readFileSync(FORMS_PASSWORD_FILE, 'utf8'));
-    return data && typeof data.hash === 'string' ? data.hash : null;
-  } catch (err) {
-    console.error('[forms-password] read error:', err.message);
-    return null;
-  }
-}
-function writeFormsPasswordFile(hash) {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(FORMS_PASSWORD_FILE, JSON.stringify({
-    hash,
-    updated: new Date().toISOString()
-  }, null, 2));
-}
 
 // ─── Middleware ───
 app.use(express.json({ limit: '25mb' }));
@@ -196,20 +169,21 @@ function saveContent(data) {
   fs.writeFileSync(CONTENT_FILE, JSON.stringify(data, null, 2));
 }
 
+// Bound after projects-routes mounts (see ./projects-routes require call
+// later in this file). Falls back to a no-op resolver until then so the
+// closure below stays safe at import time.
+let resolveProjectsUser = () => null;
+
 function authMiddleware(req, res, next) {
   const token = req.cookies?.alpha_session;
   if (token && sessions.has(token)) return next();
-  res.status(401).json({ error: 'Unauthorized' });
-}
-
-// Forms-portal middleware: accepts EITHER an admin session or a forms-only
-// session. Use this to share read/update endpoints for submissions between
-// the full admin and the standalone /forms portal.
-function requireFormsOrAdmin(req, res, next) {
-  const adminToken = req.cookies?.alpha_session;
-  if (adminToken && sessions.has(adminToken)) return next();
-  const formsToken = req.cookies?.forms_session;
-  if (formsToken && formsSessions.has(formsToken)) return next();
+  // Project-tracker super_admins are granted CMS access too — one login
+  // covers /projects, /forms, and /admin.
+  const pUser = resolveProjectsUser(req);
+  if (pUser && pUser.role === 'super_admin' && !pUser.must_change_password) {
+    req.user = pUser;
+    return next();
+  }
   res.status(401).json({ error: 'Unauthorized' });
 }
 
@@ -367,122 +341,33 @@ app.post('/api/logout', (req, res) => {
 
 app.get('/api/auth-check', (req, res) => {
   const token = req.cookies?.alpha_session;
-  res.json({ authenticated: !!(token && sessions.has(token)) });
-});
-
-// ─── Forms-only portal auth ───
-// Standalone /forms portal — read/update submissions only, no CMS access.
-// Uses its own password (FORMS_PASSWORD) and its own cookie (forms_session)
-// so an admin compromise doesn't leak the forms portal and vice versa.
-app.post('/api/forms-login', loginLimiter, async (req, res) => {
-  const { password } = req.body;
-  const supplied = password || '';
-
-  // File-based hash takes precedence — it's set by /api/forms-reset and
-  // persists across deploys on the Railway volume. The env var is only
-  // the bootstrap password used until the first successful reset.
-  const fileHash = readFormsPasswordFile();
-  let valid = false;
-  if (fileHash) {
-    try { valid = await bcrypt.compare(supplied, fileHash); } catch { valid = false; }
+  if (token && sessions.has(token)) return res.json({ authenticated: true });
+  // Super_admins authenticated via the projects portal also count as CMS auth.
+  const pUser = resolveProjectsUser(req);
+  if (pUser && pUser.role === 'super_admin' && !pUser.must_change_password) {
+    return res.json({ authenticated: true, source: 'projects' });
   }
-  if (!valid) {
-    const envStored = process.env.FORMS_PASSWORD;
-    if (!envStored && !fileHash) {
-      console.warn('[forms-login] no FORMS_PASSWORD env and no forms-password.json');
-      return res.status(503).json({ error: 'Forms login not configured' });
-    }
-    if (envStored) {
-      try { valid = await bcrypt.compare(supplied, envStored); } catch { valid = false; }
-      if (!valid && !envStored.startsWith('$2')) valid = supplied === envStored;
-    }
-  }
-  if (!valid) return res.status(401).json({ error: 'Wrong password' });
-
-  const token = crypto.randomBytes(32).toString('hex');
-  formsSessions.set(token, { created: Date.now() });
-  res.cookie('forms_session', token, {
-    httpOnly: true, sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'production', maxAge: 86400000
-  });
-  res.json({ ok: true });
+  res.json({ authenticated: false });
 });
 
-// Forgot-password: only fires the email when the supplied address matches
-// NOTIFY_EMAIL_TO. Always returns the same generic success so attackers
-// can't probe whether the address is the configured recipient.
-app.post('/api/forms-forgot', loginLimiter, async (req, res) => {
-  const generic = { ok: true, message: 'If that email is registered, a reset link has been sent.' };
-  try {
-    const supplied = String(req.body?.email || '').trim().toLowerCase();
-    const expected = (process.env.NOTIFY_EMAIL_TO || 'hello@alphasurfaces.com.au').trim().toLowerCase();
-    if (supplied && supplied === expected) {
-      const token = crypto.randomBytes(32).toString('hex');
-      formsResetTokens.set(token, { created: Date.now() });
-      const base = process.env.SITE_URL || 'https://alphasurfaces.com.au';
-      const resetUrl = `${base}/forms/reset?token=${token}`;
-      // Fire and forget — never block the response on email delivery.
-      sendFormsResetEmail(expected, resetUrl).catch(err =>
-        console.error('[forms-forgot] email error:', err.message)
-      );
-    }
-  } catch (err) {
-    console.error('[forms-forgot] error:', err.message);
-  }
-  res.json(generic);
-});
-
-// The link in the email lands here; we serve the same SPA shell and let
-// the page detect ?token= and render the reset view.
-app.get('/forms/reset', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'forms.html'));
-});
-
-app.post('/api/forms-reset', loginLimiter, async (req, res) => {
-  try {
-    const { token, password } = req.body || {};
-    if (!token || !password) {
-      return res.status(400).json({ ok: false, error: 'Missing token or password.' });
-    }
-    if (typeof password !== 'string' || password.length < 8) {
-      return res.status(400).json({ ok: false, error: 'Password must be at least 8 characters.' });
-    }
-    const entry = formsResetTokens.get(token);
-    if (!entry || (Date.now() - entry.created) > FORMS_RESET_TTL_MS) {
-      formsResetTokens.delete(token);
-      return res.status(400).json({ ok: false, error: 'Invalid or expired reset link. Please request a new one.' });
-    }
-    const hash = await bcrypt.hash(password, 10);
-    writeFormsPasswordFile(hash);
-    formsResetTokens.delete(token);
-    // Invalidate all existing forms sessions so anyone currently signed in
-    // is forced to re-authenticate with the new password.
-    formsSessions.clear();
-    res.json({ ok: true, message: 'Password updated. You can now sign in.' });
-  } catch (err) {
-    console.error('[forms-reset] error:', err.message);
-    res.status(500).json({ ok: false, error: 'Could not update password. Please try again.' });
-  }
-});
-
-app.post('/api/forms-logout', (req, res) => {
-  const token = req.cookies?.forms_session;
-  if (token) formsSessions.delete(token);
-  res.clearCookie('forms_session');
-  res.json({ ok: true });
-});
-
-app.get('/api/forms-auth-check', (req, res) => {
-  const token = req.cookies?.forms_session;
-  res.json({ authenticated: !!(token && formsSessions.has(token)) });
-});
-
+// ─── /forms — deprecated, redirects into /projects?view=forms ───
+// The standalone forms portal has been folded into the project tracker so a
+// single project_users login covers everything. Old forms_session cookies +
+// FORMS_PASSWORD are no longer honoured. /forms/reset email links are also
+// dead — anyone with an old reset link should request a new one through the
+// project tracker's forgot-password flow.
 app.get('/forms', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'forms.html'));
+  res.redirect(301, '/projects?view=forms');
+});
+app.get('/forms/reset', (req, res) => {
+  res.redirect(301, '/projects');
 });
 
 // ─── Projects ticket tracker (self-contained module) ───
-require('./projects-routes')(app, { pool, sessions, loginLimiter });
+const projectsModule = require('./projects-routes')(app, { pool, sessions, loginLimiter });
+if (projectsModule && typeof projectsModule.resolveUser === 'function') {
+  resolveProjectsUser = projectsModule.resolveUser;
+}
 
 // ─── Content API (public read, auth write) ───
 app.get('/api/content', (req, res) => {
@@ -809,7 +694,7 @@ function buildSubmissionsWhere(q) {
   return { vals, where: where.length ? ' WHERE ' + where.join(' AND ') : '' };
 }
 
-app.get('/api/admin/submissions', requireFormsOrAdmin, async (req, res) => {
+app.get('/api/admin/submissions', authMiddleware, async (req, res) => {
   try {
     const { limit = 50, offset = 0 } = req.query;
     const { vals, where } = buildSubmissionsWhere(req.query);
@@ -863,7 +748,7 @@ app.get('/api/admin/submissions', requireFormsOrAdmin, async (req, res) => {
 // "export" as the :id param (which then fails as a Postgres integer cast).
 // Supports an `ids` query param (comma-separated) for selective download
 // from the admin UI checkboxes; falls back to all rows otherwise.
-app.get('/api/admin/submissions/export', requireFormsOrAdmin, async (req, res) => {
+app.get('/api/admin/submissions/export', authMiddleware, async (req, res) => {
   try {
     const { form_type, ids } = req.query;
     const vals = [];
@@ -960,7 +845,7 @@ app.get('/api/admin/submissions/export', requireFormsOrAdmin, async (req, res) =
 });
 
 // Single submission with its sample items, for the detail drawer.
-app.get('/api/admin/submissions/:id', requireFormsOrAdmin, async (req, res) => {
+app.get('/api/admin/submissions/:id', authMiddleware, async (req, res) => {
   try {
     const { rows } = await pool.query(
       'SELECT * FROM form_submissions WHERE id = $1', [req.params.id]
@@ -984,7 +869,7 @@ app.get('/api/admin/submissions/:id', requireFormsOrAdmin, async (req, res) => {
   }
 });
 
-app.patch('/api/admin/submissions/:id', requireFormsOrAdmin, async (req, res) => {
+app.patch('/api/admin/submissions/:id', authMiddleware, async (req, res) => {
   try {
     const allowed = ['new', 'actioned', 'archived'];
     const status = req.body.status;
