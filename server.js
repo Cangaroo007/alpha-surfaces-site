@@ -2172,6 +2172,10 @@ app.get('/enquiry', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'enquiry.html'));
 });
 
+app.get('/brochure', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'brochure.html'));
+});
+
 // Standalone iPad-kiosk check-in for showroom walk-ins. No nav, no chrome.
 app.get('/showroom-checkin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'showroom-checkin.html'));

@@ -45,6 +45,7 @@
     '<div class="nav-menu" id="nav-menu">' +
       '<a href="/collections.html" class="nav-link nav-collections-trigger" id="collections-trigger">COLLECTIONS</a>' +
       '<a href="/about.html" class="nav-link">ABOUT</a>' +
+      '<a href="/brochure" class="nav-link">BROCHURE</a>' +
       '<a href="/enquiry" class="nav-link">ENQUIRY</a>' +
       '<a href="/warranty" class="nav-link">WARRANTY</a>' +
       '<a href="/#contact" class="nav-link">CONTACT</a>' +
@@ -127,6 +128,7 @@
   });
   mHtml += '</div>';
   mHtml += '<a href="/about.html" class="mobile-menu-link">ABOUT</a>';
+  mHtml += '<a href="/brochure" class="mobile-menu-link">BROCHURE</a>';
   mHtml += '<a href="/enquiry" class="mobile-menu-link">ENQUIRY</a>';
   mHtml += '<a href="/warranty" class="mobile-menu-link">WARRANTY</a>';
   mHtml += '<a href="/#contact" class="mobile-menu-link">CONTACT</a>';
