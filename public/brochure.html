@@ -15,13 +15,10 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root { --olive: #564d22; --cream: #f3f1e6; --white: #ffffff; --black: #000000; --border: rgba(0,0,0,0.1); }
 
-/* Outer page is a fixed-height column: nav · iframe (flex:1) · footer.
-   Body cannot scroll — all flipping/scrolling stays inside the iframe so
-   the brochure occupies exactly calc(100vh − nav − footer). */
-html, body {
-  height: 100%;
-  overflow: hidden;
-}
+/* Page is a column: nav · brochure (fills viewport minus chrome) · footer.
+   The FlippingBook embed sizes itself by its 3:2 aspect ratio, so we give
+   the content area a min-height that equals the viewport minus the nav
+   (~75px) and footer so the brochure always fills the screen. */
 body {
   background: var(--cream);
   color: var(--black);
@@ -30,21 +27,30 @@ body {
   line-height: 1.2;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 a { color: inherit; }
 img { display: block; max-width: 100%; }
 
 .brochure-frame {
-  flex: 1;
-  min-height: 0;
   width: 100%;
-  background: var(--black);
+  background: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  min-height: calc(100vh - 75px - 220px); /* nav 75 + desktop footer ~220 */
 }
-.brochure-frame iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
+.brochure-frame .fbo-embed {
   display: block;
+  width: 100%;
+  max-width: 1400px;
+}
+@media (max-width: 900px) {
+  .brochure-frame {
+    min-height: calc(100vh - 75px - 50px); /* nav 75 + compact footer ~50 */
+    padding: 8px;
+  }
 }
 
 /* Footer — copied from the standard pages so the column shrinks naturally
@@ -78,13 +84,8 @@ img { display: block; max-width: 100%; }
 <nav class="nav" id="main-nav"></nav>
 
 <main class="brochure-frame">
-  <iframe
-    src="https://online.flippingbook.com/view/541312945/"
-    title="Alpha Surfaces Brochure"
-    allow="fullscreen"
-    allowfullscreen
-    loading="eager"
-    referrerpolicy="no-referrer-when-downgrade"></iframe>
+  <a href="https://online.flippingbook.com/view/541312945/" class="fbo-embed" data-fbo-id="11e9773548" data-fbo-ratio="3:2" data-fbo-lightbox="yes" data-fbo-width="100%" data-fbo-height="auto" data-fbo-version="1" style="max-width: 100%">Alpha Surfaces Collections 01-05</a>
+  <script async defer src="https://online.flippingbook.com/EmbedScriptUrl.aspx?m=redir&hid=541312945"></script>
 </main>
 
 <footer class="footer">
