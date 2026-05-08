@@ -31,6 +31,9 @@ let notifyApproverRequested  = null;
 let notifyApproved           = null;
 let notifyChangesRequested   = null;
 let notifyReviewerFeedback   = null;
+let sendBlockerNotice        = null;
+let sendBlockerNagEmail      = null;
+let sendTicketStatusEmail    = null;
 try {
   ({
     checkAndSendTimeAlert,
@@ -38,7 +41,10 @@ try {
     notifyApproverRequested,
     notifyApproved,
     notifyChangesRequested,
-    notifyReviewerFeedback
+    notifyReviewerFeedback,
+    sendBlockerNotice,
+    sendBlockerNagEmail,
+    sendTicketStatusEmail
   } = require('./notifications'));
 }
 catch { /* notifications module is optional in tests */ }
@@ -79,11 +85,14 @@ const TIME_CATEGORY_COLOR = TIME_CATEGORIES.reduce((acc, c) => { acc[c.key] = c.
 const UPDATABLE_TICKET_COLS = [
   'title','description','category','priority','status',
   'assigned_to','requested_by','due_date','source',
-  'reviewers','approver'
+  'reviewers','approver',
+  'blocked_by','blocked_reason'
   // 'notes' is NOT in this list — notes are append-only via dedicated endpoint
   // 'approval_status' is set by status transitions and the review endpoint, not by users
+  // 'blocked_at' / 'blocker_last_nagged' / 'blocked_set_by_user_id' are derived
+  // server-side from blocked_by transitions, not user-editable directly
 ];
-const TRACKED_COLS = ['title','description','category','priority','status','assigned_to','requested_by','due_date','reviewers','approver'];
+const TRACKED_COLS = ['title','description','category','priority','status','assigned_to','requested_by','due_date','reviewers','approver','blocked_by','blocked_reason'];
 
 // Defaults for new tickets — Jay + Jana review (advisory), Belinda approves
 // (blocking). Creators can override or clear per ticket.
@@ -179,6 +188,34 @@ async function initSchema(pool) {
   await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS approver        VARCHAR(100)`);
   await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS approval_status VARCHAR(20)`);
   await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS review_started_at TIMESTAMPTZ`);
+
+  // Track B-Slim: blocker fields. blocked_by is a name (matched against
+  // project_users to resolve email for nag); blocked_reason is free text.
+  // blocked_at marks when the block went on; blocker_last_nagged tracks the
+  // 2-day cadence so the cron doesn't re-fire on every tick.
+  await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS blocked_by         VARCHAR(100)`);
+  await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS blocked_reason     TEXT`);
+  await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS blocked_at         TIMESTAMPTZ`);
+  await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS blocker_last_nagged TIMESTAMPTZ`);
+  await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS blocked_set_by_user_id INTEGER REFERENCES project_users(id) ON DELETE SET NULL`);
+
+  // Initial blocker seed for tickets we know are stuck on Belinda. Only fires
+  // when blocked_by is currently NULL, so manual edits in production are
+  // never overridden by a redeploy.
+  const INITIAL_BLOCKERS = [
+    { ticket_id: 'AS-008', by: 'Belinda Kelaher', reason: 'Waiting on updated fabrication manual PDF' },
+    { ticket_id: 'AS-012', by: 'Belinda Kelaher', reason: 'Waiting on brochure file' }
+  ];
+  for (const b of INITIAL_BLOCKERS) {
+    await pool.query(
+      `UPDATE tickets
+          SET blocked_by = $1, blocked_reason = $2,
+              blocked_at = COALESCE(blocked_at, NOW()),
+              blocker_last_nagged = NULL
+        WHERE ticket_id = $3 AND blocked_by IS NULL`,
+      [b.by, b.reason, b.ticket_id]
+    );
+  }
 
   // Per-action audit trail for review cycles. Captures both reviewer notes
   // (advisory) and approver decisions (binding). One row per action — multiple
@@ -479,39 +516,6 @@ function ensureSendgrid() {
   sendgridReady = true;
   return true;
 }
-async function sendStatusChangeEmail(ticket, oldStatus, newStatus, actorName) {
-  if (!ensureSendgrid()) return;
-  const to   = process.env.NOTIFY_EMAIL_TO   || 'hello@alphasurfaces.com.au';
-  const from = process.env.NOTIFY_EMAIL_FROM || 'noreply@alphasurfaces.com.au';
-  const base = process.env.SITE_URL          || 'https://alphasurfaces.com.au';
-  const url  = `${base}/projects`;
-  const html = `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f3f1e6;font-family:'Helvetica Neue',Arial,sans-serif">
-<table cellpadding="0" cellspacing="0" width="100%" style="background:#f3f1e6"><tr><td align="center" style="padding:32px 16px">
-  <table cellpadding="0" cellspacing="0" width="100%" style="max-width:560px;background:#fff;border-radius:8px;overflow:hidden">
-    <tr><td style="background:#564D22;padding:24px 28px">
-      <p style="margin:0;color:#f3f1e6;font-size:12px;letter-spacing:.12em;text-transform:uppercase">Alpha Surfaces · Project Tracker</p>
-      <h1 style="margin:6px 0 0;color:#fff;font-size:20px;font-weight:600">${esc(ticket.ticket_id)} — ${esc(ticket.title)}</h1>
-    </td></tr>
-    <tr><td style="padding:24px 28px;color:#222;font-size:15px;line-height:1.6">
-      <p style="margin:0 0 14px"><strong>${esc(actorName || 'Someone')}</strong> changed status <strong>${esc(oldStatus)}</strong> → <strong>${esc(newStatus)}</strong>.</p>
-      ${ticket.assigned_to ? `<p style="margin:0 0 14px;color:#555">Assigned to: <strong>${esc(ticket.assigned_to)}</strong></p>` : ''}
-      ${ticket.priority ? `<p style="margin:0 0 14px;color:#555">Priority: <strong>${esc(ticket.priority)}</strong></p>` : ''}
-      <p style="margin:24px 0 0"><a href="${esc(url)}" style="display:inline-block;background:#564D22;color:#fff;padding:11px 22px;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:4px">Open project tracker</a></p>
-    </td></tr>
-  </table>
-</td></tr></table>
-</body></html>`;
-  try {
-    await sgMail.send({
-      to, from,
-      subject: `[${ticket.ticket_id}] Status changed to ${newStatus} — ${ticket.title}`,
-      html
-    });
-  } catch (err) {
-    const detail = err.response?.body?.errors ? JSON.stringify(err.response.body.errors) : err.message;
-    console.error('[projects] status email error:', detail);
-  }
-}
 async function sendPasswordResetEmail(toEmail, name, resetUrl) {
   if (!ensureSendgrid()) return false;
   const from = process.env.NOTIFY_EMAIL_FROM || 'noreply@alphasurfaces.com.au';
@@ -573,12 +577,17 @@ function describeFieldChange(col, oldVal, newVal) {
     status: 'Status', priority: 'Priority', assigned_to: 'Assigned',
     title: 'Title', description: 'Description', due_date: 'Due date',
     requested_by: 'Requested by', category: 'Category',
-    reviewers: 'Reviewers', approver: 'Approver'
+    reviewers: 'Reviewers', approver: 'Approver',
+    blocked_by: 'Blocked by', blocked_reason: 'Blocker reason'
   };
   const label = labelMap[col] || col;
   // Long fields (description) — collapse to "Updated description"
   if (col === 'description' || col === 'title') {
     return { action: 'edited', detail: `Updated ${label.toLowerCase()}` };
+  }
+  if (col === 'blocked_reason') {
+    // Reason text can be long — keep the activity feed compact.
+    return { action: 'blocker_updated', detail: 'Updated blocker reason' };
   }
   const fmt = (v) => {
     if (v == null || v === '') return '—';
@@ -592,6 +601,7 @@ function describeFieldChange(col, oldVal, newVal) {
   else if (col === 'priority') action = 'priority_changed';
   else if (col === 'assigned_to') action = 'assigned';
   else if (col === 'reviewers' || col === 'approver') action = 'review_routing_changed';
+  else if (col === 'blocked_by') action = newVal ? 'blocker_set' : 'blocker_cleared';
   return { action, detail: `${label}: ${before} → ${after}` };
 }
 
@@ -2092,6 +2102,25 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         }
       }
 
+      // Blocker permission gate: super_admins can always set/clear; everyone
+      // else can only clear a blocker they set themselves. Setting a new
+      // blocker is open to anyone with ticket write access.
+      if (req.user.role !== 'super_admin'
+          && Object.prototype.hasOwnProperty.call(req.body || {}, 'blocked_by')
+          && oldRow.blocked_by) {
+        const incoming = req.body.blocked_by;
+        const isCleared = incoming == null || incoming === '';
+        const isReplaced = !isCleared && String(incoming).trim() !== oldRow.blocked_by;
+        if (isCleared || isReplaced) {
+          if (!req.user.userId || oldRow.blocked_set_by_user_id !== req.user.userId) {
+            return res.status(403).json({
+              ok: false,
+              error: 'Only a super_admin or the person who set this blocker can clear or replace it.'
+            });
+          }
+        }
+      }
+
       const sets = [];
       const vals = [];
       const changed = [];
@@ -2106,6 +2135,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
           }
           if (col === 'reviewers') newVal = normaliseReviewers(newVal);
           if (col === 'approver' && newVal != null) newVal = String(newVal).trim() || null;
+          if (col === 'blocked_by' && newVal != null) newVal = String(newVal).trim() || null;
+          if (col === 'blocked_reason' && newVal != null) newVal = String(newVal).trim() || null;
           // Normalise dates for comparison — Postgres returns Date objects.
           let oldVal = oldRow[col];
           let normNew = newVal;
@@ -2197,6 +2228,38 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         }
       }
 
+      // Blocker transition side-effects. Detected from the diff — only kick
+      // in when blocked_by actually moved. Setting a blocker stamps blocked_at
+      // + records who set it; clearing wipes all derived fields. The email
+      // dispatch happens after the UPDATE returns the fresh row.
+      const blockerChange = changed.find(c => c.col === 'blocked_by');
+      const reasonChange  = changed.find(c => c.col === 'blocked_reason');
+      const blockerJustSet     = blockerChange && !blockerChange.oldVal && blockerChange.newVal;
+      const blockerJustCleared = blockerChange && blockerChange.oldVal && !blockerChange.newVal;
+      if (blockerJustSet) {
+        sets.push(`blocked_at = NOW()`);
+        sets.push(`blocker_last_nagged = NULL`);
+        if (req.user.userId) {
+          vals.push(req.user.userId);
+          sets.push(`blocked_set_by_user_id = $${vals.length}`);
+        } else {
+          sets.push(`blocked_set_by_user_id = NULL`);
+        }
+      } else if (blockerJustCleared) {
+        sets.push(`blocked_at = NULL`);
+        sets.push(`blocker_last_nagged = NULL`);
+        sets.push(`blocked_set_by_user_id = NULL`);
+        // Force-clear reason too — UI hides reason anyway when no blocker is set.
+        if (!Object.prototype.hasOwnProperty.call(req.body || {}, 'blocked_reason')) {
+          sets.push(`blocked_reason = NULL`);
+        }
+      } else if (reasonChange && oldRow.blocked_by) {
+        // Reason was edited mid-block. Reset the nag clock so the next email
+        // includes the updated wording instead of going out 2 days later
+        // with stale text.
+        sets.push(`blocker_last_nagged = NULL`);
+      }
+
       if (!sets.length) return res.status(400).json({ ok: false, error: 'No updatable fields supplied.' });
       sets.push(`updated_at = NOW()`);
       vals.push(oldRow.id);
@@ -2213,12 +2276,20 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         logActivity(pool, newRow.ticket_id, req.user, desc.action, desc.detail);
       }
 
-      // Status email — only when status actually moved.
+      // Status email — only when status actually moved. Goes to the assignee
+      // + every active super_admin (deduped, no self-notify).
       const statusChange = changed.find(c => c.col === 'status');
-      if (statusChange) {
-        sendStatusChangeEmail(newRow, statusChange.oldVal, statusChange.newVal, req.user.name).catch(err =>
-          console.error('[projects] status email dispatch:', err.message)
-        );
+      if (statusChange && sendTicketStatusEmail) {
+        sendTicketStatusEmail(pool, newRow, statusChange.oldVal, statusChange.newVal, req.user)
+          .catch(err => console.error('[projects] status email dispatch:', err.message));
+      }
+
+      // Blocker email — fire the moment a blocker goes on. The cron handles
+      // follow-ups. Reason-only edits don't re-fire (the next cron tick will
+      // pick it up because we cleared blocker_last_nagged above).
+      if (blockerJustSet && sendBlockerNotice) {
+        sendBlockerNotice(pool, newRow, req.user.name)
+          .catch(err => console.error('[projects/blocker] notice email dispatch:', err.message));
       }
 
       // Review/approval emails — fire-and-forget, never block the response.
@@ -2565,6 +2636,81 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
   // Run once at module start so we don't wait 60s for the first sweep,
   // then on every tickets-list request (rate-limited internally).
   setTimeout(() => autoAdvanceReviews(), 5_000);
+
+  // ── Blocker nag scheduler ───────────────────────────────────────────
+  //
+  // Fires once per day around 09:00 Australia/Brisbane. Reuses the same
+  // setInterval + Brisbane-hour pattern as the daily digest in server.js so
+  // we don't introduce a new dependency. Each ticket dedupes via
+  // blocker_last_nagged: emails go out the first time a blocker has been
+  // open for ≥0 days, then every 2 days after that, until the blocker is
+  // cleared.
+  function brisbaneTodayString() {
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Australia/Brisbane' });
+  }
+  function brisbaneHour() {
+    const parts = new Intl.DateTimeFormat('en-AU', {
+      timeZone: 'Australia/Brisbane', hour: 'numeric', hour12: false
+    }).formatToParts(new Date());
+    const h = parts.find(p => p.type === 'hour');
+    return h ? parseInt(h.value, 10) : 0;
+  }
+  let lastBlockerSweepDay = null;
+  async function runBlockerNagSweep() {
+    try {
+      const { rows } = await pool.query(
+        `SELECT t.*
+           FROM tickets t
+          WHERE t.blocked_by IS NOT NULL
+            AND t.blocked_by <> ''
+            AND t.status NOT IN ('done', 'archived')
+            AND (t.blocker_last_nagged IS NULL
+                 OR t.blocker_last_nagged < NOW() - INTERVAL '2 days')`
+      );
+      for (const ticket of rows) {
+        if (sendBlockerNagEmail) {
+          try {
+            await sendBlockerNagEmail(pool, ticket);
+          } catch (err) {
+            console.error('[blocker-nag] dispatch error for', ticket.ticket_id, ':', err.message);
+            continue;
+          }
+        }
+        await pool.query(
+          'UPDATE tickets SET blocker_last_nagged = NOW() WHERE ticket_id = $1',
+          [ticket.ticket_id]
+        );
+        console.log('[blocker-nag]', ticket.ticket_id, '→', ticket.blocked_by);
+      }
+      if (rows.length) console.log('[blocker-nag] sweep nagged', rows.length, 'ticket(s)');
+    } catch (err) {
+      console.error('[blocker-nag] sweep error:', err.message);
+    }
+  }
+  async function checkBlockerNag() {
+    const today = brisbaneTodayString();
+    if (lastBlockerSweepDay === today) return;
+    if (brisbaneHour() < 9) return;
+    lastBlockerSweepDay = today;
+    console.log('[blocker-nag] firing daily sweep for', today);
+    await runBlockerNagSweep();
+  }
+  // Same cadence as the daily-digest scheduler in server.js. The day-string
+  // gate above prevents re-firing once we've swept for the day.
+  setTimeout(checkBlockerNag, 35 * 1000);
+  setInterval(checkBlockerNag, 60 * 1000);
+
+  // Manual sweep endpoint — super_admin only. Useful for QA-ing the nag
+  // template without waiting for 9am, and for forcing a re-send if a
+  // recipient lost their initial mail.
+  router.post('/blockers/run-nag', requireRole('super_admin'), async (req, res) => {
+    try {
+      await runBlockerNagSweep();
+      res.json({ ok: true });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
 
   // ── Soft delete (super_admin only) ──────────────────────────────────
   router.delete('/tickets/:id', requireRole('super_admin'), async (req, res) => {

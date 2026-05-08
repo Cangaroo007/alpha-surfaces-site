@@ -765,6 +765,100 @@ async function notifyReviewerFeedback(pool, ticket, reviewerName, feedback) {
   await dispatchReviewEmails(recipients, subject, html);
 }
 
+// ─── Blocker system + ticket status emails (Track B-Slim) ───────────────
+//
+// All three helpers reuse reviewEmailChrome for visual consistency with the
+// review workflow, and resolve recipients dynamically from project_users so
+// no hardcoded address list rots when team membership changes.
+
+// Initial "you are blocking this ticket" email — fires the moment a blocker
+// is set. CCs all super_admins so they have visibility from minute zero.
+async function sendBlockerNotice(pool, ticket, flaggedByName) {
+  if (!pool || !ticket || !ticket.blocked_by) return;
+  const blockerRows = await lookupEmailsByNames(pool, [ticket.blocked_by]);
+  const adminRows = await getSuperAdminEmails(pool);
+  // Dedupe by lowercased email — admin who is also the blocker should
+  // only get one mail.
+  const byEmail = new Map();
+  blockerRows.forEach(r => { if (r && r.email) byEmail.set(r.email.toLowerCase(), { email: r.email, primary: true }); });
+  adminRows.forEach(e => {
+    if (!e) return;
+    const k = e.toLowerCase();
+    if (!byEmail.has(k)) byEmail.set(k, { email: e, primary: false });
+  });
+  const recipients = [...byEmail.values()];
+  if (!recipients.length) {
+    console.log('[notify/blocker] no recipients resolved for', ticket.ticket_id);
+    return;
+  }
+  const reason = ticket.blocked_reason ? `<div style="margin:0 0 14px;padding:12px 14px;background:#fdecea;border-left:3px solid #dc2626;font-size:14px;color:#5a1a1a;white-space:pre-wrap">${escapeHtml(ticket.blocked_reason)}</div>` : '';
+  const body = `
+    <p style="margin:0 0 14px"><strong>${escapeHtml(flaggedByName || 'Someone')}</strong> has flagged this ticket as blocked, waiting on <strong>${escapeHtml(ticket.blocked_by)}</strong>.</p>
+    ${reason}
+    ${ticket.assigned_to ? `<p style="margin:0 0 14px;color:#555">Assigned to: <strong>${escapeHtml(ticket.assigned_to)}</strong></p>` : ''}
+    <p style="margin:0 0 14px;color:#555;font-size:13px">Please action this when you can. We'll send a reminder every 2 days while it stays blocked.</p>
+  `;
+  const subject = `⚠️ Action needed: [${ticket.ticket_id}] ${ticket.title} is waiting on you`;
+  const html = reviewEmailChrome({ headerLabel: 'Action needed', headerColor: '#dc2626', ticket, body });
+  await dispatchReviewEmails(recipients, subject, html);
+}
+
+// Cron-fired reminder. Same recipients as the initial notice (blocker +
+// super_admins) but emphasises elapsed time and the "we keep nagging" cadence.
+async function sendBlockerNagEmail(pool, ticket) {
+  if (!pool || !ticket || !ticket.blocked_by) return;
+  const blockerRows = await lookupEmailsByNames(pool, [ticket.blocked_by]);
+  const adminRows = await getSuperAdminEmails(pool);
+  const byEmail = new Map();
+  blockerRows.forEach(r => { if (r && r.email) byEmail.set(r.email.toLowerCase(), { email: r.email }); });
+  adminRows.forEach(e => { if (e) byEmail.set(e.toLowerCase(), { email: e }); });
+  const recipients = [...byEmail.values()];
+  if (!recipients.length) return;
+  const blockedAt = ticket.blocked_at ? new Date(ticket.blocked_at) : null;
+  const days = blockedAt ? Math.max(1, Math.ceil((Date.now() - blockedAt.getTime()) / 86400000)) : 1;
+  const reason = ticket.blocked_reason ? `<div style="margin:0 0 14px;padding:12px 14px;background:#fdecea;border-left:3px solid #dc2626;font-size:14px;color:#5a1a1a;white-space:pre-wrap">${escapeHtml(ticket.blocked_reason)}</div>` : '';
+  const body = `
+    <p style="margin:0 0 14px">This ticket has been blocked for <strong>${days} day${days === 1 ? '' : 's'}</strong> waiting on <strong>${escapeHtml(ticket.blocked_by)}</strong>.</p>
+    ${reason}
+    ${ticket.assigned_to ? `<p style="margin:0 0 14px;color:#555">Assignee: <strong>${escapeHtml(ticket.assigned_to)}</strong></p>` : ''}
+    <p style="margin:0 0 14px;color:#555;font-size:13px">Please action this or reply to let us know the timeline. We'll send another reminder in 2 days if it's still open.</p>
+  `;
+  const subject = `Reminder: [${ticket.ticket_id}] ${ticket.title} is still waiting on you`;
+  const html = reviewEmailChrome({ headerLabel: `Blocked ${days} day${days === 1 ? '' : 's'}`, headerColor: '#dc2626', ticket, body });
+  await dispatchReviewEmails(recipients, subject, html);
+}
+
+// Status-change broadcast. Goes to the assignee + every active super_admin,
+// minus the actor (no self-notify) and deduped by email. Replaces the legacy
+// single-recipient sendStatusChangeEmail in projects-routes.js.
+async function sendTicketStatusEmail(pool, ticket, oldStatus, newStatus, actor) {
+  if (!pool || !ticket) return;
+  const actorEmail = (actor && actor.email ? String(actor.email).toLowerCase() : null);
+  const targets = new Map();
+  if (ticket.assigned_to) {
+    const rows = await lookupEmailsByNames(pool, [ticket.assigned_to]);
+    rows.forEach(r => { if (r && r.email) targets.set(r.email.toLowerCase(), { email: r.email }); });
+  }
+  const adminEmails = await getSuperAdminEmails(pool);
+  adminEmails.forEach(e => { if (e) targets.set(e.toLowerCase(), { email: e }); });
+  if (actorEmail) targets.delete(actorEmail);
+  const recipients = [...targets.values()];
+  if (!recipients.length) return;
+  const isDone = newStatus === 'done';
+  const headerColor = isDone ? '#2e7d32' : '#564D22';
+  const headerLabel = isDone ? 'Completed' : `Moved to ${newStatus}`;
+  const doneNote = isDone ? `<p style="margin:0 0 14px;color:#246426">✅ This ticket has been completed.</p>` : '';
+  const body = `
+    <p style="margin:0 0 14px"><strong>${escapeHtml((actor && actor.name) || 'Someone')}</strong> moved this ticket from <strong>${escapeHtml(oldStatus || '—')}</strong> to <strong>${escapeHtml(newStatus || '—')}</strong>.</p>
+    ${doneNote}
+    ${ticket.assigned_to ? `<p style="margin:0 0 14px;color:#555">Assigned to: <strong>${escapeHtml(ticket.assigned_to)}</strong></p>` : ''}
+    ${ticket.priority ? `<p style="margin:0 0 14px;color:#555">Priority: <strong>${escapeHtml(ticket.priority)}</strong></p>` : ''}
+  `;
+  const subject = `[${ticket.ticket_id}] moved to ${newStatus} — ${ticket.title}`;
+  const html = reviewEmailChrome({ headerLabel, headerColor, ticket, body });
+  await dispatchReviewEmails(recipients, subject, html);
+}
+
 async function notifyNewSubmission(submission) {
   if (!submission) return;
   const results = await Promise.allSettled([
@@ -956,5 +1050,9 @@ module.exports = {
   notifyApproverRequested,
   notifyApproved,
   notifyChangesRequested,
-  notifyReviewerFeedback
+  notifyReviewerFeedback,
+  // Blocker system + ticket status
+  sendBlockerNotice,
+  sendBlockerNagEmail,
+  sendTicketStatusEmail
 };

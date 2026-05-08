@@ -441,6 +441,36 @@
   .card-changes-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: #fbeee0; color: #b07020; margin-top: 6px; }
   .card-pending-text { font-size: 11px; color: var(--muted); margin-top: 4px; font-style: italic; }
 
+  /* Blocker banner — sits at the top of the card, full-bleed red. */
+  .card.is-blocked { border-color: rgba(220,38,38,0.55); box-shadow: 0 0 0 1px rgba(220,38,38,0.20); }
+  .card-blocker-banner { background: #dc2626; color: #fff; margin: -12px -14px 8px; padding: 6px 12px; border-radius: 7px 7px 0 0; }
+  .card-blocker-banner .cbb-head { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; line-height: 1.3; }
+  .card-blocker-banner .cbb-reason { font-size: 11px; opacity: 0.92; line-height: 1.35; margin-top: 2px; word-break: break-word; }
+
+  /* Drawer blocker section. */
+  .blocker-section { background: #fdecea; border: 1px solid rgba(220,38,38,0.30); border-radius: 6px; padding: 14px 16px; margin-bottom: 18px; }
+  .blocker-section.is-set { background: #fdecea; }
+  .blocker-section.is-clear { background: var(--cream-light); border-color: var(--border); }
+  .blocker-section .bl-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .blocker-section .bl-head .bl-icon { font-size: 16px; line-height: 1; }
+  .blocker-section .bl-head .bl-title { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #5a1a1a; }
+  .blocker-section.is-clear .bl-head .bl-title { color: var(--muted); }
+  .blocker-section .bl-name { font-size: 14px; font-weight: 700; color: #5a1a1a; margin-bottom: 4px; }
+  .blocker-section .bl-reason { font-size: 13px; color: #5a1a1a; line-height: 1.45; white-space: pre-wrap; margin-bottom: 8px; }
+  .blocker-section .bl-meta { font-size: 12px; color: #7a3a3a; margin-bottom: 10px; }
+  .blocker-section .bl-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .blocker-section button { padding: 8px 14px; border-radius: 4px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; border: 1px solid var(--border-strong); background: var(--white); cursor: pointer; }
+  .blocker-section button.danger { background: #dc2626; color: #fff; border-color: #dc2626; }
+  .blocker-section button.danger:hover { background: #b91c1c; }
+  .blocker-section button.primary { background: var(--olive); color: #fff; border-color: var(--olive); }
+  .blocker-section button.primary:hover { background: var(--olive-dark); }
+  .blocker-section .bl-form { display: grid; gap: 8px; }
+  .blocker-section .bl-form input,
+  .blocker-section .bl-form select { width: 100%; padding: 8px 10px; border: 1px solid var(--border-strong); border-radius: 4px; font-size: 13px; font-family: inherit; outline: none; }
+  .blocker-section .bl-form input:focus,
+  .blocker-section .bl-form select:focus { border-color: var(--olive); }
+  .blocker-section .bl-help { font-size: 11px; color: var(--muted); }
+
   @media (max-width: 1080px) { .stats { grid-template-columns: repeat(2, 1fr); } .board { grid-template-columns: repeat(2, minmax(0,1fr)); } }
   @media (max-width: 720px)  { .stats { grid-template-columns: 1fr; } .board { grid-template-columns: 1fr; } .app-header { padding: 14px 16px; } .app-main { padding: 16px; } .toolbar input[type=search] { width: 100%; } .drawer { max-width: 100%; } .drawer-body .field-grid { grid-template-columns: 1fr; } }
 </style>
@@ -1247,8 +1277,23 @@
         pendingText = '<div class="card-pending-text">In review</div>';
       }
     }
-    return '<div class="card" draggable="true" data-id="' + t.id + '" data-ticket-id="' + escapeAttr(t.ticket_id) + '">' +
+    // Red blocker banner — rendered at the top of the card so it's
+    // unmissable. Sits ABOVE the metadata row, separate from the review
+    // indicators because a ticket can be blocked while in any status.
+    var blockerBanner = '';
+    var cardBlockedCls = '';
+    if (t.blocked_by) {
+      cardBlockedCls = ' is-blocked';
+      var rawReason = t.blocked_reason || '';
+      var truncReason = rawReason.length > 60 ? rawReason.slice(0, 57) + '…' : rawReason;
+      blockerBanner = '<div class="card-blocker-banner" title="' + escapeAttr(rawReason) + '">' +
+        '<div class="cbb-head">🚫 BLOCKED — ' + escapeHtml(t.blocked_by) + '</div>' +
+        (truncReason ? '<div class="cbb-reason">' + escapeHtml(truncReason) + '</div>' : '') +
+      '</div>';
+    }
+    return '<div class="card' + cardBlockedCls + '" draggable="true" data-id="' + t.id + '" data-ticket-id="' + escapeAttr(t.ticket_id) + '">' +
       '<button type="button" class="card-clock" data-ticket-id="' + escapeAttr(t.ticket_id) + '" data-ticket-title="' + escapeAttr(t.title) + '" title="Log time on this ticket">⏱</button>' +
+      blockerBanner +
       '<div class="card-id">' + escapeHtml(t.ticket_id) + '</div>' +
       '<div class="card-title">' + escapeHtml(t.title) + '</div>' +
       '<div class="card-meta">' +
@@ -1446,6 +1491,7 @@
           '<button data-tab="activity">Activity</button>' +
         '</div>' +
         '<div id="tab-details">' +
+          renderBlockerSection(t) +
           '<div class="field"><label>Title</label><input type="text" id="f-title" value="' + escapeAttr(t.title || '') + '"></div>' +
           '<div class="field"><label>Description</label><textarea id="f-description" rows="4">' + escapeHtml(t.description || '') + '</textarea></div>' +
           '<div class="field-grid">' +
@@ -1561,6 +1607,117 @@
     };
   }
 
+  // Days elapsed since an ISO timestamp — used to show "Blocked for N days"
+  // in the drawer. Floors to 0 (not negative) for clock-skew safety.
+  function daysSince(iso) {
+    if (!iso) return 0;
+    var d = (Date.now() - new Date(iso).getTime()) / 86400000;
+    return d < 0 ? 0 : Math.floor(d);
+  }
+
+  // Blocker section in the ticket detail drawer. Renders one of two states:
+  //   • not blocked → "Set Blocker" form (collapsed by default)
+  //   • blocked     → red banner + reason + "Clear Blocker" / "Edit reason"
+  // Permission to clear is checked client-side (super_admin OR the user who
+  // set it); the server enforces the same rule.
+  function renderBlockerSection(t) {
+    if (t.blocked_by) {
+      var days = daysSince(t.blocked_at);
+      var canClear = state.user && (
+        state.user.role === 'super_admin' ||
+        (t.blocked_set_by_user_id && t.blocked_set_by_user_id === state.user.userId)
+      );
+      var dayLabel = days === 0 ? 'Less than a day' : (days + ' day' + (days === 1 ? '' : 's'));
+      return '<div class="blocker-section is-set" id="blocker-section">' +
+        '<div class="bl-head"><span class="bl-icon">🚫</span><span class="bl-title">Blocked</span></div>' +
+        '<div class="bl-name">By ' + escapeHtml(t.blocked_by) + '</div>' +
+        (t.blocked_reason ? '<div class="bl-reason">' + escapeHtml(t.blocked_reason) + '</div>' : '') +
+        '<div class="bl-meta">Blocked for ' + escapeHtml(dayLabel) +
+          (t.blocked_at ? ' · since ' + escapeHtml(formatDate(t.blocked_at, true)) : '') + '</div>' +
+        '<div class="bl-actions">' +
+          (canClear
+            ? '<button type="button" class="danger" id="bl-clear">Clear blocker</button>'
+            : '<span class="bl-help">Only a super_admin or the person who set this can clear it.</span>') +
+          '<button type="button" id="bl-edit" style="display:' + (canClear ? '' : 'none') + '">Edit reason</button>' +
+        '</div>' +
+      '</div>';
+    }
+    // Not blocked — collapsed "Set Blocker" entry that expands inline.
+    return '<div class="blocker-section is-clear" id="blocker-section">' +
+      '<div class="bl-head"><span class="bl-icon">🚫</span><span class="bl-title">Blocker</span></div>' +
+      '<div class="bl-help" style="margin-bottom:8px">If this ticket can\'t move because it\'s waiting on someone, flag it here. The blocker gets emailed immediately and again every 2 days until cleared.</div>' +
+      '<button type="button" id="bl-set-toggle">Set blocker</button>' +
+      '<div id="bl-form" style="display:none;margin-top:10px">' +
+        '<div class="bl-form">' +
+          '<select id="bl-form-name"><option value="">— Select who is blocking —</option>' +
+            selectOptions(ASSIGNEES) +
+          '</select>' +
+          '<input type="text" id="bl-form-reason" placeholder="What are we waiting on?">' +
+        '</div>' +
+        '<div class="bl-actions" style="margin-top:8px">' +
+          '<button type="button" class="primary" id="bl-form-save">Save blocker</button>' +
+          '<button type="button" id="bl-form-cancel">Cancel</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // Wire the blocker section. Called from wireEditDrawer once the section is
+  // in the DOM. Re-renders the section in place after every save so we don't
+  // have to refresh the whole drawer.
+  function wireBlockerSection(t, onUpdated) {
+    function rerender(updated) {
+      var section = document.getElementById('blocker-section');
+      if (!section) return;
+      var wrap = document.createElement('div');
+      wrap.innerHTML = renderBlockerSection(updated);
+      section.replaceWith(wrap.firstElementChild);
+      wireBlockerSection(updated, onUpdated);
+    }
+    async function patchBlocker(payload, label) {
+      try {
+        var updated = await updateTicket(t.id, payload);
+        toast(label || 'Updated');
+        rerender(updated);
+        if (onUpdated) onUpdated(updated);
+      } catch (err) {
+        toast('Failed: ' + err.message);
+      }
+    }
+    var setToggle = document.getElementById('bl-set-toggle');
+    var form      = document.getElementById('bl-form');
+    if (setToggle) setToggle.addEventListener('click', function () {
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+    var save = document.getElementById('bl-form-save');
+    if (save) save.addEventListener('click', function () {
+      var name   = (document.getElementById('bl-form-name') || {}).value || '';
+      var reason = (document.getElementById('bl-form-reason') || {}).value.trim() || null;
+      if (!name) { toast('Pick who is blocking this ticket'); return; }
+      save.disabled = true;
+      patchBlocker({ blocked_by: name, blocked_reason: reason }, 'Blocker set').finally(function () {
+        if (save) save.disabled = false;
+      });
+    });
+    var cancel = document.getElementById('bl-form-cancel');
+    if (cancel) cancel.addEventListener('click', function () { form.style.display = 'none'; });
+    var clearBtn = document.getElementById('bl-clear');
+    if (clearBtn) clearBtn.addEventListener('click', function () {
+      if (!confirm('Clear the blocker on ' + t.ticket_id + '?')) return;
+      clearBtn.disabled = true;
+      patchBlocker({ blocked_by: null, blocked_reason: null }, 'Blocker cleared').finally(function () {
+        if (clearBtn) clearBtn.disabled = false;
+      });
+    });
+    var editBtn = document.getElementById('bl-edit');
+    if (editBtn) editBtn.addEventListener('click', function () {
+      var nextReason = prompt('Update blocker reason:', t.blocked_reason || '');
+      if (nextReason === null) return; // cancelled
+      var trimmed = nextReason.trim();
+      patchBlocker({ blocked_reason: trimmed || null }, 'Reason updated');
+    });
+  }
+
   // Parse the notes column (each line is "[stamp] Name: text") into per-note
   // blocks with attribution. Lines that don't match the format render as
   // continuations of the previous note.
@@ -1595,6 +1752,15 @@
 
     // Reviewer multi-select
     var reviewersCtrl = wireReviewerMulti('f-reviewers');
+
+    // Blocker section — inline form + clear button. After any change we
+    // refresh the local ticket reference so the rest of the drawer (Save
+    // payload, etc.) reads the latest blocker fields, and reload the board
+    // so the red banner appears/disappears immediately.
+    wireBlockerSection(t, function (updated) {
+      Object.assign(t, updated);
+      loadAll();
+    });
 
     // Tabs
     var detailsPane  = document.getElementById('tab-details');
