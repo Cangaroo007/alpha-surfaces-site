@@ -1425,7 +1425,10 @@
     // indicators because a ticket can be blocked while in any status.
     var blockerBanner = '';
     var cardBlockedCls = '';
-    if (t.blocked_by) {
+    // Defensive: also reject the literal string 'None' so a row that ended up
+    // with a placeholder name (legacy data, manual SQL edit) doesn't keep
+    // showing the red badge after a clear.
+    if (t.blocked_by && t.blocked_by !== 'None') {
       cardBlockedCls = ' is-blocked';
       var rawReason = t.blocked_reason || '';
       var truncReason = rawReason.length > 60 ? rawReason.slice(0, 57) + '…' : rawReason;

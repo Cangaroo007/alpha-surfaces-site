@@ -19,6 +19,13 @@ const express = require('express');
 const crypto  = require('crypto');
 const bcrypt  = require('bcryptjs');
 const path    = require('path');
+const fs      = require('fs');
+
+// Ticket attachments live on Railway's persistent volume so they survive
+// container restarts. Same DATA_DIR convention as server.js — env override
+// for prod, fallback to ./data for local dev.
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+const ATTACHMENTS_DIR = path.join(DATA_DIR, 'attachments');
 
 let sgMail = null;
 try { sgMail = require('@sendgrid/mail'); } catch { /* email is optional */ }
@@ -52,8 +59,6 @@ catch { /* notifications module is optional in tests */ }
 // Cloudinary is configured globally in server.js. We re-require the singleton
 // here for ticket attachment uploads — config persists across the require
 // boundary, so this is safe.
-let cloudinary = null;
-try { cloudinary = require('cloudinary').v2; } catch { /* optional in tests */ }
 let multer = null;
 try { multer = require('multer'); } catch { /* optional in tests */ }
 
@@ -3467,14 +3472,20 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         }
       }
 
-      // Blocker transition side-effects. Detected from the diff — only kick
-      // in when blocked_by actually moved. Setting a blocker stamps blocked_at
-      // + records who set it; clearing wipes all derived fields. The email
-      // dispatch happens after the UPDATE returns the fresh row.
+      // Blocker transition side-effects. The "cleared" trigger reads the
+      // request payload (not the diff) so a stale row carrying derived
+      // fields without a blocked_by name still gets fully wiped — the red
+      // badge only disappears once blocked_at + blocker_last_nagged +
+      // blocked_set_by_user_id are all NULL alongside blocked_by.
       const blockerChange = changed.find(c => c.col === 'blocked_by');
       const reasonChange  = changed.find(c => c.col === 'blocked_reason');
-      const blockerJustSet     = blockerChange && !blockerChange.oldVal && blockerChange.newVal;
-      const blockerJustCleared = blockerChange && blockerChange.oldVal && !blockerChange.newVal;
+      const blockerInPatch = Object.prototype.hasOwnProperty.call(req.body || {}, 'blocked_by');
+      const incomingBlocker = blockerInPatch ? req.body.blocked_by : undefined;
+      const blockerExplicitlyCleared = blockerInPatch && (
+        incomingBlocker == null ||
+        (typeof incomingBlocker === 'string' && incomingBlocker.trim() === '')
+      );
+      const blockerJustSet = blockerChange && !blockerChange.oldVal && blockerChange.newVal;
       if (blockerJustSet) {
         sets.push(`blocked_at = NOW()`);
         sets.push(`blocker_last_nagged = NULL`);
@@ -3484,13 +3495,17 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         } else {
           sets.push(`blocked_set_by_user_id = NULL`);
         }
-      } else if (blockerJustCleared) {
+      } else if (blockerExplicitlyCleared) {
+        // Defensive: always wipe every derived field so a partial-state row
+        // (e.g. blocked_at set but blocked_by null) can't keep the badge red.
+        // blocked_by itself was already pushed by the loop above.
         sets.push(`blocked_at = NULL`);
         sets.push(`blocker_last_nagged = NULL`);
         sets.push(`blocked_set_by_user_id = NULL`);
         // Force-clear reason too — UI hides reason anyway when no blocker is set.
         if (!Object.prototype.hasOwnProperty.call(req.body || {}, 'blocked_reason')) {
-          sets.push(`blocked_reason = NULL`);
+          vals.push(null);
+          sets.push(`blocked_reason = $${vals.length}`);
         }
       } else if (reasonChange && oldRow.blocked_by) {
         // Reason was edited mid-block. Reset the nag clock so the next email
@@ -3721,8 +3736,9 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
 
   // ── Attachments ──────────────────────────────────────────────────────
   // Reuse the same memoryStorage + 10MB limit pattern used elsewhere in the
-  // codebase. multer/cloudinary may not be available in test contexts —
-  // the upload routes degrade to a 503 when so.
+  // codebase. multer may not be available in test contexts — the upload
+  // routes degrade to a 503 when so. Files land on the persistent volume
+  // (ATTACHMENTS_DIR) and are served back via /api/projects/attachments/:f.
   const attachmentUpload = multer
     ? multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
     : null;
@@ -3735,7 +3751,6 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     },
     async (req, res) => {
       try {
-        if (!cloudinary) return res.status(503).json({ ok: false, error: 'Cloudinary not configured.' });
         if (!req.file) return res.status(400).json({ ok: false, error: 'No file uploaded.' });
         const id = req.params.id;
         const tk = /^\d+$/.test(id)
@@ -3749,28 +3764,30 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         const context = ['general', 'review_feedback', 'email_import'].includes(req.body?.context)
           ? req.body.context : 'general';
 
-        // resource_type: 'auto' lets Cloudinary pick image/video/raw based on
-        // MIME — handles screenshots, PDFs, docs uniformly.
-        const result = await new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream({
-            folder: `alpha-surfaces/tickets/${ticketId}`,
-            resource_type: 'auto',
-            use_filename: true,
-            unique_filename: true
-          }, (err, r) => err ? reject(err) : resolve(r));
-          stream.end(req.file.buffer);
-        });
+        // Sanitise the original extension. Strip anything non-alphanumeric so
+        // a hostile filename like "x.<script>" can't smuggle markup into the
+        // stored path or the Content-Disposition header.
+        const origName = req.file.originalname || 'file';
+        const rawExt = path.extname(origName).toLowerCase().replace(/[^a-z0-9.]/g, '');
+        const ext = rawExt && rawExt.length <= 10 ? rawExt : '';
+        const storedName = crypto.randomUUID() + ext;
+        await fs.promises.mkdir(ATTACHMENTS_DIR, { recursive: true });
+        await fs.promises.writeFile(path.join(ATTACHMENTS_DIR, storedName), req.file.buffer);
+
+        // Store the URL the frontend uses verbatim — same shape Cloudinary
+        // gave us, so render code (`a.url`) keeps working.
+        const url = `/api/projects/attachments/${storedName}`;
 
         const ins = await pool.query(
           `INSERT INTO ticket_attachments
              (ticket_id, user_id, user_name, filename, url, mime_type, size_bytes, context)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
           [ticketId, req.user.userId || null, req.user.name || 'Unknown',
-           req.file.originalname || 'file', result.secure_url,
+           origName, url,
            req.file.mimetype || null, req.file.size || null, context]
         );
         logActivity(pool, ticketId, req.user, 'attachment_added',
-          `Attached ${req.file.originalname || 'file'} (${context})`);
+          `Attached ${origName} (${context})`);
         res.json({ ok: true, attachment: ins.rows[0] });
       } catch (err) {
         console.error('[projects] attachment upload error:', err.message);
@@ -3778,6 +3795,46 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       }
     }
   );
+
+  // Serve a stored attachment. Filename is the random UUID + extension we
+  // saved at upload time — the basename guard rejects anything containing a
+  // separator so a crafted "../../etc/passwd" can't escape ATTACHMENTS_DIR.
+  // Access is gated to users who can see the owning ticket.
+  router.get('/attachments/:filename', async (req, res) => {
+    try {
+      const filename = req.params.filename || '';
+      if (!/^[A-Za-z0-9._-]+$/.test(filename) || filename !== path.basename(filename)) {
+        return res.status(400).json({ ok: false, error: 'Invalid filename.' });
+      }
+      const url = `/api/projects/attachments/${filename}`;
+      const att = await pool.query(
+        `SELECT a.*, t.assigned_to, t.id AS t_id
+           FROM ticket_attachments a
+           JOIN tickets t ON t.ticket_id = a.ticket_id
+          WHERE a.url = $1 LIMIT 1`,
+        [url]
+      );
+      if (!att.rows.length) return res.status(404).json({ ok: false, error: 'Not found' });
+      const row = att.rows[0];
+      if (!canAccessTicket(req.user, { assigned_to: row.assigned_to, id: row.t_id })) {
+        return res.status(404).json({ ok: false, error: 'Not found' });
+      }
+      const filePath = path.join(ATTACHMENTS_DIR, filename);
+      if (!fs.existsSync(filePath)) return res.status(404).json({ ok: false, error: 'File missing on disk.' });
+      if (row.mime_type) res.setHeader('Content-Type', row.mime_type);
+      // inline so browsers preview images/PDFs; ASCII-only quoted name plus
+      // RFC 5987 filename* for the original UTF-8 name.
+      const safeOrig = String(row.filename || 'file').replace(/[\r\n"]/g, '');
+      const asciiName = safeOrig.replace(/[^\x20-\x7E]/g, '_');
+      res.setHeader('Content-Disposition',
+        `inline; filename="${asciiName}"; filename*=UTF-8''${encodeURIComponent(safeOrig)}`);
+      res.setHeader('Cache-Control', 'private, max-age=300');
+      fs.createReadStream(filePath).pipe(res);
+    } catch (err) {
+      console.error('[projects] attachment serve error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
 
   router.get('/tickets/:id/attachments', async (req, res) => {
     try {
@@ -3809,10 +3866,19 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         const att = parseInt(req.params.attachmentId, 10);
         if (!att) return res.status(400).json({ ok: false, error: 'Invalid attachment id.' });
         const { rows } = await pool.query(
-          `DELETE FROM ticket_attachments WHERE id = $1 RETURNING ticket_id, filename`,
+          `DELETE FROM ticket_attachments WHERE id = $1 RETURNING ticket_id, filename, url`,
           [att]
         );
         if (!rows.length) return res.status(404).json({ ok: false, error: 'Attachment not found.' });
+        // Unlink the on-disk file for local-storage attachments. Legacy
+        // Cloudinary URLs (https://…) are skipped — best-effort cleanup,
+        // never block the response on a stat/unlink failure.
+        const url = rows[0].url || '';
+        const m = url.match(/^\/api\/projects\/attachments\/([A-Za-z0-9._-]+)$/);
+        if (m) {
+          fs.promises.unlink(path.join(ATTACHMENTS_DIR, m[1]))
+            .catch(err => console.error('[projects] attachment unlink:', err.message));
+        }
         logActivity(pool, rows[0].ticket_id, req.user, 'attachment_removed',
           `Removed ${rows[0].filename}`);
         res.json({ ok: true });
