@@ -23,6 +23,12 @@ const path    = require('path');
 let sgMail = null;
 try { sgMail = require('@sendgrid/mail'); } catch { /* email is optional */ }
 
+// Time-tracking alert helper lives in notifications.js so it can share the
+// SendGrid client + branded email template with the rest of the system.
+let checkAndSendTimeAlert = null;
+try { ({ checkAndSendTimeAlert } = require('./notifications')); }
+catch { /* notifications module is optional in tests */ }
+
 // ─── Static config ────────────────────────────────────────────────────────
 const ALLOWED_STATUSES   = ['backlog', 'in_progress', 'review', 'done', 'archived'];
 const ALLOWED_PRIORITIES = ['high', 'medium', 'low'];
@@ -184,6 +190,88 @@ async function initSchema(pool) {
   `);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_form_activity_submission ON form_activity(submission_id)`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_form_activity_user       ON form_activity(user_id)`);
+
+  // ── Time tracking (Track F) ────────────────────────────────────────
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS time_entries (
+      id          SERIAL PRIMARY KEY,
+      ticket_id   VARCHAR(10) REFERENCES tickets(ticket_id) ON DELETE CASCADE,
+      user_id     INTEGER NOT NULL REFERENCES project_users(id) ON DELETE CASCADE,
+      date        DATE NOT NULL DEFAULT CURRENT_DATE,
+      minutes     INTEGER NOT NULL CHECK (minutes > 0),
+      description TEXT,
+      created_at  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_time_user   ON time_entries(user_id)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_time_ticket ON time_entries(ticket_id)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_time_date   ON time_entries(date)`);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS user_time_settings (
+      id                SERIAL PRIMARY KEY,
+      user_id           INTEGER UNIQUE NOT NULL REFERENCES project_users(id) ON DELETE CASCADE,
+      monthly_hours_cap INTEGER DEFAULT 20,
+      warning_hours     INTEGER DEFAULT 15,
+      alert_email       VARCHAR(255) DEFAULT 'belinda@alphasurfaces.com.au'
+    )
+  `);
+
+  // Per (user, month, alert_type) row — UNIQUE prevents the alert from
+  // re-firing once it's been sent for the month.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS time_alerts (
+      id          SERIAL PRIMARY KEY,
+      user_id     INTEGER NOT NULL REFERENCES project_users(id) ON DELETE CASCADE,
+      month       VARCHAR(7) NOT NULL,
+      alert_type  VARCHAR(30) NOT NULL,
+      sent_at     TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE (user_id, month, alert_type)
+    )
+  `);
+
+  // Seed Sean's allocation. Idempotent — ON CONFLICT keeps any manual
+  // overrides intact.
+  await pool.query(
+    `INSERT INTO user_time_settings (user_id, monthly_hours_cap, warning_hours, alert_email)
+     SELECT id, 20, 15, 'belinda@alphasurfaces.com.au'
+       FROM project_users WHERE LOWER(email) = 'sean@cangaroo.ai'
+     ON CONFLICT (user_id) DO NOTHING`
+  );
+
+  // Idempotent May 2026 backfill — populate Sean's first-month effort only
+  // when he has zero May entries already. Avoids double-seeding on redeploy.
+  const seanRow = await pool.query(
+    `SELECT id FROM project_users WHERE LOWER(email) = 'sean@cangaroo.ai' LIMIT 1`
+  );
+  if (seanRow.rows.length) {
+    const seanId = seanRow.rows[0].id;
+    const mayCount = await pool.query(
+      `SELECT COUNT(*)::int AS c FROM time_entries
+        WHERE user_id = $1 AND date >= '2026-05-01' AND date < '2026-06-01'`,
+      [seanId]
+    );
+    if (mayCount.rows[0].c === 0) {
+      const MAY_TIME_SEED = [
+        { date: '2026-05-01', minutes: 120, desc: 'Infrastructure planning, Railway setup' },
+        { date: '2026-05-02', minutes:  90, desc: 'Twilio/SendGrid notification architecture' },
+        { date: '2026-05-03', minutes:  60, desc: 'SendGrid DNS authentication via Cloudflare' },
+        { date: '2026-05-04', minutes:  90, desc: 'Postgres provisioning, form handler integration' },
+        { date: '2026-05-05', minutes:  60, desc: 'Stakeholder alignment, email comms' },
+        { date: '2026-05-06', minutes: 120, desc: 'SMS+email notifications build, forms portal' },
+        { date: '2026-05-07', minutes: 240, desc: 'Project tracker build, user logins, Kanban, time tracking, activity log' },
+      ];
+      for (const e of MAY_TIME_SEED) {
+        await pool.query(
+          `INSERT INTO time_entries (ticket_id, user_id, date, minutes, description)
+           VALUES (NULL, $1, $2, $3, $4)`,
+          [seanId, e.date, e.minutes, e.desc]
+        );
+      }
+      const totalHrs = MAY_TIME_SEED.reduce((s, e) => s + e.minutes, 0) / 60;
+      console.log(`[projects/time] seeded May 2026 — ${totalHrs} hours for Sean`);
+    }
+  }
 
   // Seed tickets — only when table is empty.
   const tk = await pool.query('SELECT COUNT(*)::int AS c FROM tickets');
@@ -936,6 +1024,308 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       res.json({ ok: true, status });
     } catch (err) {
       console.error('[projects/forms] patch error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // ── Time tracking (Track F) ──────────────────────────────────────────
+  // Helpers shared by the routes below.
+  function currentMonth() {
+    const d = new Date();
+    return d.toISOString().slice(0, 7); // YYYY-MM (UTC is fine for monthly buckets)
+  }
+  function monthRange(month) {
+    if (!/^\d{4}-\d{2}$/.test(month)) return null;
+    const [y, m] = month.split('-').map(Number);
+    const start = `${month}-01`;
+    const end   = m === 12 ? `${y + 1}-01-01` : `${y}-${String(m + 1).padStart(2, '0')}-01`;
+    return { start, end };
+  }
+  // Operators/viewers can only ever read their own time. Super_admin sees
+  // all users by default but can scope by ?user_id=. Returns the user_id to
+  // filter on (number) or null for "no filter".
+  function resolveTimeUserScope(req) {
+    if (req.user.role === 'super_admin') {
+      const q = req.query.user_id;
+      if (q) {
+        const id = parseInt(q, 10);
+        return Number.isFinite(id) ? id : null;
+      }
+      return null;
+    }
+    return req.user.userId || -1; // -1 sentinel never matches a real id
+  }
+
+  // POST: log a time entry. Operator + super_admin only (viewers blocked
+  // by requireWrite). Optional ticket_id is validated for visibility so
+  // operators can't log time against tickets they can't see.
+  router.post('/time/entries', requireWrite, async (req, res) => {
+    try {
+      if (!req.user.userId) {
+        return res.status(400).json({ ok: false, error: 'Time can only be logged by individual user accounts (not the master admin session).' });
+      }
+      const b = req.body || {};
+      const minutes = parseInt(b.minutes, 10);
+      if (!Number.isFinite(minutes) || minutes <= 0) {
+        return res.status(400).json({ ok: false, error: 'Minutes must be a positive integer.' });
+      }
+      const date = b.date && /^\d{4}-\d{2}-\d{2}$/.test(b.date) ? b.date : new Date().toISOString().slice(0, 10);
+      let ticketId = null;
+      if (b.ticket_id) {
+        ticketId = String(b.ticket_id).trim();
+        const tk = await pool.query('SELECT * FROM tickets WHERE ticket_id = $1', [ticketId]);
+        if (!tk.rows.length) return res.status(404).json({ ok: false, error: 'Ticket not found' });
+        if (!canAccessTicket(req.user, tk.rows[0])) {
+          return res.status(403).json({ ok: false, error: 'You can only log time on tickets assigned to you.' });
+        }
+      }
+      const desc = b.description ? String(b.description).trim() : null;
+      const { rows } = await pool.query(
+        `INSERT INTO time_entries (ticket_id, user_id, date, minutes, description)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING *`,
+        [ticketId, req.user.userId, date, minutes, desc]
+      );
+      const entry = rows[0];
+      // Mirror the entry into the ticket activity feed so it surfaces in the
+      // drawer alongside status changes and notes.
+      if (ticketId) {
+        const hrs = (minutes / 60).toFixed(2).replace(/\.?0+$/, '');
+        logActivity(pool, ticketId, req.user, 'time_logged', `${hrs}h${desc ? ' — ' + desc : ''}`);
+      }
+      // Fire the threshold alert in the background — the response should not
+      // block on SendGrid latency or failure.
+      if (typeof checkAndSendTimeAlert === 'function') {
+        const month = String(date).slice(0, 7);
+        checkAndSendTimeAlert(pool, req.user.userId, month).catch(err =>
+          console.error('[projects/time] alert error:', err.message)
+        );
+      }
+      res.json({ ok: true, entry });
+    } catch (err) {
+      console.error('[projects/time] create error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // GET: list time entries (paginated). Filters: user_id, ticket_id, month.
+  router.get('/time/entries', async (req, res) => {
+    try {
+      const limit  = Math.min(parseInt(req.query.limit  || '100', 10) || 100, 500);
+      const offset = Math.max(parseInt(req.query.offset || '0',   10) || 0,   0);
+      const where = [];
+      const vals = [];
+      const scopeUserId = resolveTimeUserScope(req);
+      if (scopeUserId != null) { vals.push(scopeUserId); where.push(`te.user_id = $${vals.length}`); }
+      if (req.query.ticket_id) { vals.push(String(req.query.ticket_id)); where.push(`te.ticket_id = $${vals.length}`); }
+      if (req.query.month) {
+        const range = monthRange(req.query.month);
+        if (!range) return res.status(400).json({ ok: false, error: 'month must be YYYY-MM' });
+        vals.push(range.start); vals.push(range.end);
+        where.push(`te.date >= $${vals.length - 1}::date AND te.date < $${vals.length}::date`);
+      }
+      const whereSql = where.length ? ' WHERE ' + where.join(' AND ') : '';
+      const { rows } = await pool.query(
+        `SELECT te.id, te.ticket_id, te.user_id, te.date, te.minutes, te.description, te.created_at,
+                u.name AS user_name, u.email AS user_email,
+                t.title AS ticket_title
+           FROM time_entries te
+           LEFT JOIN project_users u ON u.id = te.user_id
+           LEFT JOIN tickets t       ON t.ticket_id = te.ticket_id
+           ${whereSql}
+          ORDER BY te.date DESC, te.id DESC
+          LIMIT $${vals.length + 1} OFFSET $${vals.length + 2}`,
+        [...vals, limit, offset]
+      );
+      const { rows: cr } = await pool.query(
+        `SELECT COUNT(*)::int AS c FROM time_entries te${whereSql}`, vals
+      );
+      res.json({ ok: true, entries: rows, total: cr[0].c });
+    } catch (err) {
+      console.error('[projects/time] list error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // GET: monthly summary. super_admin sees everyone in the month; others
+  // see only their own row. Defaults to current month.
+  router.get('/time/summary', async (req, res) => {
+    try {
+      const month = req.query.month || currentMonth();
+      const range = monthRange(month);
+      if (!range) return res.status(400).json({ ok: false, error: 'month must be YYYY-MM' });
+      const vals = [range.start, range.end];
+      let userScopeSql = '';
+      if (req.user.role !== 'super_admin') {
+        if (!req.user.userId) {
+          return res.json({ ok: true, month, summary: [], totalHours: 0 });
+        }
+        vals.push(req.user.userId);
+        userScopeSql = `AND te.user_id = $${vals.length}`;
+      }
+      const { rows } = await pool.query(
+        `SELECT u.id AS user_id, u.name, u.email, u.role,
+                COALESCE(s.monthly_hours_cap, 20) AS monthly_hours_cap,
+                COALESCE(s.warning_hours, 15)     AS warning_hours,
+                COALESCE(SUM(te.minutes), 0)::int AS total_minutes
+           FROM project_users u
+           LEFT JOIN user_time_settings s ON s.user_id = u.id
+           LEFT JOIN time_entries te
+             ON te.user_id = u.id AND te.date >= $1::date AND te.date < $2::date
+          ${req.user.role === 'super_admin'
+              ? 'WHERE u.active = TRUE'
+              : 'WHERE u.id = $3'}
+          GROUP BY u.id, u.name, u.email, u.role, s.monthly_hours_cap, s.warning_hours
+          ORDER BY total_minutes DESC, u.name ASC`,
+        vals
+      );
+      const summary = rows.map(r => {
+        const hours = r.total_minutes / 60;
+        return {
+          user_id: r.user_id,
+          name: r.name,
+          email: r.email,
+          role: r.role,
+          monthly_hours_cap: r.monthly_hours_cap,
+          warning_hours: r.warning_hours,
+          total_minutes: r.total_minutes,
+          total_hours: Math.round(hours * 100) / 100,
+          percent: r.monthly_hours_cap > 0 ? Math.round((hours / r.monthly_hours_cap) * 100) : 0
+        };
+      });
+      const totalHours = summary.reduce((s, r) => s + r.total_hours, 0);
+      res.json({ ok: true, month, summary, totalHours });
+    } catch (err) {
+      console.error('[projects/time] summary error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // GET: single user's monthly summary, with daily + per-ticket breakdowns.
+  router.get('/time/summary/:userId', async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId, 10);
+      if (!Number.isFinite(userId)) return res.status(400).json({ ok: false, error: 'Invalid user id' });
+      // Operator/viewer can only request their own breakdown.
+      if (req.user.role !== 'super_admin' && req.user.userId !== userId) {
+        return res.status(403).json({ ok: false, error: 'You can only view your own time summary.' });
+      }
+      const month = req.query.month || currentMonth();
+      const range = monthRange(month);
+      if (!range) return res.status(400).json({ ok: false, error: 'month must be YYYY-MM' });
+
+      const userQ = await pool.query(
+        `SELECT u.id, u.name, u.email, u.role,
+                COALESCE(s.monthly_hours_cap, 20) AS monthly_hours_cap,
+                COALESCE(s.warning_hours, 15)     AS warning_hours,
+                COALESCE(s.alert_email, 'belinda@alphasurfaces.com.au') AS alert_email
+           FROM project_users u
+           LEFT JOIN user_time_settings s ON s.user_id = u.id
+          WHERE u.id = $1`,
+        [userId]
+      );
+      if (!userQ.rows.length) return res.status(404).json({ ok: false, error: 'User not found' });
+      const user = userQ.rows[0];
+
+      const totalQ = await pool.query(
+        `SELECT COALESCE(SUM(minutes), 0)::int AS total FROM time_entries
+          WHERE user_id = $1 AND date >= $2::date AND date < $3::date`,
+        [userId, range.start, range.end]
+      );
+      const totalMinutes = totalQ.rows[0].total;
+
+      const byDayQ = await pool.query(
+        `SELECT date, COALESCE(SUM(minutes), 0)::int AS minutes
+           FROM time_entries
+          WHERE user_id = $1 AND date >= $2::date AND date < $3::date
+          GROUP BY date ORDER BY date ASC`,
+        [userId, range.start, range.end]
+      );
+      const byTicketQ = await pool.query(
+        `SELECT te.ticket_id, t.title, COALESCE(SUM(te.minutes), 0)::int AS minutes
+           FROM time_entries te
+           LEFT JOIN tickets t ON t.ticket_id = te.ticket_id
+          WHERE te.user_id = $1 AND te.date >= $2::date AND te.date < $3::date
+          GROUP BY te.ticket_id, t.title ORDER BY minutes DESC`,
+        [userId, range.start, range.end]
+      );
+      const entriesQ = await pool.query(
+        `SELECT te.id, te.ticket_id, te.date, te.minutes, te.description, te.created_at,
+                t.title AS ticket_title
+           FROM time_entries te
+           LEFT JOIN tickets t ON t.ticket_id = te.ticket_id
+          WHERE te.user_id = $1 AND te.date >= $2::date AND te.date < $3::date
+          ORDER BY te.date DESC, te.id DESC`,
+        [userId, range.start, range.end]
+      );
+
+      const totalHours = totalMinutes / 60;
+      res.json({
+        ok: true,
+        month,
+        user: {
+          id: user.id, name: user.name, email: user.email, role: user.role,
+          monthly_hours_cap: user.monthly_hours_cap,
+          warning_hours: user.warning_hours,
+          alert_email: user.alert_email
+        },
+        total_minutes: totalMinutes,
+        total_hours: Math.round(totalHours * 100) / 100,
+        percent: user.monthly_hours_cap > 0 ? Math.round((totalHours / user.monthly_hours_cap) * 100) : 0,
+        by_day: byDayQ.rows.map(r => ({ date: r.date, minutes: r.minutes, hours: Math.round((r.minutes / 60) * 100) / 100 })),
+        by_ticket: byTicketQ.rows.map(r => ({
+          ticket_id: r.ticket_id, title: r.title,
+          minutes: r.minutes, hours: Math.round((r.minutes / 60) * 100) / 100
+        })),
+        entries: entriesQ.rows
+      });
+    } catch (err) {
+      console.error('[projects/time] user summary error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // GET: CSV export of time entries. Filters: month (default current), user_id (super_admin only).
+  router.get('/time/export', async (req, res) => {
+    try {
+      const month = req.query.month || currentMonth();
+      const range = monthRange(month);
+      if (!range) return res.status(400).json({ ok: false, error: 'month must be YYYY-MM' });
+      const vals = [range.start, range.end];
+      const where = [`te.date >= $1::date AND te.date < $2::date`];
+      const scopeUserId = resolveTimeUserScope(req);
+      if (scopeUserId != null) { vals.push(scopeUserId); where.push(`te.user_id = $${vals.length}`); }
+      const { rows } = await pool.query(
+        `SELECT te.date, u.name AS user_name, te.ticket_id,
+                t.title AS ticket_title, te.minutes, te.description
+           FROM time_entries te
+           LEFT JOIN project_users u ON u.id = te.user_id
+           LEFT JOIN tickets t       ON t.ticket_id = te.ticket_id
+          WHERE ${where.join(' AND ')}
+          ORDER BY te.date ASC, te.id ASC`,
+        vals
+      );
+      const escapeCSV = v => {
+        if (v == null) return '';
+        const s = v instanceof Date ? v.toISOString().slice(0, 10) : String(v);
+        return (s.includes(',') || s.includes('"') || s.includes('\n'))
+          ? `"${s.replace(/"/g, '""')}"` : s;
+      };
+      const header = ['Date','User','Ticket ID','Ticket Title','Hours','Description'];
+      const lines = rows.map(r => [
+        escapeCSV(r.date),
+        escapeCSV(r.user_name),
+        escapeCSV(r.ticket_id),
+        escapeCSV(r.ticket_title),
+        escapeCSV((r.minutes / 60).toFixed(2)),
+        escapeCSV(r.description)
+      ].join(','));
+      const csv = [header.join(','), ...lines].join('\n');
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="timesheet-${month}.csv"`);
+      res.send(csv);
+    } catch (err) {
+      console.error('[projects/time] export error:', err.message);
       res.status(500).json({ ok: false, error: err.message });
     }
   });

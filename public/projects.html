@@ -151,6 +151,56 @@
   .btn-export-forms { padding: 9px 14px; border: 1px solid var(--border-strong); background: var(--white); border-radius: 4px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text); }
   .btn-export-forms.has-selection { background: var(--pri-low-bg); color: var(--pri-low-fg); border-color: var(--pri-low-fg); }
 
+  /* ── Time tracking ── */
+  .card-clock { position: absolute; top: 8px; right: 10px; background: transparent; border: none; padding: 2px 4px; font-size: 12px; line-height: 1; color: var(--muted); border-radius: 3px; cursor: pointer; transition: color 0.15s, background 0.15s; }
+  .card-clock:hover { background: rgba(86,77,34,0.10); color: var(--olive); }
+  .card { position: relative; }
+  body.role-viewer .card-clock { display: none !important; }
+  body.role-viewer #view-time-btn { display: none !important; }
+
+  .time-summary-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; margin-bottom: 18px; }
+  .time-summary-head { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+  .time-summary-head h2 { font-size: 17px; font-weight: 700; color: var(--text); }
+  .time-summary-head .meta { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; }
+  .time-progress { height: 14px; background: var(--cream-light); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; position: relative; }
+  .time-progress-fill { height: 100%; background: var(--pri-low-fg); transition: width 0.25s ease; }
+  .time-progress.warn  .time-progress-fill { background: var(--pri-med-fg); }
+  .time-progress.over  .time-progress-fill { background: var(--pri-high-fg); }
+  .time-progress-label { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .time-progress-label strong { color: var(--text); font-weight: 700; }
+  .time-month-nav { display: inline-flex; align-items: center; gap: 8px; background: var(--white); border: 1px solid var(--border-strong); border-radius: 4px; padding: 4px; }
+  .time-month-nav button { background: transparent; border: none; padding: 6px 10px; font-size: 13px; cursor: pointer; }
+  .time-month-nav .month-label { font-size: 13px; font-weight: 600; padding: 0 6px; min-width: 110px; text-align: center; }
+
+  .time-section { margin-top: 22px; }
+  .time-section h3 { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .time-table { width: 100%; border-collapse: collapse; font-size: 13.5px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .time-table th { text-align: left; padding: 10px 14px; background: var(--cream-light); border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .time-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .time-table tr:last-child td { border-bottom: none; }
+  .time-table tr.clickable { cursor: pointer; }
+  .time-table tr.clickable:hover { background: var(--cream-light); }
+  .time-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .time-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 110; align-items: center; justify-content: center; padding: 24px; }
+  .time-modal.open { display: flex; }
+  .time-modal-card { background: var(--white); border-radius: 10px; max-width: 420px; width: 100%; overflow: hidden; }
+  .time-modal-head { background: var(--olive); color: var(--white); padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; }
+  .time-modal-head h3 { font-size: 16px; font-weight: 600; color: var(--white); }
+  .time-modal-head button { background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,0.3); padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+  .time-modal-body { padding: 20px 22px; }
+  .time-modal-body label { display: block; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+  .time-modal-body input, .time-modal-body textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--border-strong); border-radius: 4px; font-size: 14px; font-family: inherit; outline: none; background: var(--white); }
+  .time-modal-body input:focus, .time-modal-body textarea:focus { border-color: var(--olive); }
+  .time-modal-body textarea { resize: vertical; min-height: 60px; }
+  .time-modal-row { margin-bottom: 14px; }
+  .time-modal-row.split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .time-modal-foot { padding: 12px 22px 18px; display: flex; gap: 10px; justify-content: flex-end; }
+  .time-modal-foot button { padding: 9px 18px; border-radius: 4px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; border: 1px solid var(--border-strong); background: var(--white); }
+  .time-modal-foot button.primary { background: var(--olive); color: var(--white); border-color: var(--olive); }
+  .time-modal-foot button.primary:hover { background: var(--olive-dark); }
+  .time-modal-error { color: var(--pri-high-fg); font-size: 13px; min-height: 18px; padding: 0 22px 8px; }
+
   /* ── App layout ── */
   .app { display: flex; flex-direction: column; min-height: 100vh; }
   .app-header { background: var(--olive); color: var(--white); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
@@ -351,6 +401,7 @@
         <button id="view-board" class="active" type="button">Kanban</button>
         <button id="view-list"  type="button">List</button>
         <button id="view-forms-btn" type="button">Forms</button>
+        <button id="view-time-btn"  type="button">Time</button>
       </div>
       <button id="btn-export" type="button">↓ Export CSV</button>
       <button id="btn-admin" class="icon-btn" type="button" title="User management" style="display:none">⚙</button>
@@ -430,7 +481,56 @@
       </div>
       <div id="forms-results"></div>
     </div>
+
+    <!-- Time tracking view -->
+    <div id="time-view" style="display:none">
+      <div class="toolbar">
+        <div class="time-month-nav">
+          <button id="time-prev-month" type="button" aria-label="Previous month">←</button>
+          <span class="month-label" id="time-month-label">—</span>
+          <button id="time-next-month" type="button" aria-label="Next month">→</button>
+        </div>
+        <select id="time-user-select" style="display:none">
+          <option value="">All users (super_admin)</option>
+        </select>
+        <button class="btn-export-forms" id="btn-export-time" type="button">↓ Export Timesheet</button>
+      </div>
+      <div id="time-results"><div class="empty">Loading…</div></div>
+    </div>
   </main>
+</div>
+
+<!-- Quick-log time modal (shared across kanban / list views) -->
+<div class="time-modal" id="time-log-modal" role="dialog" aria-hidden="true">
+  <div class="time-modal-card">
+    <div class="time-modal-head">
+      <h3 id="time-log-title">Log time</h3>
+      <button type="button" id="time-log-close">✕</button>
+    </div>
+    <form id="time-log-form" autocomplete="off">
+      <div class="time-modal-body">
+        <div class="time-modal-row split">
+          <div>
+            <label for="time-log-date">Date</label>
+            <input type="date" id="time-log-date" required>
+          </div>
+          <div>
+            <label for="time-log-minutes">Minutes</label>
+            <input type="number" id="time-log-minutes" min="1" step="1" required placeholder="e.g. 30">
+          </div>
+        </div>
+        <div class="time-modal-row">
+          <label for="time-log-desc">Description (optional)</label>
+          <textarea id="time-log-desc" rows="2" placeholder="What did you do?"></textarea>
+        </div>
+      </div>
+      <div class="time-modal-error" id="time-log-error" aria-live="polite"></div>
+      <div class="time-modal-foot">
+        <button type="button" id="time-log-cancel">Cancel</button>
+        <button type="submit" class="primary" id="time-log-submit">Log Time</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- Drawer -->
@@ -535,6 +635,8 @@
     var qsView = new URLSearchParams(location.search).get('view');
     if (qsView === 'forms' && state.user && state.user.role !== 'viewer') {
       setView('forms');
+    } else if (qsView === 'time' && state.user && state.user.role !== 'viewer') {
+      setView('time');
     } else {
       loadAll();
     }
@@ -556,6 +658,11 @@
     // Forms tab — viewers don't get forms access at all.
     var formsBtn = document.getElementById('view-forms-btn');
     if (formsBtn) formsBtn.style.display = user.role === 'viewer' ? 'none' : '';
+    var timeBtn = document.getElementById('view-time-btn');
+    if (timeBtn)  timeBtn.style.display  = user.role === 'viewer' ? 'none' : '';
+    // The all-users picker on the time view is super_admin-only.
+    var timeUserSelect = document.getElementById('time-user-select');
+    if (timeUserSelect) timeUserSelect.style.display = user.role === 'super_admin' ? '' : 'none';
     // Body class drives the read-only CSS rules.
     document.body.classList.toggle('role-viewer', user.role === 'viewer');
   }
@@ -814,6 +921,7 @@
   function renderCard(t) {
     var initials = (t.assigned_to || '').split(/\s+/).map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
     return '<div class="card" draggable="true" data-id="' + t.id + '" data-ticket-id="' + escapeAttr(t.ticket_id) + '">' +
+      '<button type="button" class="card-clock" data-ticket-id="' + escapeAttr(t.ticket_id) + '" data-ticket-title="' + escapeAttr(t.title) + '" title="Log time on this ticket">⏱</button>' +
       '<div class="card-id">' + escapeHtml(t.ticket_id) + '</div>' +
       '<div class="card-title">' + escapeHtml(t.title) + '</div>' +
       '<div class="card-meta">' +
@@ -914,22 +1022,28 @@
   document.getElementById('view-board').addEventListener('click', function () { setView('board'); });
   document.getElementById('view-list').addEventListener('click',  function () { setView('list');  });
   document.getElementById('view-forms-btn').addEventListener('click', function () { setView('forms'); });
+  document.getElementById('view-time-btn').addEventListener('click',  function () { setView('time'); });
   function setView(v) {
     state.view = v;
     var isForms = v === 'forms';
+    var isTime  = v === 'time';
+    var isTicketView = !isForms && !isTime;
     document.getElementById('view-board').classList.toggle('active', v === 'board');
     document.getElementById('view-list').classList.toggle('active',  v === 'list');
     document.getElementById('view-forms-btn').classList.toggle('active', isForms);
-    document.getElementById('tickets-view').style.display = isForms ? 'none' : 'block';
+    document.getElementById('view-time-btn').classList.toggle('active',  isTime);
+    document.getElementById('tickets-view').style.display = isTicketView ? 'block' : 'none';
     document.getElementById('forms-view').style.display   = isForms ? 'block' : 'none';
+    document.getElementById('time-view').style.display    = isTime  ? 'block' : 'none';
     // Header buttons that are ticket-only.
-    document.getElementById('btn-new').style.display    = isForms ? 'none' : '';
-    document.getElementById('btn-export').style.display = isForms ? 'none' : '';
+    document.getElementById('btn-new').style.display    = isTicketView ? '' : 'none';
+    document.getElementById('btn-export').style.display = isTicketView ? '' : 'none';
     // Close any open drawer when crossing view boundaries — content is
-    // domain-specific (ticket vs submission) and shouldn't bleed across.
+    // domain-specific and shouldn't bleed across.
     closeDrawer();
-    if (isForms) loadForms();
-    else loadTickets();
+    if (isForms)      loadForms();
+    else if (isTime)  loadTimeView();
+    else              loadTickets();
   }
 
   document.getElementById('filter-search').addEventListener('input', function (e) {
@@ -1640,6 +1754,262 @@
       toast('Failed: ' + err.message);
     }
   }
+
+  // ── Time tracking: dashboard, month nav, quick-log popover ──
+  var timeState = {
+    month: currentMonthStr(),
+    selectedUserId: null   // super_admin only — null means "show all-users summary"
+  };
+
+  function currentMonthStr() {
+    var d = new Date();
+    return d.toISOString().slice(0, 7);
+  }
+  function shiftMonth(monthStr, delta) {
+    var parts = monthStr.split('-').map(Number);
+    var d = new Date(Date.UTC(parts[0], parts[1] - 1 + delta, 1));
+    return d.toISOString().slice(0, 7);
+  }
+  function monthLabel(monthStr) {
+    var parts = monthStr.split('-').map(Number);
+    var d = new Date(Date.UTC(parts[0], parts[1] - 1, 1));
+    return d.toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  }
+  function progressClass(pct) {
+    if (pct >= 100) return 'over';
+    if (pct >= 75)  return 'warn';
+    return '';
+  }
+  function fmtHours(h) { return (Math.round(h * 100) / 100).toFixed(2).replace(/\.?0+$/, ''); }
+
+  document.getElementById('time-prev-month').addEventListener('click', function () {
+    timeState.month = shiftMonth(timeState.month, -1); loadTimeView();
+  });
+  document.getElementById('time-next-month').addEventListener('click', function () {
+    timeState.month = shiftMonth(timeState.month, 1);  loadTimeView();
+  });
+  document.getElementById('time-user-select').addEventListener('change', function (e) {
+    var v = e.target.value;
+    timeState.selectedUserId = v ? parseInt(v, 10) : null;
+    loadTimeView();
+  });
+  document.getElementById('btn-export-time').addEventListener('click', function () {
+    var url = '/api/projects/time/export?month=' + encodeURIComponent(timeState.month);
+    if (state.user && state.user.role === 'super_admin' && timeState.selectedUserId) {
+      url += '&user_id=' + timeState.selectedUserId;
+    }
+    window.location.href = url;
+  });
+
+  async function loadTimeView() {
+    document.getElementById('time-month-label').textContent = monthLabel(timeState.month);
+    var results = document.getElementById('time-results');
+    results.innerHTML = '<div class="empty">Loading…</div>';
+    try {
+      var role = state.user ? state.user.role : '';
+      // Super_admin without a selected user → show all-users dashboard.
+      if (role === 'super_admin' && !timeState.selectedUserId) {
+        await renderAllUsersSummary();
+      } else {
+        var userId = role === 'super_admin' ? timeState.selectedUserId : (state.user && state.user.userId);
+        if (!userId) {
+          results.innerHTML = '<div class="empty">No personal time tracking is available for the master admin session. Sign in as a real user.</div>';
+          return;
+        }
+        await renderUserBreakdown(userId);
+      }
+    } catch (err) {
+      results.innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  async function renderAllUsersSummary() {
+    var results = document.getElementById('time-results');
+    var res = await fetch('/api/projects/time/summary?month=' + encodeURIComponent(timeState.month), { credentials: 'include' });
+    if (res.status === 401) { showLogin('Session expired — please sign in again.'); return; }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'Failed');
+    // Populate the user picker (sticky so super_admin can drill in).
+    var sel = document.getElementById('time-user-select');
+    var current = sel.value;
+    sel.innerHTML = '<option value="">All users</option>' + data.summary.map(function (u) {
+      return '<option value="' + u.user_id + '">' + escapeHtml(u.name) + '</option>';
+    }).join('');
+    sel.value = current; // restore (won't match if just switched; that's fine)
+    // Render: total card + per-user table.
+    var totalH = data.summary.reduce(function (s, u) { return s + u.total_hours; }, 0);
+    var summary = '' +
+      '<div class="time-summary-card">' +
+        '<div class="time-summary-head"><h2>All users · ' + escapeHtml(monthLabel(data.month)) + '</h2>' +
+          '<span class="meta">' + data.summary.length + ' user' + (data.summary.length === 1 ? '' : 's') + ' · ' + fmtHours(totalH) + ' hrs total</span></div>' +
+      '</div>';
+    var rows = data.summary.map(function (u) {
+      var pct  = u.percent || 0;
+      var pcls = progressClass(pct);
+      return '<tr class="clickable" data-user-id="' + u.user_id + '">' +
+        '<td><strong>' + escapeHtml(u.name) + '</strong><div style="font-size:12px;color:var(--muted)">' + escapeHtml(u.role || '') + '</div></td>' +
+        '<td>' +
+          '<div class="time-progress ' + pcls + '" style="width:220px"><div class="time-progress-fill" style="width:' + Math.min(pct, 100) + '%"></div></div>' +
+        '</td>' +
+        '<td class="num">' + fmtHours(u.total_hours) + ' / ' + u.monthly_hours_cap + ' hrs</td>' +
+        '<td class="num">' + pct + '%</td>' +
+      '</tr>';
+    }).join('') || '<tr><td colspan="4" class="empty" style="padding:32px">No time logged yet for this month.</td></tr>';
+    results.innerHTML = summary +
+      '<div class="time-section"><h3>Per-user breakdown</h3>' +
+        '<table class="time-table"><thead><tr>' +
+          '<th>User</th><th>Progress</th><th class="num">Logged</th><th class="num">%</th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table>' +
+      '</div>';
+    document.querySelectorAll('#time-results tr.clickable').forEach(function (tr) {
+      tr.addEventListener('click', function () {
+        timeState.selectedUserId = parseInt(tr.dataset.userId, 10);
+        document.getElementById('time-user-select').value = String(timeState.selectedUserId);
+        loadTimeView();
+      });
+    });
+  }
+
+  async function renderUserBreakdown(userId) {
+    var results = document.getElementById('time-results');
+    var res = await fetch('/api/projects/time/summary/' + userId + '?month=' + encodeURIComponent(timeState.month), { credentials: 'include' });
+    if (res.status === 401) { showLogin('Session expired — please sign in again.'); return; }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'Failed');
+    var u = data.user;
+    var pct = data.percent || 0;
+    var pcls = progressClass(pct);
+    var head = '' +
+      '<div class="time-summary-card">' +
+        '<div class="time-summary-head">' +
+          '<h2>' + escapeHtml(u.name) + ' · ' + escapeHtml(monthLabel(data.month)) + '</h2>' +
+          '<span class="meta">Cap ' + u.monthly_hours_cap + ' hrs · Warn at ' + u.warning_hours + ' hrs · Alerts → ' + escapeHtml(u.alert_email) + '</span>' +
+        '</div>' +
+        '<div class="time-progress ' + pcls + '"><div class="time-progress-fill" style="width:' + Math.min(pct, 100) + '%"></div></div>' +
+        '<div class="time-progress-label"><strong>' + fmtHours(data.total_hours) + ' hrs</strong> of ' + u.monthly_hours_cap + ' hrs · ' + pct + '%</div>' +
+      '</div>';
+
+    var byDay = data.by_day && data.by_day.length
+      ? data.by_day.map(function (d) {
+          return '<tr><td>' + formatDate(d.date) + '</td>' +
+                 '<td class="num">' + fmtHours(d.hours) + ' hrs</td></tr>';
+        }).join('')
+      : '<tr><td colspan="2" class="empty" style="padding:18px">No entries this month.</td></tr>';
+
+    var byTicket = data.by_ticket && data.by_ticket.length
+      ? data.by_ticket.map(function (r) {
+          return '<tr><td>' + (r.ticket_id ? escapeHtml(r.ticket_id) : '<span style="color:var(--muted)">—</span>') + '</td>' +
+                 '<td>' + escapeHtml(r.title || (r.ticket_id ? '(ticket missing)' : 'No ticket — general logging')) + '</td>' +
+                 '<td class="num">' + fmtHours(r.hours) + ' hrs</td></tr>';
+        }).join('')
+      : '<tr><td colspan="3" class="empty" style="padding:18px">No entries this month.</td></tr>';
+
+    var entries = data.entries && data.entries.length
+      ? data.entries.map(function (e) {
+          var hrs = (e.minutes / 60);
+          return '<tr>' +
+            '<td>' + formatDate(e.date) + '</td>' +
+            '<td>' + (e.ticket_id ? escapeHtml(e.ticket_id) : '<span style="color:var(--muted)">—</span>') + '</td>' +
+            '<td>' + escapeHtml(e.ticket_title || '') + '</td>' +
+            '<td class="num">' + fmtHours(hrs) + '</td>' +
+            '<td>' + escapeHtml(e.description || '') + '</td>' +
+          '</tr>';
+        }).join('')
+      : '<tr><td colspan="5" class="empty" style="padding:18px">No entries this month.</td></tr>';
+
+    results.innerHTML = head +
+      '<div class="time-section"><h3>Daily breakdown</h3>' +
+        '<table class="time-table"><thead><tr><th>Date</th><th class="num">Hours</th></tr></thead><tbody>' + byDay + '</tbody></table>' +
+      '</div>' +
+      '<div class="time-section"><h3>Per-ticket breakdown</h3>' +
+        '<table class="time-table"><thead><tr><th>Ticket</th><th>Title</th><th class="num">Hours</th></tr></thead><tbody>' + byTicket + '</tbody></table>' +
+      '</div>' +
+      '<div class="time-section"><h3>Entries</h3>' +
+        '<table class="time-table"><thead><tr><th>Date</th><th>Ticket</th><th>Title</th><th class="num">Hours</th><th>Description</th></tr></thead><tbody>' + entries + '</tbody></table>' +
+      '</div>';
+  }
+
+  // ── Quick-log time modal (anchored from card clock + drawer-future) ──
+  var timeLogModal    = document.getElementById('time-log-modal');
+  var timeLogForm     = document.getElementById('time-log-form');
+  var timeLogTitle    = document.getElementById('time-log-title');
+  var timeLogDate     = document.getElementById('time-log-date');
+  var timeLogMinutes  = document.getElementById('time-log-minutes');
+  var timeLogDesc     = document.getElementById('time-log-desc');
+  var timeLogError    = document.getElementById('time-log-error');
+  var timeLogSubmit   = document.getElementById('time-log-submit');
+  var pendingLogTicket = null; // { id, title }
+
+  function openTimeLogModal(ticketId, ticketTitle) {
+    pendingLogTicket = ticketId ? { id: ticketId, title: ticketTitle || '' } : null;
+    timeLogTitle.textContent = ticketId
+      ? 'Log time on ' + ticketId + (ticketTitle ? ' — ' + ticketTitle : '')
+      : 'Log time';
+    timeLogDate.value = new Date().toISOString().slice(0, 10);
+    timeLogMinutes.value = '';
+    timeLogDesc.value = '';
+    timeLogError.textContent = '';
+    timeLogSubmit.disabled = false;
+    timeLogSubmit.textContent = 'Log Time';
+    timeLogModal.classList.add('open');
+    setTimeout(function () { timeLogMinutes.focus(); }, 50);
+  }
+  function closeTimeLogModal() {
+    timeLogModal.classList.remove('open');
+    pendingLogTicket = null;
+  }
+  document.getElementById('time-log-close').addEventListener('click', closeTimeLogModal);
+  document.getElementById('time-log-cancel').addEventListener('click', closeTimeLogModal);
+  timeLogModal.addEventListener('click', function (e) {
+    if (e.target === timeLogModal) closeTimeLogModal();
+  });
+
+  timeLogForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    timeLogError.textContent = '';
+    var minutes = parseInt(timeLogMinutes.value, 10);
+    if (!minutes || minutes <= 0) { timeLogError.textContent = 'Minutes must be a positive number.'; return; }
+    var date = timeLogDate.value || new Date().toISOString().slice(0, 10);
+    var desc = timeLogDesc.value.trim();
+    timeLogSubmit.disabled = true;
+    timeLogSubmit.textContent = 'Saving…';
+    try {
+      var body = { minutes: minutes, date: date, description: desc };
+      if (pendingLogTicket && pendingLogTicket.id) body.ticket_id = pendingLogTicket.id;
+      var res = await fetch('/api/projects/time/entries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body)
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok || !data.ok) throw new Error(data.error || ('HTTP ' + res.status));
+      toast('Logged ' + (minutes / 60).toFixed(2).replace(/\.?0+$/, '') + ' hrs');
+      closeTimeLogModal();
+      // Refresh whichever view is active so the new entry shows immediately.
+      if (state.view === 'time') loadTimeView();
+    } catch (err) {
+      timeLogError.textContent = err.message || 'Could not log time.';
+      timeLogSubmit.disabled = false;
+      timeLogSubmit.textContent = 'Log Time';
+    }
+  });
+
+  // Card clock click → open quick-log modal. Listener is delegated from the
+  // results container because cards are re-rendered on every loadTickets().
+  document.getElementById('results').addEventListener('click', function (e) {
+    var btn = e.target.closest('.card-clock');
+    if (!btn) return;
+    e.stopPropagation();
+    e.preventDefault();
+    openTimeLogModal(btn.dataset.ticketId || null, btn.dataset.ticketTitle || '');
+  });
+  // Stop the clock button from triggering card drag.
+  document.addEventListener('mousedown', function (e) {
+    if (e.target.closest('.card-clock')) e.stopPropagation();
+  }, true);
 
   // ── Helpers ──
   function formatDate(s, withTime) {

@@ -424,6 +424,119 @@ async function sendFormsResetEmail(to, resetUrl) {
   }
 }
 
+// ── Time-tracking threshold alerts ──
+// Fires when a user crosses their warning_hours threshold and again when
+// they hit monthly_hours_cap, for the supplied month. Dedupe is enforced by
+// the time_alerts UNIQUE(user_id, month, alert_type) — a successful INSERT
+// is treated as authoritative; if it conflicts the email is skipped.
+async function checkAndSendTimeAlert(pool, userId, month) {
+  if (!pool || !userId || !month) return { sent: [] };
+  if (!/^\d{4}-\d{2}$/.test(month)) return { sent: [] };
+  try {
+    const { rows: settingsRows } = await pool.query(
+      `SELECT s.monthly_hours_cap, s.warning_hours, s.alert_email,
+              u.name AS user_name, u.email AS user_email
+         FROM user_time_settings s
+         JOIN project_users u ON u.id = s.user_id
+        WHERE s.user_id = $1`,
+      [userId]
+    );
+    if (!settingsRows.length) return { sent: [] };
+    const settings = settingsRows[0];
+    if (!settings.alert_email) return { sent: [] };
+
+    // Range query is half-open: [first-of-month, first-of-next-month).
+    const [yyyy, mm] = month.split('-').map(Number);
+    const startDate = `${month}-01`;
+    const nextMonth = mm === 12 ? `${yyyy + 1}-01-01` : `${yyyy}-${String(mm + 1).padStart(2, '0')}-01`;
+    const { rows: sumRows } = await pool.query(
+      `SELECT COALESCE(SUM(minutes), 0)::int AS total_min FROM time_entries
+        WHERE user_id = $1 AND date >= $2::date AND date < $3::date`,
+      [userId, startDate, nextMonth]
+    );
+    const totalMinutes = sumRows[0].total_min;
+    const totalHours   = totalMinutes / 60;
+
+    const sent = [];
+    const monthLabel = new Date(`${startDate}T00:00:00Z`).toLocaleString('en-AU', {
+      month: 'long', year: 'numeric', timeZone: 'UTC'
+    });
+
+    async function maybeSend(alertType, label, color) {
+      // Race-safe dedupe: insert first, only send if we won the row. If
+      // another request already inserted, ON CONFLICT swallows the error
+      // and we skip the email.
+      const ins = await pool.query(
+        `INSERT INTO time_alerts (user_id, month, alert_type)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (user_id, month, alert_type) DO NOTHING
+         RETURNING id`,
+        [userId, month, alertType]
+      );
+      if (!ins.rows.length) return; // already sent — skip
+      if (!configureSendgrid()) {
+        console.warn('[notify/time] SENDGRID_API_KEY not set — alert recorded but no email sent');
+        return;
+      }
+      const cap     = settings.monthly_hours_cap;
+      const warning = settings.warning_hours;
+      const subject = `⏱ Time tracking alert — ${settings.user_name} has logged ${totalHours.toFixed(1)} of ${cap} hours in ${monthLabel}`;
+      const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f3f1e6;font-family:'Helvetica Neue',Arial,sans-serif">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f3f1e6">
+  <tr><td align="center" style="padding:48px 16px">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+      <tr><td style="background:${color};padding:24px 32px">
+        <p style="margin:0;color:#fff;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.85">Alpha Surfaces · Time tracking</p>
+        <h1 style="margin:6px 0 0;color:#fff;font-size:21px;font-weight:600">${escapeHtml(label)}</h1>
+      </td></tr>
+      <tr><td style="padding:28px 32px;color:#222;font-size:15px;line-height:1.6">
+        <p style="margin:0 0 14px"><strong>${escapeHtml(settings.user_name)}</strong> (${escapeHtml(settings.user_email)}) has logged
+          <strong>${totalHours.toFixed(1)} hours</strong> against a ${cap}-hour monthly allocation in ${escapeHtml(monthLabel)}.</p>
+        <p style="margin:0 0 14px;color:#555">Warning threshold: ${warning} hrs · Cap: ${cap} hrs.</p>
+        <p style="margin:24px 0 0">
+          <a href="${escapeAttr((process.env.SITE_URL || 'https://alphasurfaces.com.au') + '/projects?view=time')}"
+             style="display:inline-block;background:#564D22;color:#fff;padding:11px 22px;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:4px">
+            Open time dashboard
+          </a>
+        </p>
+      </td></tr>
+      <tr><td style="padding:18px 32px;background:#f7f4e8;color:#999;font-size:12px;text-align:center">
+        This is an automated alert. To change thresholds, edit the row in user_time_settings.
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>`;
+      try {
+        await sgMail.send({
+          to: settings.alert_email,
+          from: NOTIFY_EMAIL_FROM(),
+          subject,
+          html
+        });
+        sent.push(alertType);
+        console.log('[notify/time]', alertType, '→', settings.alert_email, '(', totalHours.toFixed(1), 'hrs )');
+      } catch (err) {
+        const detail = err.response?.body?.errors ? JSON.stringify(err.response.body.errors) : err.message;
+        console.error('[notify/time] send error:', detail);
+        // Don't roll back the time_alerts row — re-trying would spam if the
+        // address is bad; better to drop the alert and rely on the dashboard.
+      }
+    }
+
+    if (totalHours >= settings.monthly_hours_cap) {
+      await maybeSend('20hr_reached', 'Monthly cap reached', '#b3261e');
+    } else if (totalHours >= settings.warning_hours) {
+      await maybeSend('15hr_warning', 'Approaching monthly cap', '#b07020');
+    }
+    return { sent, totalHours };
+  } catch (err) {
+    console.error('[notify/time] checkAndSendTimeAlert error:', err.message);
+    return { sent: [] };
+  }
+}
+
 async function notifyNewSubmission(submission) {
   if (!submission) return;
   const results = await Promise.allSettled([
@@ -608,5 +721,6 @@ module.exports = {
   sendSubmissionSMS,
   sendSubmissionEmail,
   notifyNewSubmission,
-  sendFormsResetEmail
+  sendFormsResetEmail,
+  checkAndSendTimeAlert
 };
