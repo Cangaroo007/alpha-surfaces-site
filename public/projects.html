@@ -660,8 +660,8 @@
     </form>
   </div>
 
-  <!-- Choose default view (shown after first-login password change, or from
-       the user menu's "Set default view" item). -->
+  <!-- Choose default view (shown when the user picks "Set default view" from
+       the user menu). -->
   <div class="login-card login-card--wide" id="view-choose-default" style="display:none">
     <div class="login-brand">Alpha Surfaces</div>
     <h1 class="login-title">What would you like to see when you log in?</h1>
@@ -1221,11 +1221,22 @@
       if (!res.ok || !data.ok) throw new Error(data.error || ('HTTP ' + res.status));
       pendingCurrentPassword = '';
       okEl.textContent = 'Password updated.';
-      // Pull the now-clean user record before showing the default-view step
-      // so the role-aware option list reflects the user's actual permissions.
+      // Pull the now-clean user record so the role-based default-view
+      // assignment below uses the user's actual permissions.
       var check = await fetch('/api/projects-auth-check', { credentials: 'include' }).then(function (r) { return r.json(); }).catch(function () { return null; });
       if (check && check.authenticated && check.user) {
-        showChooseDefaultView(check.user);
+        // First-login default view assigned by role; user can change it later
+        // from the avatar menu's "Set default view" item.
+        var autoView = check.user.role === 'operator' ? 'forms' : 'kanban';
+        try {
+          await fetch('/api/projects/me/default-view', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ default_view: autoView })
+          });
+        } catch (_) { /* non-fatal — fall through to showApp */ }
+        showApp(Object.assign({}, check.user, { default_view: autoView }));
       } else {
         showLogin('Please sign in with your new password.');
       }
@@ -1235,8 +1246,8 @@
     }
   });
 
-  // ── Choose default view (post-password-change + user-menu entry) ──
-  // Renders the four landing-view options as clickable cards. Saves to
+  // ── Choose default view (user-menu "Set default view" entry) ──
+  // Renders the landing-view options as clickable cards. Saves to
   // /me/default-view and forwards into showApp() so the user lands on
   // their pick immediately. The user object passed in determines which
   // options are shown (forms hidden for viewers, time only for super_admin).
