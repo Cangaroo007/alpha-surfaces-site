@@ -83,6 +83,23 @@ img { display: block; max-width: 100%; }
 }
 .upload-placeholder strong { font-weight: 600; }
 
+/* Photo upload — replaces the placeholder. Drop zone + thumbs grid. */
+.photo-upload { background: var(--cream); border: 1px dashed rgba(86,77,34,0.35); border-radius: 6px; padding: 18px; }
+.photo-upload.is-drag { background: rgba(86,77,34,0.06); border-color: var(--olive); }
+.photo-upload-cta { display: flex; align-items: center; gap: 10px; font-family: 'Degular', sans-serif; font-size: 13px; color: var(--olive); }
+.photo-upload-cta strong { font-weight: 600; }
+.photo-upload-cta button { font-family: inherit; background: var(--olive); color: #fff; border: none; padding: 8px 14px; border-radius: 4px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; }
+.photo-upload-cta button:hover { background: #3f3819; }
+.photo-upload-cta button:disabled { opacity: 0.6; cursor: not-allowed; }
+.photo-upload-help { font-family: 'Degular', sans-serif; font-size: 12px; color: rgba(0,0,0,0.55); margin-top: 6px; }
+.photo-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+.photo-thumb { position: relative; padding-bottom: 100%; background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px; overflow: hidden; }
+.photo-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.photo-thumb .photo-remove { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: rgba(0,0,0,0.65); color: #fff; border: none; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
+.photo-thumb .photo-remove:hover { background: rgba(220,38,38,0.85); }
+.photo-thumb.is-uploading::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.6) url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%2210%22 stroke=%22%23564D22%22 stroke-width=%222%22 fill=%22none%22 stroke-dasharray=%2240 60%22%3E%3CanimateTransform attributeName=%22transform%22 type=%22rotate%22 from=%220 12 12%22 to=%22360 12 12%22 dur=%221s%22 repeatCount=%22indefinite%22/%3E%3C/circle%3E%3C/svg%3E') center/24px no-repeat; }
+.photo-error { font-family: 'Degular', sans-serif; font-size: 12px; color: var(--red); margin-top: 8px; }
+
 .consent-row { display: flex; align-items: flex-start; gap: 12px; }
 .consent-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--olive); cursor: pointer; flex-shrink: 0; margin-top: 2px; }
 .consent-row label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; color: var(--black); line-height: 1.5; cursor: pointer; }
@@ -250,9 +267,16 @@ img { display: block; max-width: 100%; }
             <input id="invoice_number" name="invoice_number" type="text" class="field-input">
           </div>
         </div>
-        <div class="upload-placeholder">
-          <span style="font-size:18px;line-height:1">&#128247;</span>
-          <span><strong>Installation photo upload</strong> &mdash; coming soon. For now, please email any photos to <a href="mailto:hello@alphasurfaces.com.au" style="color:var(--olive)">hello@alphasurfaces.com.au</a> with your name and address.</span>
+        <div class="photo-upload" id="photo-upload">
+          <div class="photo-upload-cta">
+            <span style="font-size:18px;line-height:1">&#128247;</span>
+            <span><strong>Installation photos</strong> &mdash; up to 3 images.</span>
+            <button type="button" id="photo-pick-btn" style="margin-left:auto">Choose photos</button>
+            <input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple style="display:none">
+          </div>
+          <div class="photo-upload-help">Drag-and-drop also works. JPG, PNG, WebP or HEIC, max 5MB each.</div>
+          <div class="photo-thumbs" id="photo-thumbs"></div>
+          <div class="photo-error" id="photo-error" aria-live="polite"></div>
         </div>
       </div>
 
@@ -357,6 +381,91 @@ img { display: block; max-width: 100%; }
     return ok;
   }
 
+  // ── Photo upload ──
+  // Photos are uploaded to /api/warranty-upload as soon as they're picked, so
+  // the server has Cloudinary URLs ready by the time the form is submitted.
+  // The returned URLs get included as installation_photos in the warranty
+  // payload. Removing a thumbnail removes its URL from the payload too.
+  var MAX_PHOTOS = 3;
+  var MAX_BYTES = 5 * 1024 * 1024;
+  var ACCEPTED = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+  var photoUrls = [];
+  var photoZone   = document.getElementById('photo-upload');
+  var photoInput  = document.getElementById('photo-input');
+  var photoPickBtn = document.getElementById('photo-pick-btn');
+  var photoThumbs = document.getElementById('photo-thumbs');
+  var photoError  = document.getElementById('photo-error');
+
+  function renderThumbs() {
+    photoThumbs.innerHTML = photoUrls.map(function (url, i) {
+      return '<div class="photo-thumb">' +
+        '<img src="' + url + '" alt="Installation photo ' + (i + 1) + '">' +
+        '<button type="button" class="photo-remove" data-idx="' + i + '" aria-label="Remove">×</button>' +
+      '</div>';
+    }).join('');
+    photoThumbs.querySelectorAll('.photo-remove').forEach(function (b) {
+      b.addEventListener('click', function () {
+        photoUrls.splice(parseInt(b.dataset.idx, 10), 1);
+        renderThumbs();
+      });
+    });
+  }
+
+  async function handleFiles(files) {
+    photoError.textContent = '';
+    var list = Array.from(files || []);
+    if (!list.length) return;
+    if (photoUrls.length + list.length > MAX_PHOTOS) {
+      photoError.textContent = 'Up to ' + MAX_PHOTOS + ' photos total.';
+      list = list.slice(0, MAX_PHOTOS - photoUrls.length);
+      if (!list.length) return;
+    }
+    var fd = new FormData();
+    var anyValid = false;
+    for (var i = 0; i < list.length; i++) {
+      var f = list[i];
+      if (!ACCEPTED.includes((f.type || '').toLowerCase())) {
+        photoError.textContent = 'Only JPG, PNG, WebP or HEIC images are accepted.';
+        continue;
+      }
+      if (f.size > MAX_BYTES) {
+        photoError.textContent = '"' + f.name + '" is over 5MB.';
+        continue;
+      }
+      fd.append('photos', f);
+      anyValid = true;
+    }
+    if (!anyValid) return;
+    photoPickBtn.disabled = true;
+    photoPickBtn.textContent = 'Uploading…';
+    try {
+      var res = await fetch('/api/warranty-upload', { method: 'POST', body: fd });
+      var json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error || ('HTTP ' + res.status));
+      (json.urls || []).forEach(function (u) { if (photoUrls.length < MAX_PHOTOS) photoUrls.push(u); });
+      renderThumbs();
+    } catch (err) {
+      photoError.textContent = err.message || 'Upload failed.';
+    } finally {
+      photoPickBtn.disabled = false;
+      photoPickBtn.textContent = 'Choose photos';
+    }
+  }
+  photoPickBtn.addEventListener('click', function () { photoInput.click(); });
+  photoInput.addEventListener('change', function () {
+    handleFiles(photoInput.files);
+    photoInput.value = '';
+  });
+  ['dragenter', 'dragover'].forEach(function (ev) {
+    photoZone.addEventListener(ev, function (e) { e.preventDefault(); photoZone.classList.add('is-drag'); });
+  });
+  ['dragleave', 'drop'].forEach(function (ev) {
+    photoZone.addEventListener(ev, function (e) { e.preventDefault(); photoZone.classList.remove('is-drag'); });
+  });
+  photoZone.addEventListener('drop', function (e) {
+    if (e.dataTransfer && e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+  });
+
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
     clearErrors();
@@ -372,10 +481,12 @@ img { display: block; max-width: 100%; }
       state:          fd.get('state')           || '',
       postcode:       (fd.get('postcode')       || '').trim(),
       stone_interest: (fd.get('stone_interest') || '').trim(),
+      stone_name:     (fd.get('stone_interest') || '').trim(),
       purchase_date:  fd.get('purchase_date')   || '',
       fabricator:     (fd.get('fabricator')     || '').trim(),
       retailer:       (fd.get('retailer')       || '').trim(),
       invoice_number: (fd.get('invoice_number') || '').trim(),
+      installation_photos: photoUrls.slice(),
       consent:        fd.get('consent') === 'on',
       source:         'warranty-page'
     };

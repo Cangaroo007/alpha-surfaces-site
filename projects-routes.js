@@ -154,6 +154,318 @@ const ROLE_REMAP_OPERATOR = [
 ];
 const DEACTIVATE_EMAILS = ['kate@thisisikon.com.au'];
 
+// ─── Track G: knowledge-base seed ─────────────────────────────────────────
+// Articles seeded only on the very first deploy (when knowledge_articles is
+// empty). Edits from the Docs UI persist; a redeploy never overwrites them.
+const KB_SEED = [
+  {
+    slug: 'system-overview',
+    title: 'System Overview',
+    category: 'Getting Started',
+    content: `# System Overview
+
+Alpha Surfaces uses a custom-built platform to manage its website, customer enquiries, and project work. Everything is accessed through the Project Tracker at alphasurfaces.com.au/projects.
+
+## What's in the system
+
+- **Project Tracker** (Kanban Board) — manage tasks, bugs, and feature requests
+- **Form Submissions** — view and action sample requests, enquiries, warranty activations, contact form messages, and partner enquiries
+- **Time Tracking** — consultant hours tracking with monthly caps (admin only)
+- **Website CMS** — edit stone products, collections, and page content
+- **Knowledge Base** — you're reading it
+
+## User roles
+
+| Role | Access |
+|------|--------|
+| Super Admin | Everything — tickets, all forms, CMS, time tracking, user management, docs editing |
+| Operator | Assigned tickets, form submissions |
+| Viewer | Read-only access to assigned tickets |
+
+## Key URLs
+
+| URL | Purpose |
+|-----|---------|
+| alphasurfaces.com.au/projects | Project Tracker |
+| alphasurfaces.com.au/admin | Website CMS (super_admin only) |
+| alphasurfaces.com.au | Public website |
+| review.alphasurfaces.com.au | Staging site for reviewing changes |
+`
+  },
+  {
+    slug: 'logging-in',
+    title: 'Logging In',
+    category: 'Getting Started',
+    content: `# Logging In
+
+1. Go to **alphasurfaces.com.au/projects**
+2. Enter your Alpha Surfaces email address
+3. Enter your password
+4. First time? You'll be asked to set a new password
+
+## Forgot your password?
+
+Click "Forgot Password" on the login screen. A reset link will be sent to your email (expires after 1 hour).
+
+## Your default view
+
+After your first login you'll choose a default view (Kanban, List, Forms, or Time). You can change this anytime from the user menu — click your avatar in the top right.
+`
+  },
+  {
+    slug: 'kanban-board',
+    title: 'Understanding the Kanban Board',
+    category: 'Project Tracker',
+    content: `# Understanding the Kanban Board
+
+The board shows tickets in four columns:
+
+| Column | Meaning |
+|--------|---------|
+| Backlog | Identified but not started |
+| In Progress | Currently being worked on |
+| Review | Done, waiting for check/approval |
+| Done | Completed and signed off |
+
+## Moving tickets
+
+Drag and drop between columns, or click a ticket and change status in the detail drawer.
+
+## Priority levels
+
+- **High** (red) — needs attention today
+- **Medium** (amber) — important but not urgent
+- **Low** (green) — do when time allows
+
+## Blockers
+
+If a ticket is blocked (waiting on someone), it shows a red "BLOCKED" banner with the person's name. That person receives reminder emails every 2 days until it's cleared.
+
+## Review & Approval
+
+Tickets with a reviewer and/or approver go through a review cycle before completion:
+1. Move to Review → reviewers are notified (Jay, Jana by default)
+2. Reviewers check and leave feedback
+3. After 24 hours or reviewer feedback, the approver is notified (Belinda by default)
+4. Approver either approves (→ Done) or requests changes (→ back to In Progress)
+`
+  },
+  {
+    slug: 'creating-tickets',
+    title: 'Creating Tickets',
+    category: 'Project Tracker',
+    content: `# Creating Tickets
+
+1. Click **+ New Ticket**
+2. Fill in: title, description, category, priority, assigned to
+3. Optionally set reviewer (Jay, Jana) and approver (Belinda) — leave blank to skip review
+4. Click Create
+
+## Categories
+
+| Category | Use for |
+|----------|---------|
+| Feature | New functionality |
+| Content | Text, image, or page updates |
+| Infrastructure | Server, DNS, security, deployment |
+| Process | Workflows, communications, training |
+| Print | Physical materials, QR codes |
+| Showroom | In-store displays, iPad setup |
+
+## Tips
+
+- Every action is logged in the Activity tab
+- Attach files via the Files tab (screenshots, PDFs, up to 10MB)
+- Reference other tickets by typing AS-XXX — they become clickable links
+`
+  },
+  {
+    slug: 'sample-requests',
+    title: 'Processing Sample Requests',
+    category: 'Forms',
+    content: `# Processing Sample Requests
+
+Sample requests come from the website's Order Sample page. Each gets a reference number (SR-0001, SR-0002, etc.).
+
+## Workflow
+
+1. Customer submits → status: **New** → you get an SMS + email alert
+2. Review the request → change status to **Processing**
+3. Pack and send samples → change status to **Shipped**
+4. Confirm delivery → change status to **Completed**
+
+## Fields captured
+
+Name, email, phone, company, role (homeowner/builder/architect/etc.), stone interest, shipping address, message, and how they found us.
+
+## Exporting
+
+Click "Export CSV" to download all sample requests as a spreadsheet. Filter by status or date range first to export a subset.
+`
+  },
+  {
+    slug: 'warranty-activations',
+    title: 'Warranty Activations',
+    category: 'Forms',
+    content: `# Warranty Activations
+
+Customers submit warranty activation forms after purchasing and installing Alpha Surfaces products. Each gets a reference number (WA-0001).
+
+## Workflow
+
+1. Customer submits with installation details + photos → **New**
+2. Review the submission → **Under Review**
+3. Verify purchase and installation → **Approved** (auto-assigns warranty number AW-YYYY-XXXX)
+4. Or if details are incomplete → **Rejected** with feedback
+
+## Fields captured
+
+Contact details, installation address (street, suburb, state, postcode), stone name, purchase date, fabricator, retailer, invoice number, and up to 3 installation photos.
+
+## Installation photos
+
+Photos are stored in Cloudinary. Click thumbnails to view full size.
+`
+  },
+  {
+    slug: 'editing-content',
+    title: 'Editing Website Content',
+    category: 'Website CMS',
+    content: `# Editing Website Content
+
+The CMS is at **alphasurfaces.com.au/admin** (super_admin only).
+
+## What you can edit
+
+- Stone product details (name, description, specs, images)
+- Collections (groupings of stones)
+- Page content (hero text, about sections)
+- Images (upload via Cloudinary)
+
+## After making changes
+
+The website caches aggressively. If changes don't appear:
+1. Hard refresh: **Cmd+Shift+R** (Mac) or **Ctrl+Shift+R** (Windows)
+2. Try incognito/private browsing
+3. If still stale, ask for a Cloudflare cache purge
+
+## Stone catalogue
+
+47 products across 6 collections, driven by stones.json. Each stone has: name, collection, description, specifications, and images.
+`
+  },
+  {
+    slug: 'architecture',
+    title: 'System Architecture',
+    category: 'Technical Reference',
+    content: `# System Architecture
+
+## Stack
+
+| Component | Technology |
+|-----------|-----------|
+| Server | Node.js + Express on Railway |
+| Database | PostgreSQL on Railway |
+| CDN/DNS | Cloudflare |
+| Images | Cloudinary |
+| Transactional email | SendGrid (Twilio) |
+| Company email | Microsoft 365 |
+| Marketing email | Klaviyo |
+| SMS | Twilio |
+| Source code | GitHub (cangaroo007/alpha-surfaces-site) |
+| Domain | GoDaddy → Cloudflare nameservers |
+| Analytics | GA4 + GTM + Microsoft Clarity |
+| Consent | Cookiebot |
+
+## Environments
+
+| Environment | Branch | URL |
+|-------------|--------|-----|
+| Staging | main | review.alphasurfaces.com.au |
+| Production | production | alphasurfaces.com.au |
+
+## Deploy process
+
+1. Push to \`main\` → auto-deploys to staging
+2. Test at review.alphasurfaces.com.au
+3. Merge \`main\` into \`production\` → auto-deploys to live
+4. Purge Cloudflare cache
+`
+  },
+  {
+    slug: 'database-tables',
+    title: 'Database Tables',
+    category: 'Technical Reference',
+    content: `# Database Tables
+
+## Tickets & Projects
+| Table | Purpose |
+|-------|---------|
+| tickets | Project tracker tickets |
+| project_users | User accounts and roles |
+| ticket_activity | Audit log of ticket actions |
+| ticket_reviews | Review/approval feedback trail |
+| ticket_attachments | Files attached to tickets |
+
+## Forms
+| Table | Purpose |
+|-------|---------|
+| sample_requests | Stone sample order requests |
+| enquiries | General enquiry form submissions |
+| warranty_activations | Warranty activation submissions |
+| contact_submissions | Contact form messages |
+| partner_enquiries | Trade/partner enquiries |
+| newsletter_subscribers | Email newsletter signups |
+| form_activity_log | Audit log of form actions |
+| form_submissions | Legacy archive (all old submissions) |
+
+## Time Tracking
+| Table | Purpose |
+|-------|---------|
+| time_entries | Hours logged per user per ticket |
+| time_alerts | Record of sent hour-cap alerts |
+| user_time_settings | Monthly caps and thresholds |
+
+## Other
+| Table | Purpose |
+|-------|---------|
+| knowledge_articles | This knowledge base |
+`
+  },
+  {
+    slug: 'troubleshooting',
+    title: 'Troubleshooting',
+    category: 'Technical Reference',
+    content: `# Troubleshooting
+
+## Website changes not showing
+1. Hard refresh: Cmd+Shift+R (Mac) / Ctrl+Shift+R (Windows)
+2. Try incognito/private browsing
+3. Ask for Cloudflare cache purge
+
+## Can't log in
+1. Check you're using your @alphasurfaces.com.au email
+2. Try "Forgot Password" to reset
+3. Contact sean@cangaroo.ai
+
+## Form submissions missing
+1. Check the correct form tab (Samples, Enquiries, etc.)
+2. Check status filter — new submissions default to "New"
+3. Check Railway logs for errors
+
+## Emails not sending
+1. Verify SENDGRID_API_KEY in Railway environment variables
+2. Check SendGrid dashboard for bounces
+3. Verify Cloudflare DNS records (DKIM, SPF, DMARC)
+
+## Deployment failed
+1. Check Railway dashboard → build logs
+2. Run \`node -c filename.js\` locally to find syntax errors
+3. Check package.json for missing dependencies
+`
+  }
+];
+
 // ─── DB migration + seed ──────────────────────────────────────────────────
 async function initSchema(pool) {
   await pool.query(`
@@ -333,6 +645,187 @@ async function initSchema(pool) {
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_form_activity_submission ON form_activity(submission_id)`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_form_activity_user       ON form_activity(user_id)`);
 
+  // ── Track I: per-form-type tables ──────────────────────────────────
+  // The legacy form_submissions table still receives every submission for
+  // backwards compatibility (search, archive, audit). These typed tables
+  // give each form its own schema so columns aren't NULL-padded with
+  // raw_data overflow, and so each form can have its own status flow.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS sample_requests (
+      id              SERIAL PRIMARY KEY,
+      reference       VARCHAR(20) UNIQUE NOT NULL,
+      name            VARCHAR(255) NOT NULL,
+      email           VARCHAR(255) NOT NULL,
+      phone           VARCHAR(50),
+      company         VARCHAR(255),
+      role            VARCHAR(100),
+      stone_interest  TEXT,
+      message         TEXT,
+      street          VARCHAR(255),
+      suburb          VARCHAR(100),
+      unit            VARCHAR(50),
+      source          VARCHAR(100),
+      consent         BOOLEAN DEFAULT FALSE,
+      status          VARCHAR(20) DEFAULT 'new',
+      notes           TEXT,
+      created_at      TIMESTAMPTZ DEFAULT NOW(),
+      updated_at      TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_sr_status  ON sample_requests(status)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_sr_created ON sample_requests(created_at DESC)`);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS enquiries (
+      id              SERIAL PRIMARY KEY,
+      reference       VARCHAR(20) UNIQUE NOT NULL,
+      name            VARCHAR(255) NOT NULL,
+      email           VARCHAR(255) NOT NULL,
+      phone           VARCHAR(50),
+      company         VARCHAR(255),
+      role            VARCHAR(100),
+      reason          VARCHAR(100),
+      message         TEXT NOT NULL,
+      consent         BOOLEAN DEFAULT FALSE,
+      status          VARCHAR(20) DEFAULT 'new',
+      notes           TEXT,
+      created_at      TIMESTAMPTZ DEFAULT NOW(),
+      updated_at      TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_en_status  ON enquiries(status)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_en_created ON enquiries(created_at DESC)`);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS warranty_activations (
+      id                  SERIAL PRIMARY KEY,
+      reference           VARCHAR(20) UNIQUE NOT NULL,
+      name                VARCHAR(255) NOT NULL,
+      email               VARCHAR(255) NOT NULL,
+      phone               VARCHAR(50) NOT NULL,
+      street              VARCHAR(255) NOT NULL,
+      suburb              VARCHAR(100) NOT NULL,
+      state               VARCHAR(10) NOT NULL,
+      postcode            VARCHAR(10) NOT NULL,
+      stone_name          VARCHAR(255) NOT NULL,
+      purchase_date       DATE,
+      fabricator          VARCHAR(255) NOT NULL,
+      retailer            VARCHAR(255),
+      invoice_number      VARCHAR(100),
+      installation_photos TEXT[],
+      consent             BOOLEAN DEFAULT FALSE,
+      status              VARCHAR(20) DEFAULT 'new',
+      warranty_number     VARCHAR(20),
+      approved_at         TIMESTAMPTZ,
+      approved_by         VARCHAR(100),
+      notes               TEXT,
+      created_at          TIMESTAMPTZ DEFAULT NOW(),
+      updated_at          TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_wa_status  ON warranty_activations(status)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_wa_created ON warranty_activations(created_at DESC)`);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS contact_submissions (
+      id              SERIAL PRIMARY KEY,
+      reference       VARCHAR(20) UNIQUE NOT NULL,
+      name            VARCHAR(255) NOT NULL,
+      email           VARCHAR(255) NOT NULL,
+      phone           VARCHAR(50),
+      message         TEXT NOT NULL,
+      consent         BOOLEAN DEFAULT FALSE,
+      status          VARCHAR(20) DEFAULT 'new',
+      notes           TEXT,
+      created_at      TIMESTAMPTZ DEFAULT NOW(),
+      updated_at      TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_ct_status  ON contact_submissions(status)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_ct_created ON contact_submissions(created_at DESC)`);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS partner_enquiries (
+      id              SERIAL PRIMARY KEY,
+      reference       VARCHAR(20) UNIQUE NOT NULL,
+      name            VARCHAR(255) NOT NULL,
+      email           VARCHAR(255) NOT NULL,
+      phone           VARCHAR(50),
+      company         VARCHAR(255) NOT NULL,
+      role            VARCHAR(100),
+      reason          VARCHAR(100),
+      message         TEXT,
+      consent         BOOLEAN DEFAULT FALSE,
+      status          VARCHAR(20) DEFAULT 'new',
+      notes           TEXT,
+      created_at      TIMESTAMPTZ DEFAULT NOW(),
+      updated_at      TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_pa_status  ON partner_enquiries(status)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_pa_created ON partner_enquiries(created_at DESC)`);
+
+  // Polymorphic activity log — one row covers any of the typed form tables
+  // above. The (form_type, record_id) composite index keeps the per-record
+  // history fetch cheap.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS form_activity_log (
+      id            SERIAL PRIMARY KEY,
+      form_type     VARCHAR(30) NOT NULL,
+      record_id     INTEGER NOT NULL,
+      user_id       INTEGER REFERENCES project_users(id) ON DELETE SET NULL,
+      user_name     VARCHAR(100) NOT NULL,
+      action        VARCHAR(50) NOT NULL,
+      detail        TEXT,
+      created_at    TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_fal_type_record ON form_activity_log(form_type, record_id)`);
+
+  // ── Track G: knowledge base articles ────────────────────────────────
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS knowledge_articles (
+      id          SERIAL PRIMARY KEY,
+      slug        VARCHAR(100) UNIQUE NOT NULL,
+      title       VARCHAR(255) NOT NULL,
+      category    VARCHAR(50) NOT NULL,
+      content     TEXT NOT NULL,
+      sort_order  INTEGER DEFAULT 0,
+      author      VARCHAR(100) DEFAULT 'Sean Stone',
+      updated_by  VARCHAR(100),
+      created_at  TIMESTAMPTZ DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ DEFAULT NOW(),
+      published   BOOLEAN DEFAULT TRUE
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_kb_category ON knowledge_articles(category)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_kb_slug     ON knowledge_articles(slug)`);
+
+  // ── One-time migration: copy existing form_submissions into typed tables ──
+  // Only fires when the typed tables are empty AND form_submissions has data.
+  // Idempotent guard: a redeploy after migration finds non-empty typed tables
+  // and skips. We never DROP form_submissions — it stays as the archive.
+  try {
+    const oldCountQ = await pool.query(`SELECT COUNT(*)::int AS c FROM form_submissions`);
+    const oldCount  = oldCountQ.rows[0].c;
+    if (oldCount > 0) {
+      const counts = await pool.query(`
+        SELECT
+          (SELECT COUNT(*)::int FROM sample_requests)      AS sr,
+          (SELECT COUNT(*)::int FROM enquiries)            AS en,
+          (SELECT COUNT(*)::int FROM warranty_activations) AS wa,
+          (SELECT COUNT(*)::int FROM contact_submissions)  AS ct,
+          (SELECT COUNT(*)::int FROM partner_enquiries)    AS pa
+      `);
+      const total = counts.rows[0].sr + counts.rows[0].en + counts.rows[0].wa + counts.rows[0].ct + counts.rows[0].pa;
+      if (total === 0) {
+        await migrateFormSubmissionsIntoTypedTables(pool);
+      }
+    }
+  } catch (err) {
+    console.error('[projects/migrate] form_submissions copy error:', err.message);
+  }
+
   // ── Time tracking (Track F) ────────────────────────────────────────
   await pool.query(`
     CREATE TABLE IF NOT EXISTS time_entries (
@@ -482,6 +975,22 @@ async function initSchema(pool) {
       );
     }
     console.log(`[projects] seeded ${SEED_USERS.length} users (default password: ${DEFAULT_USER_PASSWORD})`);
+  }
+
+  // Seed knowledge-base articles — only when the table is empty so manual
+  // edits via the Docs UI aren't blown away on redeploy.
+  const kb = await pool.query('SELECT COUNT(*)::int AS c FROM knowledge_articles');
+  if (kb.rows[0].c === 0 && KB_SEED.length) {
+    for (let i = 0; i < KB_SEED.length; i++) {
+      const a = KB_SEED[i];
+      await pool.query(
+        `INSERT INTO knowledge_articles (slug, title, category, content, sort_order, author, published)
+         VALUES ($1, $2, $3, $4, $5, 'Sean Stone', TRUE)
+         ON CONFLICT (slug) DO NOTHING`,
+        [a.slug, a.title, a.category, a.content, i]
+      );
+    }
+    console.log(`[projects] seeded ${KB_SEED.length} knowledge-base articles`);
   }
 }
 
@@ -635,6 +1144,256 @@ function reviewersEqual(a, b) {
   if (aa.length !== bb.length) return false;
   for (let i = 0; i < aa.length; i++) if (aa[i] !== bb[i]) return false;
   return true;
+}
+
+// ─── Track I: typed-form helpers ─────────────────────────────────────────
+//
+// FORM_TYPES describes every typed form table — the prefix powers reference
+// number generation, the route segment is the URL slug, and the legacy
+// form_type values are what server.js writes into form_submissions.form_type
+// today. Adding a new form means adding one entry here + creating the table
+// in initSchema; the CRUD route factory below picks it up automatically.
+const FORM_TYPES = {
+  sample:   { table: 'sample_requests',      prefix: 'SR', route: 'samples',   legacy: ['Sample Request'],
+              statuses: ['new', 'processing', 'shipped', 'completed', 'archived'] },
+  enquiry:  { table: 'enquiries',            prefix: 'EN', route: 'enquiries', legacy: ['Enquiry'],
+              statuses: ['new', 'read', 'responded', 'closed', 'archived'] },
+  warranty: { table: 'warranty_activations', prefix: 'WA', route: 'warranty',  legacy: ['Warranty Activation'],
+              statuses: ['new', 'under_review', 'approved', 'rejected', 'archived'] },
+  contact:  { table: 'contact_submissions',  prefix: 'CT', route: 'contacts',  legacy: ['Contact'],
+              statuses: ['new', 'read', 'responded', 'closed', 'archived'] },
+  partner:  { table: 'partner_enquiries',    prefix: 'PA', route: 'partners',  legacy: ['Partner', 'Trade'],
+              statuses: ['new', 'read', 'meeting_scheduled', 'approved', 'declined', 'archived'] }
+};
+
+// Generate the next reference number for a typed form table. Uses a
+// transactional row count to keep the sequence dense + 1-based; SR-0001,
+// SR-0002, … Concurrency note: in the unlikely case two inserts race on
+// the same count we'll get a UNIQUE collision on the reference column —
+// the caller catches the 23505 and retries with the next count. That race
+// is exceedingly rare for the volumes Alpha Surfaces sees.
+async function nextRef(pool, table, prefix) {
+  const { rows } = await pool.query(`SELECT COUNT(*)::int AS c FROM ${table}`);
+  const n = rows[0].c + 1;
+  return `${prefix}-${String(n).padStart(4, '0')}`;
+}
+
+async function logTypedFormActivity(pool, formType, recordId, user, action, detail) {
+  try {
+    await pool.query(
+      `INSERT INTO form_activity_log (form_type, record_id, user_id, user_name, action, detail)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [formType, recordId, (user && user.userId) || null, (user && user.name) || 'System', action, detail || null]
+    );
+  } catch (err) {
+    console.error('[projects/forms-typed] activity log error:', err.message);
+  }
+}
+
+// Insert a public form submission into the matching typed table. Called
+// from server.js handleForm right after the legacy form_submissions write,
+// so a single submit lands in BOTH places (typed table for the new UI,
+// legacy table for archive/search). Returns { reference, id, table } on
+// success, or null if the formType isn't one we have a typed table for.
+async function insertTypedSubmission(pool, legacyFormType, fields, sampleItems = []) {
+  const typeKey = (() => {
+    // Contact Enquiry is shared between the public contact form and the
+    // partner/trade form — store_location distinguishes them.
+    if (legacyFormType === 'Contact Enquiry') {
+      const loc = fields && (fields.store_location || fields.company);
+      return (loc && String(loc).trim()) ? 'partner' : 'contact';
+    }
+    for (const k of Object.keys(FORM_TYPES)) {
+      if (FORM_TYPES[k].legacy.includes(legacyFormType)) return k;
+    }
+    return null;
+  })();
+  if (!typeKey) return null;
+  const cfg = FORM_TYPES[typeKey];
+  const consent = !!fields.consent;
+  const name = fields.name
+    || `${fields.first_name || ''} ${fields.last_name || ''}`.trim()
+    || null;
+  // Stone interest can come either as a free-text field or as a chosen
+  // sampleItems list (sample-request page builds the list from picks).
+  const stoneInterest = fields.stone_interest
+    || (Array.isArray(sampleItems) && sampleItems.length
+      ? sampleItems.map(s => s.name || s.slug).filter(Boolean).join(', ')
+      : null);
+  // Wrap insert in a tiny retry to absorb the rare nextRef race when two
+  // submissions land in the same millisecond.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const ref = await nextRef(pool, cfg.table, cfg.prefix);
+      let result;
+      if (typeKey === 'sample') {
+        result = await pool.query(
+          `INSERT INTO sample_requests
+             (reference, name, email, phone, company, role, stone_interest, message,
+              street, suburb, unit, source, consent)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+           RETURNING id, reference`,
+          [ref, name, fields.email, fields.phone, fields.company,
+           fields.i_am_a || fields.role || fields.type || null,
+           stoneInterest, fields.message || fields.special_instructions || null,
+           fields.street, fields.suburb, fields.unit, fields.source, consent]
+        );
+      } else if (typeKey === 'enquiry') {
+        const message = fields.message || fields.special_instructions || '';
+        if (!message) return null; // enquiry table requires non-null message
+        result = await pool.query(
+          `INSERT INTO enquiries
+             (reference, name, email, phone, company, role, reason, message, consent)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+           RETURNING id, reference`,
+          [ref, name, fields.email, fields.phone, fields.company,
+           fields.i_am_a || fields.role || null,
+           fields.reason || fields.enquiry_reason || null,
+           message, consent]
+        );
+      } else if (typeKey === 'warranty') {
+        const purchase = fields.purchase_date && /^\d{4}-\d{2}-\d{2}/.test(String(fields.purchase_date))
+          ? fields.purchase_date : null;
+        result = await pool.query(
+          `INSERT INTO warranty_activations
+             (reference, name, email, phone, street, suburb, state, postcode,
+              stone_name, purchase_date, fabricator, retailer, invoice_number,
+              installation_photos, consent)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+           RETURNING id, reference`,
+          [ref, name, fields.email, fields.phone || '',
+           fields.street || '', fields.suburb || '', fields.state || '', fields.postcode || '',
+           fields.stone_name || fields.stone_interest || '',
+           purchase, fields.fabricator || '', fields.retailer || null, fields.invoice_number || null,
+           Array.isArray(fields.installation_photos) ? fields.installation_photos : [],
+           consent]
+        );
+      } else if (typeKey === 'contact') {
+        const message = fields.message || '';
+        if (!message) return null;
+        result = await pool.query(
+          `INSERT INTO contact_submissions
+             (reference, name, email, phone, message, consent)
+           VALUES ($1,$2,$3,$4,$5,$6)
+           RETURNING id, reference`,
+          [ref, name, fields.email, fields.phone, message, consent]
+        );
+      } else if (typeKey === 'partner') {
+        result = await pool.query(
+          `INSERT INTO partner_enquiries
+             (reference, name, email, phone, company, role, reason, message, consent)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+           RETURNING id, reference`,
+          [ref, name, fields.email, fields.phone,
+           fields.company || fields.store_location || '',
+           fields.i_am_a || fields.role || null,
+           fields.reason || null,
+           fields.message || null,
+           consent]
+        );
+      } else {
+        return null;
+      }
+      return { table: cfg.table, id: result.rows[0].id, reference: result.rows[0].reference, type: typeKey };
+    } catch (err) {
+      if (err.code === '23505') continue; // reference collision — retry
+      console.error(`[projects/${typeKey}] typed insert error:`, err.message);
+      return null;
+    }
+  }
+  return null;
+}
+
+// One-time copy from form_submissions into the typed tables. Routes by
+// form_type column; raw_data JSONB picks up fields that never made it into
+// dedicated columns (warranty extras, partner reason). Newsletter rows live
+// in their own table already (see db.js) so they're not part of this sweep.
+async function migrateFormSubmissionsIntoTypedTables(pool) {
+  console.log('[projects/migrate] starting form_submissions → typed-tables copy');
+  const { rows } = await pool.query(`SELECT * FROM form_submissions ORDER BY id ASC`);
+  let counts = { sample: 0, enquiry: 0, warranty: 0, contact: 0, partner: 0, skipped: 0 };
+  for (const s of rows) {
+    const ft = String(s.form_type || '');
+    const rd = (s.raw_data && typeof s.raw_data === 'object') ? s.raw_data : {};
+    const consent = !!s.consent;
+    try {
+      if (ft === 'Sample Request') {
+        const ref = await nextRef(pool, 'sample_requests', 'SR');
+        await pool.query(
+          `INSERT INTO sample_requests
+             (reference, name, email, phone, company, role, stone_interest, message,
+              street, suburb, unit, source, consent, status, created_at, updated_at)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$15)`,
+          [ref, s.name, s.email, s.phone, s.company, s.role, s.stone_interest, s.message,
+           s.street, s.suburb, s.unit, s.source, consent, s.status || 'new', s.submitted_at]
+        );
+        counts.sample++;
+      } else if (ft === 'Enquiry') {
+        if (!s.message) { counts.skipped++; continue; }
+        const ref = await nextRef(pool, 'enquiries', 'EN');
+        await pool.query(
+          `INSERT INTO enquiries
+             (reference, name, email, phone, company, role, reason, message,
+              consent, status, created_at, updated_at)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$11)`,
+          [ref, s.name, s.email, s.phone, s.company, s.role, s.reason, s.message,
+           consent, s.status || 'new', s.submitted_at]
+        );
+        counts.enquiry++;
+      } else if (ft === 'Warranty Activation') {
+        const ref = await nextRef(pool, 'warranty_activations', 'WA');
+        const purchase = rd.purchase_date || null;
+        await pool.query(
+          `INSERT INTO warranty_activations
+             (reference, name, email, phone, street, suburb, state, postcode,
+              stone_name, purchase_date, fabricator, retailer, invoice_number,
+              installation_photos, consent, status, created_at, updated_at)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$17)`,
+          [ref, s.name, s.email, s.phone || rd.phone || '',
+           s.street || rd.street || '', s.suburb || rd.suburb || '',
+           s.state || rd.state || '', s.postcode || rd.postcode || '',
+           s.stone_interest || rd.stone_interest || rd.stone_name || '',
+           purchase && /^\d{4}-\d{2}-\d{2}/.test(String(purchase)) ? purchase : null,
+           rd.fabricator || '', rd.retailer || null, rd.invoice_number || null,
+           Array.isArray(rd.installation_photos) ? rd.installation_photos : [],
+           consent, s.status || 'new', s.submitted_at]
+        );
+        counts.warranty++;
+      } else if (ft === 'Contact Enquiry') {
+        // Track I splits the legacy "Contact Enquiry" by store_location:
+        // partner enquiries always carry one (showroom/trade contact form);
+        // pure contact form submissions don't.
+        const isPartner = !!(s.store_location && String(s.store_location).trim());
+        if (!s.message) { counts.skipped++; continue; }
+        if (isPartner) {
+          const ref = await nextRef(pool, 'partner_enquiries', 'PA');
+          await pool.query(
+            `INSERT INTO partner_enquiries
+               (reference, name, email, phone, company, role, reason, message,
+                consent, status, created_at, updated_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$11)`,
+            [ref, s.name, s.email, s.phone, s.company || s.store_location, s.role, s.reason, s.message,
+             consent, s.status || 'new', s.submitted_at]
+          );
+          counts.partner++;
+        } else {
+          const ref = await nextRef(pool, 'contact_submissions', 'CT');
+          await pool.query(
+            `INSERT INTO contact_submissions
+               (reference, name, email, phone, message, consent, status, created_at, updated_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$8)`,
+            [ref, s.name, s.email, s.phone, s.message, consent, s.status || 'new', s.submitted_at]
+          );
+          counts.contact++;
+        }
+      } else {
+        counts.skipped++;
+      }
+    } catch (err) {
+      console.error('[projects/migrate] row', s.id, 'error:', err.message);
+    }
+  }
+  console.log('[projects/migrate] done:', JSON.stringify(counts));
 }
 
 // ─── Module factory ───────────────────────────────────────────────────────
@@ -1280,6 +2039,428 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       res.json({ ok: true, status });
     } catch (err) {
       console.error('[projects/forms] patch error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // ── Track I: typed form CRUD (per-form-type endpoints) ─────────────
+  //
+  // Each form type gets list / stats / detail / patch / export under its own
+  // route segment, all gated by requireFormsAccess (super_admin + operator).
+  // The factory keeps the per-form code DRY — only column lists and the few
+  // type-specific bits diverge.
+  function mountTypedFormRoutes(typeKey) {
+    const cfg = FORM_TYPES[typeKey];
+    const { table, route, statuses } = cfg;
+    const path = '/' + route;
+
+    // List with filters: status, search (name/email/reference/message),
+    // date range (from/to ISO dates). Returns rows + totals + status counts.
+    router.get(path, requireFormsAccess, async (req, res) => {
+      try {
+        const limit  = Math.min(parseInt(req.query.limit  || '100', 10) || 100, 500);
+        const offset = Math.max(parseInt(req.query.offset || '0',   10) || 0,   0);
+        const where = [];
+        const vals  = [];
+        if (req.query.status) {
+          vals.push(req.query.status);
+          where.push(`status = $${vals.length}`);
+        }
+        if (req.query.from) {
+          vals.push(req.query.from);
+          where.push(`created_at >= $${vals.length}::date`);
+        }
+        if (req.query.to) {
+          vals.push(req.query.to);
+          where.push(`created_at < ($${vals.length}::date + INTERVAL '1 day')`);
+        }
+        if (req.query.q) {
+          vals.push('%' + req.query.q + '%');
+          const i = vals.length;
+          // Build a search clause from whichever text-bearing columns this
+          // table actually has — name/email/reference are universal; the
+          // rest are conditionally added based on FORM_TYPES.
+          const cols = ['name', 'email', 'reference'];
+          if (typeKey === 'sample' || typeKey === 'enquiry' || typeKey === 'partner') cols.push('company');
+          if (typeKey === 'enquiry' || typeKey === 'partner' || typeKey === 'contact') cols.push('message');
+          if (typeKey === 'sample') cols.push('stone_interest');
+          if (typeKey === 'warranty') cols.push('stone_name', 'fabricator', 'suburb');
+          where.push('(' + cols.map(c => `${c} ILIKE $${i}`).join(' OR ') + ')');
+        }
+        const whereSql = where.length ? ' WHERE ' + where.join(' AND ') : '';
+        const { rows } = await pool.query(
+          `SELECT * FROM ${table}${whereSql}
+            ORDER BY created_at DESC, id DESC
+            LIMIT $${vals.length + 1} OFFSET $${vals.length + 2}`,
+          [...vals, limit, offset]
+        );
+        const totalQ  = await pool.query(`SELECT COUNT(*)::int AS c FROM ${table}${whereSql}`, vals);
+        const statusQ = await pool.query(`SELECT status, COUNT(*)::int AS c FROM ${table} GROUP BY status`);
+        const counts = { new: 0, total: 0 };
+        statusQ.rows.forEach(r => { counts[r.status] = r.c; counts.total += r.c; });
+        res.json({ ok: true, rows, total: totalQ.rows[0].c, counts, statuses });
+      } catch (err) {
+        console.error(`[projects/${typeKey}] list error:`, err.message);
+        res.status(500).json({ ok: false, error: err.message });
+      }
+    });
+
+    // Cheap counts endpoint for the nav-dropdown badges. Kept separate from
+    // the list endpoint so the dropdown can refresh without the full payload.
+    router.get(path + '/stats', requireFormsAccess, async (req, res) => {
+      try {
+        const statusQ = await pool.query(`SELECT status, COUNT(*)::int AS c FROM ${table} GROUP BY status`);
+        const weekQ = await pool.query(
+          `SELECT COUNT(*)::int AS c FROM ${table} WHERE created_at >= NOW() - INTERVAL '7 days'`
+        );
+        const monthQ = await pool.query(
+          `SELECT COUNT(*)::int AS c FROM ${table} WHERE created_at >= NOW() - INTERVAL '30 days'`
+        );
+        const by_status = {};
+        let total = 0;
+        statusQ.rows.forEach(r => { by_status[r.status] = r.c; total += r.c; });
+        res.json({
+          ok: true,
+          total,
+          by_status,
+          new: by_status.new || 0,
+          this_week: weekQ.rows[0].c,
+          this_month: monthQ.rows[0].c
+        });
+      } catch (err) {
+        res.status(500).json({ ok: false, error: err.message });
+      }
+    });
+
+    // Export must come before /:id so Express doesn't match "export" as the id.
+    router.get(path + '/export', requireFormsAccess, async (req, res) => {
+      try {
+        const where = [];
+        const vals = [];
+        if (req.query.status) { vals.push(req.query.status); where.push(`status = $${vals.length}`); }
+        if (req.query.from)   { vals.push(req.query.from);   where.push(`created_at >= $${vals.length}::date`); }
+        if (req.query.to)     { vals.push(req.query.to);     where.push(`created_at < ($${vals.length}::date + INTERVAL '1 day')`); }
+        const whereSql = where.length ? ' WHERE ' + where.join(' AND ') : '';
+        const { rows } = await pool.query(
+          `SELECT * FROM ${table}${whereSql} ORDER BY created_at ASC`, vals
+        );
+        // Use the first row's column list as the header — falls back to a
+        // hand-picked subset when the table is empty.
+        const cols = rows.length ? Object.keys(rows[0]) : ['reference','name','email','status','created_at'];
+        const escapeCSV = v => {
+          if (v == null) return '';
+          if (Array.isArray(v)) return '"' + v.map(x => String(x).replace(/"/g, '""')).join(' | ') + '"';
+          const s = v instanceof Date ? v.toISOString() : (typeof v === 'object' ? JSON.stringify(v) : String(v));
+          return (s.includes(',') || s.includes('"') || s.includes('\n'))
+            ? `"${s.replace(/"/g, '""')}"` : s;
+        };
+        const csv = [
+          cols.join(','),
+          ...rows.map(r => cols.map(c => escapeCSV(r[c])).join(','))
+        ].join('\n');
+        await logTypedFormActivity(pool, typeKey, 0, req.user, 'export', `Exported ${rows.length} rows`);
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="${route}-${Date.now()}.csv"`);
+        res.send(csv);
+      } catch (err) {
+        console.error(`[projects/${typeKey}] export error:`, err.message);
+        res.status(500).json({ ok: false, error: err.message });
+      }
+    });
+
+    // Activity feed — separate endpoint so the detail drawer can fetch it lazily.
+    router.get(path + '/:id/activity', requireFormsAccess, async (req, res) => {
+      try {
+        const id = parseInt(req.params.id, 10);
+        if (!id) return res.status(400).json({ ok: false, error: 'Invalid id' });
+        const { rows } = await pool.query(
+          `SELECT id, user_id, user_name, action, detail, created_at
+             FROM form_activity_log
+            WHERE form_type = $1 AND record_id = $2
+            ORDER BY created_at DESC, id DESC`,
+          [typeKey, id]
+        );
+        res.json({ ok: true, activity: rows });
+      } catch (err) {
+        res.status(500).json({ ok: false, error: err.message });
+      }
+    });
+
+    router.get(path + '/:id', requireFormsAccess, async (req, res) => {
+      try {
+        const id = parseInt(req.params.id, 10);
+        if (!id) return res.status(400).json({ ok: false, error: 'Invalid id' });
+        const { rows } = await pool.query(`SELECT * FROM ${table} WHERE id = $1`, [id]);
+        if (!rows.length) return res.status(404).json({ ok: false, error: 'Not found' });
+        res.json({ ok: true, record: rows[0] });
+      } catch (err) {
+        res.status(500).json({ ok: false, error: err.message });
+      }
+    });
+
+    // Patch handles status + notes. Warranty has the additional side-effect
+    // of stamping warranty_number / approved_at / approved_by when status
+    // moves to 'approved'. The check is gated to first-time approval so a
+    // demote-then-reapprove keeps the original warranty number.
+    router.patch(path + '/:id', requireFormsAccess, async (req, res) => {
+      try {
+        const id = parseInt(req.params.id, 10);
+        if (!id) return res.status(400).json({ ok: false, error: 'Invalid id' });
+        const b = req.body || {};
+        const sets = [];
+        const vals = [];
+        const before = await pool.query(`SELECT * FROM ${table} WHERE id = $1`, [id]);
+        if (!before.rows.length) return res.status(404).json({ ok: false, error: 'Not found' });
+        const oldRow = before.rows[0];
+        const changes = [];
+
+        if (Object.prototype.hasOwnProperty.call(b, 'status')) {
+          if (!statuses.includes(b.status)) {
+            return res.status(400).json({ ok: false, error: `status must be one of ${statuses.join(', ')}` });
+          }
+          if (b.status !== oldRow.status) {
+            vals.push(b.status); sets.push(`status = $${vals.length}`);
+            changes.push({ field: 'status', from: oldRow.status, to: b.status });
+            // Warranty: auto-assign warranty number on first approval.
+            if (typeKey === 'warranty' && b.status === 'approved' && !oldRow.warranty_number) {
+              const yr = new Date().getFullYear();
+              const seqQ = await pool.query(
+                `SELECT COUNT(*)::int AS c FROM warranty_activations
+                  WHERE warranty_number LIKE $1`,
+                [`AW-${yr}-%`]
+              );
+              const num = `AW-${yr}-${String(seqQ.rows[0].c + 1).padStart(4, '0')}`;
+              vals.push(num); sets.push(`warranty_number = $${vals.length}`);
+              sets.push(`approved_at = NOW()`);
+              vals.push(req.user.name || 'Unknown');
+              sets.push(`approved_by = $${vals.length}`);
+              changes.push({ field: 'warranty_number', from: null, to: num });
+            }
+          }
+        }
+        if (Object.prototype.hasOwnProperty.call(b, 'notes')) {
+          const notes = b.notes == null ? null : String(b.notes);
+          if (notes !== oldRow.notes) {
+            vals.push(notes); sets.push(`notes = $${vals.length}`);
+            changes.push({ field: 'notes', from: oldRow.notes, to: notes });
+          }
+        }
+        if (!sets.length) return res.json({ ok: true, record: oldRow, unchanged: true });
+        sets.push(`updated_at = NOW()`);
+        vals.push(id);
+        const { rows } = await pool.query(
+          `UPDATE ${table} SET ${sets.join(', ')} WHERE id = $${vals.length} RETURNING *`,
+          vals
+        );
+        for (const c of changes) {
+          if (c.field === 'status') {
+            await logTypedFormActivity(pool, typeKey, id, req.user, 'status_changed',
+              `Status: ${c.from || '—'} → ${c.to}`);
+          } else if (c.field === 'notes') {
+            await logTypedFormActivity(pool, typeKey, id, req.user, 'notes_updated', 'Updated notes');
+          } else if (c.field === 'warranty_number') {
+            await logTypedFormActivity(pool, typeKey, id, req.user, 'warranty_assigned',
+              `Assigned warranty number ${c.to}`);
+          }
+        }
+        res.json({ ok: true, record: rows[0] });
+      } catch (err) {
+        console.error(`[projects/${typeKey}] patch error:`, err.message);
+        res.status(500).json({ ok: false, error: err.message });
+      }
+    });
+  }
+
+  // Mount routes for every typed form. Newsletter sits separately because
+  // its table predates Track I (see db.js) and the schema diverges.
+  Object.keys(FORM_TYPES).forEach(mountTypedFormRoutes);
+
+  // Aggregated counts across all typed-form tables — powers the nav dropdown
+  // badges on the Forms ▾ menu. One query per table, run in parallel.
+  router.get('/forms-counts', requireFormsAccess, async (req, res) => {
+    try {
+      const entries = await Promise.all(Object.keys(FORM_TYPES).map(async (key) => {
+        const { table } = FORM_TYPES[key];
+        const r = await pool.query(`SELECT
+            COUNT(*) FILTER (WHERE status = 'new')::int AS new_count,
+            COUNT(*)::int AS total
+          FROM ${table}`);
+        return [key, { new: r.rows[0].new_count, total: r.rows[0].total }];
+      }));
+      // Newsletter — uses the legacy newsletter_subscribers schema.
+      const nl = await pool.query(
+        `SELECT COUNT(*) FILTER (WHERE status = 'active')::int AS active,
+                COUNT(*)::int AS total FROM newsletter_subscribers`
+      );
+      const counts = Object.fromEntries(entries);
+      counts.newsletter = { new: 0, total: nl.rows[0].total, active: nl.rows[0].active };
+      res.json({ ok: true, counts });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // ── Newsletter (super_admin only — separate from Track I form tables) ──
+  router.get('/newsletter', requireRole('super_admin'), async (req, res) => {
+    try {
+      const limit  = Math.min(parseInt(req.query.limit  || '500', 10) || 500, 5000);
+      const offset = Math.max(parseInt(req.query.offset || '0',   10) || 0,   0);
+      const where  = [];
+      const vals   = [];
+      if (req.query.status) { vals.push(req.query.status); where.push(`status = $${vals.length}`); }
+      if (req.query.q) {
+        vals.push('%' + req.query.q + '%'); const i = vals.length;
+        where.push(`(email ILIKE $${i})`);
+      }
+      const whereSql = where.length ? ' WHERE ' + where.join(' AND ') : '';
+      const { rows } = await pool.query(
+        `SELECT id, email, consent_timestamp_utc AS subscribed_at,
+                unsubscribed_timestamp_utc AS unsubscribed_at,
+                unsubscribe_method, source_url, status
+           FROM newsletter_subscribers${whereSql}
+          ORDER BY consent_timestamp_utc DESC
+          LIMIT $${vals.length + 1} OFFSET $${vals.length + 2}`,
+        [...vals, limit, offset]
+      );
+      const totalQ = await pool.query(`SELECT COUNT(*)::int AS c FROM newsletter_subscribers${whereSql}`, vals);
+      res.json({ ok: true, rows, total: totalQ.rows[0].c });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.get('/newsletter/export', requireRole('super_admin'), async (req, res) => {
+    try {
+      const { rows } = await pool.query(
+        `SELECT email, consent_timestamp_utc AS subscribed_at, status, source_url
+           FROM newsletter_subscribers WHERE status = 'active'
+          ORDER BY consent_timestamp_utc ASC`
+      );
+      const escapeCSV = v => v == null ? '' : (String(v).includes(',') ? `"${String(v).replace(/"/g, '""')}"` : String(v));
+      const csv = ['email,subscribed_at,status,source',
+        ...rows.map(r => [r.email, r.subscribed_at, r.status, r.source_url].map(escapeCSV).join(','))
+      ].join('\n');
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="newsletter-${Date.now()}.csv"`);
+      res.send(csv);
+    } catch (err) {
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // ── Track G: knowledge base ────────────────────────────────────────
+  router.get('/kb', async (req, res) => {
+    try {
+      const { rows } = await pool.query(
+        `SELECT slug, title, category, sort_order, updated_at, published
+           FROM knowledge_articles
+          WHERE published = TRUE
+          ORDER BY category ASC, sort_order ASC, title ASC`
+      );
+      res.json({ ok: true, articles: rows });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.get('/kb/search', async (req, res) => {
+    try {
+      const q = String(req.query.q || '').trim();
+      if (!q) return res.json({ ok: true, results: [] });
+      const { rows } = await pool.query(
+        `SELECT slug, title, category,
+                LEFT(content, 200) AS preview
+           FROM knowledge_articles
+          WHERE published = TRUE
+            AND (title ILIKE $1 OR content ILIKE $1)
+          ORDER BY category, title
+          LIMIT 50`,
+        ['%' + q + '%']
+      );
+      res.json({ ok: true, results: rows });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.get('/kb/:slug', async (req, res) => {
+    try {
+      const { rows } = await pool.query(
+        `SELECT * FROM knowledge_articles WHERE slug = $1`,
+        [String(req.params.slug)]
+      );
+      if (!rows.length) return res.status(404).json({ ok: false, error: 'Not found' });
+      res.json({ ok: true, article: rows[0] });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.post('/kb', requireRole('super_admin'), async (req, res) => {
+    try {
+      const b = req.body || {};
+      const slug     = String(b.slug || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/^-+|-+$/g, '');
+      const title    = String(b.title || '').trim();
+      const category = String(b.category || '').trim();
+      const content  = String(b.content || '').trim();
+      const sort     = parseInt(b.sort_order, 10) || 0;
+      const published = b.published == null ? true : !!b.published;
+      if (!slug || !title || !category || !content) {
+        return res.status(400).json({ ok: false, error: 'slug, title, category and content are required.' });
+      }
+      const { rows } = await pool.query(
+        `INSERT INTO knowledge_articles (slug, title, category, content, sort_order, author, published)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+        [slug, title, category, content, sort, req.user.name || 'Unknown', published]
+      );
+      res.json({ ok: true, article: rows[0] });
+    } catch (err) {
+      if (err.code === '23505') return res.status(409).json({ ok: false, error: 'Slug already exists.' });
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.patch('/kb/:slug', requireRole('super_admin'), async (req, res) => {
+    try {
+      const slug = String(req.params.slug);
+      const b = req.body || {};
+      const sets = [];
+      const vals = [];
+      ['title', 'category', 'content'].forEach(f => {
+        if (Object.prototype.hasOwnProperty.call(b, f)) {
+          vals.push(String(b[f] || '')); sets.push(`${f} = $${vals.length}`);
+        }
+      });
+      if (Object.prototype.hasOwnProperty.call(b, 'sort_order')) {
+        vals.push(parseInt(b.sort_order, 10) || 0); sets.push(`sort_order = $${vals.length}`);
+      }
+      if (Object.prototype.hasOwnProperty.call(b, 'published')) {
+        vals.push(!!b.published); sets.push(`published = $${vals.length}`);
+      }
+      if (!sets.length) return res.status(400).json({ ok: false, error: 'No updatable fields supplied.' });
+      vals.push(req.user.name || 'Unknown'); sets.push(`updated_by = $${vals.length}`);
+      sets.push(`updated_at = NOW()`);
+      vals.push(slug);
+      const { rows } = await pool.query(
+        `UPDATE knowledge_articles SET ${sets.join(', ')} WHERE slug = $${vals.length} RETURNING *`,
+        vals
+      );
+      if (!rows.length) return res.status(404).json({ ok: false, error: 'Not found' });
+      res.json({ ok: true, article: rows[0] });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.delete('/kb/:slug', requireRole('super_admin'), async (req, res) => {
+    try {
+      const { rowCount } = await pool.query(
+        `DELETE FROM knowledge_articles WHERE slug = $1`,
+        [String(req.params.slug)]
+      );
+      if (!rowCount) return res.status(404).json({ ok: false, error: 'Not found' });
+      res.json({ ok: true });
+    } catch (err) {
       res.status(500).json({ ok: false, error: err.message });
     }
   });
@@ -2744,3 +3925,8 @@ module.exports.ALLOWED_STATUSES   = ALLOWED_STATUSES;
 module.exports.ALLOWED_PRIORITIES = ALLOWED_PRIORITIES;
 module.exports.ALLOWED_CATEGORIES = ALLOWED_CATEGORIES;
 module.exports.ALLOWED_ROLES      = ALLOWED_ROLES;
+// Expose Track I helpers for server.js to call from /api/form-submit so a
+// single submission lands in BOTH form_submissions (legacy archive) and the
+// matching typed table (sample_requests/enquiries/warranty/contact/partner).
+module.exports.insertTypedSubmission = insertTypedSubmission;
+module.exports.FORM_TYPES = FORM_TYPES;

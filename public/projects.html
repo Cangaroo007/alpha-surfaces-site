@@ -177,6 +177,113 @@
   body.role-viewer .card-clock { display: none !important; }
   /* #view-time-btn visibility is driven by JS in applyUser() — super_admin only. */
 
+  /* ── Forms ▾ dropdown (Track I) ── */
+  .nav-dropdown { position: relative; display: inline-block; }
+  .nav-caret { font-size: 10px; opacity: 0.75; margin-left: 2px; }
+  .nav-dropdown-menu { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 220px; background: var(--white); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 80; padding: 4px; }
+  .nav-dropdown-menu.open { display: block; }
+  .nav-dropdown-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 9px 12px; background: transparent; border: none; color: var(--text); text-align: left; font-size: 13px; font-family: inherit; letter-spacing: normal; text-transform: none; border-radius: 4px; cursor: pointer; }
+  .nav-dropdown-item:hover { background: var(--cream-light); color: var(--olive); }
+  .nav-dropdown-item.active { background: var(--cream-light); color: var(--olive); font-weight: 700; }
+  .nav-dropdown-count { display: inline-block; min-width: 22px; padding: 1px 7px; text-align: center; font-size: 11px; font-weight: 700; color: var(--muted); background: var(--cream); border-radius: 10px; }
+  .nav-dropdown-count.has-new { background: #2563EB; color: #fff; }
+
+  /* ── Typed form views ── */
+  .typed-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  .typed-head h2 { font-size: 18px; font-weight: 700; color: var(--text); }
+  .typed-head .meta { font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
+  .typed-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .typed-toolbar input[type=search], .typed-toolbar input[type=date], .typed-toolbar select {
+    padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: 4px; font-size: 14px;
+    font-family: inherit; outline: none; background: var(--white);
+  }
+  .typed-toolbar input[type=search] { flex: 1; min-width: 220px; }
+  .typed-toolbar input:focus, .typed-toolbar select:focus { border-color: var(--olive); }
+
+  .status-pill { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+  .status-pill.s-new                { background: #dbe6fb; color: #1d4ed8; }
+  .status-pill.s-processing         { background: #fbeee0; color: #b07020; }
+  .status-pill.s-shipped            { background: #ede0fb; color: #6d28d9; }
+  .status-pill.s-completed,
+  .status-pill.s-approved           { background: #dcefe1; color: #166534; }
+  .status-pill.s-read               { background: #e7e7ea; color: #44495a; }
+  .status-pill.s-responded          { background: #dbe6fb; color: #1d4ed8; }
+  .status-pill.s-closed             { background: var(--cream-light); color: var(--muted); }
+  .status-pill.s-under_review       { background: #fbeee0; color: #b07020; }
+  .status-pill.s-meeting_scheduled  { background: #ede0fb; color: #6d28d9; }
+  .status-pill.s-rejected,
+  .status-pill.s-declined           { background: #fdecea; color: #b91c1c; }
+  .status-pill.s-archived           { background: var(--cream-light); color: var(--muted); }
+
+  /* Warranty cards layout */
+  .warranty-grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+  @media (min-width: 1080px) { .warranty-grid { grid-template-columns: 1fr 1fr; } }
+  .warranty-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; }
+  .warranty-card:hover { border-color: var(--olive); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+  .warranty-card .wc-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+  .warranty-card .wc-ref { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; font-weight: 700; }
+  .warranty-card .wc-name { font-size: 15px; font-weight: 700; margin-top: 2px; }
+  .warranty-card .wc-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .warranty-card .wc-stone { font-size: 13.5px; color: var(--text); margin-bottom: 8px; }
+  .warranty-card .wc-stone strong { color: var(--olive); }
+  .warranty-card .wc-meta { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; }
+  .warranty-card .wc-photos { display: flex; gap: 6px; }
+  .warranty-card .wc-photos img { width: 56px; height: 56px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
+  .warranty-card .wc-no-photos { font-size: 12px; color: var(--muted); font-style: italic; }
+  .wn-row { padding: 8px 12px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 200px 80px 120px; gap: 12px; align-items: center; }
+  .wn-row:hover { background: var(--cream-light); cursor: pointer; }
+
+  /* Docs (Track G) */
+  .docs-shell { display: grid; grid-template-columns: 280px 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 900px) { .docs-shell { grid-template-columns: 1fr; } }
+  .docs-sidebar { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px; position: sticky; top: 18px; max-height: calc(100vh - 36px); overflow-y: auto; }
+  .docs-search { width: 100%; padding: 9px 11px; border: 1px solid var(--border-strong); border-radius: 4px; font-size: 13px; font-family: inherit; outline: none; margin-bottom: 12px; }
+  .docs-search:focus { border-color: var(--olive); }
+  .docs-actions { display: flex; gap: 6px; margin-bottom: 12px; }
+  .docs-actions button { flex: 1; padding: 7px 10px; border: 1px solid var(--border-strong); background: var(--white); color: var(--text); border-radius: 4px; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 600; cursor: pointer; }
+  .docs-actions button:hover { border-color: var(--olive); color: var(--olive); }
+  .docs-nav .docs-cat { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 14px 0 6px; }
+  .docs-nav .docs-cat:first-child { margin-top: 0; }
+  .docs-nav a { display: block; padding: 6px 10px; color: var(--text); text-decoration: none; font-size: 13px; border-radius: 4px; line-height: 1.35; }
+  .docs-nav a:hover { background: var(--cream-light); color: var(--olive); }
+  .docs-nav a.active { background: var(--olive); color: #fff; font-weight: 600; }
+  .docs-main { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 32px 36px; min-height: 320px; }
+  .docs-content { font-size: 15px; line-height: 1.65; color: var(--text); }
+  .docs-content h1 { font-size: 26px; font-weight: 700; color: var(--olive); margin-bottom: 18px; line-height: 1.25; }
+  .docs-content h2 { font-size: 18px; font-weight: 700; color: var(--olive); margin: 28px 0 12px; line-height: 1.3; }
+  .docs-content h3 { font-size: 15px; font-weight: 700; margin: 18px 0 8px; }
+  .docs-content p  { margin-bottom: 12px; }
+  .docs-content ul, .docs-content ol { margin: 0 0 14px 22px; }
+  .docs-content li { margin-bottom: 4px; }
+  .docs-content a { color: var(--olive); text-decoration: underline; text-underline-offset: 2px; }
+  .docs-content code { background: var(--cream-light); padding: 2px 6px; border-radius: 3px; font-family: 'SF Mono', Menlo, monospace; font-size: 13px; color: #5a3a10; }
+  .docs-content pre { background: var(--cream-light); padding: 14px 16px; border-radius: 6px; overflow-x: auto; font-size: 13px; margin: 0 0 14px; }
+  .docs-content pre code { background: transparent; padding: 0; }
+  .docs-content table { border-collapse: collapse; width: 100%; margin: 0 0 16px; font-size: 13.5px; }
+  .docs-content th, .docs-content td { padding: 9px 12px; border: 1px solid var(--border); text-align: left; }
+  .docs-content th { background: var(--cream-light); font-weight: 700; color: var(--olive); }
+  .docs-content blockquote { margin: 0 0 14px; padding: 8px 14px; border-left: 3px solid var(--olive); background: var(--cream-light); color: var(--text); }
+  .docs-content img { max-width: 100%; border-radius: 4px; }
+  .docs-meta-bar { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 1px solid var(--border); margin-bottom: 22px; gap: 12px; flex-wrap: wrap; }
+  .docs-meta-bar .docs-meta { font-size: 12px; color: var(--muted); }
+  .docs-meta-bar button { padding: 7px 14px; border: 1px solid var(--border-strong); background: var(--white); color: var(--text); border-radius: 4px; font-size: 12px; cursor: pointer; }
+  .docs-meta-bar button:hover { border-color: var(--olive); color: var(--olive); }
+  .docs-edit-pane { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; height: calc(100vh - 220px); min-height: 420px; }
+  @media (max-width: 1100px) { .docs-edit-pane { grid-template-columns: 1fr; height: auto; } }
+  .docs-edit-pane textarea { width: 100%; height: 100%; min-height: 360px; padding: 14px 16px; border: 1px solid var(--border-strong); border-radius: 6px; font-family: 'SF Mono', Menlo, monospace; font-size: 13px; line-height: 1.5; resize: vertical; outline: none; }
+  .docs-edit-pane textarea:focus { border-color: var(--olive); }
+  .docs-edit-fields { display: grid; gap: 8px; margin-bottom: 12px; grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .docs-edit-fields input { padding: 8px 10px; border: 1px solid var(--border-strong); border-radius: 4px; font-size: 13px; font-family: inherit; outline: none; }
+  @media (max-width: 720px) { .docs-edit-fields { grid-template-columns: 1fr; } }
+  .docs-edit-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .docs-edit-actions button { padding: 9px 18px; border-radius: 4px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; border: 1px solid var(--border-strong); background: var(--white); cursor: pointer; }
+  .docs-edit-actions button.primary { background: var(--olive); color: #fff; border-color: var(--olive); }
+  .docs-edit-actions button.danger  { color: #b3261e; border-color: rgba(179,38,30,0.4); margin-left: auto; }
+  .docs-search-results { margin-top: 6px; max-height: 50vh; overflow-y: auto; }
+  .docs-search-result { display: block; padding: 8px 10px; border-radius: 4px; font-size: 12.5px; color: var(--text); text-decoration: none; line-height: 1.4; cursor: pointer; }
+  .docs-search-result:hover { background: var(--cream-light); }
+  .docs-search-result strong { display: block; color: var(--olive); margin-bottom: 2px; }
+
   /* ── Track E: consultant timesheet ── */
   .timesheet-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 24px 28px; margin-bottom: 20px; }
   .timesheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -582,11 +689,25 @@
           <button id="view-list"  class="nav-btn"        type="button" role="tab">List</button>
         </div>
         <span class="nav-divider" aria-hidden="true"></span>
-        <button id="view-forms-btn" class="nav-standalone" type="button">
-          <span class="nav-icon" aria-hidden="true">📨</span><span class="nav-label">Forms</span>
-        </button>
+        <div class="nav-dropdown" id="forms-dropdown">
+          <button id="view-forms-btn" class="nav-standalone" type="button" aria-haspopup="menu" aria-expanded="false">
+            <span class="nav-icon" aria-hidden="true">📨</span><span class="nav-label">Forms</span>
+            <span class="nav-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="nav-dropdown-menu" id="forms-dropdown-menu" role="menu" aria-hidden="true">
+            <button type="button" class="nav-dropdown-item" data-form-type="samples"   role="menuitem">Samples<span class="nav-dropdown-count" data-count="samples">0</span></button>
+            <button type="button" class="nav-dropdown-item" data-form-type="enquiries" role="menuitem">Enquiries<span class="nav-dropdown-count" data-count="enquiries">0</span></button>
+            <button type="button" class="nav-dropdown-item" data-form-type="warranty"  role="menuitem">Warranty<span class="nav-dropdown-count" data-count="warranty">0</span></button>
+            <button type="button" class="nav-dropdown-item" data-form-type="contacts"  role="menuitem">Contacts<span class="nav-dropdown-count" data-count="contacts">0</span></button>
+            <button type="button" class="nav-dropdown-item" data-form-type="partners"  role="menuitem">Partners<span class="nav-dropdown-count" data-count="partners">0</span></button>
+            <button type="button" class="nav-dropdown-item nav-dropdown-item--super" data-form-type="newsletter" role="menuitem" id="forms-newsletter-item">Newsletter</button>
+          </div>
+        </div>
         <button id="view-time-btn"  class="nav-standalone" type="button">
           <span class="nav-icon" aria-hidden="true">⏱</span><span class="nav-label">Time</span>
+        </button>
+        <button id="view-docs-btn"  class="nav-standalone" type="button">
+          <span class="nav-icon" aria-hidden="true">📖</span><span class="nav-label">Docs</span>
         </button>
       </div>
       <button id="btn-export" type="button">↓ Export CSV</button>
@@ -652,26 +773,24 @@
       <div id="results"></div>
     </div>
 
-    <!-- Forms view -->
+    <!-- Forms view (Track I — typed per form, switched by the Forms ▾ menu) -->
     <div id="forms-view" style="display:none">
-      <div class="toolbar">
-        <input type="search" id="forms-search" placeholder="Search name, email, phone, message…">
-        <select id="forms-status">
-          <option value="">All statuses</option>
-          <option value="new">New</option>
-          <option value="read">Read</option>
-          <option value="actioned">Actioned</option>
-          <option value="archived">Archived</option>
-        </select>
-        <select id="forms-category">
-          <option value="">All types</option>
-          <option value="sample">Sample</option>
-          <option value="contact">Contact</option>
-          <option value="partner">Partner</option>
-        </select>
-        <button class="btn-export-forms" id="btn-export-forms" type="button">↓ Export All</button>
+      <div id="forms-typed-host"><div class="empty">Loading…</div></div>
+    </div>
+
+    <!-- Docs view (Track G — knowledge base) -->
+    <div id="docs-view" style="display:none">
+      <div class="docs-shell">
+        <aside class="docs-sidebar" id="docs-sidebar">
+          <input type="search" class="docs-search" id="docs-search" placeholder="Search docs…">
+          <div class="docs-actions" id="docs-admin-actions" style="display:none">
+            <button type="button" id="docs-new-btn">+ New article</button>
+            <button type="button" id="docs-print-btn">Print all</button>
+          </div>
+          <nav class="docs-nav" id="docs-nav"><div class="empty">Loading…</div></nav>
+        </aside>
+        <main class="docs-main" id="docs-main"><div class="empty">Pick an article on the left.</div></main>
       </div>
-      <div id="forms-results"></div>
     </div>
 
     <!-- Time tracking view -->
@@ -891,6 +1010,9 @@
     // The all-users picker on the time view is super_admin-only.
     var timeUserSelect = document.getElementById('time-user-select');
     if (timeUserSelect) timeUserSelect.style.display = user.role === 'super_admin' ? '' : 'none';
+    // Newsletter dropdown item — super_admin only.
+    var nlItem = document.getElementById('forms-newsletter-item');
+    if (nlItem) nlItem.style.display = user.role === 'super_admin' ? '' : 'none';
     // Body class drives the read-only CSS rules.
     document.body.classList.toggle('role-viewer', user.role === 'viewer');
   }
@@ -1396,29 +1518,91 @@
   // ── Toolbar wiring ──
   document.getElementById('view-board').addEventListener('click', function () { setView('board'); });
   document.getElementById('view-list').addEventListener('click',  function () { setView('list');  });
-  document.getElementById('view-forms-btn').addEventListener('click', function () { setView('forms'); });
+  document.getElementById('view-forms-btn').addEventListener('click', function (e) {
+    // Click on the Forms button toggles the dropdown menu. The menu items
+    // call setView('forms') with the chosen type.
+    e.stopPropagation();
+    toggleFormsDropdown();
+  });
   document.getElementById('view-time-btn').addEventListener('click',  function () { setView('time'); });
+  document.getElementById('view-docs-btn').addEventListener('click',  function () { setView('docs'); });
   function setView(v) {
     state.view = v;
     var isForms = v === 'forms';
     var isTime  = v === 'time';
-    var isTicketView = !isForms && !isTime;
+    var isDocs  = v === 'docs';
+    var isTicketView = !isForms && !isTime && !isDocs;
     document.getElementById('view-board').classList.toggle('active', v === 'board');
     document.getElementById('view-list').classList.toggle('active',  v === 'list');
     document.getElementById('view-forms-btn').classList.toggle('active', isForms);
     document.getElementById('view-time-btn').classList.toggle('active',  isTime);
+    document.getElementById('view-docs-btn').classList.toggle('active',  isDocs);
     document.getElementById('tickets-view').style.display = isTicketView ? 'block' : 'none';
     document.getElementById('forms-view').style.display   = isForms ? 'block' : 'none';
     document.getElementById('time-view').style.display    = isTime  ? 'block' : 'none';
+    document.getElementById('docs-view').style.display    = isDocs  ? 'block' : 'none';
     // Header buttons that are ticket-only.
     document.getElementById('btn-new').style.display    = isTicketView ? '' : 'none';
     document.getElementById('btn-export').style.display = isTicketView ? '' : 'none';
     // Close any open drawer when crossing view boundaries — content is
     // domain-specific and shouldn't bleed across.
     closeDrawer();
-    if (isForms)      loadForms();
+    closeFormsDropdown();
+    if (isForms)      loadTypedForm(formsState.typeKey || 'samples');
     else if (isTime)  loadTimeView();
+    else if (isDocs)  loadDocsView();
     else              loadTickets();
+  }
+
+  // Forms dropdown: open/close + count refresh + item click handlers.
+  function toggleFormsDropdown() {
+    var menu = document.getElementById('forms-dropdown-menu');
+    var btn  = document.getElementById('view-forms-btn');
+    var isOpen = menu.classList.toggle('open');
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    menu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    if (isOpen) refreshFormsCounts();
+  }
+  function closeFormsDropdown() {
+    var menu = document.getElementById('forms-dropdown-menu');
+    if (!menu) return;
+    menu.classList.remove('open');
+    document.getElementById('view-forms-btn').setAttribute('aria-expanded', 'false');
+    menu.setAttribute('aria-hidden', 'true');
+  }
+  document.addEventListener('click', function (e) {
+    var menu = document.getElementById('forms-dropdown-menu');
+    if (!menu || !menu.classList.contains('open')) return;
+    if (e.target.closest('#forms-dropdown')) return;
+    closeFormsDropdown();
+  });
+  document.querySelectorAll('#forms-dropdown-menu .nav-dropdown-item').forEach(function (item) {
+    item.addEventListener('click', function () {
+      var type = item.dataset.formType;
+      formsState.typeKey = type;
+      document.querySelectorAll('#forms-dropdown-menu .nav-dropdown-item').forEach(function (i) {
+        i.classList.toggle('active', i.dataset.formType === type);
+      });
+      closeFormsDropdown();
+      setView('forms');
+    });
+  });
+
+  async function refreshFormsCounts() {
+    try {
+      var res = await fetch('/api/projects/forms-counts', { credentials: 'include' });
+      if (!res.ok) return;
+      var data = await res.json();
+      if (!data.ok) return;
+      var typeRoute = { sample: 'samples', enquiry: 'enquiries', warranty: 'warranty', contact: 'contacts', partner: 'partners' };
+      Object.keys(typeRoute).forEach(function (k) {
+        var c = (data.counts && data.counts[k]) || { new: 0 };
+        var el = document.querySelector('[data-count="' + typeRoute[k] + '"]');
+        if (!el) return;
+        el.textContent = c.new || 0;
+        el.classList.toggle('has-new', (c.new || 0) > 0);
+      });
+    } catch (_) {}
   }
 
   document.getElementById('filter-search').addEventListener('input', function (e) {
@@ -2514,26 +2698,12 @@
     if (sa) sa.checked = all.length > 0 && checked.length === all.length;
   }
 
-  document.getElementById('forms-search').addEventListener('input', function (e) {
-    clearTimeout(formsSearchDebounce);
-    formsSearchDebounce = setTimeout(function () {
-      formsState.q = e.target.value.trim(); formsState.offset = 0; loadForms();
-    }, 250);
-  });
-  document.getElementById('forms-status').addEventListener('change', function (e) {
-    formsState.status = e.target.value; formsState.offset = 0; loadForms();
-  });
-  document.getElementById('forms-category').addEventListener('change', function (e) {
-    formsState.category = e.target.value; formsState.offset = 0; loadForms();
-  });
-  document.getElementById('btn-export-forms').addEventListener('click', function () {
-    var checked = document.querySelectorAll('.forms-row-check:checked');
-    var url = '/api/projects/forms/export';
-    if (checked.length > 0) {
-      url += '?ids=' + Array.from(checked).map(function (cb) { return cb.value; }).join(',');
-    }
-    window.location.href = url;
-  });
+  // Track I removed the global forms toolbar — the typed views render their
+  // own search/status/export controls inside #forms-typed-host. The legacy
+  // wiring below is left commented as a tombstone. The legacy openFormsDrawer
+  // / renderFormsDrawer renderers remain for the time being because
+  // /api/projects/forms still works against form_submissions; we're gradually
+  // moving everything to the typed CRUD endpoints.
 
   var FORMS_FIELD_ORDER = [
     { key: 'form_type',      label: 'Type',           format: 'type' },
@@ -2657,6 +2827,758 @@
       toast('Failed: ' + err.message);
     }
   }
+
+  // ── Track I: per-form typed views (Samples / Enquiries / Warranty /
+  // Contacts / Partners / Newsletter). Each view renders into the shared
+  // #forms-typed-host container with its own toolbar, table/cards, drawer.
+  var TYPED_FORMS = {
+    samples:    { title: 'Sample Requests',     icon: '📦', endpoint: '/api/projects/samples',     statuses: ['new','processing','shipped','completed','archived'],   layout: 'table' },
+    enquiries:  { title: 'General Enquiries',   icon: '💬', endpoint: '/api/projects/enquiries',   statuses: ['new','read','responded','closed','archived'],          layout: 'table' },
+    warranty:   { title: 'Warranty Activations',icon: '🛡️', endpoint: '/api/projects/warranty',    statuses: ['new','under_review','approved','rejected','archived'], layout: 'cards' },
+    contacts:   { title: 'Contact Submissions', icon: '✉️', endpoint: '/api/projects/contacts',    statuses: ['new','read','responded','closed','archived'],          layout: 'table' },
+    partners:   { title: 'Partner Enquiries',   icon: '🤝', endpoint: '/api/projects/partners',    statuses: ['new','read','meeting_scheduled','approved','declined','archived'], layout: 'table' },
+    newsletter: { title: 'Newsletter Subscribers', icon: '📧', endpoint: '/api/projects/newsletter', statuses: ['active','unsubscribed','pending'],                  layout: 'newsletter' }
+  };
+  var STATUS_LABELS = {
+    new: 'New', processing: 'Processing', shipped: 'Shipped', completed: 'Completed',
+    read: 'Read', responded: 'Responded', closed: 'Closed', archived: 'Archived',
+    under_review: 'Under Review', approved: 'Approved', rejected: 'Rejected',
+    meeting_scheduled: 'Meeting Scheduled', declined: 'Declined',
+    active: 'Active', unsubscribed: 'Unsubscribed', pending: 'Pending'
+  };
+  var typedFormsState = { typeKey: null, q: '', status: '', from: '', to: '' };
+  var typedSearchDebounce = null;
+
+  // Pull the type-key out of the legacy formsState namespace so existing
+  // `formsState.typeKey = ...` writes from the dropdown still work.
+  Object.defineProperty(formsState, 'typeKey', {
+    get: function () { return typedFormsState.typeKey; },
+    set: function (v) { typedFormsState.typeKey = v; }
+  });
+
+  function statusPill(s) {
+    return '<span class="status-pill s-' + escapeAttr(s) + '">' + escapeHtml(STATUS_LABELS[s] || s) + '</span>';
+  }
+
+  async function loadTypedForm(typeKey) {
+    if (!TYPED_FORMS[typeKey]) typeKey = 'samples';
+    typedFormsState.typeKey = typeKey;
+    var cfg = TYPED_FORMS[typeKey];
+    var host = document.getElementById('forms-typed-host');
+    host.innerHTML = '<div class="empty">Loading…</div>';
+    if (typeKey === 'newsletter' && state.user && state.user.role !== 'super_admin') {
+      host.innerHTML = '<div class="empty">Newsletter access is restricted to super admins.</div>';
+      return;
+    }
+    document.querySelectorAll('#forms-dropdown-menu .nav-dropdown-item').forEach(function (i) {
+      i.classList.toggle('active', i.dataset.formType === typeKey);
+    });
+    try {
+      // Build the toolbar + body in two passes so the toolbar wires up
+      // before the data fetch resolves (so search/filter clicks always work).
+      host.innerHTML = renderTypedToolbarShell(cfg) + '<div id="typed-body"><div class="empty">Loading…</div></div>';
+      wireTypedToolbar(cfg);
+
+      var params = new URLSearchParams();
+      if (typedFormsState.status) params.set('status', typedFormsState.status);
+      if (typedFormsState.q)      params.set('q', typedFormsState.q);
+      if (typedFormsState.from)   params.set('from', typedFormsState.from);
+      if (typedFormsState.to)     params.set('to', typedFormsState.to);
+      var res = await fetch(cfg.endpoint + (params.toString() ? '?' + params : ''), { credentials: 'include' });
+      if (res.status === 401) { showLogin('Session expired — please sign in again.'); return; }
+      if (res.status === 403) {
+        document.getElementById('typed-body').innerHTML = '<div class="empty">Access not permitted for your role.</div>';
+        return;
+      }
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      var rows = data.rows || [];
+      // Update toolbar count
+      var countEl = host.querySelector('.typed-head .meta');
+      if (countEl) {
+        var c = data.counts || {};
+        countEl.textContent = (data.total || 0) + ' total · ' + (c.new || 0) + ' new this period';
+      }
+      var body = document.getElementById('typed-body');
+      if (typeKey === 'warranty') {
+        body.innerHTML = renderWarrantyCards(rows);
+      } else if (typeKey === 'newsletter') {
+        body.innerHTML = renderNewsletterTable(rows);
+      } else {
+        body.innerHTML = renderTypedTable(typeKey, rows);
+      }
+      wireTypedRows(typeKey);
+    } catch (err) {
+      host.innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+    refreshFormsCounts();
+  }
+
+  function renderTypedToolbarShell(cfg) {
+    var statusOpts = '<option value="">All statuses</option>' +
+      cfg.statuses.map(function (s) {
+        var sel = typedFormsState.status === s ? ' selected' : '';
+        return '<option value="' + s + '"' + sel + '>' + escapeHtml(STATUS_LABELS[s] || s) + '</option>';
+      }).join('');
+    var hideStatusFilter = cfg.layout === 'newsletter';
+    return '<div class="typed-head">' +
+        '<h2>' + escapeHtml(cfg.icon + ' ' + cfg.title) + '</h2>' +
+        '<span class="meta">Loading…</span>' +
+      '</div>' +
+      '<div class="typed-toolbar">' +
+        '<input type="search" id="typed-q" placeholder="Search name, email, reference…" value="' + escapeAttr(typedFormsState.q) + '">' +
+        (hideStatusFilter ? '' : '<select id="typed-status">' + statusOpts + '</select>') +
+        (hideStatusFilter ? '' :
+          '<input type="date" id="typed-from" value="' + escapeAttr(typedFormsState.from) + '" title="From date">' +
+          '<input type="date" id="typed-to"   value="' + escapeAttr(typedFormsState.to)   + '" title="To date">') +
+        '<button class="btn-export-forms" id="typed-export" type="button">↓ Export CSV</button>' +
+      '</div>';
+  }
+
+  function wireTypedToolbar(cfg) {
+    var q = document.getElementById('typed-q');
+    if (q) q.addEventListener('input', function (e) {
+      clearTimeout(typedSearchDebounce);
+      typedSearchDebounce = setTimeout(function () {
+        typedFormsState.q = e.target.value.trim();
+        loadTypedForm(typedFormsState.typeKey);
+      }, 250);
+    });
+    var s = document.getElementById('typed-status');
+    if (s) s.addEventListener('change', function (e) {
+      typedFormsState.status = e.target.value;
+      loadTypedForm(typedFormsState.typeKey);
+    });
+    var df = document.getElementById('typed-from');
+    if (df) df.addEventListener('change', function (e) {
+      typedFormsState.from = e.target.value;
+      loadTypedForm(typedFormsState.typeKey);
+    });
+    var dt = document.getElementById('typed-to');
+    if (dt) dt.addEventListener('change', function (e) {
+      typedFormsState.to = e.target.value;
+      loadTypedForm(typedFormsState.typeKey);
+    });
+    var ex = document.getElementById('typed-export');
+    if (ex) ex.addEventListener('click', function () {
+      var params = new URLSearchParams();
+      if (typedFormsState.status) params.set('status', typedFormsState.status);
+      if (typedFormsState.from)   params.set('from', typedFormsState.from);
+      if (typedFormsState.to)     params.set('to', typedFormsState.to);
+      window.location.href = cfg.endpoint + '/export' + (params.toString() ? '?' + params : '');
+    });
+  }
+
+  // Per-type table column definitions. Warranty uses a card layout instead.
+  function typedTableColumns(typeKey) {
+    if (typeKey === 'samples') {
+      return [
+        { key: 'reference',     label: 'Ref' },
+        { key: 'created_at',    label: 'Date',     fmt: 'date' },
+        { key: 'name',          label: 'Name' },
+        { key: 'phone',         label: 'Phone',    fmt: 'tel' },
+        { key: 'stone_interest',label: 'Stone interest', truncate: 40 },
+        { key: 'status',        label: 'Status',   fmt: 'status' }
+      ];
+    }
+    if (typeKey === 'enquiries') {
+      return [
+        { key: 'reference',     label: 'Ref' },
+        { key: 'created_at',    label: 'Date',     fmt: 'date' },
+        { key: 'name',          label: 'Name' },
+        { key: 'reason',        label: 'Reason' },
+        { key: 'message',       label: 'Message',  truncate: 60 },
+        { key: 'status',        label: 'Status',   fmt: 'status' }
+      ];
+    }
+    if (typeKey === 'contacts') {
+      return [
+        { key: 'reference',     label: 'Ref' },
+        { key: 'created_at',    label: 'Date',     fmt: 'date' },
+        { key: 'name',          label: 'Name' },
+        { key: 'email',         label: 'Email',    fmt: 'mailto' },
+        { key: 'message',       label: 'Message',  truncate: 60 },
+        { key: 'status',        label: 'Status',   fmt: 'status' }
+      ];
+    }
+    if (typeKey === 'partners') {
+      return [
+        { key: 'reference',     label: 'Ref' },
+        { key: 'created_at',    label: 'Date',     fmt: 'date' },
+        { key: 'company',       label: 'Company' },
+        { key: 'name',          label: 'Contact' },
+        { key: 'reason',        label: 'Reason' },
+        { key: 'status',        label: 'Status',   fmt: 'status' }
+      ];
+    }
+    return [];
+  }
+
+  function renderTypedTable(typeKey, rows) {
+    if (!rows.length) return '<div class="empty">No submissions match the current filters.</div>';
+    var cols = typedTableColumns(typeKey);
+    var ths = cols.map(function (c) { return '<th>' + escapeHtml(c.label) + '</th>'; }).join('');
+    var trs = rows.map(function (r) {
+      var newCls = r.status === 'new' ? ' class="row-new"' : '';
+      return '<tr data-id="' + r.id + '"' + newCls + '>' +
+        cols.map(function (c) { return '<td>' + formatTypedCell(r, c) + '</td>'; }).join('') +
+      '</tr>';
+    }).join('');
+    return '<div class="table-wrap"><table>' +
+      '<thead><tr>' + ths + '</tr></thead><tbody>' + trs + '</tbody></table></div>';
+  }
+
+  function formatTypedCell(r, col) {
+    var v = r[col.key];
+    if (col.fmt === 'status') return statusPill(v || 'new');
+    if (col.fmt === 'date') return v ? escapeHtml(formatDate(v)) : '—';
+    if (v == null || v === '') return '<span class="muted">—</span>';
+    if (col.fmt === 'tel') return '<a href="tel:' + escapeAttr(v) + '" onclick="event.stopPropagation()">' + escapeHtml(v) + '</a>';
+    if (col.fmt === 'mailto') return '<a href="mailto:' + escapeAttr(v) + '" onclick="event.stopPropagation()">' + escapeHtml(v) + '</a>';
+    var s = String(v);
+    if (col.truncate && s.length > col.truncate) s = s.slice(0, col.truncate - 1) + '…';
+    return escapeHtml(s);
+  }
+
+  function renderWarrantyCards(rows) {
+    if (!rows.length) return '<div class="empty">No warranty activations match the current filters.</div>';
+    return '<div class="warranty-grid">' + rows.map(function (r) {
+      var photos = Array.isArray(r.installation_photos) ? r.installation_photos : [];
+      var photosHtml = photos.length
+        ? '<div class="wc-photos">' + photos.slice(0, 3).map(function (u) {
+            return '<img src="' + escapeAttr(u) + '" alt="Installation photo">';
+          }).join('') + '</div>'
+        : '<div class="wc-no-photos">No photos uploaded</div>';
+      var locationParts = [r.suburb, r.state, r.postcode].filter(Boolean).join(' ');
+      var purchase = r.purchase_date ? formatDate(r.purchase_date) : '—';
+      return '<div class="warranty-card" data-id="' + r.id + '">' +
+        '<div class="wc-head">' +
+          '<div>' +
+            '<div class="wc-ref">' + escapeHtml(r.reference) + (r.warranty_number ? ' · ' + escapeHtml(r.warranty_number) : '') + '</div>' +
+            '<div class="wc-name">' + escapeHtml(r.name) + '</div>' +
+            '<div class="wc-sub">' + escapeHtml(locationParts || '—') + '</div>' +
+          '</div>' +
+          statusPill(r.status || 'new') +
+        '</div>' +
+        '<div class="wc-stone"><strong>' + escapeHtml(r.stone_name || '—') + '</strong>' +
+          (r.fabricator ? ' · ' + escapeHtml(r.fabricator) : '') + '</div>' +
+        '<div class="wc-meta">' +
+          '<span>Purchased ' + escapeHtml(purchase) + '</span>' +
+          (r.retailer ? '<span>via ' + escapeHtml(r.retailer) + '</span>' : '') +
+          (r.invoice_number ? '<span>Invoice ' + escapeHtml(r.invoice_number) + '</span>' : '') +
+        '</div>' +
+        photosHtml +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
+  function renderNewsletterTable(rows) {
+    if (!rows.length) return '<div class="empty">No subscribers yet.</div>';
+    var trs = rows.map(function (r) {
+      return '<tr>' +
+        '<td>' + escapeHtml(r.email) + '</td>' +
+        '<td>' + escapeHtml(formatDate(r.subscribed_at, true)) + '</td>' +
+        '<td>' + escapeHtml(r.source_url || '—') + '</td>' +
+        '<td>' + statusPill(r.status || 'pending') + '</td>' +
+      '</tr>';
+    }).join('');
+    return '<div class="table-wrap"><table>' +
+      '<thead><tr><th>Email</th><th>Subscribed</th><th>Source</th><th>Status</th></tr></thead>' +
+      '<tbody>' + trs + '</tbody></table></div>';
+  }
+
+  function wireTypedRows(typeKey) {
+    var sel = typeKey === 'warranty' ? '.warranty-card' : 'tbody tr[data-id]';
+    document.querySelectorAll('#typed-body ' + sel).forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        if (e.target.closest('a')) return;
+        if (typeKey === 'newsletter') return;
+        openTypedDrawer(typeKey, parseInt(el.dataset.id, 10));
+      });
+    });
+  }
+
+  // Detail drawer for typed records — generic over all types using a
+  // field list, with Status + Notes editing and an Activity tab. Warranty
+  // adds its photo gallery; partner/sample/enquiry just show their fields.
+  async function openTypedDrawer(typeKey, id) {
+    var cfg = TYPED_FORMS[typeKey];
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    drawer.innerHTML = '<div class="empty">Loading…</div>';
+    try {
+      var res = await fetch(cfg.endpoint + '/' + id, { credentials: 'include' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      drawer.innerHTML = renderTypedDrawer(typeKey, data.record);
+      wireTypedDrawer(typeKey, data.record);
+    } catch (err) {
+      drawer.innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function typedDrawerFields(typeKey) {
+    var common = [
+      { key: 'reference',  label: 'Reference' },
+      { key: 'created_at', label: 'Submitted', fmt: 'datetime' },
+      { key: 'name',       label: 'Name' },
+      { key: 'email',      label: 'Email', fmt: 'mailto' },
+      { key: 'phone',      label: 'Phone', fmt: 'tel' }
+    ];
+    if (typeKey === 'samples') {
+      return common.concat([
+        { key: 'company',        label: 'Company' },
+        { key: 'role',           label: 'Role / I am a' },
+        { key: 'stone_interest', label: 'Stone interest', fmt: 'multiline' },
+        { key: 'street',         label: 'Street' },
+        { key: 'suburb',         label: 'Suburb' },
+        { key: 'unit',           label: 'Unit' },
+        { key: 'source',         label: 'Source' },
+        { key: 'message',        label: 'Message', fmt: 'multiline' },
+        { key: 'consent',        label: 'Consent', fmt: 'boolean' }
+      ]);
+    }
+    if (typeKey === 'enquiries') {
+      return common.concat([
+        { key: 'company', label: 'Company' },
+        { key: 'role',    label: 'Role / I am a' },
+        { key: 'reason',  label: 'Reason' },
+        { key: 'message', label: 'Message', fmt: 'multiline' },
+        { key: 'consent', label: 'Consent', fmt: 'boolean' }
+      ]);
+    }
+    if (typeKey === 'contacts') {
+      return common.concat([
+        { key: 'message', label: 'Message', fmt: 'multiline' },
+        { key: 'consent', label: 'Consent', fmt: 'boolean' }
+      ]);
+    }
+    if (typeKey === 'partners') {
+      return common.concat([
+        { key: 'company', label: 'Company' },
+        { key: 'role',    label: 'Role' },
+        { key: 'reason',  label: 'Reason' },
+        { key: 'message', label: 'Message', fmt: 'multiline' },
+        { key: 'consent', label: 'Consent', fmt: 'boolean' }
+      ]);
+    }
+    if (typeKey === 'warranty') {
+      return common.concat([
+        { key: 'street',         label: 'Street' },
+        { key: 'suburb',         label: 'Suburb' },
+        { key: 'state',          label: 'State' },
+        { key: 'postcode',       label: 'Postcode' },
+        { key: 'stone_name',     label: 'Stone' },
+        { key: 'purchase_date',  label: 'Purchase date', fmt: 'date' },
+        { key: 'fabricator',     label: 'Fabricator' },
+        { key: 'retailer',       label: 'Retailer' },
+        { key: 'invoice_number', label: 'Invoice number' },
+        { key: 'warranty_number',label: 'Warranty number' },
+        { key: 'approved_at',    label: 'Approved at', fmt: 'datetime' },
+        { key: 'approved_by',    label: 'Approved by' },
+        { key: 'consent',        label: 'Consent', fmt: 'boolean' }
+      ]);
+    }
+    return common;
+  }
+
+  function formatTypedDrawerVal(v, fmt) {
+    if (fmt === 'boolean') return v ? '✓ Yes' : '✗ No';
+    if (v == null || v === '') return '<span class="muted">—</span>';
+    if (fmt === 'datetime') return escapeHtml(formatDate(v, true));
+    if (fmt === 'date')     return escapeHtml(formatDate(v));
+    if (fmt === 'mailto')   return '<a href="mailto:' + escapeAttr(v) + '">' + escapeHtml(String(v)) + '</a>';
+    if (fmt === 'tel')      return '<a href="tel:' + escapeAttr(v) + '">' + escapeHtml(String(v)) + '</a>';
+    if (fmt === 'multiline')return escapeHtml(String(v)).replace(/\n/g, '<br>');
+    return escapeHtml(String(v));
+  }
+
+  function renderTypedDrawer(typeKey, r) {
+    var cfg = TYPED_FORMS[typeKey];
+    var fields = typedDrawerFields(typeKey);
+    var rows = fields.map(function (f) {
+      return '<div class="field-row"><div class="lbl">' + escapeHtml(f.label) + '</div>' +
+        '<div class="val">' + formatTypedDrawerVal(r[f.key], f.fmt) + '</div></div>';
+    }).join('');
+    var photos = '';
+    if (typeKey === 'warranty') {
+      var imgs = Array.isArray(r.installation_photos) ? r.installation_photos : [];
+      photos = '<div class="drawer-section"><h3>Installation photos (' + imgs.length + ')</h3>' +
+        (imgs.length
+          ? '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">' +
+            imgs.map(function (u) {
+              return '<a href="' + escapeAttr(u) + '" target="_blank" rel="noopener">' +
+                '<img src="' + escapeAttr(u) + '" alt="" style="width:100%;border-radius:4px;border:1px solid var(--border)">' +
+              '</a>';
+            }).join('') + '</div>'
+          : '<div class="activity-empty">No photos uploaded.</div>') +
+        '</div>';
+    }
+    var statusOpts = cfg.statuses.map(function (s) {
+      var sel = s === r.status ? ' selected' : '';
+      return '<option value="' + s + '"' + sel + '>' + escapeHtml(STATUS_LABELS[s] || s) + '</option>';
+    }).join('');
+    return '' +
+      '<div class="drawer-header">' +
+        '<div><h2>' + escapeHtml(r.reference) + ' — ' + escapeHtml(r.name || '—') + '</h2>' +
+          '<div class="meta">' + escapeHtml(cfg.title) + '</div></div>' +
+        '<button class="drawer-close" id="drw-close" aria-label="Close">✕</button>' +
+      '</div>' +
+      '<div class="drawer-body">' +
+        '<div class="drawer-section"><h3>Status</h3>' +
+          '<div class="field-grid">' +
+            '<div class="field"><label>Status</label><select id="typed-drw-status">' + statusOpts + '</select></div>' +
+            '<div class="field"><label>Reference</label><input type="text" value="' + escapeAttr(r.reference) + '" disabled></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="drawer-section"><h3>Details</h3>' + rows + '</div>' +
+        photos +
+        '<div class="drawer-section"><h3>Notes</h3>' +
+          '<textarea id="typed-drw-notes" rows="4" placeholder="Internal notes…">' + escapeHtml(r.notes || '') + '</textarea>' +
+        '</div>' +
+      '</div>' +
+      '<div class="drawer-footer">' +
+        '<button class="primary" id="typed-drw-save">Save changes</button>' +
+        '<button id="typed-drw-cancel">Close</button>' +
+      '</div>';
+  }
+
+  function wireTypedDrawer(typeKey, r) {
+    var cfg = TYPED_FORMS[typeKey];
+    document.getElementById('drw-close').addEventListener('click', closeDrawer);
+    document.getElementById('typed-drw-cancel').addEventListener('click', closeDrawer);
+    document.getElementById('typed-drw-save').addEventListener('click', async function () {
+      var btn = this; btn.disabled = true; btn.textContent = 'Saving…';
+      try {
+        var payload = {
+          status: document.getElementById('typed-drw-status').value,
+          notes:  document.getElementById('typed-drw-notes').value
+        };
+        var res = await fetch(cfg.endpoint + '/' + r.id, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok || !data.ok) throw new Error(data.error || ('HTTP ' + res.status));
+        toast('Saved');
+        closeDrawer();
+        loadTypedForm(typeKey);
+      } catch (err) {
+        toast('Failed: ' + err.message);
+      } finally {
+        btn.disabled = false; btn.textContent = 'Save changes';
+      }
+    });
+  }
+
+  // ── Track G: Knowledge base / Docs view ────────────────────────────
+  var docsState = { articles: [], current: null, editing: false };
+
+  async function loadDocsView() {
+    var nav = document.getElementById('docs-nav');
+    var main = document.getElementById('docs-main');
+    nav.innerHTML = '<div class="empty">Loading…</div>';
+    var isAdmin = state.user && state.user.role === 'super_admin';
+    document.getElementById('docs-admin-actions').style.display = isAdmin ? 'flex' : 'none';
+    try {
+      var res = await fetch('/api/projects/kb', { credentials: 'include' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      docsState.articles = data.articles || [];
+      renderDocsNav();
+      // Land on the first article (or the previously-open one if still present).
+      var landingSlug = docsState.current
+        || (docsState.articles[0] && docsState.articles[0].slug);
+      if (landingSlug) loadDocsArticle(landingSlug);
+      else main.innerHTML = '<div class="empty">No articles yet.</div>';
+    } catch (err) {
+      nav.innerHTML = '<div class="empty">Failed: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function renderDocsNav() {
+    var nav = document.getElementById('docs-nav');
+    if (!docsState.articles.length) {
+      nav.innerHTML = '<div class="empty">No articles yet.</div>';
+      return;
+    }
+    var byCat = {};
+    docsState.articles.forEach(function (a) { (byCat[a.category] = byCat[a.category] || []).push(a); });
+    var cats = Object.keys(byCat); // server returns sorted by category
+    nav.innerHTML = cats.map(function (cat) {
+      var items = byCat[cat].map(function (a) {
+        var active = a.slug === docsState.current ? ' class="active"' : '';
+        return '<a href="#" data-slug="' + escapeAttr(a.slug) + '"' + active + '>' + escapeHtml(a.title) + '</a>';
+      }).join('');
+      return '<div class="docs-cat">' + escapeHtml(cat) + '</div>' + items;
+    }).join('');
+    nav.querySelectorAll('a[data-slug]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        loadDocsArticle(a.dataset.slug);
+      });
+    });
+  }
+
+  async function loadDocsArticle(slug) {
+    docsState.current = slug;
+    docsState.editing = false;
+    renderDocsNav();
+    var main = document.getElementById('docs-main');
+    main.innerHTML = '<div class="empty">Loading…</div>';
+    try {
+      var res = await fetch('/api/projects/kb/' + encodeURIComponent(slug), { credentials: 'include' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      renderDocsArticle(data.article);
+    } catch (err) {
+      main.innerHTML = '<div class="empty">Failed: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  // Lightweight markdown renderer — covers everything in our seeded
+  // articles (headings, bold, italic, code, lists, tables, links, blockquotes).
+  // We deliberately don't pull in marked client-side; this stays small and
+  // we control sanitisation by escaping user input before applying patterns.
+  function renderMarkdown(md) {
+    if (!md) return '';
+    var src = String(md).replace(/\r\n/g, '\n');
+    // Escape HTML up front, then re-introduce structural tags as we match.
+    function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    src = esc(src);
+    // Code blocks ``` first so their contents don't get processed below.
+    src = src.replace(/```([\s\S]*?)```/g, function (_, code) {
+      return '<pre><code>' + code.replace(/^\n+/, '') + '</code></pre>';
+    });
+    // Tables — | hdr | hdr | with alignment row underneath
+    src = src.replace(/(^\|.+\|\n\|[\s|:-]+\|\n(?:\|.*\|\n?)+)/gm, function (m) {
+      var lines = m.trim().split('\n');
+      var headers = lines[0].split('|').slice(1, -1).map(function (s) { return s.trim(); });
+      var bodyLines = lines.slice(2);
+      var thead = '<thead><tr>' + headers.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead>';
+      var tbody = '<tbody>' + bodyLines.map(function (l) {
+        var cells = l.split('|').slice(1, -1).map(function (s) { return s.trim(); });
+        return '<tr>' + cells.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>';
+      }).join('') + '</tbody>';
+      return '<table>' + thead + tbody + '</table>';
+    });
+    // Headings
+    src = src.replace(/^###\s+(.+)$/gm, '<h3>$1</h3>');
+    src = src.replace(/^##\s+(.+)$/gm,  '<h2>$1</h2>');
+    src = src.replace(/^#\s+(.+)$/gm,   '<h1>$1</h1>');
+    // Blockquotes
+    src = src.replace(/^&gt;\s?(.*)$/gm, '<blockquote>$1</blockquote>');
+    // Lists — group consecutive list lines into a single ul/ol.
+    src = src.replace(/(^(?:[-*]\s+.+(?:\n|$))+)/gm, function (block) {
+      var items = block.trim().split('\n').map(function (l) {
+        return '<li>' + l.replace(/^[-*]\s+/, '') + '</li>';
+      }).join('');
+      return '<ul>' + items + '</ul>';
+    });
+    src = src.replace(/(^(?:\d+\.\s+.+(?:\n|$))+)/gm, function (block) {
+      var items = block.trim().split('\n').map(function (l) {
+        return '<li>' + l.replace(/^\d+\.\s+/, '') + '</li>';
+      }).join('');
+      return '<ol>' + items + '</ol>';
+    });
+    // Inline: code, bold, italic, links
+    src = src.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+    src = src.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+    src = src.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+    src = src.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
+    src = src.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    // Paragraphs — split on double newline, wrap remaining text in <p>.
+    var blocks = src.split(/\n\s*\n/);
+    return blocks.map(function (b) {
+      var t = b.trim();
+      if (!t) return '';
+      if (/^<(h[1-6]|ul|ol|table|pre|blockquote)/i.test(t)) return t;
+      return '<p>' + t.replace(/\n/g, '<br>') + '</p>';
+    }).join('\n');
+  }
+
+  function renderDocsArticle(article) {
+    var main = document.getElementById('docs-main');
+    var isAdmin = state.user && state.user.role === 'super_admin';
+    if (docsState.editing) {
+      main.innerHTML = renderDocsEditor(article);
+      wireDocsEditor(article);
+      return;
+    }
+    var meta = '<div class="docs-meta-bar">' +
+      '<div class="docs-meta">Last updated ' + escapeHtml(formatDate(article.updated_at, true)) +
+        (article.updated_by ? ' by ' + escapeHtml(article.updated_by) : '') + '</div>' +
+      (isAdmin
+        ? '<div><button type="button" id="docs-edit">Edit</button></div>'
+        : '') +
+    '</div>';
+    main.innerHTML = meta + '<div class="docs-content">' + renderMarkdown(article.content) + '</div>';
+    var editBtn = document.getElementById('docs-edit');
+    if (editBtn) editBtn.addEventListener('click', function () {
+      docsState.editing = true;
+      renderDocsArticle(article);
+    });
+  }
+
+  function renderDocsEditor(article) {
+    var existing = !!article && !!article.slug;
+    var a = article || { slug: '', title: '', category: 'Getting Started', content: '', sort_order: 0 };
+    return '<div class="docs-meta-bar"><div class="docs-meta">' + (existing ? 'Editing' : 'New article') + '</div></div>' +
+      '<div class="docs-edit-fields">' +
+        '<input type="text" id="ed-slug" placeholder="slug-with-dashes" value="' + escapeAttr(a.slug || '') + '"' + (existing ? ' disabled' : '') + '>' +
+        '<input type="text" id="ed-title" placeholder="Title" value="' + escapeAttr(a.title || '') + '">' +
+        '<input type="text" id="ed-category" placeholder="Category" value="' + escapeAttr(a.category || '') + '">' +
+        '<input type="number" id="ed-sort" placeholder="Sort" value="' + escapeAttr(String(a.sort_order || 0)) + '">' +
+      '</div>' +
+      '<div class="docs-edit-pane">' +
+        '<textarea id="ed-content" placeholder="Markdown content…">' + escapeHtml(a.content || '') + '</textarea>' +
+        '<div class="docs-content" id="ed-preview" style="overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:14px 16px"></div>' +
+      '</div>' +
+      '<div class="docs-edit-actions">' +
+        '<button class="primary" id="ed-save">Save</button>' +
+        '<button id="ed-cancel">Cancel</button>' +
+        (existing ? '<button class="danger" id="ed-delete">Delete</button>' : '') +
+      '</div>';
+  }
+
+  function wireDocsEditor(article) {
+    var existing = !!article && !!article.slug;
+    var contentEl = document.getElementById('ed-content');
+    var previewEl = document.getElementById('ed-preview');
+    function updatePreview() { previewEl.innerHTML = renderMarkdown(contentEl.value); }
+    contentEl.addEventListener('input', updatePreview);
+    updatePreview();
+    document.getElementById('ed-cancel').addEventListener('click', function () {
+      docsState.editing = false;
+      if (existing) loadDocsArticle(article.slug);
+      else loadDocsView();
+    });
+    document.getElementById('ed-save').addEventListener('click', async function () {
+      var btn = this; btn.disabled = true; btn.textContent = 'Saving…';
+      try {
+        var payload = {
+          slug: document.getElementById('ed-slug').value.trim(),
+          title: document.getElementById('ed-title').value.trim(),
+          category: document.getElementById('ed-category').value.trim(),
+          sort_order: parseInt(document.getElementById('ed-sort').value, 10) || 0,
+          content: contentEl.value
+        };
+        if (!payload.title || !payload.category || !payload.content) {
+          throw new Error('Title, category and content are required.');
+        }
+        var url = existing ? '/api/projects/kb/' + encodeURIComponent(article.slug) : '/api/projects/kb';
+        var method = existing ? 'PATCH' : 'POST';
+        if (existing) delete payload.slug;
+        var res = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok || !data.ok) throw new Error(data.error || 'HTTP ' + res.status);
+        toast('Saved');
+        docsState.editing = false;
+        docsState.current = data.article.slug;
+        await loadDocsView();
+      } catch (err) {
+        toast('Failed: ' + err.message);
+        btn.disabled = false; btn.textContent = 'Save';
+      }
+    });
+    var del = document.getElementById('ed-delete');
+    if (del) del.addEventListener('click', async function () {
+      if (!confirm('Delete article "' + article.title + '"?')) return;
+      try {
+        var res = await fetch('/api/projects/kb/' + encodeURIComponent(article.slug), {
+          method: 'DELETE', credentials: 'include'
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        toast('Deleted');
+        docsState.current = null;
+        docsState.editing = false;
+        loadDocsView();
+      } catch (err) {
+        toast('Failed: ' + err.message);
+      }
+    });
+  }
+
+  // Docs sidebar wiring (search, new, print).
+  document.getElementById('docs-search').addEventListener('input', function (e) {
+    var q = e.target.value.trim();
+    var nav = document.getElementById('docs-nav');
+    if (!q) { renderDocsNav(); return; }
+    fetch('/api/projects/kb/search?q=' + encodeURIComponent(q), { credentials: 'include' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || !d.ok) return;
+        if (!d.results.length) { nav.innerHTML = '<div class="empty">No matches.</div>'; return; }
+        nav.innerHTML = '<div class="docs-search-results">' + d.results.map(function (r) {
+          return '<a class="docs-search-result" data-slug="' + escapeAttr(r.slug) + '">' +
+            '<strong>' + escapeHtml(r.title) + '</strong>' +
+            '<span style="color:var(--muted)">' + escapeHtml(r.category) + '</span>' +
+          '</a>';
+        }).join('') + '</div>';
+        nav.querySelectorAll('.docs-search-result').forEach(function (a) {
+          a.addEventListener('click', function () { loadDocsArticle(a.dataset.slug); });
+        });
+      })
+      .catch(function () {});
+  });
+  document.getElementById('docs-new-btn').addEventListener('click', function () {
+    docsState.editing = true;
+    docsState.current = null;
+    var main = document.getElementById('docs-main');
+    main.innerHTML = renderDocsEditor(null);
+    wireDocsEditor(null);
+  });
+  document.getElementById('docs-print-btn').addEventListener('click', function () {
+    // Open a printable view of every published article in a new window.
+    var w = window.open('', '_blank');
+    if (!w) return;
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Alpha Surfaces — Knowledge Base</title>' +
+      '<style>' +
+      'body{font-family:Helvetica,Arial,sans-serif;color:#222;margin:0;padding:24px;background:#fff;line-height:1.6;font-size:14px}' +
+      'h1{color:#564D22;border-bottom:2px solid #564D22;padding-bottom:8px}' +
+      'h2{color:#564D22;margin-top:36px}' +
+      'h3{margin-top:18px}' +
+      'table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13px}' +
+      'th,td{border:1px solid #ddd;padding:8px 10px;text-align:left}' +
+      'th{background:#f7f4e8;color:#564D22}' +
+      'code{background:#f3f1e6;padding:2px 5px;border-radius:3px;font-size:12px}' +
+      'pre{background:#f3f1e6;padding:12px;border-radius:4px;overflow:auto}' +
+      'article{break-after:page;page-break-after:always;margin-bottom:48px}' +
+      '.cover{padding:60px 0;text-align:center}' +
+      '.cover h1{border:none;font-size:32px;margin-bottom:8px}' +
+      '@media print{body{padding:0}}' +
+      '</style></head><body>';
+    html += '<div class="cover"><h1>Alpha Surfaces — Knowledge Base</h1>' +
+      '<p style="color:#888">Generated ' + new Date().toLocaleString('en-AU') + '</p></div>';
+    docsState.articles.forEach(function (a) {
+      // Re-fetch each article for full content (the index endpoint doesn't return content).
+    });
+    // Fetch full bodies in series so the print order matches the nav order.
+    Promise.all(docsState.articles.map(function (a) {
+      return fetch('/api/projects/kb/' + encodeURIComponent(a.slug), { credentials: 'include' })
+        .then(function (r) { return r.json(); })
+        .then(function (d) { return d && d.ok ? d.article : null; });
+    })).then(function (full) {
+      var body = full.filter(Boolean).map(function (a) {
+        return '<article><div style="font-size:11px;letter-spacing:0.08em;color:#888;text-transform:uppercase;margin-bottom:8px">' + escapeHtml(a.category) + '</div>' +
+          '<div class="docs-content">' + renderMarkdown(a.content) + '</div></article>';
+      }).join('');
+      w.document.write(html + body + '</body></html>');
+      w.document.close();
+      setTimeout(function () { w.print(); }, 400);
+    });
+  });
 
   // ── Time tracking: dashboard, month nav, quick-log popover ──
   var timeState = {

@@ -16,6 +16,9 @@ const versions = require('./lib/versions');
 const { initDB, saveSubmission, saveSubscriber, unsubscribeEmail, pool } = require('./db');
 const notifications = require('./notifications');
 const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, readSettings: readNotifSettings, writeSettings: writeNotifSettings, notifyNewSubmission } = notifications;
+// Track I: typed-form insert helper. Loaded statically (the require below
+// mounts routes; this property is attached to the module.exports object).
+const { insertTypedSubmission } = require('./projects-routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -225,7 +228,19 @@ async function handleForm(req, res, formType) {
     notifyNewSubmission(submission).catch(err =>
       console.error(`[notify] ${formType} notification error:`, err.message)
     );
-    return res.json({ ok: true, id });
+
+    // Track I: also write into the matching typed table so the new per-form
+    // views see the submission alongside the legacy archive. Best-effort —
+    // a failure here mustn't block the public form response.
+    let typed = null;
+    try {
+      if (typeof insertTypedSubmission === 'function') {
+        typed = await insertTypedSubmission(pool, formType, fields, sampleItems);
+      }
+    } catch (err) {
+      console.error('[form] typed insert error:', err.message);
+    }
+    return res.json({ ok: true, id, reference: typed && typed.reference });
   } catch (err) {
     console.error(`[form] ${formType} error:`, err.message);
     return res.status(500).json({ ok: false, error: 'Something went wrong. Please try again.' });
@@ -234,6 +249,53 @@ async function handleForm(req, res, formType) {
 
 app.post('/api/order-sample', (req, res) => handleForm(req, res, 'Sample Request'));
 app.post('/api/contact',      (req, res) => handleForm(req, res, 'Contact Enquiry'));
+
+// ─── Warranty installation-photo upload (Track I) ───
+// Used by /warranty.html before the warranty form is submitted. Photos go
+// to Cloudinary; the public/secure URLs come back to the page, which then
+// includes them in the warranty payload as `installation_photos`.
+const warrantyUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024, files: 3 },
+  fileFilter: (req, file, cb) => {
+    const ok = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
+      .includes((file.mimetype || '').toLowerCase());
+    cb(ok ? null : new Error('Only JPG, PNG, WebP, or HEIC images allowed.'), ok);
+  }
+});
+app.post('/api/warranty-upload',
+  (req, res, next) => warrantyUpload.array('photos', 3)(req, res, (err) => {
+    if (err) return res.status(400).json({ ok: false, error: err.message });
+    next();
+  }),
+  async (req, res) => {
+    try {
+      if (!req.files || !req.files.length) {
+        return res.status(400).json({ ok: false, error: 'No photos uploaded.' });
+      }
+      const urls = [];
+      for (const file of req.files) {
+        const result = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              folder: 'alpha-surfaces/warranty-photos',
+              resource_type: 'image',
+              use_filename: true,
+              unique_filename: true
+            },
+            (err, r) => err ? reject(err) : resolve(r)
+          );
+          stream.end(file.buffer);
+        });
+        urls.push(result.secure_url);
+      }
+      res.json({ ok: true, urls });
+    } catch (err) {
+      console.error('[warranty-upload]', err.message);
+      res.status(500).json({ ok: false, error: 'Upload failed.' });
+    }
+  }
+);
 
 // Generic submit endpoint for new public forms (enquiry, warranty, …).
 // Maps `form_type` in the body to the human-readable label stored in
