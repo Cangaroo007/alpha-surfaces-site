@@ -235,6 +235,24 @@ async function handleForm(req, res, formType) {
 app.post('/api/order-sample', (req, res) => handleForm(req, res, 'Sample Request'));
 app.post('/api/contact',      (req, res) => handleForm(req, res, 'Contact Enquiry'));
 
+// Generic submit endpoint for new public forms (enquiry, warranty, …).
+// Maps `form_type` in the body to the human-readable label stored in
+// form_submissions.form_type, then delegates to the same handler that
+// covers Sample Request / Contact Enquiry — so DB insert, raw_data
+// JSONB capture, and SMS+email notifications all flow the same way.
+const FORM_TYPE_LABELS = {
+  enquiry:  'Enquiry',
+  warranty: 'Warranty Activation',
+};
+app.post('/api/form-submit', (req, res) => {
+  const raw   = String(req.body && req.body.form_type || '').toLowerCase().trim();
+  const label = FORM_TYPE_LABELS[raw];
+  if (!label) {
+    return res.status(400).json({ ok: false, error: 'Unknown form type.' });
+  }
+  return handleForm(req, res, label);
+});
+
 function generateUnsubscribeUrl(email) {
   const secret  = process.env.SESSION_SECRET || 'alpha-surfaces-secret';
   const token   = crypto.createHmac('sha256', secret).update(email.toLowerCase().trim()).digest('hex').substring(0, 16);
@@ -2033,6 +2051,12 @@ app.get('/fabrication-guide', (req, res) => {
 });
 app.get('/warranty', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'warranty.html'));
+});
+app.get('/warranty-terms', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'warranty-terms.html'));
+});
+app.get('/enquiry', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'enquiry.html'));
 });
 
 // ─── Digital catalog (flipbook viewer) ───

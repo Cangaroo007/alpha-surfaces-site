@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Activate Warranty | Alpha Surfaces</title>
-<meta name="description" content="Activate your Alpha Surfaces 15-Year Residential Limited Warranty and Lifetime Stain Protection. Register within six months of purchase.">
+<title>Enquiry | Alpha Surfaces</title>
+<meta name="description" content="Get in touch with Alpha Surfaces — product information, pricing, stockists, partnership and technical questions. We'll be in touch within 24 hours.">
 <style>
 @font-face { font-family: 'Concrette S'; src: url('fonts/Web/ConcretteS-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Concrette S'; src: url('fonts/Web/ConcretteS-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
@@ -19,22 +19,16 @@ body { background: var(--cream); color: var(--black); font-family: 'Degular', sa
 a { color: inherit; }
 img { display: block; max-width: 100%; }
 
-.warranty-section { padding: 80px 44px; }
-.warranty-inner { max-width: 920px; margin: 0 auto; }
+.enquiry-section { padding: 80px 44px; }
+.enquiry-inner { max-width: 920px; margin: 0 auto; display: flex; gap: 80px; align-items: flex-start; }
+.enquiry-left { width: 320px; flex-shrink: 0; position: sticky; top: 120px; }
+.enquiry-eyebrow { font-family: 'Degular', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--olive); margin-bottom: 14px; }
+.enquiry-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 40px; line-height: 1.05; color: var(--black); margin-bottom: 18px; }
+.enquiry-desc { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; line-height: 1.5; color: var(--black); }
+.enquiry-meta { margin-top: 28px; font-family: 'Degular', sans-serif; font-size: 13px; color: var(--black); opacity: 0.7; line-height: 1.7; }
+.enquiry-meta a { color: var(--olive); text-decoration: underline; text-underline-offset: 2px; }
 
-.warranty-header { text-align: center; margin-bottom: 48px; }
-.warranty-eyebrow { font-family: 'Degular', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--olive); margin-bottom: 14px; }
-.warranty-heading { font-family: 'Concrette S', serif; font-weight: 700; font-size: 40px; line-height: 1.05; color: var(--black); margin-bottom: 16px; }
-.warranty-desc { font-family: 'Concrette S', serif; font-weight: 400; font-size: 16px; line-height: 1.6; color: var(--black); max-width: 580px; margin: 0 auto; }
-.warranty-meta { margin-top: 18px; font-family: 'Degular', sans-serif; font-size: 13px; color: var(--black); opacity: 0.7; }
-.warranty-meta a { color: var(--olive); text-decoration: underline; text-underline-offset: 2px; }
-
-.warranty-form { background: var(--white); border-radius: 8px; padding: 48px 56px; display: flex; flex-direction: column; gap: 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-
-.section-block { display: flex; flex-direction: column; gap: 24px; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
-.section-block:last-of-type { padding-bottom: 0; border-bottom: none; }
-.section-title { font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; color: var(--olive); letter-spacing: 0.04em; text-transform: uppercase; }
-
+.enquiry-form { flex: 1; max-width: 520px; background: var(--white); border-radius: 8px; padding: 44px; display: flex; flex-direction: column; gap: 28px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
 .field-group { display: flex; flex-direction: column; gap: 6px; }
 .field-label { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 14px; color: var(--black); }
 .field-label .req { color: var(--red); margin-left: 2px; }
@@ -64,24 +58,10 @@ img { display: block; max-width: 100%; }
   background-size: 12px 6px;
   padding-right: 24px;
 }
-.field-error { font-family: 'Degular', sans-serif; font-size: 12px; color: var(--red); margin-top: 2px; display: none; }
+.field-textarea { resize: vertical; min-height: 96px; padding-top: 8px; padding-bottom: 8px; }
+.field-error { font-family: 'Degular', sans-serif; font-size: 12px; color: var(--red); margin-top: 2px; min-height: 0; display: none; }
 .field-error.show { display: block; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
-
-.upload-placeholder {
-  background: var(--cream);
-  border: 1px dashed rgba(86,77,34,0.25);
-  border-radius: 6px;
-  padding: 16px 18px;
-  font-family: 'Degular', sans-serif;
-  font-size: 13px;
-  color: var(--olive);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.upload-placeholder strong { font-weight: 600; }
 
 .consent-row { display: flex; align-items: flex-start; gap: 12px; }
 .consent-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--olive); cursor: pointer; flex-shrink: 0; margin-top: 2px; }
@@ -103,7 +83,7 @@ img { display: block; max-width: 100%; }
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-width: 220px;
+  min-width: 180px;
   justify-content: center;
   transition: opacity 0.2s ease;
 }
@@ -117,10 +97,10 @@ img { display: block; max-width: 100%; }
 .form-banner.show { display: block; }
 .form-banner.error { background: #fef2f2; color: var(--red); border-left: 3px solid var(--red); }
 
-.success-card { padding: 64px 32px; text-align: center; }
+.success-card { padding: 56px 32px; text-align: center; }
 .success-card .check { width: 56px; height: 56px; margin: 0 auto 18px; border-radius: 50%; background: var(--olive); color: var(--white); display: flex; align-items: center; justify-content: center; font-size: 28px; }
 .success-card h2 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 26px; color: var(--olive); margin: 0 0 12px; }
-.success-card p { font-family: 'Degular', sans-serif; font-size: 15px; line-height: 1.7; color: #555; margin: 0 auto; max-width: 420px; }
+.success-card p { font-family: 'Degular', sans-serif; font-size: 15px; line-height: 1.7; color: #555; margin: 0 auto; max-width: 380px; }
 
 /* FOOTER */
 .footer { background: var(--white); border-top: 1px solid var(--border); padding: 50px 60px 40px; }
@@ -136,10 +116,12 @@ img { display: block; max-width: 100%; }
 .footer-bottom p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 11px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); text-align: center; }
 
 @media (max-width: 1024px) {
-  .warranty-section { padding: 56px 24px; }
-  .warranty-heading { font-size: 32px; }
-  .warranty-form { padding: 32px 24px; }
-  .field-row, .field-row-3 { grid-template-columns: 1fr; gap: 24px; }
+  .enquiry-section { padding: 56px 24px; }
+  .enquiry-inner { flex-direction: column; gap: 36px; }
+  .enquiry-left { width: 100%; position: static; }
+  .enquiry-heading { font-size: 32px; }
+  .enquiry-form { padding: 32px 24px; }
+  .field-row { grid-template-columns: 1fr; gap: 28px; }
   .btn-submit { width: 100%; align-self: stretch; }
   .footer { padding: 30px 24px; }
   .footer-inner { grid-template-columns: 1fr; gap: 32px; }
@@ -152,119 +134,88 @@ img { display: block; max-width: 100%; }
 
 <nav class="nav" id="main-nav"></nav>
 
-<section class="warranty-section">
-  <div class="warranty-inner">
-    <div class="warranty-header">
-      <p class="warranty-eyebrow">Warranty Activation</p>
-      <h1 class="warranty-heading">Activate your Alpha Surfaces warranty.</h1>
-      <p class="warranty-desc">Register your product within six (6) months of purchase to activate your 15-Year Residential Limited Warranty and Lifetime Stain Protection.</p>
-      <p class="warranty-meta">Read the full <a href="/warranty-terms">warranty terms</a> &middot; Questions? Call <a href="tel:1300257420">1300 257 420</a></p>
+<section class="enquiry-section">
+  <div class="enquiry-inner">
+    <div class="enquiry-left">
+      <p class="enquiry-eyebrow">Get in touch</p>
+      <h1 class="enquiry-heading">We'd love to hear from you.</h1>
+      <p class="enquiry-desc">Whether you're after product details, pricing, a stockist near you, or something more specific — send us a note and we'll be in touch within 24 hours.</p>
+      <div class="enquiry-meta">
+        <p><strong>Phone:</strong> <a href="tel:1300257420">1300 257 420</a></p>
+        <p><strong>Email:</strong> <a href="mailto:hello@alphasurfaces.com.au">hello@alphasurfaces.com.au</a></p>
+      </div>
     </div>
 
-    <form id="warranty-form" class="warranty-form" novalidate>
+    <form id="enquiry-form" class="enquiry-form" novalidate>
       <div id="form-banner" class="form-banner"></div>
 
-      <div class="section-block">
-        <div class="section-title">Your details</div>
+      <div class="field-group">
+        <label class="field-label" for="name">Name <span class="req">*</span></label>
+        <input id="name" name="name" type="text" class="field-input" autocomplete="name" required>
+        <div class="field-error" data-for="name">Please enter your name.</div>
+      </div>
+
+      <div class="field-row">
         <div class="field-group">
-          <label class="field-label" for="name">Full name <span class="req">*</span></label>
-          <input id="name" name="name" type="text" class="field-input" autocomplete="name" required>
-          <div class="field-error" data-for="name">Please enter your full name.</div>
+          <label class="field-label" for="email">Email <span class="req">*</span></label>
+          <input id="email" name="email" type="email" class="field-input" autocomplete="email" required>
+          <div class="field-error" data-for="email">Please enter a valid email.</div>
         </div>
-        <div class="field-row">
-          <div class="field-group">
-            <label class="field-label" for="email">Email <span class="req">*</span></label>
-            <input id="email" name="email" type="email" class="field-input" autocomplete="email" required>
-            <div class="field-error" data-for="email">Please enter a valid email.</div>
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="phone">Phone <span class="req">*</span></label>
-            <input id="phone" name="phone" type="tel" class="field-input" autocomplete="tel" required>
-            <div class="field-error" data-for="phone">Please enter your phone number.</div>
-          </div>
+        <div class="field-group">
+          <label class="field-label" for="phone">Phone <span class="req">*</span></label>
+          <input id="phone" name="phone" type="tel" class="field-input" autocomplete="tel" required>
+          <div class="field-error" data-for="phone">Please enter your phone number.</div>
         </div>
       </div>
 
-      <div class="section-block">
-        <div class="section-title">Installation address</div>
+      <div class="field-row">
         <div class="field-group">
-          <label class="field-label" for="street">Street address <span class="req">*</span></label>
-          <input id="street" name="street" type="text" class="field-input" autocomplete="street-address" required>
-          <div class="field-error" data-for="street">Please enter the street address.</div>
+          <label class="field-label" for="company">Company</label>
+          <input id="company" name="company" type="text" class="field-input" autocomplete="organization">
         </div>
-        <div class="field-row-3">
-          <div class="field-group">
-            <label class="field-label" for="suburb">Suburb <span class="req">*</span></label>
-            <input id="suburb" name="suburb" type="text" class="field-input" autocomplete="address-level2" required>
-            <div class="field-error" data-for="suburb">Please enter the suburb.</div>
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="state">State <span class="req">*</span></label>
-            <select id="state" name="state" class="field-select" required>
-              <option value="">- Select -</option>
-              <option value="NSW">NSW</option>
-              <option value="VIC">VIC</option>
-              <option value="QLD">QLD</option>
-              <option value="SA">SA</option>
-              <option value="WA">WA</option>
-              <option value="TAS">TAS</option>
-              <option value="NT">NT</option>
-              <option value="ACT">ACT</option>
-            </select>
-            <div class="field-error" data-for="state">Please select a state.</div>
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="postcode">Postcode <span class="req">*</span></label>
-            <input id="postcode" name="postcode" type="text" inputmode="numeric" pattern="\d{4}" maxlength="4" class="field-input" autocomplete="postal-code" required>
-            <div class="field-error" data-for="postcode">4-digit postcode.</div>
-          </div>
+        <div class="field-group">
+          <label class="field-label" for="role">I am a&hellip;</label>
+          <select id="role" name="role" class="field-select">
+            <option value="">- Select -</option>
+            <option value="Homeowner">Homeowner</option>
+            <option value="Builder">Builder</option>
+            <option value="Architect/Designer">Architect / Designer</option>
+            <option value="Fabricator">Fabricator</option>
+            <option value="Retailer/Stockist">Retailer / Stockist</option>
+            <option value="Other">Other</option>
+          </select>
         </div>
       </div>
 
-      <div class="section-block">
-        <div class="section-title">Product details</div>
-        <div class="field-row">
-          <div class="field-group">
-            <label class="field-label" for="stone_interest">Stone colour / name <span class="req">*</span></label>
-            <input id="stone_interest" name="stone_interest" type="text" class="field-input" placeholder="e.g. Calacatta Leggera" required>
-            <div class="field-error" data-for="stone_interest">Please enter the stone name.</div>
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="purchase_date">Purchase date <span class="req">*</span></label>
-            <input id="purchase_date" name="purchase_date" type="date" class="field-input" required>
-            <div class="field-error" data-for="purchase_date">Please enter the purchase date.</div>
-          </div>
-        </div>
-        <div class="field-group">
-          <label class="field-label" for="fabricator">Fabricator / installer name <span class="req">*</span></label>
-          <input id="fabricator" name="fabricator" type="text" class="field-input" required>
-          <div class="field-error" data-for="fabricator">Please enter the fabricator or installer.</div>
-        </div>
-        <div class="field-row">
-          <div class="field-group">
-            <label class="field-label" for="retailer">Retailer / stockist purchased from</label>
-            <input id="retailer" name="retailer" type="text" class="field-input">
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="invoice_number">Invoice / receipt number</label>
-            <input id="invoice_number" name="invoice_number" type="text" class="field-input">
-          </div>
-        </div>
-        <div class="upload-placeholder">
-          <span style="font-size:18px;line-height:1">&#128247;</span>
-          <span><strong>Installation photo upload</strong> &mdash; coming soon. For now, please email any photos to <a href="mailto:hello@alphasurfaces.com.au" style="color:var(--olive)">hello@alphasurfaces.com.au</a> with your name and address.</span>
-        </div>
+      <div class="field-group">
+        <label class="field-label" for="reason">Reason for enquiry <span class="req">*</span></label>
+        <select id="reason" name="reason" class="field-select" required>
+          <option value="">- Select -</option>
+          <option value="Product Information">Product Information</option>
+          <option value="Pricing">Pricing</option>
+          <option value="Stockist Enquiry">Stockist Enquiry</option>
+          <option value="Partnership">Partnership</option>
+          <option value="Technical Question">Technical Question</option>
+          <option value="Other">Other</option>
+        </select>
+        <div class="field-error" data-for="reason">Please select a reason.</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="message">Message <span class="req">*</span></label>
+        <textarea id="message" name="message" class="field-textarea" placeholder="Tell us a bit about what you're looking for…" required></textarea>
+        <div class="field-error" data-for="message">Please include a message.</div>
       </div>
 
       <div class="consent-row">
         <input type="checkbox" id="consent" name="consent" required>
-        <label for="consent">I confirm the information above is accurate and agree to the Alpha Surfaces <a href="/warranty-terms">warranty terms</a> and <a href="/privacy.html">privacy policy</a>. <span class="req">*</span></label>
+        <label for="consent">I agree to be contacted by Alpha Surfaces about this enquiry. See our <a href="/privacy.html">Privacy Policy</a>. <span class="req">*</span></label>
       </div>
-      <div class="field-error" data-for="consent" style="margin-top:-24px">Please tick the consent box to continue.</div>
+      <div class="field-error" data-for="consent" style="margin-top:-12px">Please tick the consent box to continue.</div>
 
       <button type="submit" class="btn-submit" id="submit-btn">
         <span class="spinner"></span>
-        <span class="btn-label">Submit warranty activation</span>
+        <span class="btn-label">Send enquiry</span>
       </button>
     </form>
   </div>
@@ -313,7 +264,7 @@ img { display: block; max-width: 100%; }
 <script>
 (function () {
   'use strict';
-  var form  = document.getElementById('warranty-form');
+  var form  = document.getElementById('enquiry-form');
   var btn   = document.getElementById('submit-btn');
   var label = btn.querySelector('.btn-label');
   var banner = document.getElementById('form-banner');
@@ -326,6 +277,7 @@ img { display: block; max-width: 100%; }
     form.querySelectorAll('.field-error').forEach(function (el) { el.classList.remove('show'); });
     form.querySelectorAll('.field-input, .field-select, .field-textarea').forEach(function (el) { el.classList.remove('error'); });
   }
+
   function showFieldError(name, msg) {
     var input = form.querySelector('[name="' + name + '"]');
     var err   = form.querySelector('.field-error[data-for="' + name + '"]');
@@ -335,25 +287,21 @@ img { display: block; max-width: 100%; }
       err.classList.add('show');
     }
   }
+
   function showBanner(msg) {
     banner.className = 'form-banner show error';
     banner.textContent = msg;
     banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  function validate(d) {
+  function validate(data) {
     var ok = true;
-    if (!d.name)                                { showFieldError('name');           ok = false; }
-    if (!d.email || !EMAIL_RE.test(d.email))    { showFieldError('email');          ok = false; }
-    if (!d.phone)                               { showFieldError('phone');          ok = false; }
-    if (!d.street)                              { showFieldError('street');         ok = false; }
-    if (!d.suburb)                              { showFieldError('suburb');         ok = false; }
-    if (!d.state)                               { showFieldError('state');          ok = false; }
-    if (!d.postcode || !/^\d{4}$/.test(d.postcode)) { showFieldError('postcode');   ok = false; }
-    if (!d.stone_interest)                      { showFieldError('stone_interest'); ok = false; }
-    if (!d.purchase_date)                       { showFieldError('purchase_date');  ok = false; }
-    if (!d.fabricator)                          { showFieldError('fabricator');     ok = false; }
-    if (!d.consent)                             { showFieldError('consent');        ok = false; }
+    if (!data.name)                            { showFieldError('name');    ok = false; }
+    if (!data.email || !EMAIL_RE.test(data.email)) { showFieldError('email'); ok = false; }
+    if (!data.phone)                           { showFieldError('phone');   ok = false; }
+    if (!data.reason)                          { showFieldError('reason');  ok = false; }
+    if (!data.message)                         { showFieldError('message'); ok = false; }
+    if (!data.consent)                         { showFieldError('consent'); ok = false; }
     return ok;
   }
 
@@ -363,28 +311,23 @@ img { display: block; max-width: 100%; }
 
     var fd = new FormData(form);
     var data = {
-      form_type:      'warranty',
-      name:           (fd.get('name')           || '').trim(),
-      email:          (fd.get('email')          || '').trim(),
-      phone:          (fd.get('phone')          || '').trim(),
-      street:         (fd.get('street')         || '').trim(),
-      suburb:         (fd.get('suburb')         || '').trim(),
-      state:          fd.get('state')           || '',
-      postcode:       (fd.get('postcode')       || '').trim(),
-      stone_interest: (fd.get('stone_interest') || '').trim(),
-      purchase_date:  fd.get('purchase_date')   || '',
-      fabricator:     (fd.get('fabricator')     || '').trim(),
-      retailer:       (fd.get('retailer')       || '').trim(),
-      invoice_number: (fd.get('invoice_number') || '').trim(),
-      consent:        fd.get('consent') === 'on',
-      source:         'warranty-page'
+      form_type: 'enquiry',
+      name:    (fd.get('name')    || '').trim(),
+      email:   (fd.get('email')   || '').trim(),
+      phone:   (fd.get('phone')   || '').trim(),
+      company: (fd.get('company') || '').trim(),
+      role:    fd.get('role')    || '',
+      reason:  fd.get('reason')  || '',
+      message: (fd.get('message') || '').trim(),
+      consent: fd.get('consent') === 'on',
+      source:  'enquiry-page'
     };
 
     if (!validate(data)) return;
 
     btn.disabled = true;
     btn.classList.add('loading');
-    label.textContent = 'Submitting…';
+    label.textContent = 'Sending…';
 
     try {
       var res  = await fetch('/api/form-submit', {
@@ -395,25 +338,26 @@ img { display: block; max-width: 100%; }
       var json = await res.json();
       if (!json.ok) throw new Error(json.error || 'Submission failed');
 
+      // GA event (no-op when GA isn't configured)
       if (typeof window.gtag === 'function') {
-        window.gtag('event', 'form_submit', { form_type: 'warranty', stone: data.stone_interest });
+        window.gtag('event', 'form_submit', { form_type: 'enquiry', reason: data.reason });
       }
 
       form.outerHTML =
-        '<div class="warranty-form success-card">' +
+        '<div class="enquiry-form success-card">' +
           '<div class="check">&#10003;</div>' +
-          '<h2>Warranty activation submitted.</h2>' +
-          '<p>Your warranty activation has been submitted. You\'ll receive confirmation within 48 hours. ' +
-          'In the meantime, you can <a href="/warranty-terms" style="color:var(--olive)">read the full warranty terms</a>.</p>' +
+          '<h2>Thank you for your enquiry.</h2>' +
+          '<p>We\'ll be in touch within 24 hours.</p>' +
         '</div>';
     } catch (err) {
       btn.disabled = false;
       btn.classList.remove('loading');
-      label.textContent = 'Submit warranty activation';
+      label.textContent = 'Send enquiry';
       showBanner(err.message || 'Something went wrong. Please call us on 1300 257 420.');
     }
   });
 
+  // Clear an inline error when the user edits the offending field.
   ['input', 'change'].forEach(function (evt) {
     form.addEventListener(evt, function (e) {
       var t = e.target;
