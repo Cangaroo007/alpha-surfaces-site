@@ -307,13 +307,64 @@ const FORM_TYPE_LABELS = {
   warranty: 'Warranty Activation',
 };
 app.post('/api/form-submit', (req, res) => {
-  const raw   = String(req.body && req.body.form_type || '').toLowerCase().trim();
+  const raw = String(req.body && req.body.form_type || '').toLowerCase().trim();
+  // Showroom check-in lives outside the form_submissions pipeline because
+  // walk-ins often won't share an email — handleForm requires one. We write
+  // straight into showroom_checkins via insertTypedSubmission and fire the
+  // standard SMS+email notification with a synthetic submission object so
+  // Belinda's alerts still go out.
+  if (raw === 'showroom-checkin') {
+    return handleShowroomCheckin(req, res);
+  }
   const label = FORM_TYPE_LABELS[raw];
   if (!label) {
     return res.status(400).json({ ok: false, error: 'Unknown form type.' });
   }
   return handleForm(req, res, label);
 });
+
+async function handleShowroomCheckin(req, res) {
+  try {
+    const f = req.body || {};
+    const name  = String(f.name  || '').trim();
+    const phone = String(f.phone || '').trim();
+    if (!name)  return res.status(400).json({ ok: false, error: 'Name is required.' });
+    if (!phone) return res.status(400).json({ ok: false, error: 'Phone is required.' });
+    const fields = {
+      name,
+      phone,
+      email: f.email ? String(f.email).trim() : null,
+      stone_interest: f.stone_interest || null,
+      source: f.source || null,
+      message: f.message || f.notes || null,
+      consent: true
+    };
+    const typed = await insertTypedSubmission(pool, 'Showroom Check-In', fields);
+    if (!typed) {
+      return res.status(500).json({ ok: false, error: 'Could not save check-in.' });
+    }
+    // Fire the same SMS+email notification path used for typed submissions.
+    // Synthetic submission shape — only the keys the notifier reads.
+    notifyNewSubmission({
+      id: typed.id,
+      form_type: 'Showroom Check-In',
+      submitted_at: new Date(),
+      name,
+      email: fields.email,
+      phone,
+      stone_interest: fields.stone_interest,
+      message: fields.message,
+      source: fields.source,
+      reference: typed.reference,
+      status: 'new',
+      consent: true
+    }).catch(err => console.error('[notify] Showroom Check-In error:', err.message));
+    return res.json({ ok: true, id: typed.id, reference: typed.reference });
+  } catch (err) {
+    console.error('[form] Showroom Check-In error:', err.message);
+    return res.status(500).json({ ok: false, error: 'Something went wrong. Please try again.' });
+  }
+}
 
 function generateUnsubscribeUrl(email) {
   const secret  = process.env.SESSION_SECRET || 'alpha-surfaces-secret';
@@ -2120,6 +2171,17 @@ app.get('/warranty-terms', (req, res) => {
 app.get('/enquiry', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'enquiry.html'));
 });
+
+// Standalone iPad-kiosk check-in for showroom walk-ins. No nav, no chrome.
+app.get('/showroom-checkin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'showroom-checkin.html'));
+});
+
+// Legacy WordPress URLs Jess may still have bookmarked on the iPad.
+app.get(['/showroom-enquiry-2026', '/showroom-enquiry-2026/'], (req, res) =>
+  res.redirect(301, '/showroom-checkin'));
+app.get(['/wp-admin', '/wp-admin/'], (req, res) =>
+  res.redirect(301, '/projects'));
 
 // ─── Digital catalog (flipbook viewer) ───
 // Slugs in EXTERNAL_CATALOGS are 302-redirected to a hosted viewer (FlippingBook

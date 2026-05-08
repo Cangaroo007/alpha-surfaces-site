@@ -214,6 +214,9 @@
   .status-pill.s-rejected,
   .status-pill.s-declined           { background: #fdecea; color: #b91c1c; }
   .status-pill.s-archived           { background: var(--cream-light); color: var(--muted); }
+  .status-pill.s-followed_up        { background: #fbeee0; color: #b07020; }
+  .status-pill.s-converted          { background: #dcefe1; color: #166534; }
+  .status-pill.s-no_response        { background: #fdecea; color: #b91c1c; }
 
   /* Warranty cards layout */
   .warranty-grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
@@ -230,6 +233,12 @@
   .warranty-card .wc-photos { display: flex; gap: 6px; }
   .warranty-card .wc-photos img { width: 56px; height: 56px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
   .warranty-card .wc-no-photos { font-size: 12px; color: var(--muted); font-style: italic; }
+
+  /* Showroom check-in stats card */
+  .showroom-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .showroom-stats .ss-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; text-align: center; }
+  .showroom-stats .ss-num { font-size: 28px; font-weight: 700; color: var(--olive); line-height: 1.1; }
+  .showroom-stats .ss-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
   .wn-row { padding: 8px 12px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 200px 80px 120px; gap: 12px; align-items: center; }
   .wn-row:hover { background: var(--cream-light); cursor: pointer; }
 
@@ -700,6 +709,7 @@
             <button type="button" class="nav-dropdown-item" data-form-type="warranty"  role="menuitem">Warranty<span class="nav-dropdown-count" data-count="warranty">0</span></button>
             <button type="button" class="nav-dropdown-item" data-form-type="contacts"  role="menuitem">Contacts<span class="nav-dropdown-count" data-count="contacts">0</span></button>
             <button type="button" class="nav-dropdown-item" data-form-type="partners"  role="menuitem">Partners<span class="nav-dropdown-count" data-count="partners">0</span></button>
+            <button type="button" class="nav-dropdown-item" data-form-type="showroom"  role="menuitem">Showroom<span class="nav-dropdown-count" data-count="showroom">0</span></button>
             <button type="button" class="nav-dropdown-item nav-dropdown-item--super" data-form-type="newsletter" role="menuitem" id="forms-newsletter-item">Newsletter</button>
           </div>
         </div>
@@ -707,7 +717,7 @@
           <span class="nav-icon" aria-hidden="true">⏱</span><span class="nav-label">Time</span>
         </button>
         <button id="view-docs-btn"  class="nav-standalone" type="button">
-          <span class="nav-icon" aria-hidden="true">📖</span><span class="nav-label">Docs</span>
+          <span class="nav-icon" aria-hidden="true">📖</span><span class="nav-label">Knowledge Base</span>
         </button>
       </div>
       <button id="btn-export" type="button">↓ Export CSV</button>
@@ -1605,7 +1615,7 @@
       if (!res.ok) return;
       var data = await res.json();
       if (!data.ok) return;
-      var typeRoute = { sample: 'samples', enquiry: 'enquiries', warranty: 'warranty', contact: 'contacts', partner: 'partners' };
+      var typeRoute = { sample: 'samples', enquiry: 'enquiries', warranty: 'warranty', contact: 'contacts', partner: 'partners', showroom: 'showroom' };
       Object.keys(typeRoute).forEach(function (k) {
         var c = (data.counts && data.counts[k]) || { new: 0 };
         var el = document.querySelector('[data-count="' + typeRoute[k] + '"]');
@@ -2848,6 +2858,7 @@
     warranty:   { title: 'Warranty Activations',icon: '🛡️', endpoint: '/api/projects/warranty',    statuses: ['new','under_review','approved','rejected','archived'], layout: 'cards' },
     contacts:   { title: 'Contact Submissions', icon: '✉️', endpoint: '/api/projects/contacts',    statuses: ['new','read','responded','closed','archived'],          layout: 'table' },
     partners:   { title: 'Partner Enquiries',   icon: '🤝', endpoint: '/api/projects/partners',    statuses: ['new','read','meeting_scheduled','approved','declined','archived'], layout: 'table' },
+    showroom:   { title: 'Showroom Walk-Ins',   icon: '🏬', endpoint: '/api/projects/showroom',    statuses: ['new','followed_up','converted','no_response','archived'],          layout: 'showroom' },
     newsletter: { title: 'Newsletter Subscribers', icon: '📧', endpoint: '/api/projects/newsletter', statuses: ['active','unsubscribed','pending'],                  layout: 'newsletter' }
   };
   var STATUS_LABELS = {
@@ -2855,6 +2866,7 @@
     read: 'Read', responded: 'Responded', closed: 'Closed', archived: 'Archived',
     under_review: 'Under Review', approved: 'Approved', rejected: 'Rejected',
     meeting_scheduled: 'Meeting Scheduled', declined: 'Declined',
+    followed_up: 'Followed Up', converted: 'Converted', no_response: 'No Response',
     active: 'Active', unsubscribed: 'Unsubscribed', pending: 'Pending'
   };
   var typedFormsState = { typeKey: null, q: '', status: '', from: '', to: '' };
@@ -2916,6 +2928,13 @@
         body.innerHTML = renderWarrantyCards(rows);
       } else if (typeKey === 'newsletter') {
         body.innerHTML = renderNewsletterTable(rows);
+      } else if (typeKey === 'showroom') {
+        body.innerHTML = '<div id="showroom-stats" class="showroom-stats">' +
+          '<div class="ss-card"><div class="ss-num">…</div><div class="ss-lbl">Today</div></div>' +
+          '<div class="ss-card"><div class="ss-num">…</div><div class="ss-lbl">This week</div></div>' +
+          '<div class="ss-card"><div class="ss-num">…</div><div class="ss-lbl">This month</div></div>' +
+        '</div>' + renderTypedTable(typeKey, rows);
+        loadShowroomStats();
       } else {
         body.innerHTML = renderTypedTable(typeKey, rows);
       }
@@ -3023,6 +3042,17 @@
         { key: 'status',        label: 'Status',   fmt: 'status' }
       ];
     }
+    if (typeKey === 'showroom') {
+      return [
+        { key: 'reference',     label: 'Ref' },
+        { key: 'created_at',    label: 'Date / Time', fmt: 'datetime' },
+        { key: 'name',          label: 'Name' },
+        { key: 'phone',         label: 'Phone',    fmt: 'tel' },
+        { key: 'interests',     label: 'Interests', truncate: 40 },
+        { key: 'source',        label: 'Source' },
+        { key: 'status',        label: 'Status',   fmt: 'status' }
+      ];
+    }
     return [];
   }
 
@@ -3110,6 +3140,23 @@
     });
   }
 
+  async function loadShowroomStats() {
+    try {
+      var res = await fetch('/api/projects/showroom/stats', { credentials: 'include' });
+      if (!res.ok) return;
+      var data = await res.json();
+      if (!data.ok) return;
+      var card = document.getElementById('showroom-stats');
+      if (!card) return;
+      var nums = card.querySelectorAll('.ss-num');
+      if (nums.length >= 3) {
+        nums[0].textContent = data.today      != null ? data.today      : 0;
+        nums[1].textContent = data.this_week  != null ? data.this_week  : 0;
+        nums[2].textContent = data.this_month != null ? data.this_month : 0;
+      }
+    } catch (_) {}
+  }
+
   // Detail drawer for typed records — generic over all types using a
   // field list, with Status + Notes editing and an Activity tab. Warranty
   // adds its photo gallery; partner/sample/enquiry just show their fields.
@@ -3192,6 +3239,12 @@
         { key: 'consent',        label: 'Consent', fmt: 'boolean' }
       ]);
     }
+    if (typeKey === 'showroom') {
+      return common.concat([
+        { key: 'interests', label: 'Interested in', fmt: 'multiline' },
+        { key: 'source',    label: 'How they heard about us' }
+      ]);
+    }
     return common;
   }
 
@@ -3231,6 +3284,12 @@
       var sel = s === r.status ? ' selected' : '';
       return '<option value="' + s + '"' + sel + '>' + escapeHtml(STATUS_LABELS[s] || s) + '</option>';
     }).join('');
+    var followUpField = '';
+    if (typeKey === 'showroom') {
+      var fud = r.follow_up_date ? String(r.follow_up_date).slice(0, 10) : '';
+      followUpField = '<div class="field"><label>Follow-up date</label>' +
+        '<input type="date" id="typed-drw-followup" value="' + escapeAttr(fud) + '"></div>';
+    }
     return '' +
       '<div class="drawer-header">' +
         '<div><h2>' + escapeHtml(r.reference) + ' — ' + escapeHtml(r.name || '—') + '</h2>' +
@@ -3242,6 +3301,7 @@
           '<div class="field-grid">' +
             '<div class="field"><label>Status</label><select id="typed-drw-status">' + statusOpts + '</select></div>' +
             '<div class="field"><label>Reference</label><input type="text" value="' + escapeAttr(r.reference) + '" disabled></div>' +
+            followUpField +
           '</div>' +
         '</div>' +
         '<div class="drawer-section"><h3>Details</h3>' + rows + '</div>' +
@@ -3267,6 +3327,8 @@
           status: document.getElementById('typed-drw-status').value,
           notes:  document.getElementById('typed-drw-notes').value
         };
+        var fud = document.getElementById('typed-drw-followup');
+        if (fud) payload.follow_up_date = fud.value || null;
         var res = await fetch(cfg.endpoint + '/' + r.id, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },

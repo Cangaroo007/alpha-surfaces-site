@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Alpha Surfaces">
+  <meta name="theme-color" content="#f3f1e6">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Welcome — Alpha Surfaces Showroom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: #f3f1e6;
+      color: #2b2a25;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+    .page {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 32px 56px;
+      flex: 1;
+    }
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .brand img {
+      width: 64px; height: auto;
+      object-fit: contain;
+    }
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 500;
+      font-size: 34px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      color: #564D22;
+      margin: 0;
+      text-align: center;
+    }
+    .subtitle {
+      margin: 8px 0 0;
+      font-size: 17px;
+      color: #6b6753;
+      text-align: center;
+      line-height: 1.5;
+    }
+    form { margin-top: 8px; }
+    .field { margin-bottom: 22px; }
+    label {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      color: #564D22;
+      margin-bottom: 8px;
+      letter-spacing: 0.01em;
+    }
+    label .opt {
+      font-weight: 400;
+      color: #9a957d;
+      font-size: 13px;
+      margin-left: 6px;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea {
+      width: 100%;
+      font: inherit;
+      font-size: 19px;
+      padding: 16px 18px;
+      border: 1.5px solid #d8d3bd;
+      border-radius: 12px;
+      background: #fffdf6;
+      color: #2b2a25;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    select {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23564D22' stroke-width='1.5'><path d='M1 1l5 5 5-5'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 18px center;
+      background-size: 14px;
+      padding-right: 44px;
+    }
+    textarea {
+      resize: none;
+      min-height: 96px;
+      line-height: 1.5;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #564D22;
+      box-shadow: 0 0 0 3px rgba(86,77,34,0.15);
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .chip {
+      flex: 0 0 auto;
+      min-height: 52px;
+      padding: 0 22px;
+      font: inherit;
+      font-size: 17px;
+      font-weight: 500;
+      color: #564D22;
+      background: #fffdf6;
+      border: 1.5px solid #d8d3bd;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .chip:active { transform: scale(0.97); }
+    .chip[aria-pressed="true"] {
+      background: #564D22;
+      border-color: #564D22;
+      color: #f3f1e6;
+    }
+    .submit {
+      width: 100%;
+      height: 60px;
+      font: inherit;
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #f3f1e6;
+      background: #564D22;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: background .15s, transform .1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .submit:active { transform: scale(0.99); }
+    .submit:disabled {
+      background: #9a957d;
+      cursor: not-allowed;
+    }
+    .error {
+      margin-top: 14px;
+      padding: 12px 16px;
+      background: #fbe8e0;
+      border-radius: 10px;
+      color: #8a3a14;
+      font-size: 15px;
+      text-align: center;
+    }
+    .error[hidden] { display: none; }
+
+    /* Thank-you screen */
+    .thanks {
+      position: fixed;
+      inset: 0;
+      background: #f3f1e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 18px;
+      padding: 32px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .3s, visibility .3s;
+      z-index: 50;
+    }
+    .thanks.show { opacity: 1; visibility: visible; }
+    .thanks .check {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      background: #564D22;
+      color: #f3f1e6;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 56px; line-height: 1;
+      animation: pop .4s cubic-bezier(.2,1.4,.4,1) both;
+    }
+    .thanks h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 500;
+      font-size: 32px;
+      margin: 0;
+      color: #564D22;
+      text-align: center;
+    }
+    .thanks p {
+      margin: 0;
+      font-size: 18px;
+      color: #6b6753;
+      text-align: center;
+    }
+    @keyframes pop {
+      0%   { transform: scale(0); }
+      80%  { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    /* iPad portrait gets a touch more breathing room */
+    @media (min-width: 768px) {
+      .page { padding: 56px 48px 72px; }
+      h1 { font-size: 40px; }
+      .brand { margin-bottom: 44px; }
+      input[type="text"], input[type="email"], input[type="tel"], select, textarea {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page" id="page">
+    <div class="brand">
+      <img src="/logos/01 Brandmark/RGB_digital/Alpha Surfaces_Brandmark_RGB.png" alt="Alpha Surfaces">
+      <span style="font-family:'Playfair Display',serif;font-size:14px;letter-spacing:0.18em;color:#564D22;text-transform:uppercase;">Alpha Surfaces</span>
+    </div>
+
+    <h1>Welcome to Alpha Surfaces</h1>
+    <p class="subtitle">Tell us a little about your visit — we'll be in touch.</p>
+
+    <form id="checkin-form" autocomplete="on" novalidate>
+      <div class="field">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required autocomplete="name" autocapitalize="words" autofocus>
+      </div>
+
+      <div class="field">
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" name="phone" required autocomplete="tel" inputmode="tel" pattern="[0-9 +()-]{6,}">
+      </div>
+
+      <div class="field">
+        <label for="email">Email <span class="opt">optional</span></label>
+        <input type="email" id="email" name="email" autocomplete="email" inputmode="email" autocapitalize="off" autocorrect="off">
+      </div>
+
+      <div class="field">
+        <label>Interested in <span class="opt">tap any that apply</span></label>
+        <div class="chips" id="interests" role="group" aria-label="Stone interest">
+          <button type="button" class="chip" aria-pressed="false" data-value="Marble">Marble</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="Concrete">Concrete</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="Terrazzo">Terrazzo</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="Porcelain">Porcelain</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="Not sure">Not sure</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="source">How did you hear about us? <span class="opt">optional</span></label>
+        <select id="source" name="source">
+          <option value="">— Select —</option>
+          <option>Google</option>
+          <option>Instagram</option>
+          <option>Referral</option>
+          <option>Drove past</option>
+          <option>Trade show</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="message">Notes <span class="opt">optional</span></label>
+        <textarea id="message" name="message" rows="3" placeholder="Project type, budget, timeline…"></textarea>
+      </div>
+
+      <button type="submit" class="submit" id="submit-btn">Check in</button>
+      <div class="error" id="error" hidden></div>
+    </form>
+  </main>
+
+  <div class="thanks" id="thanks" role="status" aria-live="polite">
+    <div class="check">✓</div>
+    <h2 id="thanks-name">Thank you!</h2>
+    <p>Someone from our team will be with you shortly.</p>
+  </div>
+
+  <script>
+    (function () {
+      var form     = document.getElementById('checkin-form');
+      var btn      = document.getElementById('submit-btn');
+      var errorEl  = document.getElementById('error');
+      var thanksEl = document.getElementById('thanks');
+      var thanksNm = document.getElementById('thanks-name');
+      var chipsEl  = document.getElementById('interests');
+
+      // Toggle-chip selection.
+      chipsEl.addEventListener('click', function (e) {
+        var chip = e.target.closest('.chip');
+        if (!chip) return;
+        var pressed = chip.getAttribute('aria-pressed') === 'true';
+        chip.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+      });
+
+      function selectedInterests() {
+        return Array.from(chipsEl.querySelectorAll('.chip[aria-pressed="true"]'))
+          .map(function (b) { return b.getAttribute('data-value'); });
+      }
+
+      function showError(msg) {
+        errorEl.textContent = msg;
+        errorEl.hidden = false;
+      }
+
+      function hideError() {
+        errorEl.hidden = true;
+        errorEl.textContent = '';
+      }
+
+      function resetForm() {
+        form.reset();
+        chipsEl.querySelectorAll('.chip').forEach(function (c) {
+          c.setAttribute('aria-pressed', 'false');
+        });
+        hideError();
+        btn.disabled = false;
+        btn.textContent = 'Check in';
+        // Refocus name for the next visitor.
+        var n = document.getElementById('name');
+        if (n) n.focus({ preventScroll: true });
+      }
+
+      function showThankYou(name) {
+        thanksNm.textContent = 'Thank you, ' + (name || 'friend') + '!';
+        thanksEl.classList.add('show');
+        setTimeout(function () {
+          thanksEl.classList.remove('show');
+          resetForm();
+        }, 3000);
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        hideError();
+        var name  = (document.getElementById('name').value  || '').trim();
+        var phone = (document.getElementById('phone').value || '').trim();
+        var email = (document.getElementById('email').value || '').trim();
+        if (!name)  return showError('Please enter a name.');
+        if (!phone) return showError('Please enter a phone number.');
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          return showError('That email doesn’t look right.');
+        }
+        var payload = {
+          form_type: 'showroom-checkin',
+          name: name,
+          phone: phone,
+          email: email || undefined,
+          stone_interest: selectedInterests().join(', ') || undefined,
+          source: document.getElementById('source').value || undefined,
+          message: (document.getElementById('message').value || '').trim() || undefined
+        };
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+        try {
+          var res = await fetch('/api/form-submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          var data = await res.json().catch(function () { return {}; });
+          if (!res.ok || !data.ok) {
+            throw new Error(data && data.error ? data.error : 'Could not save. Please try again.');
+          }
+          showThankYou(name.split(/\s+/)[0]);
+        } catch (err) {
+          showError(err.message || 'Something went wrong.');
+          btn.disabled = false;
+          btn.textContent = 'Check in';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

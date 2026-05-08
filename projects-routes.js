@@ -765,6 +765,30 @@ async function initSchema(pool) {
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_pa_status  ON partner_enquiries(status)`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_pa_created ON partner_enquiries(created_at DESC)`);
 
+  // Showroom walk-in check-ins (Jess fills these on the iPad while talking to
+  // visitors). Email is optional — many walk-ins won't share one — so the
+  // schema permits NULL there. Status flow: new → followed_up → converted /
+  // no_response.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS showroom_checkins (
+      id              SERIAL PRIMARY KEY,
+      reference       VARCHAR(20) UNIQUE NOT NULL,
+      name            VARCHAR(255) NOT NULL,
+      email           VARCHAR(255),
+      phone           VARCHAR(50) NOT NULL,
+      interests       TEXT,
+      source          VARCHAR(100),
+      notes           TEXT,
+      consent         BOOLEAN DEFAULT TRUE,
+      status          VARCHAR(20) DEFAULT 'new',
+      follow_up_date  DATE,
+      created_at      TIMESTAMPTZ DEFAULT NOW(),
+      updated_at      TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_sc_status  ON showroom_checkins(status)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_sc_created ON showroom_checkins(created_at DESC)`);
+
   // Polymorphic activity log — one row covers any of the typed form tables
   // above. The (form_type, record_id) composite index keeps the per-record
   // history fetch cheap.
@@ -1163,7 +1187,9 @@ const FORM_TYPES = {
   contact:  { table: 'contact_submissions',  prefix: 'CT', route: 'contacts',  legacy: ['Contact'],
               statuses: ['new', 'read', 'responded', 'closed', 'archived'] },
   partner:  { table: 'partner_enquiries',    prefix: 'PA', route: 'partners',  legacy: ['Partner', 'Trade'],
-              statuses: ['new', 'read', 'meeting_scheduled', 'approved', 'declined', 'archived'] }
+              statuses: ['new', 'read', 'meeting_scheduled', 'approved', 'declined', 'archived'] },
+  showroom: { table: 'showroom_checkins',    prefix: 'SC', route: 'showroom',  legacy: ['Showroom Check-In'],
+              statuses: ['new', 'followed_up', 'converted', 'no_response', 'archived'] }
 };
 
 // Generate the next reference number for a typed form table. Uses a
@@ -1290,6 +1316,16 @@ async function insertTypedSubmission(pool, legacyFormType, fields, sampleItems =
            fields.reason || null,
            fields.message || null,
            consent]
+        );
+      } else if (typeKey === 'showroom') {
+        result = await pool.query(
+          `INSERT INTO showroom_checkins
+             (reference, name, email, phone, interests, source, notes, consent)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+           RETURNING id, reference`,
+          [ref, name, fields.email || null, fields.phone,
+           stoneInterest, fields.source || null,
+           fields.message || fields.notes || null, consent]
         );
       } else {
         return null;
@@ -2085,6 +2121,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
           if (typeKey === 'enquiry' || typeKey === 'partner' || typeKey === 'contact') cols.push('message');
           if (typeKey === 'sample') cols.push('stone_interest');
           if (typeKey === 'warranty') cols.push('stone_name', 'fabricator', 'suburb');
+          if (typeKey === 'showroom') cols.push('phone', 'interests', 'notes', 'source');
           where.push('(' + cols.map(c => `${c} ILIKE $${i}`).join(' OR ') + ')');
         }
         const whereSql = where.length ? ' WHERE ' + where.join(' AND ') : '';
@@ -2110,6 +2147,13 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     router.get(path + '/stats', requireFormsAccess, async (req, res) => {
       try {
         const statusQ = await pool.query(`SELECT status, COUNT(*)::int AS c FROM ${table} GROUP BY status`);
+        // "Today" is calendar-day in Brisbane time so the dashboard count
+        // matches what Jess sees on the showroom iPad.
+        const todayQ = await pool.query(
+          `SELECT COUNT(*)::int AS c FROM ${table}
+            WHERE (created_at AT TIME ZONE 'Australia/Brisbane')::date
+                = (NOW()       AT TIME ZONE 'Australia/Brisbane')::date`
+        );
         const weekQ = await pool.query(
           `SELECT COUNT(*)::int AS c FROM ${table} WHERE created_at >= NOW() - INTERVAL '7 days'`
         );
@@ -2124,6 +2168,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
           total,
           by_status,
           new: by_status.new || 0,
+          today: todayQ.rows[0].c,
           this_week: weekQ.rows[0].c,
           this_month: monthQ.rows[0].c
         });
@@ -2245,6 +2290,16 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
             changes.push({ field: 'notes', from: oldRow.notes, to: notes });
           }
         }
+        if (typeKey === 'showroom' && Object.prototype.hasOwnProperty.call(b, 'follow_up_date')) {
+          const fud = b.follow_up_date && /^\d{4}-\d{2}-\d{2}$/.test(String(b.follow_up_date))
+            ? b.follow_up_date : null;
+          const old = oldRow.follow_up_date
+            ? new Date(oldRow.follow_up_date).toISOString().slice(0, 10) : null;
+          if (fud !== old) {
+            vals.push(fud); sets.push(`follow_up_date = $${vals.length}`);
+            changes.push({ field: 'follow_up_date', from: old, to: fud });
+          }
+        }
         if (!sets.length) return res.json({ ok: true, record: oldRow, unchanged: true });
         sets.push(`updated_at = NOW()`);
         vals.push(id);
@@ -2261,6 +2316,9 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
           } else if (c.field === 'warranty_number') {
             await logTypedFormActivity(pool, typeKey, id, req.user, 'warranty_assigned',
               `Assigned warranty number ${c.to}`);
+          } else if (c.field === 'follow_up_date') {
+            await logTypedFormActivity(pool, typeKey, id, req.user, 'follow_up_set',
+              `Follow-up: ${c.from || '—'} → ${c.to || '—'}`);
           }
         }
         res.json({ ok: true, record: rows[0] });
