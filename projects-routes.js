@@ -94,17 +94,24 @@ async function initSchema(pool) {
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS project_users (
-      id            SERIAL PRIMARY KEY,
-      email         VARCHAR(255) UNIQUE NOT NULL,
-      name          VARCHAR(100) NOT NULL,
-      role          VARCHAR(20)  DEFAULT 'member',
-      password_hash VARCHAR(255) NOT NULL,
-      last_login    TIMESTAMPTZ,
-      created_at    TIMESTAMPTZ DEFAULT NOW(),
-      active        BOOLEAN      DEFAULT TRUE
+      id                   SERIAL PRIMARY KEY,
+      email                VARCHAR(255) UNIQUE NOT NULL,
+      name                 VARCHAR(100) NOT NULL,
+      role                 VARCHAR(20)  DEFAULT 'member',
+      password_hash        VARCHAR(255) NOT NULL,
+      last_login           TIMESTAMPTZ,
+      created_at           TIMESTAMPTZ DEFAULT NOW(),
+      active               BOOLEAN      DEFAULT TRUE,
+      must_change_password BOOLEAN      DEFAULT TRUE
     )
   `);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_users_email ON project_users(LOWER(email))`);
+  // Backfill the flag on existing production DBs that were created before
+  // Track G — every existing seeded user is on the shared default password.
+  await pool.query(
+    `ALTER TABLE project_users
+       ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT TRUE`
+  );
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS ticket_activity (
@@ -146,8 +153,8 @@ async function initSchema(pool) {
     const hash = await bcrypt.hash(DEFAULT_USER_PASSWORD, 10);
     for (const su of SEED_USERS) {
       await pool.query(
-        `INSERT INTO project_users (email, name, role, password_hash)
-         VALUES (LOWER($1), $2, $3, $4)
+        `INSERT INTO project_users (email, name, role, password_hash, must_change_password)
+         VALUES (LOWER($1), $2, $3, $4, TRUE)
          ON CONFLICT (email) DO NOTHING`,
         [su.email, su.name, su.role, hash]
       );
@@ -327,6 +334,12 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
   function requireAuth(req, res, next) {
     const user = resolveUser(req);
     if (!user) return res.status(401).json({ error: 'Unauthorized' });
+    // Force first-login password change. Block every route except the
+    // change-password endpoint itself and the /me probe (UI uses it to
+    // confirm session state when rendering the force-change view).
+    if (user.must_change_password && req.path !== '/change-password' && req.path !== '/me') {
+      return res.status(403).json({ code: 'MUST_CHANGE_PASSWORD', error: 'Password change required before continuing.' });
+    }
     req.user = user;
     next();
   }
@@ -355,7 +368,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     if (email && typeof email === 'string') {
       try {
         const { rows } = await pool.query(
-          'SELECT id, email, name, role, password_hash, active FROM project_users WHERE LOWER(email) = LOWER($1)',
+          'SELECT id, email, name, role, password_hash, active, must_change_password FROM project_users WHERE LOWER(email) = LOWER($1)',
           [email.trim()]
         );
         if (rows.length) {
@@ -366,7 +379,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
           if (valid) {
             await pool.query('UPDATE project_users SET last_login = NOW() WHERE id = $1', [u.id]);
             return issueSession(res, {
-              userId: u.id, email: u.email, name: u.name, role: u.role, source: 'user'
+              userId: u.id, email: u.email, name: u.name, role: u.role, source: 'user',
+              must_change_password: !!u.must_change_password
             });
           }
         }
@@ -383,7 +397,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       if (!valid && !master.startsWith('$2')) valid = supplied === master;
       if (valid) {
         return issueSession(res, {
-          userId: null, email: 'admin@alphasurfaces.com.au', name: 'Admin', role: 'admin', source: 'master'
+          userId: null, email: 'admin@alphasurfaces.com.au', name: 'Admin', role: 'admin', source: 'master',
+          must_change_password: false
         });
       }
     }
@@ -398,7 +413,11 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       httpOnly: true, sameSite: 'strict',
       secure: process.env.NODE_ENV === 'production', maxAge: 86400000
     });
-    res.json({ ok: true, user: { email: payload.email, name: payload.name, role: payload.role } });
+    res.json({
+      ok: true,
+      user: { email: payload.email, name: payload.name, role: payload.role },
+      must_change_password: !!payload.must_change_password
+    });
   }
 
   app.post('/api/projects-logout', (req, res) => {
@@ -414,7 +433,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     res.json({
       authenticated: true,
       user: { email: user.email, name: user.name, role: user.role,
-              initials: initialsFromName(user.name) }
+              initials: initialsFromName(user.name) },
+      must_change_password: !!user.must_change_password
     });
   });
 
@@ -461,7 +481,10 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         return res.status(400).json({ ok: false, error: 'Invalid or expired reset link. Please request a new one.' });
       }
       const hash = await bcrypt.hash(password, 10);
-      await pool.query('UPDATE project_users SET password_hash = $1 WHERE id = $2', [hash, entry.userId]);
+      await pool.query(
+        'UPDATE project_users SET password_hash = $1, must_change_password = FALSE WHERE id = $2',
+        [hash, entry.userId]
+      );
       projectsResetTokens.delete(token);
       // Drop any active sessions for this user so they re-authenticate
       for (const [tok, sess] of projectsSessions) {
@@ -494,6 +517,9 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 8) {
         return res.status(400).json({ ok: false, error: 'New password must be at least 8 characters.' });
       }
+      if (newPassword === DEFAULT_USER_PASSWORD) {
+        return res.status(400).json({ ok: false, error: 'Please choose a password different from the shared default.' });
+      }
       if (!req.user.userId) {
         return res.status(400).json({ ok: false, error: 'The Admin master account has no individual password to change. Use a real user account.' });
       }
@@ -504,7 +530,18 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       const ok = await bcrypt.compare(String(currentPassword || ''), rows[0].password_hash);
       if (!ok) return res.status(401).json({ ok: false, error: 'Current password is incorrect.' });
       const hash = await bcrypt.hash(newPassword, 10);
-      await pool.query('UPDATE project_users SET password_hash = $1 WHERE id = $2', [hash, req.user.userId]);
+      await pool.query(
+        'UPDATE project_users SET password_hash = $1, must_change_password = FALSE WHERE id = $2',
+        [hash, req.user.userId]
+      );
+      // Clear the flag on the live session record so subsequent requests stop
+      // hitting the MUST_CHANGE_PASSWORD gate without a fresh login.
+      const token = req.cookies?.projects_session;
+      if (token && projectsSessions.has(token)) {
+        const sess = projectsSessions.get(token);
+        sess.must_change_password = false;
+        projectsSessions.set(token, sess);
+      }
       res.json({ ok: true, message: 'Password updated.' });
     } catch (err) {
       console.error('[projects] change-password error:', err.message);

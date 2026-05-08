@@ -290,6 +290,27 @@
     </form>
   </div>
 
+  <div class="login-card" id="view-force-change" style="display:none">
+    <div class="login-brand">Alpha Surfaces</div>
+    <h1 class="login-title" id="force-change-heading">Welcome</h1>
+    <p style="margin:-6px 0 18px;color:var(--muted);font-size:14px;line-height:1.5">
+      You're using the shared default password. Please choose a new one before continuing.
+    </p>
+    <form id="force-change-form" autocomplete="off">
+      <div class="field">
+        <label for="force-new-password">New password</label>
+        <input type="password" id="force-new-password" name="password" required autocomplete="new-password" minlength="8">
+      </div>
+      <div class="field">
+        <label for="force-confirm-password">Confirm password</label>
+        <input type="password" id="force-confirm-password" name="confirm" required autocomplete="new-password" minlength="8">
+      </div>
+      <button type="submit" id="force-change-btn">Set new password</button>
+      <div class="login-error" id="force-change-error" aria-live="polite"></div>
+      <div class="login-success" id="force-change-success" aria-live="polite"></div>
+    </form>
+  </div>
+
 </div>
 
 <!-- App -->
@@ -402,34 +423,57 @@
   // ── View-switching helpers ──
   var loginWrap = document.getElementById('login-wrap');
   var appEl = document.getElementById('app');
-  var viewLogin  = document.getElementById('view-login');
-  var viewForgot = document.getElementById('view-forgot');
-  var viewReset  = document.getElementById('view-reset');
+  var viewLogin       = document.getElementById('view-login');
+  var viewForgot      = document.getElementById('view-forgot');
+  var viewReset       = document.getElementById('view-reset');
+  var viewForceChange = document.getElementById('view-force-change');
   var loginForm = document.getElementById('login-form');
   var loginBtn = document.getElementById('login-btn');
   var loginErr = document.getElementById('login-error');
+  // Held in memory between login and the force-change submit so we can
+  // pass currentPassword to /change-password without re-prompting.
+  var pendingCurrentPassword = '';
 
+  function hideAllLoginViews() {
+    viewLogin.style.display       = 'none';
+    viewForgot.style.display      = 'none';
+    viewReset.style.display       = 'none';
+    viewForceChange.style.display = 'none';
+  }
   function showLoginView() {
     loginWrap.style.display = 'flex';
     appEl.style.display = 'none';
-    viewLogin.style.display  = 'block';
-    viewForgot.style.display = 'none';
-    viewReset.style.display  = 'none';
+    hideAllLoginViews();
+    viewLogin.style.display = 'block';
     loginErr.textContent = '';
   }
   function showForgotView() {
-    viewLogin.style.display  = 'none';
+    hideAllLoginViews();
     viewForgot.style.display = 'block';
-    viewReset.style.display  = 'none';
     document.getElementById('forgot-error').textContent = '';
     document.getElementById('forgot-success').textContent = '';
   }
   function showResetView() {
     loginWrap.style.display = 'flex';
     appEl.style.display = 'none';
-    viewLogin.style.display  = 'none';
-    viewForgot.style.display = 'none';
-    viewReset.style.display  = 'block';
+    hideAllLoginViews();
+    viewReset.style.display = 'block';
+  }
+  function showForceChangeView(user) {
+    loginWrap.style.display = 'flex';
+    appEl.style.display = 'none';
+    hideAllLoginViews();
+    viewForceChange.style.display = 'block';
+    var heading = document.getElementById('force-change-heading');
+    heading.textContent = user && user.name ? 'Welcome, ' + user.name : 'Welcome';
+    document.getElementById('force-change-error').textContent = '';
+    document.getElementById('force-change-success').textContent = '';
+    document.getElementById('force-new-password').value = '';
+    document.getElementById('force-confirm-password').value = '';
+    var btn = document.getElementById('force-change-btn');
+    btn.disabled = false;
+    btn.textContent = 'Set new password';
+    setTimeout(function () { document.getElementById('force-new-password').focus(); }, 50);
   }
   function showApp(user) {
     if (user) applyUser(user);
@@ -465,7 +509,21 @@
   } else {
     fetch('/api/projects-auth-check', { credentials: 'include' })
       .then(function (r) { return r.json(); })
-      .then(function (d) { if (d && d.authenticated && d.user) showApp(d.user); })
+      .then(function (d) {
+        if (!d || !d.authenticated || !d.user) return;
+        // If the session is flagged for password change but we don't have the
+        // current password in memory (e.g. page was refreshed), the only safe
+        // path is to send them back through login so we can capture it.
+        if (d.must_change_password && !pendingCurrentPassword) {
+          showLogin('Please sign in again to set a new password.');
+          return;
+        }
+        if (d.must_change_password) {
+          showForceChangeView(d.user);
+          return;
+        }
+        showApp(d.user);
+      })
       .catch(function () {});
   }
 
@@ -485,7 +543,16 @@
       });
       var data = await res.json().catch(function () { return {}; });
       if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
-      showApp(data.user || { name: email, role: 'member', initials: initialsOf(email) });
+      var user = data.user || { name: email, role: 'member', initials: initialsOf(email) };
+      if (!user.initials) user.initials = initialsOf(user.name || email);
+      if (data.must_change_password) {
+        // Hold the just-entered password so /change-password can verify it.
+        pendingCurrentPassword = pw;
+        showForceChangeView(user);
+      } else {
+        pendingCurrentPassword = '';
+        showApp(user);
+      }
     } catch (err) {
       loginErr.textContent = err.message || 'Login failed';
     } finally {
@@ -500,6 +567,7 @@
     document.getElementById('projects-pw').value = '';
     document.body.classList.remove('role-viewer');
     state.user = null;
+    pendingCurrentPassword = '';
     document.getElementById('user-chip').style.display = 'none';
     document.getElementById('btn-admin').style.display = 'none';
     showLogin();
@@ -567,6 +635,49 @@
     } catch (err) {
       errEl.textContent = err.message || 'Could not update password.';
       btn.disabled = false; btn.textContent = 'Update Password';
+    }
+  });
+
+  // ── Force password change on first login ──
+  var DEFAULT_SHARED_PASSWORD = 'AlphaSurfaces2026';
+  document.getElementById('force-change-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn   = document.getElementById('force-change-btn');
+    var errEl = document.getElementById('force-change-error');
+    var okEl  = document.getElementById('force-change-success');
+    errEl.textContent = ''; okEl.textContent = '';
+    var pw      = document.getElementById('force-new-password').value;
+    var confirm = document.getElementById('force-confirm-password').value;
+    if (pw.length < 8)              { errEl.textContent = 'Password must be at least 8 characters.'; return; }
+    if (pw !== confirm)             { errEl.textContent = 'Passwords do not match.';                  return; }
+    if (pw === DEFAULT_SHARED_PASSWORD) { errEl.textContent = 'Please choose a password different from the shared default.'; return; }
+    if (!pendingCurrentPassword) {
+      errEl.textContent = 'Session expired — please sign in again.';
+      setTimeout(function () { showLogin(); }, 1200);
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'Saving…';
+    try {
+      var res = await fetch('/api/projects/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ currentPassword: pendingCurrentPassword, newPassword: pw })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok || !data.ok) throw new Error(data.error || ('HTTP ' + res.status));
+      pendingCurrentPassword = '';
+      okEl.textContent = 'Password updated. Loading dashboard…';
+      // Re-pull the user record so the chip + role gating reflect the now-clean session.
+      var check = await fetch('/api/projects-auth-check', { credentials: 'include' }).then(function (r) { return r.json(); }).catch(function () { return null; });
+      if (check && check.authenticated && check.user) {
+        showApp(check.user);
+      } else {
+        showLogin('Please sign in with your new password.');
+      }
+    } catch (err) {
+      errEl.textContent = err.message || 'Could not update password.';
+      btn.disabled = false; btn.textContent = 'Set new password';
     }
   });
 
