@@ -429,6 +429,19 @@ async function sendFormsResetEmail(to, resetUrl) {
 // they hit monthly_hours_cap, for the supplied month. Dedupe is enforced by
 // the time_alerts UNIQUE(user_id, month, alert_type) — a successful INSERT
 // is treated as authoritative; if it conflicts the email is skipped.
+async function getSuperAdminEmails(pool) {
+  if (!pool) return [];
+  try {
+    const { rows } = await pool.query(
+      `SELECT email FROM project_users WHERE role = 'super_admin' AND active = TRUE`
+    );
+    return rows.map(r => r.email).filter(Boolean);
+  } catch (err) {
+    console.error('[notify/time] super_admin lookup error:', err.message);
+    return [];
+  }
+}
+
 async function checkAndSendTimeAlert(pool, userId, month) {
   if (!pool || !userId || !month) return { sent: [] };
   if (!/^\d{4}-\d{2}$/.test(month)) return { sent: [] };
@@ -443,7 +456,6 @@ async function checkAndSendTimeAlert(pool, userId, month) {
     );
     if (!settingsRows.length) return { sent: [] };
     const settings = settingsRows[0];
-    if (!settings.alert_email) return { sent: [] };
 
     // Range query is half-open: [first-of-month, first-of-next-month).
     const [yyyy, mm] = month.split('-').map(Number);
@@ -457,12 +469,45 @@ async function checkAndSendTimeAlert(pool, userId, month) {
     const totalMinutes = sumRows[0].total_min;
     const totalHours   = totalMinutes / 60;
 
+    const cap     = settings.monthly_hours_cap;
+    const warning = settings.warning_hours;
     const sent = [];
     const monthLabel = new Date(`${startDate}T00:00:00Z`).toLocaleString('en-AU', {
       month: 'long', year: 'numeric', timeZone: 'UTC'
     });
 
-    async function maybeSend(alertType, label, color) {
+    // Resolve recipient list once per call. Track D requirement: every
+    // super_admin gets the alert, sent as separate one-recipient emails so
+    // each lands in their own inbox (not a single CC-everyone send).
+    const recipients = await getSuperAdminEmails(pool);
+    if (!recipients.length) {
+      console.warn('[notify/time] no active super_admin recipients — alert skipped');
+      return { sent: [], totalHours };
+    }
+
+    // Build the threshold ladder. Floor on each level so a brief 14.99 hr
+    // calculation doesn't fire the 15hr alert; only fires once the user is
+    // genuinely *at* or above the threshold.
+    const thresholds = [];
+    if (warning && warning < cap) {
+      thresholds.push({ hours: warning, type: `${warning}hr_warning`, label: 'Approaching monthly cap', color: '#b07020' });
+    }
+    thresholds.push({ hours: cap, type: `${cap}hr_reached`, label: 'Monthly cap reached', color: '#b3261e' });
+    // Overage rungs every 5 hours above the cap. Cap at totalHours so we
+    // don't preemptively schedule alerts that haven't been crossed yet.
+    if (totalHours > cap) {
+      const top = Math.floor(totalHours / 5) * 5;
+      for (let h = cap + 5; h <= top; h += 5) {
+        thresholds.push({
+          hours: h,
+          type: `${h}hr_overage`,
+          label: `${h - cap} hours over cap`,
+          color: '#b3261e'
+        });
+      }
+    }
+
+    async function maybeSend(threshold) {
       // Race-safe dedupe: insert first, only send if we won the row. If
       // another request already inserted, ON CONFLICT swallows the error
       // and we skip the email.
@@ -471,29 +516,30 @@ async function checkAndSendTimeAlert(pool, userId, month) {
          VALUES ($1, $2, $3)
          ON CONFLICT (user_id, month, alert_type) DO NOTHING
          RETURNING id`,
-        [userId, month, alertType]
+        [userId, month, threshold.type]
       );
       if (!ins.rows.length) return; // already sent — skip
       if (!configureSendgrid()) {
         console.warn('[notify/time] SENDGRID_API_KEY not set — alert recorded but no email sent');
         return;
       }
-      const cap     = settings.monthly_hours_cap;
-      const warning = settings.warning_hours;
+      const overBy = totalHours - cap;
       const subject = `⏱ Time tracking alert — ${settings.user_name} has logged ${totalHours.toFixed(1)} of ${cap} hours in ${monthLabel}`;
       const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#f3f1e6;font-family:'Helvetica Neue',Arial,sans-serif">
 <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f3f1e6">
   <tr><td align="center" style="padding:48px 16px">
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-      <tr><td style="background:${color};padding:24px 32px">
+      <tr><td style="background:${threshold.color};padding:24px 32px">
         <p style="margin:0;color:#fff;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.85">Alpha Surfaces · Time tracking</p>
-        <h1 style="margin:6px 0 0;color:#fff;font-size:21px;font-weight:600">${escapeHtml(label)}</h1>
+        <h1 style="margin:6px 0 0;color:#fff;font-size:21px;font-weight:600">${escapeHtml(threshold.label)}</h1>
       </td></tr>
       <tr><td style="padding:28px 32px;color:#222;font-size:15px;line-height:1.6">
         <p style="margin:0 0 14px"><strong>${escapeHtml(settings.user_name)}</strong> (${escapeHtml(settings.user_email)}) has logged
           <strong>${totalHours.toFixed(1)} hours</strong> against a ${cap}-hour monthly allocation in ${escapeHtml(monthLabel)}.</p>
-        <p style="margin:0 0 14px;color:#555">Warning threshold: ${warning} hrs · Cap: ${cap} hrs.</p>
+        ${overBy > 0
+          ? `<p style="margin:0 0 14px;color:#b3261e"><strong>${overBy.toFixed(1)} hours over cap.</strong></p>`
+          : `<p style="margin:0 0 14px;color:#555">Warning threshold: ${warning} hrs · Cap: ${cap} hrs.</p>`}
         <p style="margin:24px 0 0">
           <a href="${escapeAttr((process.env.SITE_URL || 'https://alphasurfaces.com.au') + '/projects?view=time')}"
              style="display:inline-block;background:#564D22;color:#fff;padding:11px 22px;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:4px">
@@ -502,33 +548,35 @@ async function checkAndSendTimeAlert(pool, userId, month) {
         </p>
       </td></tr>
       <tr><td style="padding:18px 32px;background:#f7f4e8;color:#999;font-size:12px;text-align:center">
-        This is an automated alert. To change thresholds, edit the row in user_time_settings.
+        Sent to all super_admins. To change thresholds, edit the row in user_time_settings.
       </td></tr>
     </table>
   </td></tr>
 </table>
 </body></html>`;
-      try {
-        await sgMail.send({
-          to: settings.alert_email,
-          from: NOTIFY_EMAIL_FROM(),
-          subject,
-          html
-        });
-        sent.push(alertType);
-        console.log('[notify/time]', alertType, '→', settings.alert_email, '(', totalHours.toFixed(1), 'hrs )');
-      } catch (err) {
-        const detail = err.response?.body?.errors ? JSON.stringify(err.response.body.errors) : err.message;
+      // One-by-one send so each recipient gets the email directly addressed
+      // to them (some clients de-prioritise mail with multiple To: addresses).
+      const results = await Promise.allSettled(recipients.map(to =>
+        sgMail.send({ to, from: NOTIFY_EMAIL_FROM(), subject, html })
+      ));
+      const okCount = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected');
+      sent.push(threshold.type);
+      console.log('[notify/time]', threshold.type, '→', okCount, '/', recipients.length, 'super_admins (', totalHours.toFixed(1), 'hrs )');
+      failed.forEach(f => {
+        const detail = f.reason?.response?.body?.errors
+          ? JSON.stringify(f.reason.response.body.errors)
+          : (f.reason && f.reason.message);
         console.error('[notify/time] send error:', detail);
-        // Don't roll back the time_alerts row — re-trying would spam if the
-        // address is bad; better to drop the alert and rely on the dashboard.
-      }
+      });
     }
 
-    if (totalHours >= settings.monthly_hours_cap) {
-      await maybeSend('20hr_reached', 'Monthly cap reached', '#b3261e');
-    } else if (totalHours >= settings.warning_hours) {
-      await maybeSend('15hr_warning', 'Approaching monthly cap', '#b07020');
+    // Fire any threshold the user has reached. maybeSend dedupes per
+    // (user, month, alert_type) so re-running the sweep is safe.
+    for (const t of thresholds) {
+      if (totalHours >= t.hours) {
+        await maybeSend(t);
+      }
     }
     return { sent, totalHours };
   } catch (err) {

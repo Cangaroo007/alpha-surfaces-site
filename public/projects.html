@@ -50,6 +50,17 @@
   /* ── Login ── */
   .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
   .login-card { background: var(--white); border-radius: 12px; padding: 48px 40px; max-width: 420px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
+  .login-card.login-card--wide { max-width: 560px; }
+  .default-view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+  .default-view-grid.single { grid-template-columns: 1fr; }
+  .default-view-card { display: flex; align-items: flex-start; gap: 12px; padding: 16px 18px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--white); cursor: pointer; transition: border-color 0.15s, background 0.15s, box-shadow 0.15s; text-align: left; font-family: inherit; width: 100%; }
+  .default-view-card:hover { border-color: var(--olive); background: var(--cream-light); }
+  .default-view-card.selected { border-color: var(--olive); background: var(--cream-light); box-shadow: 0 0 0 2px rgba(86,77,34,0.18); }
+  .default-view-card .dv-icon { font-size: 22px; line-height: 1; flex-shrink: 0; }
+  .default-view-card .dv-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .default-view-card .dv-desc { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+  .default-view-card[disabled] { opacity: 0.5; cursor: not-allowed; }
+  @media (max-width: 540px) { .default-view-grid { grid-template-columns: 1fr; } }
   .login-brand { color: var(--olive); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; }
   .login-title { color: var(--black); font-size: 22px; font-weight: 700; margin-bottom: 28px; }
   .login-card label { display: block; color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
@@ -68,8 +79,16 @@
   .login-link.subtle:hover { color: var(--olive); }
 
   /* Header user chip */
-  .user-chip { display: inline-flex; align-items: center; gap: 8px; color: var(--cream); font-size: 13px; padding: 0 4px; }
-  .user-chip .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--cream); color: var(--olive); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+  .user-chip-wrap { position: relative; display: inline-block; }
+  .app-header button.user-chip { display: inline-flex; align-items: center; gap: 8px; color: var(--cream); font-size: 13px; padding: 4px 10px 4px 4px; background: transparent; border: 1px solid transparent; border-radius: 999px; cursor: pointer; transition: background 0.15s, border-color 0.15s; font-family: inherit; letter-spacing: normal; text-transform: none; }
+  .app-header button.user-chip:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.32); }
+  .app-header button.user-chip[aria-expanded="true"] { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.45); }
+  .app-header button.user-chip .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--cream); color: var(--olive); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+  .user-chip-caret { font-size: 10px; opacity: 0.7; }
+  .user-menu { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 180px; background: var(--white); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 80; padding: 4px; }
+  .user-menu.open { display: block; }
+  .user-menu-item { display: block; width: 100%; padding: 9px 12px; background: transparent; border: none; color: var(--text); text-align: left; font-size: 13px; font-family: inherit; letter-spacing: normal; text-transform: none; border-radius: 4px; cursor: pointer; }
+  .user-menu-item:hover { background: var(--cream-light); color: var(--olive); }
 
   /* Drawer tabs */
   .tabs { display: flex; border-bottom: 1px solid var(--border); margin: 0 -28px 18px; padding: 0 28px; }
@@ -156,7 +175,7 @@
   .card-clock:hover { background: rgba(86,77,34,0.10); color: var(--olive); }
   .card { position: relative; }
   body.role-viewer .card-clock { display: none !important; }
-  body.role-viewer #view-time-btn { display: none !important; }
+  /* #view-time-btn visibility is driven by JS in applyUser() — super_admin only. */
 
   .time-summary-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; margin-bottom: 18px; }
   .time-summary-head { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -231,9 +250,25 @@
   }
   .toolbar input[type=search]:focus, .toolbar select:focus { border-color: var(--olive); }
   .toolbar input[type=search] { flex: 1; min-width: 200px; }
-  .view-toggle { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 4px; overflow: hidden; }
-  .view-toggle button { padding: 8px 14px; background: var(--white); border: none; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-  .view-toggle button.active { background: var(--olive); color: var(--white); }
+  /* ── Nav: Kanban|List pill + standalone Forms/Time ──
+     Selectors are scoped under .app-header to win against the generic
+     `.app-header button` base styles via specificity (2 classes + 1 element). */
+  .nav-group { display: inline-flex; align-items: center; gap: 8px; }
+  .nav-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.22); margin: 0 6px; }
+  .app-header .view-toggle { display: inline-flex; background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.32); border-radius: 6px; overflow: hidden; padding: 2px; gap: 2px; }
+  .app-header .view-toggle .nav-btn { background: transparent; color: var(--cream); border: none; padding: 7px 16px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; border-radius: 4px; transition: background 0.15s, color 0.15s; }
+  .app-header .view-toggle .nav-btn:hover { background: rgba(255,255,255,0.10); border-color: transparent; }
+  .app-header .view-toggle .nav-btn.active { background: var(--cream); color: var(--olive); box-shadow: 0 1px 3px rgba(0,0,0,0.18); }
+  .app-header button.nav-standalone { display: inline-flex; align-items: center; gap: 6px; background: transparent; color: var(--cream); border: 1px solid rgba(255,255,255,0.32); padding: 7px 16px; border-radius: 6px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+  .app-header button.nav-standalone:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.55); }
+  .app-header button.nav-standalone.active { background: var(--cream); color: var(--olive); border-color: var(--cream); box-shadow: 0 1px 3px rgba(0,0,0,0.18); }
+  .app-header button.nav-standalone .nav-icon { font-size: 14px; line-height: 1; }
+  @media (max-width: 720px) {
+    .nav-divider { display: none; }
+    .app-header button.nav-standalone { padding: 7px 10px; }
+    .app-header button.nav-standalone .nav-label { display: none; }
+    .app-header .view-toggle .nav-btn { padding: 7px 10px; }
+  }
 
   /* ── Kanban ── */
   .board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
@@ -447,6 +482,18 @@
     </form>
   </div>
 
+  <!-- Choose default view (shown after first-login password change, or from
+       the user menu's "Set default view" item). -->
+  <div class="login-card login-card--wide" id="view-choose-default" style="display:none">
+    <div class="login-brand">Alpha Surfaces</div>
+    <h1 class="login-title">What would you like to see when you log in?</h1>
+    <p style="margin:-6px 0 18px;color:var(--muted);font-size:14px;line-height:1.5">
+      You can change this later from your user menu.
+    </p>
+    <div class="default-view-grid" id="default-view-grid"></div>
+    <div class="login-error" id="default-view-error" aria-live="polite"></div>
+  </div>
+
 </div>
 
 <!-- App -->
@@ -458,18 +505,31 @@
     </div>
     <div class="tools">
       <button id="btn-new" class="primary" type="button">＋ New Ticket</button>
-      <div class="view-toggle" role="tablist">
-        <button id="view-board" class="active" type="button">Kanban</button>
-        <button id="view-list"  type="button">List</button>
-        <button id="view-forms-btn" type="button">Forms</button>
-        <button id="view-time-btn"  type="button">Time</button>
+      <div class="nav-group" role="navigation" aria-label="Views">
+        <div class="view-toggle" role="tablist" aria-label="Ticket views">
+          <button id="view-board" class="nav-btn active" type="button" role="tab">Kanban</button>
+          <button id="view-list"  class="nav-btn"        type="button" role="tab">List</button>
+        </div>
+        <span class="nav-divider" aria-hidden="true"></span>
+        <button id="view-forms-btn" class="nav-standalone" type="button">
+          <span class="nav-icon" aria-hidden="true">📨</span><span class="nav-label">Forms</span>
+        </button>
+        <button id="view-time-btn"  class="nav-standalone" type="button">
+          <span class="nav-icon" aria-hidden="true">⏱</span><span class="nav-label">Time</span>
+        </button>
       </div>
       <button id="btn-export" type="button">↓ Export CSV</button>
       <button id="btn-admin" class="icon-btn" type="button" title="User management" style="display:none">⚙</button>
-      <span class="user-chip" id="user-chip" style="display:none">
-        <span class="avatar" id="user-avatar"></span>
-        <span id="user-name"></span>
-      </span>
+      <div class="user-chip-wrap" id="user-chip-wrap" style="display:none">
+        <button class="user-chip" id="user-chip" type="button" aria-haspopup="menu" aria-expanded="false">
+          <span class="avatar" id="user-avatar"></span>
+          <span id="user-name"></span>
+          <span class="user-chip-caret" aria-hidden="true">▾</span>
+        </button>
+        <div class="user-menu" id="user-menu" role="menu" aria-hidden="true">
+          <button type="button" class="user-menu-item" id="menu-default-view" role="menuitem">Set default view</button>
+        </div>
+      </div>
       <button id="btn-logout" type="button">Sign out</button>
     </div>
   </header>
@@ -654,6 +714,8 @@
     viewForgot.style.display      = 'none';
     viewReset.style.display       = 'none';
     viewForceChange.style.display = 'none';
+    var chooseDefault = document.getElementById('view-choose-default');
+    if (chooseDefault) chooseDefault.style.display = 'none';
   }
   function showLoginView() {
     loginWrap.style.display = 'flex';
@@ -694,17 +756,40 @@
     if (user) applyUser(user);
     loginWrap.style.display = 'none';
     appEl.style.display = 'flex';
-    // Honour ?view=forms in the URL — landing on /projects?view=forms (e.g.
-    // from the legacy /forms 301 redirect) should drop straight into the
-    // forms tab rather than the kanban.
+    // Honour ?view=… in the URL first — explicit links should always win
+    // over the saved preference (used by the legacy /forms 301 redirect and
+    // by deep links from emails). Otherwise fall back to the user's saved
+    // default_view, then to the kanban.
     var qsView = new URLSearchParams(location.search).get('view');
+    var landing = null;
     if (qsView === 'forms' && state.user && state.user.role !== 'viewer') {
-      setView('forms');
-    } else if (qsView === 'time' && state.user && state.user.role !== 'viewer') {
-      setView('time');
+      landing = 'forms';
+    } else if (qsView === 'time' && state.user && state.user.role === 'super_admin') {
+      landing = 'time';
+    } else if (qsView === 'list' || qsView === 'board') {
+      landing = qsView;
+    } else if (state.user && state.user.default_view) {
+      landing = resolveLandingView(state.user.default_view, state.user.role);
+    }
+    if (landing && landing !== 'kanban' && landing !== 'board') {
+      setView(landing);
+    } else if (landing === 'list') {
+      setView('list');
     } else {
+      // 'kanban' / 'board' / nothing → default kanban via loadAll()
       loadAll();
     }
+  }
+
+  // Map a saved default_view to a setView() argument, downgrading if the
+  // user's role no longer permits the saved view (e.g. demoted from
+  // super_admin → operator after picking 'time').
+  function resolveLandingView(view, role) {
+    if (view === 'kanban') return 'board';
+    if (view === 'list')   return 'list';
+    if (view === 'forms')  return role === 'viewer' ? 'board' : 'forms';
+    if (view === 'time')   return role === 'super_admin' ? 'time' : 'board';
+    return 'board';
   }
   function showLogin(msg) {
     showLoginView();
@@ -713,8 +798,8 @@
 
   function applyUser(user) {
     state.user = user;
-    var chip = document.getElementById('user-chip');
-    chip.style.display = 'inline-flex';
+    var wrap = document.getElementById('user-chip-wrap');
+    if (wrap) wrap.style.display = 'inline-block';
     document.getElementById('user-name').textContent = user.name || '';
     document.getElementById('user-avatar').textContent = user.initials || initialsOf(user.name);
     // Admin (gear) → user management. Super_admin only.
@@ -723,8 +808,10 @@
     // Forms tab — viewers don't get forms access at all.
     var formsBtn = document.getElementById('view-forms-btn');
     if (formsBtn) formsBtn.style.display = user.role === 'viewer' ? 'none' : '';
+    // Time tab — Sean's consulting hours dashboard, super_admin only. Hidden
+    // entirely for operators and viewers, not just disabled.
     var timeBtn = document.getElementById('view-time-btn');
-    if (timeBtn)  timeBtn.style.display  = user.role === 'viewer' ? 'none' : '';
+    if (timeBtn)  timeBtn.style.display  = user.role === 'super_admin' ? '' : 'none';
     // The all-users picker on the time view is super_admin-only.
     var timeUserSelect = document.getElementById('time-user-select');
     if (timeUserSelect) timeUserSelect.style.display = user.role === 'super_admin' ? '' : 'none';
@@ -794,6 +881,40 @@
     }
   });
 
+  // User chip popover — toggle on click, close on outside click or Escape.
+  (function wireUserMenu() {
+    var chip = document.getElementById('user-chip');
+    var menu = document.getElementById('user-menu');
+    if (!chip || !menu) return;
+    function close() {
+      menu.classList.remove('open');
+      chip.setAttribute('aria-expanded', 'false');
+      menu.setAttribute('aria-hidden', 'true');
+    }
+    function open() {
+      menu.classList.add('open');
+      chip.setAttribute('aria-expanded', 'true');
+      menu.setAttribute('aria-hidden', 'false');
+    }
+    chip.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (menu.classList.contains('open')) close(); else open();
+    });
+    document.addEventListener('click', function (e) {
+      if (!menu.classList.contains('open')) return;
+      if (e.target === menu || menu.contains(e.target)) return;
+      close();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+    });
+    var menuItem = document.getElementById('menu-default-view');
+    if (menuItem) menuItem.addEventListener('click', function () {
+      close();
+      if (state.user) showChooseDefaultView(state.user);
+    });
+  })();
+
   document.getElementById('btn-logout').addEventListener('click', async function () {
     await fetch('/api/projects-logout', { method: 'POST', credentials: 'include' }).catch(function () {});
     document.getElementById('projects-email').value = '';
@@ -801,7 +922,8 @@
     document.body.classList.remove('role-viewer');
     state.user = null;
     pendingCurrentPassword = '';
-    document.getElementById('user-chip').style.display = 'none';
+    var wrap = document.getElementById('user-chip-wrap');
+    if (wrap) wrap.style.display = 'none';
     document.getElementById('btn-admin').style.display = 'none';
     showLogin();
   });
@@ -900,11 +1022,12 @@
       var data = await res.json().catch(function () { return {}; });
       if (!res.ok || !data.ok) throw new Error(data.error || ('HTTP ' + res.status));
       pendingCurrentPassword = '';
-      okEl.textContent = 'Password updated. Loading dashboard…';
-      // Re-pull the user record so the chip + role gating reflect the now-clean session.
+      okEl.textContent = 'Password updated.';
+      // Pull the now-clean user record before showing the default-view step
+      // so the role-aware option list reflects the user's actual permissions.
       var check = await fetch('/api/projects-auth-check', { credentials: 'include' }).then(function (r) { return r.json(); }).catch(function () { return null; });
       if (check && check.authenticated && check.user) {
-        showApp(check.user);
+        showChooseDefaultView(check.user);
       } else {
         showLogin('Please sign in with your new password.');
       }
@@ -913,6 +1036,67 @@
       btn.disabled = false; btn.textContent = 'Set new password';
     }
   });
+
+  // ── Choose default view (post-password-change + user-menu entry) ──
+  // Renders the four landing-view options as clickable cards. Saves to
+  // /me/default-view and forwards into showApp() so the user lands on
+  // their pick immediately. The user object passed in determines which
+  // options are shown (forms hidden for viewers, time only for super_admin).
+  var DEFAULT_VIEW_OPTIONS = [
+    { value: 'kanban', icon: '📋', title: 'Kanban Board',     desc: 'See all tickets in columns by status.' },
+    { value: 'list',   icon: '📝', title: 'List View',         desc: 'See tickets in a searchable table.' },
+    { value: 'forms',  icon: '📨', title: 'Form Submissions',  desc: 'See incoming enquiries and sample requests.' },
+    { value: 'time',   icon: '⏱',  title: 'Time Tracking',     desc: "See time logged against projects." }
+  ];
+
+  function defaultViewOptionsForRole(role) {
+    return DEFAULT_VIEW_OPTIONS.filter(function (o) {
+      if (o.value === 'forms' && role === 'viewer')      return false;
+      if (o.value === 'time'  && role !== 'super_admin') return false;
+      return true;
+    });
+  }
+
+  function showChooseDefaultView(user) {
+    loginWrap.style.display = 'flex';
+    appEl.style.display = 'none';
+    hideAllLoginViews();
+    document.getElementById('view-choose-default').style.display = 'block';
+    var grid = document.getElementById('default-view-grid');
+    var opts = defaultViewOptionsForRole(user && user.role);
+    grid.classList.toggle('single', opts.length === 1);
+    grid.innerHTML = opts.map(function (o) {
+      return '<button type="button" class="default-view-card" data-view="' + o.value + '">' +
+        '<span class="dv-icon" aria-hidden="true">' + o.icon + '</span>' +
+        '<span><span class="dv-title">' + o.title + '</span>' +
+          '<span class="dv-desc">' + o.desc + '</span></span>' +
+      '</button>';
+    }).join('');
+    document.getElementById('default-view-error').textContent = '';
+    grid.querySelectorAll('.default-view-card').forEach(function (card) {
+      card.addEventListener('click', async function () {
+        if (card.disabled) return;
+        var v = card.dataset.view;
+        grid.querySelectorAll('.default-view-card').forEach(function (c) { c.classList.remove('selected'); c.disabled = true; });
+        card.classList.add('selected');
+        try {
+          var res = await fetch('/api/projects/me/default-view', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ default_view: v })
+          });
+          var data = await res.json().catch(function () { return {}; });
+          if (!res.ok || !data.ok) throw new Error(data.error || ('HTTP ' + res.status));
+          var next = Object.assign({}, user, { default_view: v });
+          showApp(next);
+        } catch (err) {
+          document.getElementById('default-view-error').textContent = err.message || 'Could not save preference.';
+          grid.querySelectorAll('.default-view-card').forEach(function (c) { c.disabled = false; });
+        }
+      });
+    });
+  }
 
   // ── Data loading ──
   async function loadAll() {

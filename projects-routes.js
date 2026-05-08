@@ -60,6 +60,7 @@ const ALLOWED_CATEGORIES = ['website','content','integration','consulting','show
 //   operator    → assigned tickets only + full forms access (no CMS, no users)
 //   viewer      → assigned tickets only, read-only, no forms
 const ALLOWED_ROLES      = ['super_admin', 'operator', 'viewer'];
+const ALLOWED_DEFAULT_VIEWS = ['kanban', 'list', 'forms', 'time'];
 
 const UPDATABLE_TICKET_COLS = [
   'title','description','category','priority','status',
@@ -223,6 +224,14 @@ async function initSchema(pool) {
   await pool.query(
     `ALTER TABLE project_users
        ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT TRUE`
+  );
+
+  // Per-user landing view preference (Track D). 'kanban' is the historical
+  // default and matches what the front-end falls back to. Allowed values
+  // mirror the four nav buttons.
+  await pool.query(
+    `ALTER TABLE project_users
+       ADD COLUMN IF NOT EXISTS default_view VARCHAR(20) DEFAULT 'kanban'`
   );
 
   // Role overhaul: re-map legacy roles (admin/member/viewer) to the new
@@ -654,7 +663,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     if (email && typeof email === 'string') {
       try {
         const { rows } = await pool.query(
-          'SELECT id, email, name, role, password_hash, active, must_change_password FROM project_users WHERE LOWER(email) = LOWER($1)',
+          'SELECT id, email, name, role, password_hash, active, must_change_password, default_view FROM project_users WHERE LOWER(email) = LOWER($1)',
           [email.trim()]
         );
         if (rows.length) {
@@ -666,7 +675,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
             await pool.query('UPDATE project_users SET last_login = NOW() WHERE id = $1', [u.id]);
             return issueSession(res, {
               userId: u.id, email: u.email, name: u.name, role: u.role, source: 'user',
-              must_change_password: !!u.must_change_password
+              must_change_password: !!u.must_change_password,
+              default_view: u.default_view || 'kanban'
             });
           }
         }
@@ -684,7 +694,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       if (valid) {
         return issueSession(res, {
           userId: null, email: 'admin@alphasurfaces.com.au', name: 'Admin', role: 'super_admin', source: 'master',
-          must_change_password: false
+          must_change_password: false,
+          default_view: 'kanban'
         });
       }
     }
@@ -701,7 +712,10 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     });
     res.json({
       ok: true,
-      user: { email: payload.email, name: payload.name, role: payload.role },
+      user: {
+        email: payload.email, name: payload.name, role: payload.role,
+        default_view: payload.default_view || 'kanban'
+      },
       must_change_password: !!payload.must_change_password
     });
   }
@@ -713,13 +727,27 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     res.json({ ok: true });
   });
 
-  app.get('/api/projects-auth-check', (req, res) => {
+  app.get('/api/projects-auth-check', async (req, res) => {
     const user = resolveUser(req);
     if (!user) return res.json({ authenticated: false });
+    // Pull the current default_view from the DB so it always reflects the
+    // latest preference (the in-memory session may be stale after a PATCH).
+    let defaultView = user.default_view || 'kanban';
+    if (user.userId) {
+      try {
+        const { rows } = await pool.query(
+          'SELECT default_view FROM project_users WHERE id = $1', [user.userId]
+        );
+        if (rows.length && rows[0].default_view) defaultView = rows[0].default_view;
+      } catch (err) {
+        console.error('[projects-auth-check] default_view lookup error:', err.message);
+      }
+    }
     res.json({
       authenticated: true,
       user: { email: user.email, name: user.name, role: user.role,
-              initials: initialsFromName(user.name) },
+              initials: initialsFromName(user.name),
+              default_view: defaultView },
       must_change_password: !!user.must_change_password
     });
   });
@@ -787,14 +815,63 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
   const router = express.Router();
   router.use(requireAuth);
 
-  router.get('/me', (req, res) => {
+  router.get('/me', async (req, res) => {
+    let defaultView = 'kanban';
+    if (req.user.userId) {
+      try {
+        const { rows } = await pool.query(
+          'SELECT default_view FROM project_users WHERE id = $1', [req.user.userId]
+        );
+        if (rows.length && rows[0].default_view) defaultView = rows[0].default_view;
+      } catch (err) {
+        console.error('[projects/me] default_view lookup error:', err.message);
+      }
+    }
     res.json({
       ok: true,
       user: {
         email: req.user.email, name: req.user.name, role: req.user.role,
-        initials: initialsFromName(req.user.name), source: req.user.source
+        initials: initialsFromName(req.user.name), source: req.user.source,
+        default_view: defaultView
       }
     });
+  });
+
+  // Update the user's landing-view preference. Body: { default_view: 'forms' }.
+  // Role-gated: forms is blocked for viewers, time is super_admin-only — the
+  // server enforces this so the UI can't quietly persist an inaccessible view.
+  router.patch('/me/default-view', async (req, res) => {
+    try {
+      const v = String(req.body?.default_view || '').trim().toLowerCase();
+      if (!ALLOWED_DEFAULT_VIEWS.includes(v)) {
+        return res.status(400).json({ ok: false, error: 'Invalid view.' });
+      }
+      if (v === 'forms' && req.user.role === 'viewer') {
+        return res.status(403).json({ ok: false, error: 'Viewers cannot land on the forms view.' });
+      }
+      if (v === 'time' && req.user.role !== 'super_admin') {
+        return res.status(403).json({ ok: false, error: 'Time tracking is restricted to super_admin.' });
+      }
+      if (!req.user.userId) {
+        return res.status(400).json({ ok: false, error: 'Default view cannot be set on the master admin session.' });
+      }
+      await pool.query(
+        'UPDATE project_users SET default_view = $1 WHERE id = $2',
+        [v, req.user.userId]
+      );
+      // Update the in-memory session record so the next /me hit returns the
+      // new value immediately, without waiting for re-login.
+      const token = req.cookies?.projects_session;
+      if (token && projectsSessions.has(token)) {
+        const sess = projectsSessions.get(token);
+        sess.default_view = v;
+        projectsSessions.set(token, sess);
+      }
+      res.json({ ok: true, default_view: v });
+    } catch (err) {
+      console.error('[projects] default-view error:', err.message);
+      res.status(500).json({ ok: false, error: err.message });
+    }
   });
 
   router.post('/change-password', async (req, res) => {
@@ -1177,10 +1254,12 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     return req.user.userId || -1; // -1 sentinel never matches a real id
   }
 
-  // POST: log a time entry. Operator + super_admin only (viewers blocked
-  // by requireWrite). Optional ticket_id is validated for visibility so
-  // operators can't log time against tickets they can't see.
-  router.post('/time/entries', requireWrite, async (req, res) => {
+  // POST: log a time entry. super_admin only — time tracking is scoped to
+  // Sean's consulting hours against a monthly cap. Operators / viewers don't
+  // have access. The ticket_id visibility check below is harmless under this
+  // tighter policy (a super_admin sees every ticket), kept for defensive
+  // symmetry should the policy ever broaden again.
+  router.post('/time/entries', requireRole('super_admin'), async (req, res) => {
     try {
       if (!req.user.userId) {
         return res.status(400).json({ ok: false, error: 'Time can only be logged by individual user accounts (not the master admin session).' });
@@ -1229,8 +1308,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     }
   });
 
-  // GET: list time entries (paginated). Filters: user_id, ticket_id, month.
-  router.get('/time/entries', async (req, res) => {
+  // GET: list time entries (paginated). super_admin only.
+  router.get('/time/entries', requireRole('super_admin'), async (req, res) => {
     try {
       const limit  = Math.min(parseInt(req.query.limit  || '100', 10) || 100, 500);
       const offset = Math.max(parseInt(req.query.offset || '0',   10) || 0,   0);
@@ -1268,22 +1347,13 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     }
   });
 
-  // GET: monthly summary. super_admin sees everyone in the month; others
-  // see only their own row. Defaults to current month.
-  router.get('/time/summary', async (req, res) => {
+  // GET: monthly summary across active users. super_admin only.
+  router.get('/time/summary', requireRole('super_admin'), async (req, res) => {
     try {
       const month = req.query.month || currentMonth();
       const range = monthRange(month);
       if (!range) return res.status(400).json({ ok: false, error: 'month must be YYYY-MM' });
       const vals = [range.start, range.end];
-      let userScopeSql = '';
-      if (req.user.role !== 'super_admin') {
-        if (!req.user.userId) {
-          return res.json({ ok: true, month, summary: [], totalHours: 0 });
-        }
-        vals.push(req.user.userId);
-        userScopeSql = `AND te.user_id = $${vals.length}`;
-      }
       const { rows } = await pool.query(
         `SELECT u.id AS user_id, u.name, u.email, u.role,
                 COALESCE(s.monthly_hours_cap, 20) AS monthly_hours_cap,
@@ -1293,9 +1363,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
            LEFT JOIN user_time_settings s ON s.user_id = u.id
            LEFT JOIN time_entries te
              ON te.user_id = u.id AND te.date >= $1::date AND te.date < $2::date
-          ${req.user.role === 'super_admin'
-              ? 'WHERE u.active = TRUE'
-              : 'WHERE u.id = $3'}
+          WHERE u.active = TRUE
           GROUP BY u.id, u.name, u.email, u.role, s.monthly_hours_cap, s.warning_hours
           ORDER BY total_minutes DESC, u.name ASC`,
         vals
@@ -1323,14 +1391,11 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
   });
 
   // GET: single user's monthly summary, with daily + per-ticket breakdowns.
-  router.get('/time/summary/:userId', async (req, res) => {
+  // super_admin only.
+  router.get('/time/summary/:userId', requireRole('super_admin'), async (req, res) => {
     try {
       const userId = parseInt(req.params.userId, 10);
       if (!Number.isFinite(userId)) return res.status(400).json({ ok: false, error: 'Invalid user id' });
-      // Operator/viewer can only request their own breakdown.
-      if (req.user.role !== 'super_admin' && req.user.userId !== userId) {
-        return res.status(403).json({ ok: false, error: 'You can only view your own time summary.' });
-      }
       const month = req.query.month || currentMonth();
       const range = monthRange(month);
       if (!range) return res.status(400).json({ ok: false, error: 'month must be YYYY-MM' });
@@ -1406,8 +1471,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     }
   });
 
-  // GET: CSV export of time entries. Filters: month (default current), user_id (super_admin only).
-  router.get('/time/export', async (req, res) => {
+  // GET: CSV export of time entries. super_admin only.
+  router.get('/time/export', requireRole('super_admin'), async (req, res) => {
     try {
       const month = req.query.month || currentMonth();
       const range = monthRange(month);
