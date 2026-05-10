@@ -661,6 +661,9 @@ async function initSchema(pool) {
   `);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_sr_status  ON sample_requests(status)`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_sr_created ON sample_requests(created_at DESC)`);
+  // Address completeness — older deployments are missing postcode/state.
+  await pool.query(`ALTER TABLE sample_requests ADD COLUMN IF NOT EXISTS postcode VARCHAR(10)`);
+  await pool.query(`ALTER TABLE sample_requests ADD COLUMN IF NOT EXISTS state    VARCHAR(20)`);
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS enquiries (
@@ -1253,13 +1256,15 @@ async function insertTypedSubmission(pool, legacyFormType, fields, sampleItems =
         result = await pool.query(
           `INSERT INTO sample_requests
              (reference, name, email, phone, company, role, stone_interest, message,
-              street, suburb, unit, source, consent)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+              street, suburb, unit, state, postcode, source, consent)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
            RETURNING id, reference`,
           [ref, name, fields.email, fields.phone, fields.company,
            fields.i_am_a || fields.role || fields.type || null,
            stoneInterest, fields.message || fields.special_instructions || null,
-           fields.street, fields.suburb, fields.unit, fields.source, consent]
+           fields.street, fields.suburb, fields.unit,
+           fields.state || null, fields.postcode || null,
+           fields.source, consent]
         );
       } else if (typeKey === 'enquiry') {
         const message = fields.message || fields.special_instructions || '';
@@ -1363,13 +1368,18 @@ async function migrateFormSubmissionsIntoTypedTables(pool) {
       if (ft === 'Sample Request') {
         const ref = await nextRef(pool, 'sample_requests', 'SR');
         const stoneInterest = stonesBySubmissionId.get(s.id) || s.stone_interest || null;
+        // postcode/state were not captured as dedicated columns on the
+        // legacy form_submissions table — fall back to raw_data when they
+        // do exist there.
+        const postcode = s.postcode || rd.postcode || null;
+        const stateAU  = s.state    || rd.state    || null;
         await pool.query(
           `INSERT INTO sample_requests
              (reference, name, email, phone, company, role, stone_interest, message,
-              street, suburb, unit, source, consent, status, created_at, updated_at)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$15)`,
+              street, suburb, unit, state, postcode, source, consent, status, created_at, updated_at)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$17)`,
           [ref, s.name, s.email, s.phone, s.company, s.role, stoneInterest, s.message,
-           s.street, s.suburb, s.unit, s.source, consent, s.status || 'new', s.submitted_at]
+           s.street, s.suburb, s.unit, stateAU, postcode, s.source, consent, s.status || 'new', s.submitted_at]
         );
         counts.sample++;
       } else if (ft === 'Enquiry') {

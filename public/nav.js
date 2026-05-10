@@ -47,7 +47,7 @@
       '<a href="/about.html" class="nav-link">ABOUT</a>' +
       '<a href="/brochure" class="nav-link">BROCHURE</a>' +
       '<div class="nav-dropdown" id="contact-dropdown">' +
-        '<a href="/#contact" class="nav-link nav-dropdown-trigger" id="contact-trigger">CONTACT US <span class="nav-caret">▾</span></a>' +
+        '<a href="/#contact" class="nav-link nav-dropdown-trigger" id="contact-trigger">CONTACT US</a>' +
         '<div class="nav-dropdown-menu" id="contact-dropdown-menu">' +
           '<a href="/#contact" class="nav-dropdown-item">Contact Us</a>' +
           '<a href="/enquiry" class="nav-dropdown-item">General Enquiry</a>' +
