@@ -4,9 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Alpha Surfaces for Dream Doors Kitchens — Partner Program</title>
+<title>Alpha Surfaces for Hammertime Kitchens — Partner Program</title>
 <style>
-/* --- FONTS --- */
 @font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Concrette S'; src: url('../fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('../fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
@@ -14,7 +13,6 @@
 @font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Degular'; src: url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('../fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
 
-/* --- RESET & BASE --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --olive: #564d22;
@@ -30,27 +28,26 @@ body { background: var(--white); color: var(--black); font-family: 'Degular', sa
 a { color: inherit; }
 img { display: block; max-width: 100%; }
 
-/* --- PREPARED-FOR STRIP --- */
 .prepared-for { background: var(--cream); padding: 12px 90px; border-bottom: 1px solid var(--border); }
 .prepared-for p { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--olive); }
 .prepared-for span { opacity: 0.55; margin-right: 8px; }
 
-/* --- HERO --- */
 .hero { position: relative; width: 100%; height: calc(100vh - 155px); min-height: 600px; max-height: 880px; overflow: hidden; }
 .hero img { width: 100%; height: 100%; object-fit: cover; }
-.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.25) 50%, transparent 100%); }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.25) 50%, transparent 100%); }
 .hero-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 80px 90px; }
 .hero-eyebrow { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 20px; }
-.hero-content h1 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 60px; line-height: 1.05; color: var(--white); max-width: 920px; margin-bottom: 22px; }
-.hero-content p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 24px; line-height: 1.3; color: rgba(255,255,255,0.85); max-width: 640px; }
+.hero-content h1 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 60px; line-height: 1.05; color: var(--white); max-width: 940px; margin-bottom: 22px; }
+.hero-content p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 24px; line-height: 1.3; color: rgba(255,255,255,0.85); max-width: 660px; }
 
-/* --- INTRO STATEMENT --- */
-.statement { background: var(--olive); display: flex; flex-direction: column; align-items: flex-start; padding: 130px 90px 110px; }
+.statement { background: var(--olive); padding: 130px 90px 110px; }
 .statement-label { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 1.6px; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 24px; }
 .statement p { font-family: 'Concrette S', serif; font-weight: 500; font-size: 40px; line-height: 1.2; color: var(--white); max-width: 1080px; }
 
-/* --- SECTION: WHY ALPHA (split layout) --- */
-.split { background: var(--cream); padding: 120px 90px; display: grid; grid-template-columns: 1fr 1.05fr; gap: 80px; align-items: center; }
+.split { padding: 120px 90px; display: grid; grid-template-columns: 1fr 1.05fr; gap: 80px; align-items: center; }
+.split.cream { background: var(--cream); }
+.split.reverse { grid-template-columns: 1.05fr 1fr; }
+.split.reverse .split-image { order: 2; }
 .split-image { aspect-ratio: 4/5; overflow: hidden; }
 .split-image img { width: 100%; height: 100%; object-fit: cover; }
 .split-text .section-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--olive); margin-bottom: 18px; }
@@ -60,17 +57,15 @@ img { display: block; max-width: 100%; }
 .split-list li { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 17px; line-height: 1.5; color: var(--black); padding-left: 28px; position: relative; max-width: 560px; }
 .split-list li::before { content: ""; position: absolute; left: 0; top: 10px; width: 16px; height: 1px; background: var(--olive); }
 
-/* --- SECTION: WHAT SETS ALPHA APART (4 differentiator cards) --- */
 .differentiators { background: var(--white); padding: 120px 90px; }
 .differentiators-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--olive); margin-bottom: 18px; }
-.differentiators h2 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 42px; line-height: 1.15; color: var(--black); margin-bottom: 60px; max-width: 700px; }
+.differentiators h2 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 42px; line-height: 1.15; color: var(--black); margin-bottom: 60px; max-width: 720px; }
 .diff-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
 .diff-card { background: var(--cream); padding: 36px 30px; display: flex; flex-direction: column; gap: 14px; min-height: 280px; }
 .diff-card .diff-num { font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; color: var(--olive); letter-spacing: 1px; }
 .diff-card h3 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 22px; line-height: 1.2; color: var(--black); }
 .diff-card p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15px; line-height: 1.5; color: var(--black); opacity: 0.78; }
 
-/* --- SECTION: FEATURED STONES --- */
 .showcase { background: var(--cream); padding: 120px 90px; }
 .showcase-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--olive); margin-bottom: 18px; }
 .showcase h2 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 42px; line-height: 1.15; color: var(--black); margin-bottom: 14px; max-width: 760px; }
@@ -85,18 +80,6 @@ img { display: block; max-width: 100%; }
 .showcase-card .sc-sub { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--black); opacity: 0.55; }
 .showcase-card .sc-tag { display: inline-block; align-self: flex-start; font-family: 'Degular', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--olive); border: 1px solid var(--olive); padding: 3px 8px; margin-top: 4px; border-radius: 2px; }
 
-/* --- SECTION: PARTNERSHIP / PERSONAL NOTE --- */
-.partnership { background: var(--white); padding: 120px 90px; display: grid; grid-template-columns: 1fr 1.1fr; gap: 80px; align-items: center; }
-.partnership-text .section-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--olive); margin-bottom: 18px; }
-.partnership-text h2 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 38px; line-height: 1.15; color: var(--black); margin-bottom: 28px; }
-.partnership-text p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 19px; line-height: 1.5; color: var(--black); opacity: 0.8; margin-bottom: 16px; }
-.partnership-text p:last-of-type { margin-bottom: 0; }
-.partnership-quote { background: var(--cream); padding: 50px 48px; border-left: 3px solid var(--olive); }
-.partnership-quote .quote-mark { font-family: 'Concrette S', serif; font-weight: 700; font-size: 64px; color: var(--olive); line-height: 0.8; margin-bottom: 12px; }
-.partnership-quote p { font-family: 'Concrette S', serif; font-weight: 500; font-size: 22px; line-height: 1.4; color: var(--black); margin-bottom: 24px; }
-.partnership-quote .quote-attr { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 14px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--olive); }
-
-/* --- CTA BAR --- */
 .cta-bar { background: var(--olive); padding: 100px 90px; display: flex; justify-content: space-between; align-items: center; gap: 60px; }
 .cta-bar-text h2 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 38px; line-height: 1.15; color: var(--white); margin-bottom: 12px; max-width: 640px; }
 .cta-bar-text p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 19px; line-height: 1.4; color: rgba(255,255,255,0.78); max-width: 640px; }
@@ -107,53 +90,38 @@ img { display: block; max-width: 100%; }
 .cta-contact strong { color: var(--white); font-weight: 600; }
 .cta-contact a { color: rgba(255,255,255,0.85); text-decoration: underline; }
 
-/* --- FOOTER --- */
 .footer { background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; padding: 30px 50px; }
 .footer p { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 15.33px; letter-spacing: 0.46px; text-transform: uppercase; color: var(--black); }
 
-/* --- MOBILE --- */
 @media (max-width: 1024px) {
   .prepared-for { padding: 10px 24px; }
   .prepared-for p { font-size: 11px; letter-spacing: 1.2px; }
-
   .hero { height: 60vh; min-height: 400px; }
   .hero-content { padding: 40px 24px; }
   .hero-content h1 { font-size: 32px; }
   .hero-content p { font-size: 17px; }
-
   .statement { padding: 70px 24px; }
   .statement p { font-size: 24px; line-height: 1.2; }
-
-  .split { padding: 60px 24px; grid-template-columns: 1fr; gap: 40px; }
+  .split, .split.reverse { padding: 60px 24px; grid-template-columns: 1fr; gap: 40px; }
+  .split.reverse .split-image { order: 0; }
   .split-text h2 { font-size: 28px; }
   .split-text .lede { font-size: 17px; }
   .split-list li { font-size: 15px; }
-
   .differentiators { padding: 60px 24px; }
   .differentiators h2 { font-size: 28px; margin-bottom: 40px; }
   .diff-grid { grid-template-columns: 1fr; gap: 16px; }
   .diff-card { padding: 28px 24px; min-height: 0; }
   .diff-card h3 { font-size: 20px; }
-
   .showcase { padding: 60px 24px; }
   .showcase h2 { font-size: 28px; }
   .showcase-sub { font-size: 16px; margin-bottom: 36px; }
   .showcase-grid { grid-template-columns: repeat(2, 1fr); gap: 20px 12px; }
-
-  .partnership { padding: 60px 24px; grid-template-columns: 1fr; gap: 40px; }
-  .partnership-text h2 { font-size: 26px; }
-  .partnership-text p { font-size: 17px; }
-  .partnership-quote { padding: 32px 28px; }
-  .partnership-quote .quote-mark { font-size: 48px; }
-  .partnership-quote p { font-size: 18px; }
-
   .cta-bar { padding: 60px 24px; flex-direction: column; align-items: flex-start; gap: 30px; }
   .cta-bar-text h2 { font-size: 26px; }
   .cta-bar-text p { font-size: 17px; }
   .cta-bar-actions { align-items: flex-start; width: 100%; }
   .cta-btn { width: 100%; text-align: center; }
   .cta-contact { text-align: left; }
-
   .footer { padding: 30px 24px; }
   .footer p { font-size: 12px; letter-spacing: 0.36px; }
 }
@@ -164,99 +132,93 @@ img { display: block; max-width: 100%; }
 </head>
 <body>
 
-<!-- NAV -->
 <nav class="nav" id="main-nav"></nav>
 
-<!-- PREPARED FOR -->
 <div class="prepared-for">
-  <p><span>Prepared for</span>Dream Doors Kitchens — Glenn Stanton</p>
+  <p><span>Prepared for</span>Hammertime Kitchens — Ben &amp; Amanda Attard, Baringa</p>
 </div>
 
-<!-- HERO -->
 <section class="hero">
-  <img src="../images/hero.jpg" alt="Alpha Surfaces premium kitchen benchtop for Dream Doors Kitchens">
+  <img src="../images/indoor-outdoor-hero.webp" alt="Alpha Surfaces UV-stable outdoor kitchen install for Queensland builders">
   <div class="hero-overlay"></div>
   <div class="hero-content">
-    <p class="hero-eyebrow">Alpha Surfaces for Dream Doors Kitchens</p>
-    <h1>A stone partner as distinctive as your kitchen transformations.</h1>
-    <p>Premium Australian-made surfaces, an Alpha Shield warranty no competitor can match, and a UV-stable outdoor range built for the Queensland climate — paired with the personal account support a network like yours deserves.</p>
+    <p class="hero-eyebrow">Alpha Surfaces for Hammertime Kitchens</p>
+    <h1>Quality stone for Queensland's volume kitchen builders.</h1>
+    <p>Batch consistency at scale, an Alpha Shield warranty your builders can sell, and the only UV-stable engineered stone range built for the Queensland sun — through your stonemason at Southeast Stone.</p>
   </div>
 </section>
 
-<!-- INTRO STATEMENT -->
 <section class="statement">
-  <span class="statement-label">A note for Dream Doors</span>
-  <p>You aren't picking from twelve brands that all look the same. Alpha is the standout — the only surface with Alpha Shield protection, a genuine indoor/outdoor UV range, and exclusive collections your clients won't see in every showroom down the road.</p>
+  <span class="statement-label">A note for Hammertime</span>
+  <p>You service some of Queensland's biggest builders. They need consistency, supply, and a story to sell at handover. Alpha gives you all three — without picking another stone that looks like every other one on the spec sheet.</p>
 </section>
 
-<!-- WHY ALPHA FOR KITCHEN FACELIFTS -->
-<section class="split" id="why">
+<section class="split cream" id="why">
   <div class="split-image">
-    <img src="../images/gallery-kitchen.webp" alt="Alpha Surfaces benchtop in a renovated kitchen">
+    <img src="../images/gallery-kitchen.webp" alt="Consistent Alpha Surfaces benchtop install across multiple units">
   </div>
   <div class="split-text">
-    <p class="section-label">Why Alpha for kitchen facelifts</p>
-    <h2>Designed for the way Dream Doors works.</h2>
-    <p class="lede">Your clients want a kitchen the neighbours don't have — and they want it on a three-day install promise. Alpha delivers both, with the consistency and account support a network the size of yours expects.</p>
+    <p class="section-label">Built for volume — without compromising quality</p>
+    <h2>The supplier behind your scale.</h2>
+    <p class="lede">QLD's volume builders don't tolerate variance. Hammertime doesn't either. Alpha is built around the consistency, supply and compliance a factory like Baringa actually depends on.</p>
     <ul class="split-list">
-      <li>Stones you won't find in every showroom — a clear point of difference for your clients across the Sunshine Coast, Moreton Bay and Sydney.</li>
-      <li>Fast, predictable turnaround that matches your three-day install workflow.</li>
-      <li>Australian-made premium positioning that elevates the Dream Doors name on every quote.</li>
-      <li>One dedicated account contact across both regions — not a call centre or a reseller.</li>
+      <li>Batch-to-batch colour and pattern consistency across large multi-unit projects.</li>
+      <li>Reliable supply chain into QLD — Stone Ambassador is one option; Alpha is the second source your builders need.</li>
+      <li>QBCC-compliant, certified Australian product — full documentation, ready to hand to the principal.</li>
+      <li>Technical support direct to Southeast Stone for the trickier fabrication conversations.</li>
     </ul>
   </div>
 </section>
 
-<!-- WHAT SETS ALPHA APART -->
+<section class="split reverse">
+  <div class="split-image">
+    <img src="../images/indoor-outdoor-hero.webp" alt="UV-stable outdoor kitchen install in Queensland">
+  </div>
+  <div class="split-text">
+    <p class="section-label">Extend your offering outdoors</p>
+    <h2>Built for the Queensland sun.</h2>
+    <p class="lede">Your socials show outdoor kitchens. Your competitors are selling engineered stone outdoors and crossing their fingers. Alpha is the only range that won't betray you in twelve months under QLD UV.</p>
+    <ul class="split-list">
+      <li>UV-stable colours — colour-locked for outdoor kitchen, alfresco and pool-deck installs.</li>
+      <li>Alpha Shield protection gives your outdoor jobs a warranty edge nobody else can offer.</li>
+      <li>A genuine point of difference your builder clients can put on the brochure.</li>
+      <li>A stone you can quote confidently for full indoor-outdoor projects, not just the inside benchtop.</li>
+    </ul>
+  </div>
+</section>
+
 <section class="differentiators">
-  <p class="differentiators-label">What sets Alpha apart</p>
-  <h2>Four things only Alpha brings to your benchtop conversation.</h2>
+  <p class="differentiators-label">The Alpha advantage</p>
+  <h2>Four things your builder clients will care about.</h2>
   <div class="diff-grid">
     <div class="diff-card">
       <span class="diff-num">01</span>
       <h3>Alpha Shield protection</h3>
-      <p>The only warranty-backed surface treatment in the Australian market — a tangible, ownable selling point your competitors can't replicate.</p>
+      <p>The only warranty-backed surface treatment in Australia — a sellable feature your sales team can put on every quote.</p>
     </div>
     <div class="diff-card">
       <span class="diff-num">02</span>
-      <h3>Indoor / outdoor UV range</h3>
-      <p>UV-stable colours built for Queensland sun — the genuine gap in the market. Extends your offering into outdoor kitchens, alfresco and poolside.</p>
+      <h3>UV-stable outdoor range</h3>
+      <p>Colour-locked engineered stone built for Queensland sun — extends your kitchens out to alfresco and poolside without compromise.</p>
     </div>
     <div class="diff-card">
       <span class="diff-num">03</span>
       <h3>EPD certified</h3>
-      <p>Environmental Product Declaration for clients (and specifiers) who care about sustainability credentials on a renovation.</p>
+      <p>Environmental Product Declaration — increasingly required on the commercial and government projects coming through QLD builders.</p>
     </div>
     <div class="diff-card">
       <span class="diff-num">04</span>
-      <h3>Exclusive colour palette</h3>
-      <p>Australian-designed surfaces your Caesarstone and Polytec accounts can't access — a visual point of difference on every quote you write.</p>
+      <h3>Australian-made premium</h3>
+      <p>Australian-made, premium positioning — the credible alternative to the engineered stones that have come and gone over the last two years.</p>
     </div>
   </div>
 </section>
 
-<!-- FEATURED STONES -->
 <section class="showcase" id="collections">
-  <p class="showcase-label">Featured collections</p>
-  <h2>Stones that won't show up in every showroom on the coast.</h2>
-  <p class="showcase-sub">A starting selection from the Alpha range — bold, distinctive surfaces your renovation clients will recognise as something different.</p>
+  <p class="showcase-label">Featured stones</p>
+  <h2>Outdoor-ready colours and volume workhorses.</h2>
+  <p class="showcase-sub">The UV-stable Collection 03 range up top — the indoor stones below that pair with them for full indoor-outdoor kitchen specs.</p>
   <div class="showcase-grid">
-    <div class="showcase-card">
-      <div class="sc-img"><img src="../images/stones/calacatta-leggera.webp" alt="Calacatta Leggera"></div>
-      <div class="sc-meta"><span class="sc-name">Calacatta Leggera</span><span class="sc-sub">Collection 04</span></div>
-    </div>
-    <div class="showcase-card">
-      <div class="sc-img"><img src="../images/stones/statuario-gold.webp" alt="Statuario Gold"></div>
-      <div class="sc-meta"><span class="sc-name">Statuario Gold</span><span class="sc-sub">Collection 04</span></div>
-    </div>
-    <div class="showcase-card">
-      <div class="sc-img"><img src="../images/stones/taj-mahal.webp" alt="Taj Mahal"></div>
-      <div class="sc-meta"><span class="sc-name">Taj Mahal</span><span class="sc-sub">Collection 05</span></div>
-    </div>
-    <div class="showcase-card">
-      <div class="sc-img"><img src="../images/stones/autumn-gold.webp" alt="Autumn Gold"></div>
-      <div class="sc-meta"><span class="sc-name">Autumn Gold</span><span class="sc-sub">Collection 05</span></div>
-    </div>
     <div class="showcase-card">
       <div class="sc-img"><img src="../images/stones/whitehaven.webp" alt="Whitehaven"></div>
       <div class="sc-meta"><span class="sc-name">Whitehaven</span><span class="sc-sub">Collection 03</span><span class="sc-tag">UV outdoor</span></div>
@@ -266,39 +228,56 @@ img { display: block; max-width: 100%; }
       <div class="sc-meta"><span class="sc-name">Cabarita</span><span class="sc-sub">Collection 03</span><span class="sc-tag">UV outdoor</span></div>
     </div>
     <div class="showcase-card">
-      <div class="sc-img"><img src="../images/stones/viola-ligera.webp" alt="Viola Ligera"></div>
-      <div class="sc-meta"><span class="sc-name">Viola Ligera</span><span class="sc-sub">Collection 05</span></div>
+      <div class="sc-img"><img src="../images/stones/torquay.webp" alt="Torquay"></div>
+      <div class="sc-meta"><span class="sc-name">Torquay</span><span class="sc-sub">Collection 03</span><span class="sc-tag">UV outdoor</span></div>
     </div>
     <div class="showcase-card">
-      <div class="sc-img"><img src="../images/stones/emerald-haze.webp" alt="Emerald Haze"></div>
-      <div class="sc-meta"><span class="sc-name">Emerald Haze</span><span class="sc-sub">Collection 05</span></div>
+      <div class="sc-img"><img src="../images/stones/broome.webp" alt="Broome"></div>
+      <div class="sc-meta"><span class="sc-name">Broome</span><span class="sc-sub">Collection 03</span><span class="sc-tag">UV outdoor</span></div>
+    </div>
+    <div class="showcase-card">
+      <div class="sc-img"><img src="../images/stones/carrara.webp" alt="Carrara"></div>
+      <div class="sc-meta"><span class="sc-name">Carrara</span><span class="sc-sub">Collection 02</span></div>
+    </div>
+    <div class="showcase-card">
+      <div class="sc-img"><img src="../images/stones/arctic.webp" alt="Arctic"></div>
+      <div class="sc-meta"><span class="sc-name">Arctic</span><span class="sc-sub">Collection 02</span></div>
+    </div>
+    <div class="showcase-card">
+      <div class="sc-img"><img src="../images/stones/calacatta-leggera.webp" alt="Calacatta Leggera"></div>
+      <div class="sc-meta"><span class="sc-name">Calacatta Leggera</span><span class="sc-sub">Collection 04</span></div>
+    </div>
+    <div class="showcase-card">
+      <div class="sc-img"><img src="../images/stones/statuario-gold.webp" alt="Statuario Gold"></div>
+      <div class="sc-meta"><span class="sc-name">Statuario Gold</span><span class="sc-sub">Collection 04</span></div>
     </div>
   </div>
 </section>
 
-<!-- PARTNERSHIP / PERSONAL NOTE -->
-<section class="partnership" id="partnership">
-  <div class="partnership-text">
-    <p class="section-label">Partnership benefits</p>
-    <h2>The support behind a network like Dream Doors.</h2>
-    <p>Sample kits and showroom display materials for Sunshine Coast, Moreton Bay and your Sydney sites — at our cost, ready when you are. Co-marketing assets your franchisees can plug straight into their local campaigns. Competitive trade pricing structured around the way you actually quote.</p>
-    <p>Most of all, one person who knows your business — not a different rep every call.</p>
+<section class="split cream" id="partnership">
+  <div class="split-image">
+    <img src="../images/fullbleed.jpg" alt="Alpha Surfaces sample display for QLD trade partners">
   </div>
-  <div class="partnership-quote">
-    <div class="quote-mark">"</div>
-    <p>You've built Dream Doors on doing renovations properly — fast, beautifully, and without the drama. We've built Alpha the same way. Let's give your clients something their neighbours genuinely can't get anywhere else.</p>
-    <span class="quote-attr">— Belinda Kelaher, Alpha Surfaces</span>
+  <div class="split-text">
+    <p class="section-label">Supply partnership</p>
+    <h2>Set up for the way Baringa runs.</h2>
+    <p class="lede">Hammertime is by appointment, by referral, and by reputation. We'll structure the partnership the same way — quietly, professionally, and built around what your factory actually needs.</p>
+    <ul class="split-list">
+      <li>Trade pricing structured around volume commitments — not a sliding scale you have to chase.</li>
+      <li>Sample displays and POS materials for your Baringa factory showroom — at our cost.</li>
+      <li>Direct technical support for Southeast Stone, factory-to-factory.</li>
+      <li>An EPD-certified, QBCC-compliant product your builders can put on the spec sheet without a second thought.</li>
+    </ul>
   </div>
 </section>
 
-<!-- CTA BAR -->
 <section class="cta-bar" id="contact">
   <div class="cta-bar-text">
-    <h2>Let's talk, Glenn.</h2>
-    <p>Pick a fifteen-minute window that suits — Sunshine Coast, Moreton Bay or Sydney — and we'll bring the sample box.</p>
+    <h2>Let's meet at your factory.</h2>
+    <p>Pick a time that suits Baringa — we'll bring the sample box, the UV-range slabs, and the EPD documentation. No pitch, just the product in your hands.</p>
   </div>
   <div class="cta-bar-actions">
-    <a class="cta-btn" href="mailto:belinda@alphasurfaces.com.au?subject=Dream%20Doors%20Kitchens%20%C3%97%20Alpha%20Surfaces">Let's talk</a>
+    <a class="cta-btn" href="tel:1300257420">Call 1300 257 420</a>
     <div class="cta-contact">
       <strong>Belinda Kelaher</strong> — Managing Director, Alpha Surfaces<br>
       M: <a href="tel:0417764689">0417 764 689</a> &nbsp;·&nbsp; <a href="mailto:belinda@alphasurfaces.com.au">belinda@alphasurfaces.com.au</a>
@@ -306,7 +285,6 @@ img { display: block; max-width: 100%; }
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer class="footer">
   <p>Copyright &copy; 2026 Alpha Surfaces – ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVATE PARTNER PROPOSAL</p>
 </footer>
