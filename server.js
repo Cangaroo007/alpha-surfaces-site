@@ -2236,6 +2236,15 @@ const renamedSlugs = {
   'viola-ligerra': 'viola-ligera'
 };
 
+// ─── Partner landing pages (private ABM pages — direct URL only) ───
+// Maps /partners/<slug> to public/partners/<slug>.html.
+app.get('/partners/:slug', (req, res) => {
+  const slug = req.params.slug.replace(/[^a-z0-9-]/gi, '');
+  const filePath = path.join(__dirname, 'public', 'partners', slug + '.html');
+  if (fs.existsSync(filePath)) return res.sendFile(filePath);
+  res.redirect('/');
+});
+
 // ─── Stone detail page ───
 app.get('/surfaces/:slug', (req, res) => {
   const slug = req.params.slug.replace(/[^a-z0-9-]/gi, '');
