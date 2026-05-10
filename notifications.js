@@ -333,6 +333,290 @@ async function sendDailyDigest({ pool }) {
   return { ok: true, sent, formsCovered: Object.keys(byFormId).length };
 }
 
+// ─── Weekly sales activity report (Friday 5pm Brisbane) ─────────────────
+// Combines local DB (typed-form submissions this week) with Pipedrive
+// (open deals / activities / leads inbox) into a single branded email to
+// Belinda + Jay, CC Jana + Sean. Best-effort throughout — missing
+// PIPEDRIVE_API_TOKEN renders the Pipedrive sections empty rather than
+// failing the whole report.
+
+function brisbaneNow() {
+  // Construct a Date that, when read with getDate/getDay/getHours/etc,
+  // returns Brisbane wall-clock fields. Used by the Friday 5pm scheduler.
+  return new Date(new Date().toLocaleString('en-US', { timeZone: 'Australia/Brisbane' }));
+}
+
+function formatBrisbaneDate(d) {
+  return d.toLocaleDateString('en-AU', {
+    timeZone: 'Australia/Brisbane',
+    day: 'numeric', month: 'long', year: 'numeric',
+  });
+}
+
+async function generateWeeklyReport({ pool }) {
+  if (!pool) return { ok: false, reason: 'no pool' };
+  const pipedrive = (() => {
+    try { return require('./pipedrive'); } catch { return null; }
+  })();
+
+  const now = new Date();
+  const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const weekStartISO = weekStart.toISOString();
+  const weekStartDate = weekStartISO.split('T')[0];
+  const todayDate = now.toISOString().split('T')[0];
+
+  // 1. Local DB — submission counts by typed table.
+  const tableLabels = [
+    ['sample_requests',      'Sample Requests'],
+    ['enquiries',            'Enquiries'],
+    ['contact_submissions',  'Contacts'],
+    ['partner_enquiries',    'Partner Enquiries'],
+    ['showroom_checkins',    'Showroom Walk-ins'],
+    ['warranty_activations', 'Warranty Activations'],
+  ];
+  const formCounts = {};
+  for (const [table, label] of tableLabels) {
+    try {
+      const { rows } = await pool.query(
+        `SELECT COUNT(*)::int AS c FROM ${table} WHERE created_at >= $1`,
+        [weekStartISO]
+      );
+      formCounts[label] = rows[0].c;
+    } catch (err) {
+      console.error('[report/weekly]', table, 'count error:', err.message);
+      formCounts[label] = 0;
+    }
+  }
+  // Showroom: split walk-ins by `interests`/source if available so the
+  // "(2 homeowners, 1 builder)" summary lands. This is best-effort —
+  // the 'role' isn't always captured for walk-ins.
+  let showroomBreakdown = '';
+  try {
+    const { rows } = await pool.query(
+      `SELECT COALESCE(NULLIF(source, ''), 'unspecified') AS bucket, COUNT(*)::int AS c
+         FROM showroom_checkins WHERE created_at >= $1
+        GROUP BY 1 ORDER BY c DESC`,
+      [weekStartISO]
+    );
+    if (rows.length) {
+      showroomBreakdown = rows.map(r => `${r.c} ${r.bucket}`).join(', ');
+    }
+  } catch (_) { /* table may not exist on fresh dbs — ignore */ }
+
+  // Warranty bucket counts (new this week / under_review / approved).
+  let warrantyBuckets = { new: 0, under_review: 0, approved: 0 };
+  try {
+    const { rows } = await pool.query(
+      `SELECT status, COUNT(*)::int AS c FROM warranty_activations WHERE created_at >= $1 GROUP BY status`,
+      [weekStartISO]
+    );
+    rows.forEach(r => { warrantyBuckets[r.status] = r.c; });
+  } catch (_) {}
+
+  // 2. Pipedrive — pull open deals, activities, leads inbox.
+  let deals = [];
+  let activities = [];
+  let leads = [];
+  if (pipedrive && process.env.PIPEDRIVE_API_TOKEN) {
+    try {
+      const dealsResp = await pipedrive.pdGet('deals', { status: 'open', limit: 500 });
+      deals = Array.isArray(dealsResp?.data) ? dealsResp.data : [];
+    } catch (err) { console.error('[report/weekly] deals fetch:', err.message); }
+    try {
+      const actResp = await pipedrive.pdGet('activities', {
+        start_date: weekStartDate,
+        end_date: todayDate,
+        limit: 500,
+      });
+      activities = Array.isArray(actResp?.data) ? actResp.data : [];
+    } catch (err) { console.error('[report/weekly] activities fetch:', err.message); }
+    try {
+      const leadsResp = await pipedrive.pdGet('leads', { limit: 500 });
+      leads = Array.isArray(leadsResp?.data) ? leadsResp.data : [];
+    } catch (err) { console.error('[report/weekly] leads fetch:', err.message); }
+  }
+
+  // 3. Build & send.
+  const html = buildWeeklyReportHtml({
+    formCounts, showroomBreakdown, warrantyBuckets,
+    deals, activities, leads,
+    weekStart, now,
+  });
+
+  if (!configureSendgrid()) {
+    console.warn('[report/weekly] SENDGRID_API_KEY not set — skipping send');
+    return { ok: false, reason: 'no sendgrid' };
+  }
+  const from = NOTIFY_EMAIL_FROM();
+  const to = ['belinda@alphasurfaces.com.au', 'jay@alphasurfaces.com.au'];
+  const cc = ['jana@northcoaststone.com.au', 'sean@cangaroo.ai'];
+  const subject = `Alpha Surfaces Weekly Sales Report — Week ending ${formatBrisbaneDate(now)}`;
+  try {
+    await sgMail.send({ to, cc, from, subject, html });
+    console.log('[report/weekly] sent to', to.join(', '), 'cc', cc.join(', '));
+    return { ok: true, recipients: to.length + cc.length };
+  } catch (err) {
+    const detail = err.response?.body?.errors ? JSON.stringify(err.response.body.errors) : err.message;
+    console.error('[report/weekly] send error:', detail);
+    return { ok: false, reason: detail };
+  }
+}
+
+function moneyAUD(n) {
+  const v = Number(n) || 0;
+  return '$' + v.toLocaleString('en-AU', { maximumFractionDigits: 0 });
+}
+
+function buildWeeklyReportHtml({ formCounts, showroomBreakdown, warrantyBuckets, deals, activities, leads, weekStart, now }) {
+  // Pipeline buckets — Tile Pipeline (id 1) vs Commercial Projects (id 4).
+  const pipelineBuckets = { 1: { name: 'Tile Pipeline', open: 0, value: 0, won: 0 },
+                            4: { name: 'Commercial',    open: 0, value: 0, won: 0 } };
+  deals.forEach(d => {
+    const p = pipelineBuckets[d.pipeline_id];
+    if (!p) return;
+    p.open++;
+    p.value += Number(d.value) || 0;
+  });
+  // Top 3 open deals by value across all pipelines.
+  const topDeals = [...deals]
+    .sort((a, b) => (Number(b.value) || 0) - (Number(a.value) || 0))
+    .slice(0, 3);
+
+  // Activities per assignee (calls / emails / meetings).
+  const teamActivity = {};
+  activities.forEach(a => {
+    const owner = a.owner_name || a.user_name || 'Unassigned';
+    teamActivity[owner] = teamActivity[owner] || { call: 0, email: 0, meeting: 0 };
+    const t = String(a.type || '').toLowerCase();
+    if (t === 'call') teamActivity[owner].call++;
+    else if (t === 'email') teamActivity[owner].email++;
+    else if (t === 'meeting' || t === 'lunch' || t === 'demo') teamActivity[owner].meeting++;
+  });
+
+  // Leads inbox bucketed by label name. We don't enforce label colour →
+  // bucket here because Pipedrive labels are workspace-defined; just
+  // bucket by lowercased name and surface counts.
+  const leadBuckets = { hot: 0, warm: 0, cold: 0, other: 0 };
+  let oldestLeadDays = 0;
+  leads.forEach(l => {
+    const labelNames = (l.label_ids || []).map(() => '').filter(Boolean);
+    // We don't have label name on the lead — fall back to first label_id
+    // bucket. Best-effort summary; the link in the report goes to the inbox.
+    if (l.label_ids && l.label_ids.length) {
+      // Without a label-id → name map we can't do better than 'other'.
+      leadBuckets.other++;
+    } else {
+      leadBuckets.other++;
+    }
+    const added = l.add_time ? new Date(l.add_time) : null;
+    if (added) {
+      const days = Math.floor((now - added) / (1000 * 60 * 60 * 24));
+      if (days > oldestLeadDays) oldestLeadDays = days;
+    }
+  });
+
+  const totalLeadsThisWeek =
+    (formCounts['Sample Requests'] || 0) +
+    (formCounts['Enquiries'] || 0) +
+    (formCounts['Contacts'] || 0) +
+    (formCounts['Partner Enquiries'] || 0);
+
+  const olive = '#564D22';
+  const cream = '#f3f1e6';
+
+  const pipelineRows = Object.values(pipelineBuckets).map(p => `
+    <tr>
+      <td style="padding:6px 12px;border-bottom:1px solid #eee">${escapeHtml(p.name)}</td>
+      <td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">${p.open}</td>
+      <td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">${moneyAUD(p.value)}</td>
+      <td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">${p.won}</td>
+    </tr>
+  `).join('');
+
+  const topDealsHtml = topDeals.length
+    ? '<ol style="margin:8px 0 0;padding-left:22px;color:#222">' +
+      topDeals.map(d => `<li style="margin:3px 0">${escapeHtml(d.title || '—')} — <strong>${moneyAUD(d.value)}</strong> <span style="color:#888">(${escapeHtml(d.stage_name || d.status || '—')})</span></li>`).join('') +
+      '</ol>'
+    : '<p style="margin:6px 0 0;color:#888">No open deals.</p>';
+
+  const teamRows = Object.entries(teamActivity).map(([who, c]) => `
+    <tr>
+      <td style="padding:6px 12px;border-bottom:1px solid #eee">${escapeHtml(who)}</td>
+      <td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">${c.call}</td>
+      <td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">${c.email}</td>
+      <td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">${c.meeting}</td>
+    </tr>
+  `).join('');
+  const teamWarning = !Object.keys(teamActivity).length
+    ? '<p style="margin:8px 0 0;color:#b07020;font-size:13px">⚠️ No activities logged in Pipedrive this week — tracking recommended.</p>'
+    : '';
+
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:${cream};font-family:'Helvetica Neue',Arial,sans-serif">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${cream}">
+<tr><td align="center" style="padding:48px 16px">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:680px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+  <tr><td style="background:${olive};padding:28px 32px;color:#fff">
+    <p style="margin:0;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.85">Alpha Surfaces · Weekly Report</p>
+    <h1 style="margin:8px 0 0;font-size:22px;font-weight:600">Weekly Sales Activity Report</h1>
+    <p style="margin:6px 0 0;font-size:14px;opacity:.9">Week ending ${escapeHtml(formatBrisbaneDate(now))}</p>
+  </td></tr>
+
+  <tr><td style="padding:28px 32px;color:#222;font-size:14px;line-height:1.55">
+
+    <h2 style="margin:0 0 8px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:${olive};border-bottom:1px solid #eee;padding-bottom:6px">New Leads This Week</h2>
+    <p style="margin:6px 0 0">Total: <strong>${totalLeadsThisWeek}</strong> hot leads from website</p>
+    <ul style="margin:6px 0 0;padding-left:22px;color:#444">
+      <li>${formCounts['Sample Requests'] || 0} Sample Requests</li>
+      <li>${formCounts['Enquiries'] || 0} General Enquiries</li>
+      <li>${formCounts['Partner Enquiries'] || 0} Partner Enquiries</li>
+      <li>${formCounts['Contacts'] || 0} Contact Forms</li>
+    </ul>
+
+    <h2 style="margin:24px 0 8px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:${olive};border-bottom:1px solid #eee;padding-bottom:6px">Showroom</h2>
+    <p style="margin:6px 0 0">Walk-ins: <strong>${formCounts['Showroom Walk-ins'] || 0}</strong>${showroomBreakdown ? ' (' + escapeHtml(showroomBreakdown) + ')' : ''}</p>
+
+    <h2 style="margin:24px 0 8px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:${olive};border-bottom:1px solid #eee;padding-bottom:6px">Pipedrive Pipeline</h2>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;margin-top:8px;font-size:13px">
+      <thead><tr style="background:${cream}">
+        <th align="left"  style="padding:6px 12px">Pipeline</th>
+        <th align="right" style="padding:6px 12px">Open</th>
+        <th align="right" style="padding:6px 12px">Value</th>
+        <th align="right" style="padding:6px 12px">Won this week</th>
+      </tr></thead>
+      <tbody>${pipelineRows || '<tr><td colspan="4" style="padding:8px 12px;color:#888">No data.</td></tr>'}</tbody>
+    </table>
+    <p style="margin:14px 0 0;font-weight:600;color:${olive}">Top 3 open deals</p>
+    ${topDealsHtml}
+
+    <h2 style="margin:24px 0 8px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:${olive};border-bottom:1px solid #eee;padding-bottom:6px">Team Activity (Pipedrive)</h2>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;margin-top:8px;font-size:13px">
+      <thead><tr style="background:${cream}">
+        <th align="left"  style="padding:6px 12px">Owner</th>
+        <th align="right" style="padding:6px 12px">Calls</th>
+        <th align="right" style="padding:6px 12px">Emails</th>
+        <th align="right" style="padding:6px 12px">Meetings</th>
+      </tr></thead>
+      <tbody>${teamRows || '<tr><td colspan="4" style="padding:8px 12px;color:#888">No activities logged this week.</td></tr>'}</tbody>
+    </table>
+    ${teamWarning}
+
+    <h2 style="margin:24px 0 8px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:${olive};border-bottom:1px solid #eee;padding-bottom:6px">Leads Inbox</h2>
+    <p style="margin:6px 0 0">Total in inbox: <strong>${leads.length}</strong></p>
+    <p style="margin:4px 0 0;color:#555">Oldest unactioned lead: <strong>${oldestLeadDays}</strong> day${oldestLeadDays === 1 ? '' : 's'}</p>
+
+    <h2 style="margin:24px 0 8px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:${olive};border-bottom:1px solid #eee;padding-bottom:6px">Warranty Activations</h2>
+    <p style="margin:6px 0 0">New this week: <strong>${formCounts['Warranty Activations'] || 0}</strong></p>
+    <p style="margin:4px 0 0;color:#555">Under review: ${warrantyBuckets.under_review || 0} · Approved: ${warrantyBuckets.approved || 0}</p>
+
+    <p style="margin:32px 0 0;color:#888;font-size:12px">Auto-generated by alphasurfaces.com.au — fires every Friday 5pm AEST.</p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`;
+}
+
 // ─── Single-recipient instant notification helpers ──────────────────────
 // These fire on every form submit regardless of admin-configured per-form
 // recipients. Used by the form POST handlers in server.js. Failures never
@@ -1080,6 +1364,7 @@ module.exports = {
   notifySubscribe,
   sendTestForForm,
   sendDailyDigest,
+  generateWeeklyReport,
   // New env-driven single-recipient path:
   sendSubmissionSMS,
   sendSubmissionEmail,

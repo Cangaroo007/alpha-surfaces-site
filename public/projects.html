@@ -557,6 +557,25 @@
   .card-changes-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: #fbeee0; color: #b07020; margin-top: 6px; }
   .card-pending-text { font-size: 11px; color: var(--muted); margin-top: 4px; font-style: italic; }
 
+  /* Approval banners — amber for "awaiting approval", orange for "changes
+     requested". Same full-bleed shape as the red blocker banner so the
+     review column is visually scannable. Subtle "in review" lozenge for
+     advisory-only review (no approver) is intentionally low-emphasis. */
+  .card.is-awaiting-approval { border-color: rgba(184,134,11,0.55); box-shadow: 0 0 0 1px rgba(184,134,11,0.18); }
+  .card.is-changes-requested { border-color: rgba(234,88,12,0.55); box-shadow: 0 0 0 1px rgba(234,88,12,0.18); }
+  .card-approval-banner { color: #fff; margin: -12px -14px 8px; padding: 6px 12px; border-radius: 7px 7px 0 0; }
+  .card-approval-banner.awaiting { background: #B8860B; }
+  .card-approval-banner.changes  { background: #EA580C; }
+  .card-approval-banner .cab-head { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; line-height: 1.3; }
+  .card-approval-banner .cab-sub  { font-size: 11px; opacity: 0.95; line-height: 1.35; margin-top: 2px; }
+  .card-inreview-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: var(--cream-light); color: var(--muted); margin-top: 6px; }
+
+  /* "Pending your approval" stat card — gold/amber to draw the eye. */
+  .stat-card.amber { border-color: rgba(184,134,11,0.45); background: #fdf7e6; cursor: pointer; transition: transform 0.1s; }
+  .stat-card.amber:hover { transform: translateY(-1px); }
+  .stat-card.amber .stat-value { color: #B8860B; }
+  .stat-card.amber.active { box-shadow: 0 0 0 2px #B8860B; }
+
   /* Blocker banner — sits at the top of the card, full-bleed red. */
   .card.is-blocked { border-color: rgba(220,38,38,0.55); box-shadow: 0 0 0 1px rgba(220,38,38,0.20); }
   .card-blocker-banner { background: #dc2626; color: #fff; margin: -12px -14px 8px; padding: 6px 12px; border-radius: 7px 7px 0 0; }
@@ -745,6 +764,10 @@
         <div class="stat-card high"><div class="stat-label">High Priority</div><div class="stat-value" id="stat-high">0</div></div>
         <div class="stat-card"><div class="stat-label">In Progress</div><div class="stat-value" id="stat-progress">0</div></div>
         <div class="stat-card green"><div class="stat-label">Completed This Week</div><div class="stat-value" id="stat-done">0</div></div>
+        <div class="stat-card amber" id="stat-pending-approval-card" style="display:none" title="Click to filter — tickets waiting on your approval">
+          <div class="stat-label">Pending Your Approval</div>
+          <div class="stat-value" id="stat-pending-approval">0</div>
+        </div>
       </div>
 
       <!-- Filters -->
@@ -895,6 +918,7 @@
     sort: 'updated_at',
     order: 'desc',
     filters: { search: '', category: '', priority: '', assigned_to: '' },
+    pendingMyApproval: false,  // toggled by the amber stat card to filter the board
     tickets: [],
     user: null   // { email, name, role, initials }
   };
@@ -1362,13 +1386,48 @@
 
   function render() {
     var results = document.getElementById('results');
-    if (!state.tickets.length) {
+    refreshPendingApprovalCard();
+    var visible = state.tickets;
+    if (state.pendingMyApproval) visible = visible.filter(isAwaitingMyApproval);
+    if (!visible.length) {
       results.innerHTML = '<div class="empty">No tickets match the current filters.</div>';
       return;
     }
-    results.innerHTML = state.view === 'board' ? renderBoard(state.tickets) : renderList(state.tickets);
+    results.innerHTML = state.view === 'board' ? renderBoard(visible) : renderList(visible);
     if (state.view === 'board') wireBoard();
     else wireList();
+  }
+
+  // Tickets where the current logged-in user is the approver and the
+  // ticket is still in the review column without an approval. Matches by
+  // case-insensitive first-name OR full-name overlap so 'Belinda' resolves
+  // to 'Belinda Kelaher' the way the backend nag-resolver does.
+  function isAwaitingMyApproval(t) {
+    if (!state.user || !state.user.name) return false;
+    if (t.status !== 'review') return false;
+    if (!t.approver) return false;
+    if (t.approval_status === 'approved') return false;
+    var me = String(state.user.name).toLowerCase();
+    var approver = String(t.approver).toLowerCase();
+    if (approver === me) return true;
+    var meFirst = me.split(/\s+/)[0];
+    var apprFirst = approver.split(/\s+/)[0];
+    return meFirst && (apprFirst === meFirst || approver.indexOf(meFirst) === 0);
+  }
+
+  function refreshPendingApprovalCard() {
+    var card = document.getElementById('stat-pending-approval-card');
+    if (!card) return;
+    var pending = state.tickets.filter(isAwaitingMyApproval);
+    if (!pending.length) {
+      card.style.display = 'none';
+      state.pendingMyApproval = false;
+      card.classList.remove('active');
+      return;
+    }
+    card.style.display = '';
+    document.getElementById('stat-pending-approval').textContent = pending.length;
+    card.classList.toggle('active', state.pendingMyApproval);
   }
 
   function renderBoard(tickets) {
@@ -1389,8 +1448,9 @@
   function renderCard(t) {
     var initials = (t.assigned_to || '').split(/\s+/).map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
     var reviewRow = '';
-    var changesBadge = '';
-    var pendingText = '';
+    var approvalBanner = '';
+    var inReviewPill = '';
+    var approvalCardCls = '';
     // Surface review/approval state on the card so the board reflects who's
     // blocking. Reviewers render as olive-on-olive avatars, approver as a
     // cream chip with an olive border to mark them as the binding role.
@@ -1412,12 +1472,22 @@
           avatars.join('') +
         '</div>';
       }
+      // Prominent banner for the binding states (changes-requested + waiting
+      // on approver). Less-prominent pill for advisory-only review without
+      // an approver — those don't gate progression.
       if (t.approval_status === 'changes_requested') {
-        changesBadge = '<div class="card-changes-badge">Changes Requested</div>';
-      } else if (t.approval_status === 'pending_approval' && t.approver) {
-        pendingText = '<div class="card-pending-text">Awaiting ' + escapeHtml(t.approver) + '</div>';
-      } else if (t.approval_status === 'pending_review') {
-        pendingText = '<div class="card-pending-text">In review</div>';
+        approvalCardCls = ' is-changes-requested';
+        approvalBanner = '<div class="card-approval-banner changes">' +
+          '<div class="cab-head">✏️ CHANGES REQUESTED</div>' +
+          (t.approver ? '<div class="cab-sub">From ' + escapeHtml(t.approver) + '</div>' : '') +
+        '</div>';
+      } else if (t.status === 'review' && t.approver && t.approval_status !== 'approved') {
+        approvalCardCls = ' is-awaiting-approval';
+        approvalBanner = '<div class="card-approval-banner awaiting">' +
+          '<div class="cab-head">⏳ AWAITING APPROVAL — ' + escapeHtml(t.approver) + '</div>' +
+        '</div>';
+      } else if (t.approval_status === 'pending_review' && Array.isArray(t.reviewers) && t.reviewers.length) {
+        inReviewPill = '<div class="card-inreview-pill">In review — ' + escapeHtml(t.reviewers.join(', ')) + '</div>';
       }
     }
     // Red blocker banner — rendered at the top of the card so it's
@@ -1437,9 +1507,10 @@
         (truncReason ? '<div class="cbb-reason">' + escapeHtml(truncReason) + '</div>' : '') +
       '</div>';
     }
-    return '<div class="card' + cardBlockedCls + '" draggable="true" data-id="' + t.id + '" data-ticket-id="' + escapeAttr(t.ticket_id) + '">' +
+    return '<div class="card' + cardBlockedCls + approvalCardCls + '" draggable="true" data-id="' + t.id + '" data-ticket-id="' + escapeAttr(t.ticket_id) + '">' +
       '<button type="button" class="card-clock" data-ticket-id="' + escapeAttr(t.ticket_id) + '" data-ticket-title="' + escapeAttr(t.title) + '" title="Log time on this ticket">⏱</button>' +
       blockerBanner +
+      approvalBanner +
       '<div class="card-id">' + escapeHtml(t.ticket_id) + '</div>' +
       '<div class="card-title">' + escapeHtml(t.title) + '</div>' +
       '<div class="card-meta">' +
@@ -1447,8 +1518,7 @@
         (t.category ? '<span class="pill cat">' + escapeHtml(t.category) + '</span>' : '') +
         (initials ? '<span class="avatar" title="' + escapeAttr(t.assigned_to) + '">' + initials + '</span>' : '') +
       '</div>' +
-      changesBadge +
-      pendingText +
+      inReviewPill +
       reviewRow +
     '</div>';
   }
@@ -1517,6 +1587,13 @@
         var newStatus = col.dataset.status;
         var t = state.tickets.find(function (x) { return String(x.id) === String(id); });
         if (!t || t.status === newStatus) return;
+        // Block done-without-approval at the UI layer so users get a clear
+        // toast instead of a silent 403 from the API. The backend still
+        // enforces this — this is just for UX.
+        if (newStatus === 'done' && t.approver && t.approval_status !== 'approved') {
+          toast('This ticket requires approval from ' + t.approver + ' before it can be marked as done.');
+          return;
+        }
         // Optimistic move so the UI feels instant
         t.status = newStatus;
         render();
@@ -1636,6 +1713,13 @@
   document.getElementById('filter-category').addEventListener('change', function (e) { state.filters.category = e.target.value; loadTickets(); });
   document.getElementById('filter-priority').addEventListener('change', function (e) { state.filters.priority = e.target.value; loadTickets(); });
   document.getElementById('filter-assignee').addEventListener('change', function (e) { state.filters.assigned_to = e.target.value; loadTickets(); });
+
+  // Click the amber stat card to filter the board to "tickets waiting on
+  // me to approve". Re-clicking clears the filter.
+  document.getElementById('stat-pending-approval-card').addEventListener('click', function () {
+    state.pendingMyApproval = !state.pendingMyApproval;
+    render();
+  });
 
   document.getElementById('btn-export').addEventListener('click', function () {
     window.location.href = '/api/projects/tickets/export';

@@ -15,10 +15,14 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const versions = require('./lib/versions');
 const { initDB, saveSubmission, saveSubscriber, unsubscribeEmail, pool } = require('./db');
 const notifications = require('./notifications');
-const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, readSettings: readNotifSettings, writeSettings: writeNotifSettings, notifyNewSubmission } = notifications;
+const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, generateWeeklyReport, readSettings: readNotifSettings, writeSettings: writeNotifSettings, notifyNewSubmission } = notifications;
 // Track I: typed-form insert helper. Loaded statically (the require below
 // mounts routes; this property is attached to the module.exports object).
 const { insertTypedSubmission } = require('./projects-routes');
+// Pipedrive integration — best-effort sync of public form submits into the
+// Pipedrive Leads Inbox (forms → HOT leads). All calls are wrapped so a
+// Pipedrive outage can't fail the form response.
+const pipedrive = require('./pipedrive');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -241,6 +245,14 @@ async function handleForm(req, res, formType) {
     } catch (err) {
       console.error('[form] typed insert error:', err.message);
     }
+
+    // Pipedrive: forms → HOT leads (or activity/note for walk-ins/warranty).
+    // Fire-and-forget so a Pipedrive 500 / network blip never blocks the user.
+    if (process.env.PIPEDRIVE_API_TOKEN) {
+      pipedrive.syncFormToPipedrive(formType, fields, sampleItems, typed)
+        .catch(err => console.error('[pipedrive] sync error:', err.message));
+    }
+
     return res.json({ ok: true, id, reference: typed && typed.reference });
   } catch (err) {
     console.error(`[form] ${formType} error:`, err.message);
@@ -360,6 +372,13 @@ async function handleShowroomCheckin(req, res) {
       status: 'new',
       consent: true
     }).catch(err => console.error('[notify] Showroom Check-In error:', err.message));
+
+    // Pipedrive: log walk-in as a completed activity on the person record.
+    if (process.env.PIPEDRIVE_API_TOKEN) {
+      pipedrive.syncFormToPipedrive('Showroom Check-In', fields, [], typed)
+        .catch(err => console.error('[pipedrive] showroom sync error:', err.message));
+    }
+
     return res.json({ ok: true, id: typed.id, reference: typed.reference });
   } catch (err) {
     console.error('[form] Showroom Check-In error:', err.message);
@@ -2291,12 +2310,49 @@ async function checkDailyDigest() {
   }
 }
 
+// ─── Weekly sales report scheduler — Friday 5pm Brisbane ───
+// Same Brisbane-wall-clock pattern as the daily digest. A per-week guard
+// (lastWeeklyReportWeek) prevents a repeat fire if the 5-min interval lands
+// twice during the 5pm hour.
+let lastWeeklyReportWeek = null;
+function brisbaneWeekString() {
+  // ISO-week-ish: YYYY-Www, where W is the day-of-year week. Used purely
+  // as a once-per-week dedup key; exact ISO week is overkill.
+  const d = new Date(new Date().toLocaleString('en-US', { timeZone: 'Australia/Brisbane' }));
+  const start = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d - start) / 86400000 + start.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${String(week).padStart(2, '0')}`;
+}
+async function checkWeeklyReport() {
+  try {
+    if (!process.env.SENDGRID_API_KEY) return; // can't send without sg
+    const briz = new Date(new Date().toLocaleString('en-US', { timeZone: 'Australia/Brisbane' }));
+    if (briz.getDay() !== 5) return;          // Friday only
+    if (briz.getHours() !== 17) return;       // 5pm hour only (cron runs every 5min)
+    const week = brisbaneWeekString();
+    if (lastWeeklyReportWeek === week) return;
+    lastWeeklyReportWeek = week;
+    console.log('[report/weekly] firing for week', week);
+    const result = await generateWeeklyReport({ pool });
+    console.log('[report/weekly] result:', JSON.stringify(result));
+  } catch (err) {
+    console.error('[report/weekly] scheduler error:', err.message);
+  }
+}
+
 initDB()
   .then(() => {
     app.listen(PORT, () => console.log(`[server] Listening on port ${PORT}`));
     // Kick off scheduler — first check after 30s, then every 60s.
     setTimeout(checkDailyDigest, 30 * 1000);
     setInterval(checkDailyDigest, 60 * 1000);
+    // Weekly Friday 5pm Brisbane sales report.
+    setInterval(checkWeeklyReport, 5 * 60 * 1000);
+    // Cache the Pipedrive HOT label id once the network is up. Silent
+    // no-op when PIPEDRIVE_API_TOKEN is unset.
+    pipedrive.initPipedriveLabels().catch(err =>
+      console.error('[pipedrive] init labels error:', err.message)
+    );
   })
   .catch(err => {
     console.error('[db] Failed to initialise database:', err);
