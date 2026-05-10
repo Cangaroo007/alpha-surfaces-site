@@ -38,6 +38,66 @@
   cursor: pointer;
 }
 .nav-link:hover { opacity: 0.8; }
+
+/* --- DESKTOP CONTACT US DROPDOWN --- */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+.nav-dropdown-trigger { display: inline-flex; align-items: center; gap: 6px; }
+.nav-caret {
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.85;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+.nav-dropdown.open .nav-caret { transform: rotate(180deg); }
+.nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--olive, #564d22);
+  min-width: 220px;
+  padding: 8px 0;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 99;
+}
+.nav-dropdown.open .nav-dropdown-menu {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+/* Invisible hover bridge — gap between trigger and menu shouldn't kill hover */
+.nav-dropdown.open .nav-dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  left: 0;
+  right: 0;
+  height: 16px;
+}
+.nav-dropdown-item {
+  display: block;
+  font-family: 'Degular', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: 0.4px;
+  color: var(--cream, #f3f1e6);
+  text-decoration: none;
+  padding: 10px 22px;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.nav-dropdown-item:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
 .nav-hamburger {
   display: none;
   cursor: pointer;
@@ -244,6 +304,27 @@
 }
 .mobile-coll-stones ul li a:hover { opacity: 1; }
 
+/* Mobile CONTACT US accordion */
+.mobile-contact-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding-left: 24px;
+}
+.mobile-contact-panel.open {
+  max-height: 400px;
+}
+.mobile-sub-link {
+  display: block;
+  font-family: 'Degular', sans-serif;
+  font-weight: 400;
+  font-size: 22px;
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  padding: 6px 0;
+}
+.mobile-sub-link:hover { color: #fff; }
+
 /* --- RESPONSIVE --- */
 @media (max-width: 1024px) {
   .nav { padding: 24px 21px; }
@@ -252,4 +333,5 @@
   .nav-menu { display: none; }
   .nav-hamburger { display: block; }
   .mega-menu { display: none; }
+  .nav-dropdown-menu { display: none; }
 }

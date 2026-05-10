@@ -609,6 +609,38 @@ async function lookupEmailsByNames(pool, names) {
   return rows;
 }
 
+// Resolve a blocker name (free-text) to actual project_users rows. Used by
+// the blocker-notice and blocker-nag emails so the addressee is the person
+// being waited on, not a super_admin. Tries, in order:
+//   1) exact case-insensitive match on full name
+//   2) case-insensitive match on first token (e.g. 'Belinda' → 'Belinda Kelaher')
+// Why: blocker_by is free-text and can be saved as 'belinda', 'Belinda',
+// 'Belinda Kelaher' etc. The previous lookup was strict-case on full name
+// and silently dropped these — emails fell through to super_admins only.
+async function lookupBlockerEmails(pool, rawName) {
+  if (!pool) return [];
+  const name = String(rawName || '').trim();
+  if (!name) return [];
+  // Step 1: case-insensitive full-name match.
+  let { rows } = await pool.query(
+    `SELECT name, email FROM project_users
+      WHERE active = TRUE AND LOWER(name) = LOWER($1)`,
+    [name]
+  );
+  if (rows.length) return rows;
+  // Step 2: partial — match by first token of either side. Lets 'Belinda'
+  // resolve to 'Belinda Kelaher' and vice versa.
+  const firstToken = name.split(/\s+/)[0];
+  ({ rows } = await pool.query(
+    `SELECT name, email FROM project_users
+      WHERE active = TRUE
+        AND (LOWER(SPLIT_PART(name, ' ', 1)) = LOWER($1)
+          OR LOWER(name) LIKE LOWER($2))`,
+    [firstToken, `${firstToken}%`]
+  ));
+  return rows;
+}
+
 function reviewEmailChrome({ headerLabel, headerColor, ticket, body, ctaUrl }) {
   const base = process.env.SITE_URL || 'https://alphasurfaces.com.au';
   const url  = ctaUrl || `${base}/projects?ticket=${encodeURIComponent(ticket.ticket_id)}`;
@@ -775,8 +807,11 @@ async function notifyReviewerFeedback(pool, ticket, reviewerName, feedback) {
 // is set. CCs all super_admins so they have visibility from minute zero.
 async function sendBlockerNotice(pool, ticket, flaggedByName) {
   if (!pool || !ticket || !ticket.blocked_by) return;
-  const blockerRows = await lookupEmailsByNames(pool, [ticket.blocked_by]);
+  const blockerRows = await lookupBlockerEmails(pool, ticket.blocked_by);
   const adminRows = await getSuperAdminEmails(pool);
+  if (!blockerRows.length) {
+    console.warn('[notify/blocker] could not resolve blocker name to user:', ticket.blocked_by, '— falling back to super_admins');
+  }
   // Dedupe by lowercased email — admin who is also the blocker should
   // only get one mail.
   const byEmail = new Map();
@@ -803,14 +838,20 @@ async function sendBlockerNotice(pool, ticket, flaggedByName) {
   await dispatchReviewEmails(recipients, subject, html);
 }
 
-// Cron-fired reminder. Same recipients as the initial notice (blocker +
-// super_admins) but emphasises elapsed time and the "we keep nagging" cadence.
+// Cron-fired reminder. Goes TO the blocker (the person we're waiting on) with
+// super_admins CC'd via additional sends. If we can't resolve the blocker name
+// to a real user, we fall back to super_admins only and log a warning so the
+// nag still surfaces somewhere.
 async function sendBlockerNagEmail(pool, ticket) {
   if (!pool || !ticket || !ticket.blocked_by) return;
-  const blockerRows = await lookupEmailsByNames(pool, [ticket.blocked_by]);
+  const blockerRows = await lookupBlockerEmails(pool, ticket.blocked_by);
   const adminRows = await getSuperAdminEmails(pool);
   const byEmail = new Map();
+  // Blocker first — they're the actual addressee.
   blockerRows.forEach(r => { if (r && r.email) byEmail.set(r.email.toLowerCase(), { email: r.email }); });
+  if (!blockerRows.length) {
+    console.warn('[notify/blocker-nag] could not resolve blocker name to user:', ticket.blocked_by, '— falling back to super_admins');
+  }
   adminRows.forEach(e => { if (e) byEmail.set(e.toLowerCase(), { email: e }); });
   const recipients = [...byEmail.values()];
   if (!recipients.length) return;

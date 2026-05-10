@@ -516,25 +516,7 @@ async function initSchema(pool) {
   await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS blocker_last_nagged TIMESTAMPTZ`);
   await pool.query(`ALTER TABLE tickets ADD COLUMN IF NOT EXISTS blocked_set_by_user_id INTEGER REFERENCES project_users(id) ON DELETE SET NULL`);
 
-  // Initial blocker seed for tickets we know are stuck on Belinda. Only fires
-  // when blocked_by is currently NULL, so manual edits in production are
-  // never overridden by a redeploy.
-  const INITIAL_BLOCKERS = [
-    { ticket_id: 'AS-008', by: 'Belinda Kelaher', reason: 'Waiting on updated fabrication manual PDF' },
-    { ticket_id: 'AS-012', by: 'Belinda Kelaher', reason: 'Waiting on brochure file' }
-  ];
-  for (const b of INITIAL_BLOCKERS) {
-    await pool.query(
-      `UPDATE tickets
-          SET blocked_by = $1, blocked_reason = $2,
-              blocked_at = COALESCE(blocked_at, NOW()),
-              blocker_last_nagged = NULL
-        WHERE ticket_id = $3 AND blocked_by IS NULL`,
-      [b.by, b.reason, b.ticket_id]
-    );
-  }
-
-  // Per-action audit trail for review cycles. Captures both reviewer notes
+// Per-action audit trail for review cycles. Captures both reviewer notes
   // (advisory) and approver decisions (binding). One row per action — multiple
   // rounds of changes_requested produce multiple rows so the full history is
   // preserved.
@@ -853,6 +835,16 @@ async function initSchema(pool) {
     }
   } catch (err) {
     console.error('[projects/migrate] form_submissions copy error:', err.message);
+  }
+
+  // Self-healing backfill for sample_requests.stone_interest. Idempotent —
+  // only touches rows that are still blank — so it's safe to run on every
+  // boot. Catches rows that the original migration created with NULL stones
+  // before sample_request_items was being joined.
+  try {
+    await backfillSampleRequestStoneInterest(pool);
+  } catch (err) {
+    console.error('[projects/backfill] sample stone_interest error:', err.message);
   }
 
   // ── Time tracking (Track F) ────────────────────────────────────────
@@ -1351,6 +1343,16 @@ async function insertTypedSubmission(pool, legacyFormType, fields, sampleItems =
 // in their own table already (see db.js) so they're not part of this sweep.
 async function migrateFormSubmissionsIntoTypedTables(pool) {
   console.log('[projects/migrate] starting form_submissions → typed-tables copy');
+  // For sample requests, the picked stones live in sample_request_items not
+  // form_submissions.stone_interest. Pre-aggregate so each row gets a real
+  // comma-joined list (e.g. "Jewel, Carrara") instead of NULL.
+  const { rows: sampleStoneRows } = await pool.query(
+    `SELECT submission_id, string_agg(stone_name, ', ' ORDER BY id) AS stones
+       FROM sample_request_items
+      GROUP BY submission_id`
+  );
+  const stonesBySubmissionId = new Map();
+  for (const r of sampleStoneRows) stonesBySubmissionId.set(r.submission_id, r.stones);
   const { rows } = await pool.query(`SELECT * FROM form_submissions ORDER BY id ASC`);
   let counts = { sample: 0, enquiry: 0, warranty: 0, contact: 0, partner: 0, skipped: 0 };
   for (const s of rows) {
@@ -1360,12 +1362,13 @@ async function migrateFormSubmissionsIntoTypedTables(pool) {
     try {
       if (ft === 'Sample Request') {
         const ref = await nextRef(pool, 'sample_requests', 'SR');
+        const stoneInterest = stonesBySubmissionId.get(s.id) || s.stone_interest || null;
         await pool.query(
           `INSERT INTO sample_requests
              (reference, name, email, phone, company, role, stone_interest, message,
               street, suburb, unit, source, consent, status, created_at, updated_at)
            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$15)`,
-          [ref, s.name, s.email, s.phone, s.company, s.role, s.stone_interest, s.message,
+          [ref, s.name, s.email, s.phone, s.company, s.role, stoneInterest, s.message,
            s.street, s.suburb, s.unit, s.source, consent, s.status || 'new', s.submitted_at]
         );
         counts.sample++;
@@ -1435,6 +1438,49 @@ async function migrateFormSubmissionsIntoTypedTables(pool) {
     }
   }
   console.log('[projects/migrate] done:', JSON.stringify(counts));
+}
+
+// Backfill stone_interest on sample_requests rows that came through the
+// initial typed-table migration with NULL/empty stones. The data lives in
+// sample_request_items (linked to form_submissions, not sample_requests),
+// so we re-match on name+email+created_at to find the originating
+// form_submissions row, then aggregate its items.
+//
+// Idempotent by construction: only processes rows where stone_interest is
+// blank, so a re-run after success simply finds nothing to do.
+async function backfillSampleRequestStoneInterest(pool) {
+  const { rows: blanks } = await pool.query(
+    `SELECT sr.id, sr.name, sr.email, sr.created_at FROM sample_requests sr
+      WHERE sr.stone_interest IS NULL OR sr.stone_interest = '' OR sr.stone_interest = '—'`
+  );
+  if (!blanks.length) return;
+  console.log('[projects/backfill] sample_requests stone_interest:', blanks.length, 'row(s) to backfill');
+  let fixed = 0;
+  for (const sr of blanks) {
+    if (!sr.name || !sr.email) continue;
+    const { rows: matches } = await pool.query(
+      `SELECT fs.id FROM form_submissions fs
+        WHERE LOWER(fs.name) = LOWER($1) AND LOWER(fs.email) = LOWER($2)
+          AND fs.form_type = 'Sample Request'
+        ORDER BY ABS(EXTRACT(EPOCH FROM (fs.submitted_at - $3::timestamptz))) ASC
+        LIMIT 1`,
+      [sr.name, sr.email, sr.created_at]
+    );
+    if (!matches.length) continue;
+    const { rows: items } = await pool.query(
+      `SELECT string_agg(stone_name, ', ' ORDER BY id) AS stones
+         FROM sample_request_items WHERE submission_id = $1`,
+      [matches[0].id]
+    );
+    if (items[0]?.stones) {
+      await pool.query(
+        'UPDATE sample_requests SET stone_interest = $1 WHERE id = $2',
+        [items[0].stones, sr.id]
+      );
+      fixed++;
+    }
+  }
+  console.log('[projects/backfill] sample_requests stone_interest: fixed', fixed, 'row(s)');
 }
 
 // ─── Module factory ───────────────────────────────────────────────────────
@@ -3963,14 +4009,21 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
   let lastBlockerSweepDay = null;
   async function runBlockerNagSweep() {
     try {
+      // Atomic claim: UPDATE with the cooldown predicate, RETURNING the row.
+      // Because the UPDATE itself bumps blocker_last_nagged, a second
+      // overlapping sweep on the same minute can't re-claim the ticket — it
+      // sees the just-updated timestamp and the predicate filters it out.
+      // Sending after the claim means the worst case on dispatch failure is a
+      // missed nag (recoverable next sweep) rather than a duplicate email.
       const { rows } = await pool.query(
-        `SELECT t.*
-           FROM tickets t
-          WHERE t.blocked_by IS NOT NULL
-            AND t.blocked_by <> ''
-            AND t.status NOT IN ('done', 'archived')
-            AND (t.blocker_last_nagged IS NULL
-                 OR t.blocker_last_nagged < NOW() - INTERVAL '2 days')`
+        `UPDATE tickets
+            SET blocker_last_nagged = NOW()
+          WHERE blocked_by IS NOT NULL
+            AND blocked_by <> ''
+            AND status NOT IN ('done', 'archived')
+            AND (blocker_last_nagged IS NULL
+                 OR blocker_last_nagged < NOW() - INTERVAL '2 days')
+          RETURNING *`
       );
       for (const ticket of rows) {
         if (sendBlockerNagEmail) {
@@ -3981,10 +4034,6 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
             continue;
           }
         }
-        await pool.query(
-          'UPDATE tickets SET blocker_last_nagged = NOW() WHERE ticket_id = $1',
-          [ticket.ticket_id]
-        );
         console.log('[blocker-nag]', ticket.ticket_id, '→', ticket.blocked_by);
       }
       if (rows.length) console.log('[blocker-nag] sweep nagged', rows.length, 'ticket(s)');

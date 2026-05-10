@@ -46,9 +46,14 @@
       '<a href="/collections.html" class="nav-link nav-collections-trigger" id="collections-trigger">COLLECTIONS</a>' +
       '<a href="/about.html" class="nav-link">ABOUT</a>' +
       '<a href="/brochure" class="nav-link">BROCHURE</a>' +
-      '<a href="/enquiry" class="nav-link">ENQUIRY</a>' +
-      '<a href="/warranty" class="nav-link">WARRANTY</a>' +
-      '<a href="/#contact" class="nav-link">CONTACT</a>' +
+      '<div class="nav-dropdown" id="contact-dropdown">' +
+        '<a href="/#contact" class="nav-link nav-dropdown-trigger" id="contact-trigger">CONTACT US <span class="nav-caret">▾</span></a>' +
+        '<div class="nav-dropdown-menu" id="contact-dropdown-menu">' +
+          '<a href="/#contact" class="nav-dropdown-item">Contact Us</a>' +
+          '<a href="/enquiry" class="nav-dropdown-item">General Enquiry</a>' +
+          '<a href="/warranty" class="nav-dropdown-item">Activate Warranty</a>' +
+        '</div>' +
+      '</div>' +
     '</div>' +
     '<button class="nav-hamburger" id="nav-hamburger" aria-label="Menu"><span></span><span></span><span></span></button>' +
     '<div class="mega-menu" id="mega-menu"></div>' +
@@ -129,9 +134,14 @@
   mHtml += '</div>';
   mHtml += '<a href="/about.html" class="mobile-menu-link">ABOUT</a>';
   mHtml += '<a href="/brochure" class="mobile-menu-link">BROCHURE</a>';
-  mHtml += '<a href="/enquiry" class="mobile-menu-link">ENQUIRY</a>';
-  mHtml += '<a href="/warranty" class="mobile-menu-link">WARRANTY</a>';
-  mHtml += '<a href="/#contact" class="mobile-menu-link">CONTACT</a>';
+  mHtml += '<div class="mobile-collections-row">' +
+    '<a href="/#contact" class="mobile-menu-link" style="flex:1;">CONTACT US</a>' +
+    '<button class="mobile-toggle-btn" id="mobile-contact-toggle"><span class="toggle-icon">+</span></button></div>' +
+    '<div class="mobile-contact-panel" id="mobile-contact-panel">' +
+      '<a href="/#contact" class="mobile-sub-link">Contact Us</a>' +
+      '<a href="/enquiry" class="mobile-sub-link">General Enquiry</a>' +
+      '<a href="/warranty" class="mobile-sub-link">Activate Warranty</a>' +
+    '</div>';
   mobileMenu.innerHTML = mHtml;
 
   /* ══════════════════════════════════════════════════
@@ -167,6 +177,25 @@
   var otherLinks = document.querySelectorAll('#nav-menu .nav-link:not(.nav-collections-trigger)');
   for (var i = 0; i < otherLinks.length; i++) otherLinks[i].addEventListener('click', function() { megaMenu.classList.remove('open'); });
 
+  // Desktop CONTACT US dropdown — hover-driven on wide screens, untouched
+  // on narrow (mobile menu owns that). The trigger link still navigates on
+  // click so users without hover (touch laptops) get to /#contact directly.
+  var contactDropdown = document.getElementById('contact-dropdown');
+  var contactTrigger = document.getElementById('contact-trigger');
+  var contactMenuEl = document.getElementById('contact-dropdown-menu');
+  if (contactDropdown && contactTrigger && contactMenuEl) {
+    var contactTimer;
+    contactDropdown.addEventListener('mouseenter', function() {
+      if (window.innerWidth >= 1024) { clearTimeout(contactTimer); contactDropdown.classList.add('open'); }
+    });
+    contactDropdown.addEventListener('mouseleave', function() {
+      if (window.innerWidth >= 1024) contactTimer = setTimeout(function() { contactDropdown.classList.remove('open'); }, 250);
+    });
+    document.addEventListener('click', function(e) {
+      if (contactDropdown.classList.contains('open') && !contactDropdown.contains(e.target)) contactDropdown.classList.remove('open');
+    });
+  }
+
   // Hamburger
   hamburger.addEventListener('click', function(e) { e.stopPropagation(); toggleMobile(); });
 
@@ -183,6 +212,17 @@
     collToggle.addEventListener('click', function() {
       collPanel.classList.toggle('open');
       collToggle.querySelector('.toggle-icon').textContent = collPanel.classList.contains('open') ? '\u2013' : '+';
+    });
+  }
+
+  // Mobile accordion: CONTACT US toggle
+  var contactToggle = document.getElementById('mobile-contact-toggle');
+  var contactPanel = document.getElementById('mobile-contact-panel');
+  if (contactToggle && contactPanel) {
+    contactToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      contactPanel.classList.toggle('open');
+      contactToggle.querySelector('.toggle-icon').textContent = contactPanel.classList.contains('open') ? '\u2013' : '+';
     });
   }
 
