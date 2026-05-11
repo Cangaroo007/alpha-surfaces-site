@@ -22,15 +22,17 @@
   --red: #f56c6c;
   --gray: #cccccc;
   --border: rgba(0,0,0,0.1);
+  --partner-accent: #EA7D00;
 }
 html { scroll-behavior: smooth; }
 body { background: var(--white); color: var(--black); font-family: 'Degular', sans-serif; font-weight: 400; line-height: 1.2; }
 a { color: inherit; }
 img { display: block; max-width: 100%; }
 
-.prepared-for { background: var(--cream); padding: 12px 90px; border-bottom: 1px solid var(--border); }
-.prepared-for p { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--olive); }
-.prepared-for span { opacity: 0.55; margin-right: 8px; }
+.prepared-for { background: var(--cream); padding: 18px 90px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 28px; }
+.prepared-for-label { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--olive); opacity: 0.6; flex-shrink: 0; }
+.prepared-for-logo { height: 36px; width: auto; max-width: 220px; object-fit: contain; flex-shrink: 0; }
+.prepared-for-name { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--olive); opacity: 0.55; margin-left: auto; }
 
 .hero { position: relative; width: 100%; height: calc(100vh - 155px); min-height: 600px; max-height: 880px; overflow: hidden; }
 .hero img { width: 100%; height: 100%; object-fit: cover; }
@@ -80,12 +82,12 @@ img { display: block; max-width: 100%; }
 .showcase-card .sc-sub { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--black); opacity: 0.55; }
 .showcase-card .sc-tag { display: inline-block; align-self: flex-start; font-family: 'Degular', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--olive); border: 1px solid var(--olive); padding: 3px 8px; margin-top: 4px; border-radius: 2px; }
 
-.cta-bar { background: var(--olive); padding: 100px 90px; display: flex; justify-content: space-between; align-items: center; gap: 60px; }
+.cta-bar { background: var(--olive); padding: 100px 90px; display: flex; justify-content: space-between; align-items: center; gap: 60px; border-top: 4px solid var(--partner-accent); }
 .cta-bar-text h2 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 38px; line-height: 1.15; color: var(--white); margin-bottom: 12px; max-width: 640px; }
 .cta-bar-text p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 19px; line-height: 1.4; color: rgba(255,255,255,0.78); max-width: 640px; }
 .cta-bar-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 16px; flex-shrink: 0; }
-.cta-btn { display: inline-block; background: var(--white); color: var(--olive); font-family: 'Degular', sans-serif; font-weight: 500; font-size: 16px; letter-spacing: 0.6px; text-transform: uppercase; padding: 18px 44px; border-radius: 10px; text-decoration: none; transition: transform 0.2s ease; }
-.cta-btn:hover { transform: translateY(-2px); }
+.cta-btn { display: inline-block; background: var(--white); color: var(--olive); font-family: 'Degular', sans-serif; font-weight: 500; font-size: 16px; letter-spacing: 0.6px; text-transform: uppercase; padding: 18px 44px; border-radius: 10px; text-decoration: none; transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease; }
+.cta-btn:hover { transform: translateY(-2px); background: var(--partner-accent); color: var(--white); }
 .cta-contact { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 14px; color: rgba(255,255,255,0.7); text-align: right; line-height: 1.5; }
 .cta-contact strong { color: var(--white); font-weight: 600; }
 .cta-contact a { color: rgba(255,255,255,0.85); text-decoration: underline; }
@@ -135,11 +137,13 @@ img { display: block; max-width: 100%; }
 <nav class="nav" id="main-nav"></nav>
 
 <div class="prepared-for">
-  <p><span>Prepared for</span>Hammertime Kitchens — Ben &amp; Amanda Attard, Baringa</p>
+  <span class="prepared-for-label">Prepared for</span>
+  <img class="prepared-for-logo" src="assets/hammertime-logo.png" alt="Hammertime Kitchens">
+  <span class="prepared-for-name">Ben &amp; Amanda Attard — Baringa, QLD</span>
 </div>
 
 <section class="hero">
-  <img src="../images/indoor-outdoor-hero.webp" alt="Alpha Surfaces UV-stable outdoor kitchen install for Queensland builders">
+  <img src="assets/hammertime-hero.jpg" alt="Hammertime Kitchens premium install paired with Alpha Surfaces">
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <p class="hero-eyebrow">Alpha Surfaces for Hammertime Kitchens</p>
@@ -172,12 +176,12 @@ img { display: block; max-width: 100%; }
 
 <section class="split reverse">
   <div class="split-image">
-    <img src="../images/indoor-outdoor-hero.webp" alt="UV-stable outdoor kitchen install in Queensland">
+    <img src="assets/hammertime-outdoor.jpg" alt="Hammertime Kitchens outdoor install — the exact use case for Alpha's UV-stable range">
   </div>
   <div class="split-text">
     <p class="section-label">Extend your offering outdoors</p>
     <h2>Built for the Queensland sun.</h2>
-    <p class="lede">Your socials show outdoor kitchens. Your competitors are selling engineered stone outdoors and crossing their fingers. Alpha is the only range that won't betray you in twelve months under QLD UV.</p>
+    <p class="lede">Your socials show outdoor kitchens like this one. Your competitors are selling engineered stone outdoors and crossing their fingers. Alpha is the only range that won't betray you in twelve months under QLD UV.</p>
     <ul class="split-list">
       <li>UV-stable colours — colour-locked for outdoor kitchen, alfresco and pool-deck installs.</li>
       <li>Alpha Shield protection gives your outdoor jobs a warranty edge nobody else can offer.</li>
