@@ -3379,6 +3379,91 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     }
   });
 
+  // ── Approval helpers ─────────────────────────────────────────────────
+  // Match a user against a ticket's named approver. Full name OR first name,
+  // case-insensitive — same rules the rest of the codebase uses.
+  function isTicketApprover(user, ticket) {
+    if (!user || !ticket || !ticket.approver) return false;
+    if (user.role === 'super_admin') return true;
+    const name = String(user.name || '').trim().toLowerCase();
+    if (!name) return false;
+    const first = name.split(/\s+/)[0];
+    const target = String(ticket.approver).trim().toLowerCase();
+    const targetFirst = target.split(/\s+/)[0];
+    return target === name || target === first || targetFirst === name || targetFirst === first;
+  }
+
+  // When the approver clicks Approve, peek at the ticket's description + notes
+  // for words that suggest the work has already shipped. If so, jump straight
+  // to 'done'; otherwise the ticket sits in review with a green APPROVED badge
+  // so the assignee knows to deploy.
+  const DEPLOYED_RE = /\b(deployed|deploy(?:ed)? to (?:prod|production|main)|in production|live on (?:prod|production|main)|shipped|released|rolled out|implemented|pushed to (?:prod|production|main))\b/i;
+  function looksDeployed(ticket) {
+    const blob = [ticket.description || '', ticket.notes || ''].join('\n');
+    return DEPLOYED_RE.test(blob);
+  }
+
+  // Shared approve / request_changes pipeline. Returns the updated ticket row.
+  // Both POST /review and PATCH approval_status funnel through here so the
+  // audit trail, emails, and status transitions stay consistent.
+  async function applyApprovalDecision(pool, ticket, user, decision, feedback) {
+    const fb = feedback ? String(feedback).trim() : '';
+    if (decision === 'changes_requested' && !fb) {
+      const err = new Error('Feedback is required when requesting changes.');
+      err.status = 400;
+      throw err;
+    }
+
+    // Audit row first — never lose history if the UPDATE fails.
+    await pool.query(
+      `INSERT INTO ticket_reviews (ticket_id, reviewer_id, reviewer_name, action, feedback, role)
+       VALUES ($1, $2, $3, $4, $5, 'approver')`,
+      [ticket.ticket_id, user.userId || null, user.name || 'Unknown', decision, fb || null]
+    );
+
+    let updated = ticket;
+    if (decision === 'approved') {
+      const targetStatus = looksDeployed(ticket) ? 'done' : 'review';
+      const upd = await pool.query(
+        `UPDATE tickets SET status = $2, approval_status = 'approved',
+                            review_started_at = NULL, updated_at = NOW()
+          WHERE id = $1 RETURNING *`,
+        [ticket.id, targetStatus]
+      );
+      updated = upd.rows[0];
+      // Auto-log to ticket notes for visibility outside the review tab.
+      const noteLine = fb ? `Approved by ${user.name}: ${fb}` : `Approved by ${user.name}`;
+      updated = await appendNote(pool, ticket.ticket_id, user, noteLine) || updated;
+      logActivity(pool, ticket.ticket_id, user, 'approved',
+        targetStatus === 'done'
+          ? (fb ? `Approved: ${fb} — moved to done` : 'Approved — moved to done')
+          : (fb ? `Approved: ${fb} — awaiting deployment` : 'Approved — awaiting deployment'));
+      if (notifyApproved) {
+        notifyApproved(pool, updated, user.name, fb)
+          .catch(e => console.error('[projects/review] approved email dispatch:', e.message));
+      }
+    } else if (decision === 'changes_requested') {
+      const upd = await pool.query(
+        `UPDATE tickets SET status = 'in_progress', approval_status = 'changes_requested',
+                            review_started_at = NULL, updated_at = NOW()
+          WHERE id = $1 RETURNING *`,
+        [ticket.id]
+      );
+      updated = upd.rows[0];
+      updated = await appendNote(pool, ticket.ticket_id, user, `Changes requested by ${user.name}: ${fb}`) || updated;
+      logActivity(pool, ticket.ticket_id, user, 'changes_requested', fb);
+      if (notifyChangesRequested) {
+        notifyChangesRequested(pool, updated, user.name, fb)
+          .catch(e => console.error('[projects/review] changes_requested email dispatch:', e.message));
+      }
+    } else {
+      const err = new Error('Invalid approval decision.');
+      err.status = 400;
+      throw err;
+    }
+    return updated;
+  }
+
   // ── Update ───────────────────────────────────────────────────────────
   router.patch('/tickets/:id', requireWrite, async (req, res) => {
     try {
@@ -3392,6 +3477,35 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       if (!canAccessTicket(req.user, oldRow)) {
         return res.status(403).json({ ok: false, error: 'You can only edit tickets assigned to you.' });
       }
+      // approval_status is approver-only — short-circuit straight to the
+      // shared decision pipeline so PATCH and POST /review share one code
+      // path. Reject anything but 'approved' / 'changes_requested' here so
+      // the column-loop below can keep treating approval_status as derived.
+      if (Object.prototype.hasOwnProperty.call(req.body || {}, 'approval_status')) {
+        const incoming = String(req.body.approval_status || '').trim();
+        if (incoming !== 'approved' && incoming !== 'changes_requested') {
+          return res.status(400).json({
+            ok: false,
+            error: 'approval_status can only be set to "approved" or "changes_requested" via PATCH.'
+          });
+        }
+        if (!isTicketApprover(req.user, oldRow)) {
+          return res.status(403).json({
+            ok: false,
+            error: `Only the named approver (${oldRow.approver || '—'}) can change approval_status.`
+          });
+        }
+        try {
+          const ticket = await applyApprovalDecision(
+            pool, oldRow, req.user, incoming,
+            req.body.feedback || req.body.note || ''
+          );
+          return res.json({ ok: true, ticket });
+        } catch (e) {
+          return res.status(e.status || 500).json({ ok: false, error: e.message });
+        }
+      }
+
       // Operators can't reassign a ticket away from themselves — keeps audit
       // trail honest.
       if (req.user.role === 'operator' && Object.prototype.hasOwnProperty.call(req.body || {}, 'assigned_to')) {
@@ -3681,51 +3795,23 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
         return res.status(403).json({ ok: false, error: 'Only a named reviewer can leave reviewer feedback.' });
       }
 
-      const role = isApproveAction ? 'approver' : 'reviewer';
-      const reviewAction = action === 'approve' ? 'approved'
-                         : action === 'request_changes' ? 'changes_requested'
-                         : 'feedback';
-
-      // Insert the audit row first — never lose history even if downstream
-      // status update fails.
-      await pool.query(
-        `INSERT INTO ticket_reviews (ticket_id, reviewer_id, reviewer_name, action, feedback, role)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [ticket.ticket_id, req.user.userId || null, req.user.name || 'Unknown', reviewAction, feedback || null, role]
-      );
-
       let updated = ticket;
-      if (action === 'approve') {
-        const upd = await pool.query(
-          `UPDATE tickets SET status = 'done', approval_status = 'approved',
-                              review_started_at = NULL, updated_at = NOW()
-            WHERE id = $1 RETURNING *`,
-          [ticket.id]
-        );
-        updated = upd.rows[0];
-        logActivity(pool, ticket.ticket_id, req.user, 'approved',
-          feedback ? `Approved: ${feedback}` : 'Approved — moved to done');
-        if (notifyApproved) {
-          notifyApproved(pool, updated, req.user.name, feedback)
-            .catch(err => console.error('[projects/review] approved email dispatch:', err.message));
-        }
-      } else if (action === 'request_changes') {
-        const upd = await pool.query(
-          `UPDATE tickets SET status = 'in_progress', approval_status = 'changes_requested',
-                              review_started_at = NULL, updated_at = NOW()
-            WHERE id = $1 RETURNING *`,
-          [ticket.id]
-        );
-        updated = upd.rows[0];
-        logActivity(pool, ticket.ticket_id, req.user, 'changes_requested', feedback);
-        if (notifyChangesRequested) {
-          notifyChangesRequested(pool, updated, req.user.name, feedback)
-            .catch(err => console.error('[projects/review] changes_requested email dispatch:', err.message));
+      if (action === 'approve' || action === 'request_changes') {
+        const decision = action === 'approve' ? 'approved' : 'changes_requested';
+        try {
+          updated = await applyApprovalDecision(pool, ticket, req.user, decision, feedback);
+        } catch (e) {
+          return res.status(e.status || 500).json({ ok: false, error: e.message });
         }
       } else {
         // reviewer_feedback: advisory only, doesn't change status. But it
         // does advance pending_review → pending_approval per the spec
         // ("after 24h OR when any reviewer leaves feedback, whichever first").
+        await pool.query(
+          `INSERT INTO ticket_reviews (ticket_id, reviewer_id, reviewer_name, action, feedback, role)
+           VALUES ($1, $2, $3, 'feedback', $4, 'reviewer')`,
+          [ticket.ticket_id, req.user.userId || null, req.user.name || 'Unknown', feedback || null]
+        );
         if (ticket.approval_status === 'pending_review' && ticket.approver) {
           const upd = await pool.query(
             `UPDATE tickets SET approval_status = 'pending_approval',

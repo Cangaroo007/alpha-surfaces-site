@@ -506,10 +506,10 @@
   .review-action-bar textarea:focus { border-color: var(--olive); }
   .review-actions-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .review-actions-row button { padding: 9px 18px; border-radius: 4px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; border: 1px solid var(--border-strong); background: var(--white); cursor: pointer; }
-  .review-actions-row button.btn-approve { background: #2e7d32; color: #fff; border-color: #2e7d32; }
-  .review-actions-row button.btn-approve:hover { background: #246426; }
-  .review-actions-row button.btn-changes  { background: #b07020; color: #fff; border-color: #b07020; }
-  .review-actions-row button.btn-changes:hover  { background: #905a18; }
+  .review-actions-row button.btn-approve { background: var(--olive); color: #fff; border-color: var(--olive); }
+  .review-actions-row button.btn-approve:hover { background: #44391b; }
+  .review-actions-row button.btn-changes  { background: var(--white); color: #EA580C; border-color: #EA580C; }
+  .review-actions-row button.btn-changes:hover  { background: #fef3ea; }
   .review-actions-row button.btn-feedback { background: var(--olive); color: #fff; border-color: var(--olive); }
   .review-actions-row button.btn-attach   { background: var(--white); }
   .review-actions-row button:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -563,9 +563,11 @@
      advisory-only review (no approver) is intentionally low-emphasis. */
   .card.is-awaiting-approval { border-color: rgba(184,134,11,0.55); box-shadow: 0 0 0 1px rgba(184,134,11,0.18); }
   .card.is-changes-requested { border-color: rgba(234,88,12,0.55); box-shadow: 0 0 0 1px rgba(234,88,12,0.18); }
+  .card.is-approved-review   { border-color: rgba(46,125,50,0.55);  box-shadow: 0 0 0 1px rgba(46,125,50,0.18); }
   .card-approval-banner { color: #fff; margin: -12px -14px 8px; padding: 6px 12px; border-radius: 7px 7px 0 0; }
   .card-approval-banner.awaiting { background: #B8860B; }
   .card-approval-banner.changes  { background: #EA580C; }
+  .card-approval-banner.approved { background: #2e7d32; }
   .card-approval-banner .cab-head { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; line-height: 1.3; }
   .card-approval-banner .cab-sub  { font-size: 11px; opacity: 0.95; line-height: 1.35; margin-top: 2px; }
   .card-inreview-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: var(--cream-light); color: var(--muted); margin-top: 6px; }
@@ -1472,10 +1474,17 @@
           avatars.join('') +
         '</div>';
       }
-      // Prominent banner for the binding states (changes-requested + waiting
-      // on approver). Less-prominent pill for advisory-only review without
-      // an approver — those don't gate progression.
-      if (t.approval_status === 'changes_requested') {
+      // Prominent banner for the binding states (approved/changes-requested
+      // while still in review, or waiting on approver). Less-prominent pill
+      // for advisory-only review without an approver — those don't gate
+      // progression.
+      if (t.approval_status === 'approved' && t.status === 'review') {
+        approvalCardCls = ' is-approved-review';
+        approvalBanner = '<div class="card-approval-banner approved">' +
+          '<div class="cab-head">✅ APPROVED</div>' +
+          (t.approver ? '<div class="cab-sub">By ' + escapeHtml(t.approver) + '</div>' : '') +
+        '</div>';
+      } else if (t.approval_status === 'changes_requested') {
         approvalCardCls = ' is-changes-requested';
         approvalBanner = '<div class="card-approval-banner changes">' +
           '<div class="cab-head">✏️ CHANGES REQUESTED</div>' +
@@ -2196,7 +2205,10 @@
     }
     var isApprover = matches(t.approver) || user.role === 'super_admin';
     var isReviewer = (Array.isArray(t.reviewers) && t.reviewers.some(matches));
-    if (t.approval_status === 'pending_approval' && isApprover) return 'approver_active';
+    // Approver can act any time the ticket is in review and not already
+    // approved — no need to wait for advisory reviewer feedback or the 24h
+    // auto-advance window.
+    if (isApprover && t.status === 'review' && t.approval_status !== 'approved') return 'approver_active';
     if (t.approval_status === 'pending_review'   && isReviewer) return 'reviewer_active';
     if (isApprover) return 'approver_passive';
     if (isReviewer) return 'reviewer_passive';
