@@ -584,6 +584,23 @@ async function initSchema(pool) {
        ADD COLUMN IF NOT EXISTS default_view VARCHAR(20) DEFAULT 'kanban'`
   );
 
+  // GitHub commit-author emails used by the auto time-tracker to map a
+  // commit back to a project_users row. Array so a user can claim multiple
+  // identities (their own email + bot emails like noreply@anthropic.com
+  // for Claude-assisted commits they triggered).
+  await pool.query(
+    `ALTER TABLE project_users
+       ADD COLUMN IF NOT EXISTS github_emails TEXT[] DEFAULT '{}'`
+  );
+  // Seed Sean's GitHub identities. Idempotent — only overwrites when the
+  // current value is NULL or empty so manual edits stick.
+  await pool.query(
+    `UPDATE project_users
+        SET github_emails = ARRAY['sean@cangaroo.ai', 'noreply@anthropic.com']
+      WHERE LOWER(email) = 'sean@cangaroo.ai'
+        AND (github_emails IS NULL OR array_length(github_emails, 1) IS NULL)`
+  );
+
   // Role overhaul: re-map legacy roles (admin/member/viewer) to the new
   // hierarchy. Idempotent — once rows match the new values, these UPDATEs
   // change nothing.
@@ -873,6 +890,15 @@ async function initSchema(pool) {
   // room to add new categories without a migration round-trip.
   await pool.query(`ALTER TABLE time_entries ADD COLUMN IF NOT EXISTS category VARCHAR(30) DEFAULT 'development'`);
 
+  // Provenance flag for entries created by the auto time-tracker. Manual
+  // POSTs default to 'manual'; the auto-tracker writes 'auto-git'. The
+  // partial unique index lets the tracker re-run hourly and idempotently
+  // update today's row without stacking duplicates, while never colliding
+  // with a manual entry on the same date.
+  await pool.query(`ALTER TABLE time_entries ADD COLUMN IF NOT EXISTS source VARCHAR(20) DEFAULT 'manual'`);
+  await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_time_auto_unique
+                    ON time_entries (user_id, date) WHERE source = 'auto-git'`);
+
   // One-shot backfill for the seeded May 2026 entries + early Track E/F/G
   // work. Each UPDATE is gated on category IS NULL OR category = 'development'
   // (the default) so it's idempotent and never overwrites a manual choice.
@@ -964,6 +990,53 @@ async function initSchema(pool) {
       const totalHrs = MAY_TIME_SEED.reduce((s, e) => s + e.minutes, 0) / 60;
       console.log(`[projects/time] seeded May 2026 — ${totalHrs} hours for Sean`);
     }
+
+    // Track G follow-up: backfill May 9 + May 11 2026 from git log (no
+    // auto-tracker was running yet). Idempotent per-date: only inserts when
+    // the (user, date) is empty so re-running this block on redeploy is
+    // a no-op. The cap bump below ensures the warning + cap alerts stay
+    // quiet for this historical insert.
+    await pool.query(
+      `UPDATE user_time_settings SET monthly_hours_cap = 30
+        WHERE user_id = $1 AND monthly_hours_cap < 30`,
+      [seanId]
+    );
+    const MAY_9_11_BACKFILL = [
+      {
+        date: '2026-05-09',
+        minutes: 465,
+        desc: 'FlippingBook brochure integration (CSP/embed/iframe), blocker system + nag notifications, showroom check-in form, knowledge base with seeded docs, time tracker category breakdown, nav UX redesign, warranty photo upload',
+      },
+      {
+        date: '2026-05-11',
+        minutes: 480,
+        desc: 'Forms → Pipedrive hot leads, weekly sales report scheduler, approval badges on Kanban, target account landing pages (Dream Doors, Impala, Dimension Stone, Hammertime), partner brand assets + alpha-advantage page, blocker nag fixes, Contact Us nav restructure, fab guide prep',
+      },
+    ];
+    for (const e of MAY_9_11_BACKFILL) {
+      const existing = await pool.query(
+        `SELECT 1 FROM time_entries WHERE user_id = $1 AND date = $2::date LIMIT 1`,
+        [seanId, e.date]
+      );
+      if (!existing.rows.length) {
+        await pool.query(
+          `INSERT INTO time_entries (ticket_id, user_id, date, minutes, description, category, source)
+           VALUES (NULL, $1, $2, $3, $4, 'development', 'backfill-git')`,
+          [seanId, e.date, e.minutes, e.desc]
+        );
+        console.log(`[projects/time] backfilled ${e.date}: ${e.minutes}m for Sean`);
+      }
+    }
+    // Pre-mark May 2026 warning + cap alerts as already sent so the
+    // backfill doesn't trigger emails for past hours. Forward-looking
+    // alerts (overage rungs above 30h) still fire when crossed.
+    await pool.query(
+      `INSERT INTO time_alerts (user_id, month, alert_type)
+       VALUES ($1, '2026-05', '15hr_warning'), ($1, '2026-05', '20hr_reached'),
+              ($1, '2026-05', '30hr_reached')
+       ON CONFLICT (user_id, month, alert_type) DO NOTHING`,
+      [seanId]
+    );
   }
 
   // Seed tickets — only when table is empty.
@@ -1627,6 +1700,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     res.json({
       ok: true,
       user: {
+        userId: payload.userId || null,
         email: payload.email, name: payload.name, role: payload.role,
         default_view: payload.default_view || 'kanban'
       },
@@ -1659,7 +1733,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
     }
     res.json({
       authenticated: true,
-      user: { email: user.email, name: user.name, role: user.role,
+      user: { userId: user.userId || null,
+              email: user.email, name: user.name, role: user.role,
               initials: initialsFromName(user.name),
               default_view: defaultView },
       must_change_password: !!user.must_change_password
