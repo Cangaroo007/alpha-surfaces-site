@@ -15,7 +15,8 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const versions = require('./lib/versions');
 const { initDB, saveSubmission, saveSubscriber, unsubscribeEmail, pool } = require('./db');
 const notifications = require('./notifications');
-const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, generateWeeklyReport, readSettings: readNotifSettings, writeSettings: writeNotifSettings, notifyNewSubmission } = notifications;
+const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, generateWeeklyReport, readSettings: readNotifSettings, writeSettings: writeNotifSettings, notifyNewSubmission, checkAndSendTimeAlert } = notifications;
+const { scheduleAutoTracker } = require('./auto-time-tracker');
 // Track I: typed-form insert helper. Loaded statically (the require below
 // mounts routes; this property is attached to the module.exports object).
 const { insertTypedSubmission } = require('./projects-routes');
@@ -2357,6 +2358,10 @@ initDB()
     setInterval(checkDailyDigest, 60 * 1000);
     // Weekly Friday 5pm Brisbane sales report.
     setInterval(checkWeeklyReport, 5 * 60 * 1000);
+    // Auto time-tracking from GitHub commits — runs at the top of each
+    // hour between 06:00 and 22:00 Brisbane. Silent no-op when
+    // GITHUB_TOKEN is unset.
+    scheduleAutoTracker({ pool, checkAndSendTimeAlert });
     // Cache the Pipedrive HOT label id once the network is up. Silent
     // no-op when PIPEDRIVE_API_TOKEN is unset.
     pipedrive.initPipedriveLabels().catch(err =>
