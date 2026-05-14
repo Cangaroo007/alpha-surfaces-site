@@ -188,7 +188,7 @@ img { display: block; max-width: 100%; }
 (function() {
   var slug = document.body.getAttribute('data-slug');
 
-  fetch('../data/stones.json')
+  fetch('/api/public/stones').then(function(r){ if(!r.ok) throw new Error('managed content unavailable'); return r; }).catch(function(){ return fetch('../data/stones.json'); })
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var stone = null;
@@ -382,7 +382,7 @@ document.addEventListener('click', function(e) {
 </script>
 <script src="../animation.js?v=18"></script>
 <script src="../slab-lightbox.js?v=18"></script>
-<script src="../nav.js?v=18"></script>
+<script src="../nav.js?v=20"></script>
 <script src="/newsletter-form.js"></script>
 </body>
 </html>

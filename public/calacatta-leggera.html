@@ -190,7 +190,7 @@ img { display: block; max-width: 100%; }
   var currentStone = 'calacatta-leggera';
   var currentCollection = 'collection-01';
 
-  fetch('/data/stones.json')
+  fetch('/api/public/stones').then(function(r){ if(!r.ok) throw new Error('managed content unavailable'); return r; }).catch(function(){ return fetch('/data/stones.json'); })
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var section = document.getElementById('collection-stones');

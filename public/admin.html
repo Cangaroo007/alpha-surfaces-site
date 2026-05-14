@@ -786,6 +786,7 @@ body{background:var(--bg);color:var(--text)}
       <a href="#" data-panel="features" onclick="showPanel('features',this)">✨ Features Strip</a>
       <a href="#" data-panel="about" onclick="showPanel('about',this)">📖 About</a>
       <a href="#" data-panel="collections" onclick="showPanel('collections',this)">🗂️ Collections</a>
+      <a href="#" data-panel="managed-cms" onclick="showPanel('managed-cms',this)">✎ Managed Content</a>
       <a href="#" data-panel="product" onclick="showPanel('product',this)">💎 Product Detail</a>
       <a href="#" data-panel="advantage" onclick="showPanel('advantage',this)">⚡ Advantage</a>
       <a href="#" data-panel="warranty" onclick="showPanel('warranty',this)">🛡️ Warranty</a>
@@ -1120,6 +1121,11 @@ body{background:var(--bg);color:var(--text)}
         <div id="settings-panel"></div>
       </div>
 
+      <!-- MANAGED CMS -->
+      <div id="panel-managed-cms" class="panel">
+        <div id="managed-cms-panel"></div>
+      </div>
+
       <!-- FORMS -->
       <div id="panel-forms" class="panel">
         <div id="forms-panel"></div>
@@ -1290,8 +1296,9 @@ function showPanel(id, el) {
   document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el?.classList.add('active');
-  const titles = { styles:'Brand Styles', layout:'Layout & Order', nav:'Navigation', hero:'Hero', features:'Features Strip', about:'About', collections:'Collections', product:'Product Detail', advantage:'Advantage', warranty:'Warranty', cta:'Call to Action', footer:'Footer', forms:'Forms', notifications:'Notifications', apikeys:'API Keys & Integrations', ai:'AI Content Assistant', versions:'Version History', settings:'Settings' };
+  const titles = { styles:'Brand Styles', layout:'Layout & Order', nav:'Navigation', hero:'Hero', features:'Features Strip', about:'About', collections:'Collections', 'managed-cms':'Managed Content', product:'Product Detail', advantage:'Advantage', warranty:'Warranty', cta:'Call to Action', footer:'Footer', forms:'Forms', notifications:'Notifications', apikeys:'API Keys & Integrations', ai:'AI Content Assistant', versions:'Version History', settings:'Settings' };
   document.getElementById('panel-title').textContent = titles[id] || id;
+  if (id === 'managed-cms' && window.renderManagedCmsPanel) window.renderManagedCmsPanel();
   // Toggle AI-active mode on main container
   const mainEl = document.querySelector('.main');
   if (id === 'ai') {
@@ -2900,5 +2907,6 @@ checkAuth();
 <script src="/admin-settings.js?v=19"></script>
 <script src="/admin-forms.js?v=19"></script>
 <script src="/admin-notifications.js?v=19"></script>
+<script src="/admin-cms.js?v=1"></script>
 </body>
 </html>

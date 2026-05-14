@@ -328,8 +328,14 @@ img { display: block; max-width: 100%; }
 </footer>
 
 <script>
-  fetch('/data/stones.json')
-    .then(r => r.json())
+  fetch('/api/public/stones')
+    .then(function(r) {
+      if (!r.ok) throw new Error('managed content unavailable');
+      return r.json();
+    })
+    .catch(function() {
+      return fetch('/data/stones.json').then(function(r) { return r.json(); });
+    })
     .then(data => {
       const container = document.getElementById('stones-container');
 
@@ -567,7 +573,7 @@ img { display: block; max-width: 100%; }
 </script>
 <script src="slab-lightbox.js?v=19"></script>
 <script src="animation.js?v=19"></script>
-<script src="nav.js?v=19"></script>
+<script src="nav.js?v=20"></script>
 <script src="sample-modal.js?v=19"></script>
 <script src="sample-popup.js?v=15"></script>
 <script src="/newsletter-form.js"></script>

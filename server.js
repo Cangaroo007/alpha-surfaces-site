@@ -24,6 +24,7 @@ const { insertTypedSubmission } = require('./projects-routes');
 // Pipedrive Leads Inbox (forms → HOT leads). All calls are wrapped so a
 // Pipedrive outage can't fail the form response.
 const pipedrive = require('./pipedrive');
+const cmsCore = require('./cms-core');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -520,6 +521,8 @@ const projectsModule = require('./projects-routes')(app, { pool, sessions, login
 if (projectsModule && typeof projectsModule.resolveUser === 'function') {
   resolveProjectsUser = projectsModule.resolveUser;
 }
+
+cmsCore.mountCms(app, { pool, authMiddleware, dataDir: DATA_DIR });
 
 // ─── Content API (public read, auth write) ───
 app.get('/api/content', (req, res) => {
@@ -2351,6 +2354,7 @@ async function checkWeeklyReport() {
 }
 
 initDB()
+  .then(() => cmsCore.initCms({ pool }))
   .then(() => {
     app.listen(PORT, () => console.log(`[server] Listening on port ${PORT}`));
     // Kick off scheduler — first check after 30s, then every 60s.
