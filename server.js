@@ -155,6 +155,42 @@ app.use((req, res, next) => {
   next();
 });
 
+// ─── Shared footer partial (single source of truth) ───
+// views/partials/footer.html is the canonical 4-column footer. Pages that opt
+// in carry a `<!-- FOOTER -->` marker (left in place by scripts/strip-footer.js);
+// the middleware below substitutes it on the way out. Pages without the marker
+// (admin, kc, partner pages, catalog viewer, etc.) are served unchanged.
+// Cached at startup — restart to pick up partial edits.
+const PUBLIC_DIR = path.resolve(path.join(__dirname, 'public'));
+const FOOTER_PARTIAL = fs.readFileSync(path.join(__dirname, 'views', 'partials', 'footer.html'), 'utf8');
+const FOOTER_MARKER = '<!-- FOOTER -->';
+
+function renderHtml(filePath) {
+  const html = fs.readFileSync(filePath, 'utf8');
+  return html.includes(FOOTER_MARKER)
+    ? html.replace(FOOTER_MARKER, FOOTER_PARTIAL)
+    : html;
+}
+
+function sendHtml(res, filePath) {
+  res.set('Content-Type', 'text/html; charset=utf-8');
+  res.send(renderHtml(filePath));
+}
+
+// Intercept GET requests that resolve to a public/*.html file so the footer
+// partial gets injected. Runs before express.static. Path traversal is
+// blocked by ensuring the resolved path stays inside PUBLIC_DIR.
+app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+  let urlPath = req.path;
+  if (urlPath === '/') urlPath = '/index.html';
+  if (!urlPath.endsWith('.html')) return next();
+  const resolved = path.resolve(path.join(PUBLIC_DIR, urlPath));
+  if (!resolved.startsWith(PUBLIC_DIR + path.sep)) return next();
+  if (!fs.existsSync(resolved)) return next();
+  return sendHtml(res, resolved);
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const loginLimiter = rateLimit({
@@ -2152,17 +2188,17 @@ const MAX_VERSIONS = 50;
 
 // ─── Admin route ───
 app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'admin.html'));
 });
 
 // ─── Kitchen Connection landing page ───
 app.get('/kc', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'kc.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'kc.html'));
 });
 
 // ─── Collections page ───
 app.get('/collections', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'collections.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'collections.html'));
 });
 
 // TODO: Instagram API endpoint
@@ -2176,33 +2212,33 @@ app.get('/collections', (req, res) => {
 
 // ─── Preview route — shareable URL for Belinda and Jay to review ───
 app.get('/preview', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'index.html'));
 });
 
 // ─── Document pages (clean URLs) ───
 app.get('/care-and-maintenance', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'care-and-maintenance.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'care-and-maintenance.html'));
 });
 app.get('/fabrication-guide', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'fabrication-guide.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'fabrication-guide.html'));
 });
 app.get('/warranty', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'warranty.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'warranty.html'));
 });
 app.get('/warranty-terms', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'warranty-terms.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'warranty-terms.html'));
 });
 app.get('/enquiry', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'enquiry.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'enquiry.html'));
 });
 
 app.get('/brochure', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'brochure.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'brochure.html'));
 });
 
 // Standalone iPad-kiosk check-in for showroom walk-ins. No nav, no chrome.
 app.get('/showroom-checkin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'showroom-checkin.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'showroom-checkin.html'));
 });
 
 // Legacy WordPress URLs Jess may still have bookmarked on the iPad.
@@ -2219,14 +2255,14 @@ const EXTERNAL_CATALOGS = {
   brochure: 'https://online.flippingbook.com/view/541312945/',
 };
 app.get('/catalog', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'catalog', 'index.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'catalog', 'index.html'));
 });
 app.get('/catalog/:slug', (req, res) => {
   const slug = (req.params.slug || '').replace(/[^a-z0-9-]/gi, '');
   if (!slug) return res.redirect(302, '/catalog');
   if (EXTERNAL_CATALOGS[slug]) return res.redirect(302, EXTERNAL_CATALOGS[slug]);
   // The viewer reads the slug from window.location and fetches the matching manifest
-  res.sendFile(path.join(__dirname, 'public', 'catalog', 'viewer.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'catalog', 'viewer.html'));
 });
 
 // ─── Discontinued Alpha Zero stones — redirect to collections ───
@@ -2245,7 +2281,7 @@ const renamedSlugs = {
 app.get('/partners/:slug', (req, res) => {
   const slug = req.params.slug.replace(/[^a-z0-9-]/gi, '');
   const filePath = path.join(__dirname, 'public', 'partners', slug + '.html');
-  if (fs.existsSync(filePath)) return res.sendFile(filePath);
+  if (fs.existsSync(filePath)) return sendHtml(res, filePath);
   res.redirect('/');
 });
 
@@ -2260,7 +2296,7 @@ app.get('/surfaces/:slug', (req, res) => {
   }
   const filePath = path.join(__dirname, 'public', 'surfaces', slug + '.html');
   if (fs.existsSync(filePath)) {
-    res.sendFile(filePath);
+    sendHtml(res, filePath);
   } else {
     res.status(404).send(`<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2278,7 +2314,7 @@ a:hover{opacity:0.9}
 
 // ─── Catch-all for SPA ───
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'index.html'));
 });
 
 // ─── Version History Startup ───
