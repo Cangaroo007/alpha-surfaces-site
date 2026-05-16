@@ -353,8 +353,33 @@ function formatBrisbaneDate(d) {
   });
 }
 
+// ISO-8601 week key (YYYY-Www) anchored to Brisbane local time. Used as the
+// once-per-week dedup key for the weekly report, persisted to settings so
+// the guard survives process restarts.
+function isoWeekStringBrisbane(date) {
+  const briz = new Date((date || new Date()).toLocaleString('en-US', { timeZone: 'Australia/Brisbane' }));
+  // Copy as UTC date so the ISO-week math (which assumes UTC) doesn't drift.
+  const d = new Date(Date.UTC(briz.getFullYear(), briz.getMonth(), briz.getDate()));
+  // ISO week: Thursday determines the year, weeks start Monday.
+  const dayNum = d.getUTCDay() || 7; // Sun=0 → 7
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNum = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return `${d.getUTCFullYear()}-W${String(weekNum).padStart(2, '0')}`;
+}
+
 async function generateWeeklyReport({ pool }) {
   if (!pool) return { ok: false, reason: 'no pool' };
+
+  // Persistent dedup: skip if we already sent for this ISO week. Survives
+  // restarts (the in-memory guard in server.js does not), which is the
+  // actual cause of the duplicate-send incident.
+  const currentWeek = isoWeekStringBrisbane();
+  const cfg = readSettings() || { notifications: {}, _state: {} };
+  if (cfg._state && cfg._state.lastWeeklyReportWeek === currentWeek) {
+    console.log(`[report/weekly] already sent for week ${currentWeek} — skipping`);
+    return { ok: false, reason: 'already sent', week: currentWeek };
+  }
   const pipedrive = (() => {
     try { return require('./pipedrive'); } catch { return null; }
   })();
@@ -375,6 +400,7 @@ async function generateWeeklyReport({ pool }) {
     ['warranty_activations', 'Warranty Activations'],
   ];
   const formCounts = {};
+  let formCountFailures = 0;
   for (const [table, label] of tableLabels) {
     try {
       const { rows } = await pool.query(
@@ -385,7 +411,14 @@ async function generateWeeklyReport({ pool }) {
     } catch (err) {
       console.error('[report/weekly]', table, 'count error:', err.message);
       formCounts[label] = 0;
+      formCountFailures += 1;
     }
+  }
+  // If every form-count query failed, the report would be all zeros and
+  // misleading — skip the send entirely and let the next cron tick retry.
+  if (formCountFailures === tableLabels.length) {
+    console.warn(`[report/weekly] all ${tableLabels.length} form-count queries failed — skipping send (would have been all zeros)`);
+    return { ok: false, reason: 'all form counts failed', week: currentWeek };
   }
   // Showroom: split walk-ins by `interests`/source if available so the
   // "(2 homeowners, 1 builder)" summary lands. This is best-effort —
@@ -454,7 +487,13 @@ async function generateWeeklyReport({ pool }) {
   try {
     await sgMail.send({ to, cc, from, subject, html });
     console.log('[report/weekly] sent to', to.join(', '), 'cc', cc.join(', '));
-    return { ok: true, recipients: to.length + cc.length };
+    // Persist the dedup key only after a confirmed send so a failed attempt
+    // is retried on the next cron tick.
+    cfg._state = cfg._state || {};
+    cfg._state.lastWeeklyReportWeek = currentWeek;
+    cfg._state.lastWeeklyReportSentAt = new Date().toISOString();
+    writeSettings(cfg);
+    return { ok: true, recipients: to.length + cc.length, week: currentWeek };
   } catch (err) {
     const detail = err.response?.body?.errors ? JSON.stringify(err.response.body.errors) : err.message;
     console.error('[report/weekly] send error:', detail);
@@ -1365,6 +1404,7 @@ module.exports = {
   sendTestForForm,
   sendDailyDigest,
   generateWeeklyReport,
+  isoWeekStringBrisbane,
   // New env-driven single-recipient path:
   sendSubmissionSMS,
   sendSubmissionEmail,

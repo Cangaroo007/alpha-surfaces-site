@@ -2360,30 +2360,24 @@ async function checkDailyDigest() {
 }
 
 // ─── Weekly sales report scheduler — Friday 5pm Brisbane ───
-// Same Brisbane-wall-clock pattern as the daily digest. A per-week guard
-// (lastWeeklyReportWeek) prevents a repeat fire if the 5-min interval lands
-// twice during the 5pm hour.
-let lastWeeklyReportWeek = null;
-function brisbaneWeekString() {
-  // ISO-week-ish: YYYY-Www, where W is the day-of-year week. Used purely
-  // as a once-per-week dedup key; exact ISO week is overkill.
-  const d = new Date(new Date().toLocaleString('en-US', { timeZone: 'Australia/Brisbane' }));
-  const start = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil(((d - start) / 86400000 + start.getDay() + 1) / 7);
-  return `${d.getFullYear()}-W${String(week).padStart(2, '0')}`;
-}
+// Two-layer dedup: this in-memory `lastSentWeek` guards against re-fires
+// inside the same process, and notifications.js persists the same key to
+// settings.json so the guard also survives a restart (which is what caused
+// the duplicate-send incident). The in-memory flag is only set after a
+// confirmed successful send so a failed attempt is retried on the next tick.
+let lastSentWeek = null;
 async function checkWeeklyReport() {
   try {
     if (!process.env.SENDGRID_API_KEY) return; // can't send without sg
     const briz = new Date(new Date().toLocaleString('en-US', { timeZone: 'Australia/Brisbane' }));
     if (briz.getDay() !== 5) return;          // Friday only
     if (briz.getHours() !== 17) return;       // 5pm hour only (cron runs every 5min)
-    const week = brisbaneWeekString();
-    if (lastWeeklyReportWeek === week) return;
-    lastWeeklyReportWeek = week;
-    console.log('[report/weekly] firing for week', week);
+    const currentWeek = notifications.isoWeekStringBrisbane();
+    if (lastSentWeek === currentWeek) return;
+    console.log('[report/weekly] firing for week', currentWeek);
     const result = await generateWeeklyReport({ pool });
     console.log('[report/weekly] result:', JSON.stringify(result));
+    if (result && result.ok) lastSentWeek = currentWeek;
   } catch (err) {
     console.error('[report/weekly] scheduler error:', err.message);
   }
