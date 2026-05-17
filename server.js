@@ -132,11 +132,27 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://online.flippingbook.com"],
+      scriptSrc: [
+        "'self'", "'unsafe-inline'", "'unsafe-eval'",
+        "https://cdn.jsdelivr.net", "https://online.flippingbook.com",
+        "https://www.googletagmanager.com", "https://www.google-analytics.com",
+        "https://www.clarity.ms", "https://*.clarity.ms"
+      ],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://online.flippingbook.com", "https://*.flippingbook.com"],
-      imgSrc: ["'self'", "https://res.cloudinary.com", "data:", "https://online.flippingbook.com", "https://*.flippingbook.com"],
+      imgSrc: [
+        "'self'", "https://res.cloudinary.com", "data:",
+        "https://online.flippingbook.com", "https://*.flippingbook.com",
+        "https://www.google-analytics.com", "https://www.googletagmanager.com",
+        "https://c.clarity.ms", "https://*.clarity.ms"
+      ],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      connectSrc: ["'self'", "https://online.flippingbook.com", "https://*.flippingbook.com"],
+      connectSrc: [
+        "'self'", "https://online.flippingbook.com", "https://*.flippingbook.com",
+        "https://www.google-analytics.com", "https://region1.google-analytics.com",
+        "https://analytics.google.com",
+        "https://www.clarity.ms", "https://c.clarity.ms", "https://d.clarity.ms",
+        "https://*.clarity.ms"
+      ],
       frameSrc: ["'self'", "https://online.flippingbook.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
     },
@@ -282,6 +298,31 @@ async function handleForm(req, res, formType) {
       }
     } catch (err) {
       console.error('[form] typed insert error:', err.message);
+    }
+
+    // Outreach attribution — when the form arrived with a landing-page
+    // pid + utm_source, link it back to the originating send and mark the
+    // send as converted so the per-AM dashboard reflects the conversion.
+    // Best-effort: a missing/stale pid must never block the form response.
+    const pid = fields.pid || null;
+    const utmSource = fields.utm_source || null;
+    if (pid && utmSource === 'landing_page') {
+      const conversionType = formType === 'Sample Request' ? 'sample_request'
+        : formType === 'Enquiry' ? 'enquiry'
+        : formType === 'Contact Enquiry' ? 'contact'
+        : 'other';
+      pool.query(
+        `INSERT INTO outreach_conversions
+           (prospect_id, outreach_send_id, form_submission_id, conversion_type)
+         SELECT $1, (SELECT id FROM outreach_sends WHERE prospect_id = $1 ORDER BY sent_at DESC LIMIT 1),
+                $2, $3`,
+        [pid, id, conversionType]
+      ).then(() =>
+        pool.query(
+          `UPDATE outreach_sends SET status = 'converted' WHERE prospect_id = $1`,
+          [pid]
+        )
+      ).catch(err => console.error('[outreach] conversion log error:', err.message));
     }
 
     // Pipedrive: forms → HOT leads (or activity/note for walk-ins/warranty).
@@ -2309,6 +2350,149 @@ p{font-size:16px;color:var(--black);opacity:0.5;margin-bottom:32px}
 a{font-size:12px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--white);background:var(--olive);padding:12px 28px;border-radius:8px;text-decoration:none}
 a:hover{opacity:0.9}
 </style></head><body><div><h1>Surface Not Found</h1><p>The surface you're looking for doesn't exist.</p><a href="/collections.html">Return to Collections</a></div></body></html>`);
+  }
+});
+
+// ─── Outreach tracking ───
+// Receiver for the landing-page-tracker.js sendBeacon. sendBeacon ships
+// the body as text/plain (no Content-Type negotiation), so we accept any
+// MIME and parse JSON manually. Failures are swallowed (200) so a flaky
+// tracking write never breaks the page experience.
+app.post('/api/tracking/landing-page',
+  express.text({ type: '*/*', limit: '32kb' }),
+  async (req, res) => {
+    try {
+      const data = typeof req.body === 'string' && req.body
+        ? JSON.parse(req.body)
+        : (req.body || {});
+      const { pid, campaign, am_email, page,
+              duration_seconds, max_scroll_pct, cta_clicks,
+              referrer, user_agent } = data;
+      if (!pid || !page) return res.sendStatus(400);
+
+      await pool.query(
+        `INSERT INTO landing_page_views
+           (prospect_id, campaign, am_email, page_path, duration_seconds,
+            max_scroll_pct, cta_clicks, referrer, user_agent, viewed_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, NOW())
+         ON CONFLICT (prospect_id, page_path, (viewed_at::date))
+         DO UPDATE SET
+           duration_seconds = GREATEST(landing_page_views.duration_seconds, EXCLUDED.duration_seconds),
+           max_scroll_pct   = GREATEST(landing_page_views.max_scroll_pct,   EXCLUDED.max_scroll_pct),
+           cta_clicks       = landing_page_views.cta_clicks || EXCLUDED.cta_clicks`,
+        [pid, campaign || null, am_email || null, page,
+         Number(duration_seconds) || 0, Number(max_scroll_pct) || 0,
+         JSON.stringify(Array.isArray(cta_clicks) ? cta_clicks : []),
+         referrer || null, user_agent || null]
+      );
+
+      // Promote send status from 'sent' → 'clicked' on first view. Don't
+      // demote already-converted sends.
+      await pool.query(
+        `UPDATE outreach_sends
+           SET status = 'clicked'
+         WHERE prospect_id = $1 AND status = 'sent'`,
+        [pid]
+      );
+
+      res.sendStatus(200);
+    } catch (err) {
+      console.error('[tracking] landing-page error:', err.message);
+      res.sendStatus(200);
+    }
+  }
+);
+
+// Generate a tracked outreach URL — admin-only. Records the send so the
+// view receiver and form attribution can link visits back to the prospect.
+app.get('/api/admin/outreach/generate-url', authMiddleware, async (req, res) => {
+  try {
+    const { prospect_email, am_email, page_slug, prospect_name, prospect_company } = req.query;
+    if (!prospect_email || !am_email || !page_slug) {
+      return res.status(400).json({
+        error: 'Missing required params: prospect_email, am_email, page_slug'
+      });
+    }
+    const cleanSlug = String(page_slug).replace(/[^a-z0-9-]/gi, '');
+    if (!cleanSlug) return res.status(400).json({ error: 'Invalid page_slug' });
+
+    const prospectId = crypto.randomUUID();
+    const baseUrl = process.env.SITE_URL || 'https://alphasurfaces.com.au';
+    const trackedUrl = `${baseUrl}/partners/${cleanSlug}` +
+      `?pid=${prospectId}` +
+      `&utm_source=landing_page` +
+      `&utm_medium=email` +
+      `&utm_campaign=${encodeURIComponent(cleanSlug)}` +
+      `&utm_content=${encodeURIComponent(am_email)}`;
+
+    await pool.query(
+      `INSERT INTO outreach_sends
+         (prospect_id, prospect_email, prospect_name, prospect_company,
+          am_email, landing_page_slug, landing_page_url, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'sent')`,
+      [prospectId, prospect_email, prospect_name || null,
+       prospect_company || null, am_email, cleanSlug, trackedUrl]
+    );
+
+    res.json({
+      ok: true,
+      prospect_id: prospectId,
+      tracked_url: trackedUrl,
+      page_slug: cleanSlug,
+      am_email,
+      prospect_email
+    });
+  } catch (err) {
+    console.error('[outreach] generate-url error:', err.message);
+    res.status(500).json({ error: 'Failed to generate tracked URL' });
+  }
+});
+
+// Admin dashboard summary — last 30 days of sends, engagement, per-AM.
+app.get('/api/admin/outreach/stats', authMiddleware, async (req, res) => {
+  try {
+    const sends = await pool.query(`
+      SELECT
+        COUNT(*)::int as total_sends,
+        COUNT(*) FILTER (WHERE status = 'sent')::int      as pending,
+        COUNT(*) FILTER (WHERE status = 'opened')::int    as opened,
+        COUNT(*) FILTER (WHERE status = 'clicked')::int   as clicked,
+        COUNT(*) FILTER (WHERE status = 'converted')::int as converted,
+        COUNT(*) FILTER (WHERE status = 'stale')::int     as stale
+      FROM outreach_sends
+      WHERE sent_at > NOW() - INTERVAL '30 days'
+    `);
+
+    const views = await pool.query(`
+      SELECT
+        COUNT(*)::int                                     as total_views,
+        COALESCE(ROUND(AVG(duration_seconds))::int, 0)    as avg_duration,
+        COALESCE(ROUND(AVG(max_scroll_pct))::int, 0)      as avg_scroll
+      FROM landing_page_views
+      WHERE viewed_at > NOW() - INTERVAL '30 days'
+    `);
+
+    const perAm = await pool.query(`
+      SELECT
+        am_email,
+        COUNT(*)::int                                                          as sends,
+        COUNT(*) FILTER (WHERE status IN ('opened','clicked','converted'))::int as engaged,
+        COUNT(*) FILTER (WHERE status = 'converted')::int                       as converted
+      FROM outreach_sends
+      WHERE sent_at > NOW() - INTERVAL '30 days'
+      GROUP BY am_email
+      ORDER BY sends DESC
+    `);
+
+    res.json({
+      ok: true,
+      summary: sends.rows[0],
+      engagement: views.rows[0],
+      per_am: perAm.rows
+    });
+  } catch (err) {
+    console.error('[outreach] stats error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch stats' });
   }
 });
 
