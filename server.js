@@ -124,6 +124,68 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 *
 // Active sessions (in-memory, resets on restart)
 const sessions = new Map();
 
+// ─── Outreach tracking receiver (MUST be registered before express.json) ───
+// Receiver for landing-page-tracker.js sendBeacon pings. Registered ahead
+// of the global express.json() so body-parser never sees the request —
+// production logs showed double-encoded payloads (""{\"pid\":...}"") that
+// crashed body-parser with a strict-JSON SyntaxError, killing the response
+// before the route handler could run. express.raw() hands us the untouched
+// Buffer; we parse it here ourselves with a defensive single-layer
+// stringification unwrap. Failures are swallowed (200) so a flaky tracking
+// write never breaks the page experience.
+app.post('/api/tracking/landing-page',
+  express.raw({ type: '*/*', limit: '1mb' }),
+  async (req, res) => {
+    try {
+      let raw = req.body;
+      if (Buffer.isBuffer(raw)) raw = raw.toString('utf-8');
+      if (typeof raw === 'string') raw = raw.trim();
+
+      // Defensive: strip one layer of stringification if upstream
+      // double-encoded the body (e.g. ""{\"pid\":...}"" → {"pid":...}).
+      if (typeof raw === 'string' && raw.startsWith('"') && raw.endsWith('"')) {
+        try { raw = JSON.parse(raw); } catch (e) { /* not double-wrapped */ }
+      }
+
+      const data = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+      const { pid, campaign, am_email, page,
+              duration_seconds, max_scroll_pct, cta_clicks,
+              referrer, user_agent } = data;
+      if (!pid || !page) return res.sendStatus(400);
+
+      await pool.query(
+        `INSERT INTO landing_page_views
+           (prospect_id, campaign, am_email, page_path, duration_seconds,
+            max_scroll_pct, cta_clicks, referrer, user_agent, viewed_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, NOW())
+         ON CONFLICT (prospect_id, page_path, (viewed_at::date))
+         DO UPDATE SET
+           duration_seconds = GREATEST(landing_page_views.duration_seconds, EXCLUDED.duration_seconds),
+           max_scroll_pct   = GREATEST(landing_page_views.max_scroll_pct,   EXCLUDED.max_scroll_pct),
+           cta_clicks       = landing_page_views.cta_clicks || EXCLUDED.cta_clicks`,
+        [pid, campaign || null, am_email || null, page,
+         Number(duration_seconds) || 0, Number(max_scroll_pct) || 0,
+         JSON.stringify(Array.isArray(cta_clicks) ? cta_clicks : []),
+         referrer || null, user_agent || null]
+      );
+
+      // Promote send status from 'sent' → 'clicked' on first view. Don't
+      // demote already-converted sends.
+      await pool.query(
+        `UPDATE outreach_sends
+           SET status = 'clicked'
+         WHERE prospect_id = $1 AND status = 'sent'`,
+        [pid]
+      );
+
+      res.sendStatus(200);
+    } catch (err) {
+      console.error('[tracking] landing-page error:', err.message);
+      res.sendStatus(200);
+    }
+  }
+);
+
 // ─── Middleware ───
 app.use(express.json({ limit: '25mb' }));
 app.use(cookieParser());
@@ -2352,56 +2414,6 @@ a:hover{opacity:0.9}
 </style></head><body><div><h1>Surface Not Found</h1><p>The surface you're looking for doesn't exist.</p><a href="/collections.html">Return to Collections</a></div></body></html>`);
   }
 });
-
-// ─── Outreach tracking ───
-// Receiver for the landing-page-tracker.js sendBeacon. sendBeacon ships
-// the body as text/plain (no Content-Type negotiation), so we accept any
-// MIME and parse JSON manually. Failures are swallowed (200) so a flaky
-// tracking write never breaks the page experience.
-app.post('/api/tracking/landing-page',
-  express.text({ type: '*/*', limit: '32kb' }),
-  async (req, res) => {
-    try {
-      const data = typeof req.body === 'string' && req.body
-        ? JSON.parse(req.body)
-        : (req.body || {});
-      const { pid, campaign, am_email, page,
-              duration_seconds, max_scroll_pct, cta_clicks,
-              referrer, user_agent } = data;
-      if (!pid || !page) return res.sendStatus(400);
-
-      await pool.query(
-        `INSERT INTO landing_page_views
-           (prospect_id, campaign, am_email, page_path, duration_seconds,
-            max_scroll_pct, cta_clicks, referrer, user_agent, viewed_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, NOW())
-         ON CONFLICT (prospect_id, page_path, (viewed_at::date))
-         DO UPDATE SET
-           duration_seconds = GREATEST(landing_page_views.duration_seconds, EXCLUDED.duration_seconds),
-           max_scroll_pct   = GREATEST(landing_page_views.max_scroll_pct,   EXCLUDED.max_scroll_pct),
-           cta_clicks       = landing_page_views.cta_clicks || EXCLUDED.cta_clicks`,
-        [pid, campaign || null, am_email || null, page,
-         Number(duration_seconds) || 0, Number(max_scroll_pct) || 0,
-         JSON.stringify(Array.isArray(cta_clicks) ? cta_clicks : []),
-         referrer || null, user_agent || null]
-      );
-
-      // Promote send status from 'sent' → 'clicked' on first view. Don't
-      // demote already-converted sends.
-      await pool.query(
-        `UPDATE outreach_sends
-           SET status = 'clicked'
-         WHERE prospect_id = $1 AND status = 'sent'`,
-        [pid]
-      );
-
-      res.sendStatus(200);
-    } catch (err) {
-      console.error('[tracking] landing-page error:', err.message);
-      res.sendStatus(200);
-    }
-  }
-);
 
 // Generate a tracked outreach URL — admin-only. Records the send so the
 // view receiver and form attribution can link visits back to the prospect.
