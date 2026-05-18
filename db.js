@@ -79,6 +79,64 @@ async function initDB() {
     `);
     console.log('[db] Backfill from raw_data complete');
 
+    // ─── Outreach tracking (landing-page → form attribution) ───
+    // outreach_sends: one row per tracked URL handed to a prospect
+    // landing_page_views: engagement pings from landing-page-tracker.js
+    // outreach_conversions: form submissions linked back to the send
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS outreach_sends (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        prospect_id VARCHAR(100) NOT NULL,
+        prospect_email VARCHAR(255) NOT NULL,
+        prospect_name VARCHAR(255),
+        prospect_company VARCHAR(255),
+        am_email VARCHAR(255) NOT NULL,
+        landing_page_slug VARCHAR(100) NOT NULL,
+        landing_page_url TEXT NOT NULL,
+        sg_message_id VARCHAR(255),
+        pipedrive_contact_id VARCHAR(255),
+        pipedrive_org_id VARCHAR(255),
+        sent_at TIMESTAMPTZ DEFAULT NOW(),
+        status VARCHAR(50) DEFAULT 'sent'
+      );
+
+      CREATE TABLE IF NOT EXISTS landing_page_views (
+        id SERIAL PRIMARY KEY,
+        prospect_id VARCHAR(100),
+        campaign VARCHAR(100),
+        am_email VARCHAR(255),
+        page_path VARCHAR(255),
+        duration_seconds INT,
+        max_scroll_pct INT,
+        cta_clicks JSONB DEFAULT '[]',
+        referrer TEXT,
+        user_agent TEXT,
+        viewed_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_lp_views_unique
+        ON landing_page_views (prospect_id, page_path, (viewed_at::date));
+
+      CREATE TABLE IF NOT EXISTS outreach_conversions (
+        id SERIAL PRIMARY KEY,
+        prospect_id VARCHAR(100),
+        outreach_send_id UUID REFERENCES outreach_sends(id),
+        form_submission_id INT REFERENCES form_submissions(id),
+        pipedrive_lead_id VARCHAR(255),
+        conversion_type VARCHAR(50),
+        converted_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_outreach_sends_am ON outreach_sends(am_email);
+      CREATE INDEX IF NOT EXISTS idx_outreach_sends_status ON outreach_sends(status);
+      CREATE INDEX IF NOT EXISTS idx_outreach_sends_prospect ON outreach_sends(prospect_email);
+      CREATE INDEX IF NOT EXISTS idx_outreach_sends_pid ON outreach_sends(prospect_id);
+      CREATE INDEX IF NOT EXISTS idx_lp_views_prospect ON landing_page_views(prospect_id);
+      CREATE INDEX IF NOT EXISTS idx_lp_views_campaign ON landing_page_views(campaign);
+      CREATE INDEX IF NOT EXISTS idx_conversions_prospect ON outreach_conversions(prospect_id);
+    `);
+    console.log('[db] Outreach tracking tables ready');
+
     await client.query(`
       CREATE TABLE IF NOT EXISTS newsletter_subscribers (
         id                         SERIAL PRIMARY KEY,
