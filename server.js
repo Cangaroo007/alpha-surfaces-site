@@ -156,9 +156,9 @@ app.post('/api/tracking/landing-page',
       await pool.query(
         `INSERT INTO landing_page_views
            (prospect_id, campaign, am_email, page_path, duration_seconds,
-            max_scroll_pct, cta_clicks, referrer, user_agent, viewed_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, NOW())
-         ON CONFLICT (prospect_id, page_path, (viewed_at::date))
+            max_scroll_pct, cta_clicks, referrer, user_agent, viewed_date, viewed_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, CURRENT_DATE, NOW())
+         ON CONFLICT (prospect_id, page_path, viewed_date)
          DO UPDATE SET
            duration_seconds = GREATEST(landing_page_views.duration_seconds, EXCLUDED.duration_seconds),
            max_scroll_pct   = GREATEST(landing_page_views.max_scroll_pct,   EXCLUDED.max_scroll_pct),

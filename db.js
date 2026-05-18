@@ -106,6 +106,7 @@ async function initDB() {
         campaign VARCHAR(100),
         am_email VARCHAR(255),
         page_path VARCHAR(255),
+        viewed_date DATE DEFAULT CURRENT_DATE,
         duration_seconds INT,
         max_scroll_pct INT,
         cta_clicks JSONB DEFAULT '[]',
@@ -114,8 +115,20 @@ async function initDB() {
         viewed_at TIMESTAMPTZ DEFAULT NOW()
       );
 
+      ALTER TABLE landing_page_views
+        ADD COLUMN IF NOT EXISTS viewed_date DATE;
+
+      UPDATE landing_page_views
+         SET viewed_date = COALESCE(viewed_date, viewed_at::date, CURRENT_DATE)
+       WHERE viewed_date IS NULL;
+
+      ALTER TABLE landing_page_views
+        ALTER COLUMN viewed_date SET DEFAULT CURRENT_DATE;
+
+      DROP INDEX IF EXISTS idx_lp_views_unique;
+
       CREATE UNIQUE INDEX IF NOT EXISTS idx_lp_views_unique
-        ON landing_page_views (prospect_id, page_path, (viewed_at::date));
+        ON landing_page_views (prospect_id, page_path, viewed_date);
 
       CREATE TABLE IF NOT EXISTS outreach_conversions (
         id SERIAL PRIMARY KEY,
