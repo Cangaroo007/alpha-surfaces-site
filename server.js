@@ -213,22 +213,25 @@ app.use(
         "https://www.google-analytics.com", "https://region1.google-analytics.com",
         "https://analytics.google.com",
         "https://www.clarity.ms", "https://c.clarity.ms", "https://d.clarity.ms",
-        "https://*.clarity.ms"
+        "https://*.clarity.ms",
+        "https://roadrunner-api-staging.up.railway.app"
       ],
       frameSrc: ["'self'", "https://online.flippingbook.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
     },
   })
 );
-// No-cache headers for HTML during pre-launch review period
-// TODO: Remove after launch when Cloudflare handles cache invalidation
+// Cache headers — public pages cached by Cloudflare (failover during outages)
 app.use((req, res, next) => {
-  if (!req.path.includes('.') || req.path.endsWith('.html')) {
-    res.set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
-    });
+  const p = req.path;
+  const isAPI = p.startsWith('/api/');
+  const isAdmin = p === '/admin' || p.startsWith('/admin/') || p.startsWith('/projects');
+  const isForm = ['/order-sample', '/enquiry', '/warranty', '/showroom-checkin'].some(f => p.startsWith(f));
+  
+  if (isAPI || isAdmin || isForm) {
+    res.set({ 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' });
+  } else if (!p.includes('.') || p.endsWith('.html')) {
+    res.set({ 'Cache-Control': 'public, max-age=14400, s-maxage=14400', 'Vary': 'Accept-Encoding' });
   }
   next();
 });
