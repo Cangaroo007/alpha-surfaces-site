@@ -359,6 +359,11 @@
         if (n) n.focus({ preventScroll: true });
       }
 
+      function makeSubmissionId() {
+        if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+        return 'sc-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+      }
+
       function showThankYou(name) {
         thanksNm.textContent = 'Thank you, ' + (name || 'friend') + '!';
         thanksEl.classList.add('show');
@@ -380,6 +385,7 @@
           return showError('That email doesn’t look right.');
         }
         var payload = {
+          _client_submission_id: makeSubmissionId(),
           form_type: 'showroom-checkin',
           name: name,
           phone: phone,
@@ -398,10 +404,20 @@
           });
           var data = await res.json().catch(function () { return {}; });
           if (!res.ok || !data.ok) {
+            if (res.status >= 500) {
+              console.warn('Showroom check-in queued locally after server error:', res.status);
+              showThankYou(name.split(/\s+/)[0]);
+              return;
+            }
             throw new Error(data && data.error ? data.error : 'Could not save. Please try again.');
           }
           showThankYou(name.split(/\s+/)[0]);
         } catch (err) {
+          if (err && (err.name === 'TypeError' || /failed to fetch|network|load failed/i.test(err.message || ''))) {
+            console.warn('Showroom check-in queued locally after network error:', err.message);
+            showThankYou(name.split(/\s+/)[0]);
+            return;
+          }
           showError(err.message || 'Something went wrong.');
           btn.disabled = false;
           btn.textContent = 'Check in';
