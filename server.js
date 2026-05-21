@@ -24,6 +24,7 @@ const { insertTypedSubmission } = require('./projects-routes');
 // Pipedrive Leads Inbox (forms → HOT leads). All calls are wrapped so a
 // Pipedrive outage can't fail the form response.
 const pipedrive = require('./pipedrive');
+const cmsCore = require('./cms-core');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -123,6 +124,68 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 *
 // Active sessions (in-memory, resets on restart)
 const sessions = new Map();
 
+// ─── Outreach tracking receiver (MUST be registered before express.json) ───
+// Receiver for landing-page-tracker.js sendBeacon pings. Registered ahead
+// of the global express.json() so body-parser never sees the request —
+// production logs showed double-encoded payloads (""{\"pid\":...}"") that
+// crashed body-parser with a strict-JSON SyntaxError, killing the response
+// before the route handler could run. express.raw() hands us the untouched
+// Buffer; we parse it here ourselves with a defensive single-layer
+// stringification unwrap. Failures are swallowed (200) so a flaky tracking
+// write never breaks the page experience.
+app.post('/api/tracking/landing-page',
+  express.raw({ type: '*/*', limit: '1mb' }),
+  async (req, res) => {
+    try {
+      let raw = req.body;
+      if (Buffer.isBuffer(raw)) raw = raw.toString('utf-8');
+      if (typeof raw === 'string') raw = raw.trim();
+
+      // Defensive: strip one layer of stringification if upstream
+      // double-encoded the body (e.g. ""{\"pid\":...}"" → {"pid":...}).
+      if (typeof raw === 'string' && raw.startsWith('"') && raw.endsWith('"')) {
+        try { raw = JSON.parse(raw); } catch (e) { /* not double-wrapped */ }
+      }
+
+      const data = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+      const { pid, campaign, am_email, page,
+              duration_seconds, max_scroll_pct, cta_clicks,
+              referrer, user_agent } = data;
+      if (!pid || !page) return res.sendStatus(400);
+
+      await pool.query(
+        `INSERT INTO landing_page_views
+           (prospect_id, campaign, am_email, page_path, duration_seconds,
+            max_scroll_pct, cta_clicks, referrer, user_agent, viewed_date, viewed_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, CURRENT_DATE, NOW())
+         ON CONFLICT (prospect_id, page_path, viewed_date)
+         DO UPDATE SET
+           duration_seconds = GREATEST(landing_page_views.duration_seconds, EXCLUDED.duration_seconds),
+           max_scroll_pct   = GREATEST(landing_page_views.max_scroll_pct,   EXCLUDED.max_scroll_pct),
+           cta_clicks       = landing_page_views.cta_clicks || EXCLUDED.cta_clicks`,
+        [pid, campaign || null, am_email || null, page,
+         Number(duration_seconds) || 0, Number(max_scroll_pct) || 0,
+         JSON.stringify(Array.isArray(cta_clicks) ? cta_clicks : []),
+         referrer || null, user_agent || null]
+      );
+
+      // Promote send status from 'sent' → 'clicked' on first view. Don't
+      // demote already-converted sends.
+      await pool.query(
+        `UPDATE outreach_sends
+           SET status = 'clicked'
+         WHERE prospect_id = $1 AND status = 'sent'`,
+        [pid]
+      );
+
+      res.sendStatus(200);
+    } catch (err) {
+      console.error('[tracking] landing-page error:', err.message);
+      res.sendStatus(200);
+    }
+  }
+);
+
 // ─── Middleware ───
 app.use(express.json({ limit: '25mb' }));
 app.use(cookieParser());
@@ -131,27 +194,82 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://online.flippingbook.com"],
+      scriptSrc: [
+        "'self'", "'unsafe-inline'", "'unsafe-eval'",
+        "https://cdn.jsdelivr.net", "https://online.flippingbook.com",
+        "https://www.googletagmanager.com", "https://www.google-analytics.com",
+        "https://www.clarity.ms", "https://*.clarity.ms"
+      ],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://online.flippingbook.com", "https://*.flippingbook.com"],
-      imgSrc: ["'self'", "https://res.cloudinary.com", "data:", "https://online.flippingbook.com", "https://*.flippingbook.com"],
+      imgSrc: [
+        "'self'", "https://res.cloudinary.com", "data:",
+        "https://online.flippingbook.com", "https://*.flippingbook.com",
+        "https://www.google-analytics.com", "https://www.googletagmanager.com",
+        "https://c.clarity.ms", "https://*.clarity.ms"
+      ],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      connectSrc: ["'self'", "https://online.flippingbook.com", "https://*.flippingbook.com"],
+      connectSrc: [
+        "'self'", "https://online.flippingbook.com", "https://*.flippingbook.com",
+        "https://www.google-analytics.com", "https://region1.google-analytics.com",
+        "https://analytics.google.com",
+        "https://www.clarity.ms", "https://c.clarity.ms", "https://d.clarity.ms",
+        "https://*.clarity.ms",
+        "https://roadrunner-api-staging.up.railway.app"
+      ],
       frameSrc: ["'self'", "https://online.flippingbook.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
     },
   })
 );
-// No-cache headers for HTML during pre-launch review period
-// TODO: Remove after launch when Cloudflare handles cache invalidation
+// Cache headers — public pages cached by Cloudflare (failover during outages)
 app.use((req, res, next) => {
-  if (!req.path.includes('.') || req.path.endsWith('.html')) {
-    res.set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
-    });
+  const p = req.path;
+  const isAPI = p.startsWith('/api/');
+  const isAdmin = p === '/admin' || p.startsWith('/admin/') || p.startsWith('/projects');
+  const isForm = ['/order-sample', '/enquiry', '/warranty', '/showroom-checkin'].some(f => p.startsWith(f));
+  
+  if (isAPI || isAdmin || isForm) {
+    res.set({ 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' });
+  } else if (!p.includes('.') || p.endsWith('.html')) {
+    res.set({ 'Cache-Control': 'public, max-age=14400, s-maxage=14400', 'Vary': 'Accept-Encoding' });
   }
   next();
+});
+
+// ─── Shared footer partial (single source of truth) ───
+// views/partials/footer.html is the canonical 4-column footer. Pages that opt
+// in carry a `<!-- FOOTER -->` marker (left in place by scripts/strip-footer.js);
+// the middleware below substitutes it on the way out. Pages without the marker
+// (admin, kc, partner pages, catalog viewer, etc.) are served unchanged.
+// Cached at startup — restart to pick up partial edits.
+const PUBLIC_DIR = path.resolve(path.join(__dirname, 'public'));
+const FOOTER_PARTIAL = fs.readFileSync(path.join(__dirname, 'views', 'partials', 'footer.html'), 'utf8');
+const FOOTER_MARKER = '<!-- FOOTER -->';
+
+function renderHtml(filePath) {
+  const html = fs.readFileSync(filePath, 'utf8');
+  return html.includes(FOOTER_MARKER)
+    ? html.replace(FOOTER_MARKER, FOOTER_PARTIAL)
+    : html;
+}
+
+function sendHtml(res, filePath) {
+  res.set('Content-Type', 'text/html; charset=utf-8');
+  res.send(renderHtml(filePath));
+}
+
+// Intercept GET requests that resolve to a public/*.html file so the footer
+// partial gets injected. Runs before express.static. Path traversal is
+// blocked by ensuring the resolved path stays inside PUBLIC_DIR.
+app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+  let urlPath = req.path;
+  if (urlPath === '/') urlPath = '/index.html';
+  if (!urlPath.endsWith('.html')) return next();
+  const resolved = path.resolve(path.join(PUBLIC_DIR, urlPath));
+  if (!resolved.startsWith(PUBLIC_DIR + path.sep)) return next();
+  if (!fs.existsSync(resolved)) return next();
+  return sendHtml(res, resolved);
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -245,6 +363,31 @@ async function handleForm(req, res, formType) {
       }
     } catch (err) {
       console.error('[form] typed insert error:', err.message);
+    }
+
+    // Outreach attribution — when the form arrived with a landing-page
+    // pid + utm_source, link it back to the originating send and mark the
+    // send as converted so the per-AM dashboard reflects the conversion.
+    // Best-effort: a missing/stale pid must never block the form response.
+    const pid = fields.pid || null;
+    const utmSource = fields.utm_source || null;
+    if (pid && utmSource === 'landing_page') {
+      const conversionType = formType === 'Sample Request' ? 'sample_request'
+        : formType === 'Enquiry' ? 'enquiry'
+        : formType === 'Contact Enquiry' ? 'contact'
+        : 'other';
+      pool.query(
+        `INSERT INTO outreach_conversions
+           (prospect_id, outreach_send_id, form_submission_id, conversion_type)
+         SELECT $1, (SELECT id FROM outreach_sends WHERE prospect_id = $1 ORDER BY sent_at DESC LIMIT 1),
+                $2, $3`,
+        [pid, id, conversionType]
+      ).then(() =>
+        pool.query(
+          `UPDATE outreach_sends SET status = 'converted' WHERE prospect_id = $1`,
+          [pid]
+        )
+      ).catch(err => console.error('[outreach] conversion log error:', err.message));
     }
 
     // Pipedrive: forms → HOT leads (or activity/note for walk-ins/warranty).
@@ -520,6 +663,8 @@ const projectsModule = require('./projects-routes')(app, { pool, sessions, login
 if (projectsModule && typeof projectsModule.resolveUser === 'function') {
   resolveProjectsUser = projectsModule.resolveUser;
 }
+
+cmsCore.mountCms(app, { pool, authMiddleware, dataDir: DATA_DIR });
 
 // ─── Content API (public read, auth write) ───
 app.get('/api/content', (req, res) => {
@@ -2149,17 +2294,17 @@ const MAX_VERSIONS = 50;
 
 // ─── Admin route ───
 app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'admin.html'));
 });
 
 // ─── Kitchen Connection landing page ───
 app.get('/kc', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'kc.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'kc.html'));
 });
 
 // ─── Collections page ───
 app.get('/collections', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'collections.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'collections.html'));
 });
 
 // TODO: Instagram API endpoint
@@ -2173,33 +2318,33 @@ app.get('/collections', (req, res) => {
 
 // ─── Preview route — shareable URL for Belinda and Jay to review ───
 app.get('/preview', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'index.html'));
 });
 
 // ─── Document pages (clean URLs) ───
 app.get('/care-and-maintenance', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'care-and-maintenance.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'care-and-maintenance.html'));
 });
 app.get('/fabrication-guide', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'fabrication-guide.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'fabrication-guide.html'));
 });
 app.get('/warranty', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'warranty.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'warranty.html'));
 });
 app.get('/warranty-terms', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'warranty-terms.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'warranty-terms.html'));
 });
 app.get('/enquiry', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'enquiry.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'enquiry.html'));
 });
 
 app.get('/brochure', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'brochure.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'brochure.html'));
 });
 
 // Standalone iPad-kiosk check-in for showroom walk-ins. No nav, no chrome.
 app.get('/showroom-checkin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'showroom-checkin.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'showroom-checkin.html'));
 });
 
 // Legacy WordPress URLs Jess may still have bookmarked on the iPad.
@@ -2216,14 +2361,14 @@ const EXTERNAL_CATALOGS = {
   brochure: 'https://online.flippingbook.com/view/541312945/',
 };
 app.get('/catalog', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'catalog', 'index.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'catalog', 'index.html'));
 });
 app.get('/catalog/:slug', (req, res) => {
   const slug = (req.params.slug || '').replace(/[^a-z0-9-]/gi, '');
   if (!slug) return res.redirect(302, '/catalog');
   if (EXTERNAL_CATALOGS[slug]) return res.redirect(302, EXTERNAL_CATALOGS[slug]);
   // The viewer reads the slug from window.location and fetches the matching manifest
-  res.sendFile(path.join(__dirname, 'public', 'catalog', 'viewer.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'catalog', 'viewer.html'));
 });
 
 // ─── Discontinued Alpha Zero stones — redirect to collections ───
@@ -2242,7 +2387,7 @@ const renamedSlugs = {
 app.get('/partners/:slug', (req, res) => {
   const slug = req.params.slug.replace(/[^a-z0-9-]/gi, '');
   const filePath = path.join(__dirname, 'public', 'partners', slug + '.html');
-  if (fs.existsSync(filePath)) return res.sendFile(filePath);
+  if (fs.existsSync(filePath)) return sendHtml(res, filePath);
   res.redirect('/');
 });
 
@@ -2257,7 +2402,7 @@ app.get('/surfaces/:slug', (req, res) => {
   }
   const filePath = path.join(__dirname, 'public', 'surfaces', slug + '.html');
   if (fs.existsSync(filePath)) {
-    res.sendFile(filePath);
+    sendHtml(res, filePath);
   } else {
     res.status(404).send(`<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2273,9 +2418,102 @@ a:hover{opacity:0.9}
   }
 });
 
+// Generate a tracked outreach URL — admin-only. Records the send so the
+// view receiver and form attribution can link visits back to the prospect.
+app.get('/api/admin/outreach/generate-url', authMiddleware, async (req, res) => {
+  try {
+    const { prospect_email, am_email, page_slug, prospect_name, prospect_company } = req.query;
+    if (!prospect_email || !am_email || !page_slug) {
+      return res.status(400).json({
+        error: 'Missing required params: prospect_email, am_email, page_slug'
+      });
+    }
+    const cleanSlug = String(page_slug).replace(/[^a-z0-9-]/gi, '');
+    if (!cleanSlug) return res.status(400).json({ error: 'Invalid page_slug' });
+
+    const prospectId = crypto.randomUUID();
+    const baseUrl = process.env.SITE_URL || 'https://alphasurfaces.com.au';
+    const trackedUrl = `${baseUrl}/partners/${cleanSlug}` +
+      `?pid=${prospectId}` +
+      `&utm_source=landing_page` +
+      `&utm_medium=email` +
+      `&utm_campaign=${encodeURIComponent(cleanSlug)}` +
+      `&utm_content=${encodeURIComponent(am_email)}`;
+
+    await pool.query(
+      `INSERT INTO outreach_sends
+         (prospect_id, prospect_email, prospect_name, prospect_company,
+          am_email, landing_page_slug, landing_page_url, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'sent')`,
+      [prospectId, prospect_email, prospect_name || null,
+       prospect_company || null, am_email, cleanSlug, trackedUrl]
+    );
+
+    res.json({
+      ok: true,
+      prospect_id: prospectId,
+      tracked_url: trackedUrl,
+      page_slug: cleanSlug,
+      am_email,
+      prospect_email
+    });
+  } catch (err) {
+    console.error('[outreach] generate-url error:', err.message);
+    res.status(500).json({ error: 'Failed to generate tracked URL' });
+  }
+});
+
+// Admin dashboard summary — last 30 days of sends, engagement, per-AM.
+app.get('/api/admin/outreach/stats', authMiddleware, async (req, res) => {
+  try {
+    const sends = await pool.query(`
+      SELECT
+        COUNT(*)::int as total_sends,
+        COUNT(*) FILTER (WHERE status = 'sent')::int      as pending,
+        COUNT(*) FILTER (WHERE status = 'opened')::int    as opened,
+        COUNT(*) FILTER (WHERE status = 'clicked')::int   as clicked,
+        COUNT(*) FILTER (WHERE status = 'converted')::int as converted,
+        COUNT(*) FILTER (WHERE status = 'stale')::int     as stale
+      FROM outreach_sends
+      WHERE sent_at > NOW() - INTERVAL '30 days'
+    `);
+
+    const views = await pool.query(`
+      SELECT
+        COUNT(*)::int                                     as total_views,
+        COALESCE(ROUND(AVG(duration_seconds))::int, 0)    as avg_duration,
+        COALESCE(ROUND(AVG(max_scroll_pct))::int, 0)      as avg_scroll
+      FROM landing_page_views
+      WHERE viewed_at > NOW() - INTERVAL '30 days'
+    `);
+
+    const perAm = await pool.query(`
+      SELECT
+        am_email,
+        COUNT(*)::int                                                          as sends,
+        COUNT(*) FILTER (WHERE status IN ('opened','clicked','converted'))::int as engaged,
+        COUNT(*) FILTER (WHERE status = 'converted')::int                       as converted
+      FROM outreach_sends
+      WHERE sent_at > NOW() - INTERVAL '30 days'
+      GROUP BY am_email
+      ORDER BY sends DESC
+    `);
+
+    res.json({
+      ok: true,
+      summary: sends.rows[0],
+      engagement: views.rows[0],
+      per_am: perAm.rows
+    });
+  } catch (err) {
+    console.error('[outreach] stats error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
 // ─── Catch-all for SPA ───
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  sendHtml(res, path.join(__dirname, 'public', 'index.html'));
 });
 
 // ─── Version History Startup ───
@@ -2321,36 +2559,31 @@ async function checkDailyDigest() {
 }
 
 // ─── Weekly sales report scheduler — Friday 5pm Brisbane ───
-// Same Brisbane-wall-clock pattern as the daily digest. A per-week guard
-// (lastWeeklyReportWeek) prevents a repeat fire if the 5-min interval lands
-// twice during the 5pm hour.
-let lastWeeklyReportWeek = null;
-function brisbaneWeekString() {
-  // ISO-week-ish: YYYY-Www, where W is the day-of-year week. Used purely
-  // as a once-per-week dedup key; exact ISO week is overkill.
-  const d = new Date(new Date().toLocaleString('en-US', { timeZone: 'Australia/Brisbane' }));
-  const start = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil(((d - start) / 86400000 + start.getDay() + 1) / 7);
-  return `${d.getFullYear()}-W${String(week).padStart(2, '0')}`;
-}
+// Two-layer dedup: this in-memory `lastSentWeek` guards against re-fires
+// inside the same process, and notifications.js persists the same key to
+// settings.json so the guard also survives a restart (which is what caused
+// the duplicate-send incident). The in-memory flag is only set after a
+// confirmed successful send so a failed attempt is retried on the next tick.
+let lastSentWeek = null;
 async function checkWeeklyReport() {
   try {
     if (!process.env.SENDGRID_API_KEY) return; // can't send without sg
     const briz = new Date(new Date().toLocaleString('en-US', { timeZone: 'Australia/Brisbane' }));
     if (briz.getDay() !== 5) return;          // Friday only
     if (briz.getHours() !== 17) return;       // 5pm hour only (cron runs every 5min)
-    const week = brisbaneWeekString();
-    if (lastWeeklyReportWeek === week) return;
-    lastWeeklyReportWeek = week;
-    console.log('[report/weekly] firing for week', week);
+    const currentWeek = notifications.isoWeekStringBrisbane();
+    if (lastSentWeek === currentWeek) return;
+    console.log('[report/weekly] firing for week', currentWeek);
     const result = await generateWeeklyReport({ pool });
     console.log('[report/weekly] result:', JSON.stringify(result));
+    if (result && result.ok) lastSentWeek = currentWeek;
   } catch (err) {
     console.error('[report/weekly] scheduler error:', err.message);
   }
 }
 
 initDB()
+  .then(() => cmsCore.initCms({ pool }))
   .then(() => {
     app.listen(PORT, () => console.log(`[server] Listening on port ${PORT}`));
     // Kick off scheduler — first check after 30s, then every 60s.

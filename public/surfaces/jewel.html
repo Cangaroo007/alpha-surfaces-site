@@ -145,50 +145,12 @@ img { display: block; max-width: 100%; }
 <section class="collection-section" id="collection-stones"></section>
 
 <!-- FOOTER -->
-<footer class="footer">
-  <div class="footer-inner">
-    <div class="footer-col">
-      <p class="footer-col-heading">Stay in the loop.</p>
-      <p>Sign up for the latest from Alpha Surfaces.</p>
-      <div class="footer-email-form">
-        <input type="email" class="footer-email-input" placeholder="Email">
-        <button class="footer-email-btn">Submit</button>
-      </div>
-    </div>
-    <div class="footer-col">
-      <p class="footer-col-heading">Follow us</p>
-      <!-- TODO: Verify Instagram and Facebook URLs with Belinda -->
-      <div style="display:flex;align-items:center;gap:16px;margin-top:8px;">
-        <a href="https://instagram.com/alphasurfaces" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color:var(--black);opacity:0.7;transition:opacity 0.2s;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/></svg></a>
-        <a href="https://www.facebook.com/profile.php?id=61554632139588" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color:var(--black);opacity:0.7;transition:opacity 0.2s;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
-      </div>
-    </div>
-    <div class="footer-col" id="contact">
-      <p class="footer-col-heading">Contact us</p>
-      <p><a href="tel:1300257420">1300 257 420</a></p>
-      <p><a href="mailto:hello@alphasurfaces.com.au">hello@alphasurfaces.com.au</a></p>
-      <p style="margin-top:14px;"><strong>Head Office (QLD)</strong><br>13 Enterprise Street,<br>Kunda Park QLD 4556</p>
-      <p style="margin-top:10px;"><strong>Sydney (NSW)</strong><br>Unit 2, 235 Kurrajong Rd,<br>Prestons NSW 2170</p>
-      <p style="margin-top:14px;"><a href="/enquiry">General Enquiry</a></p>
-      <p><a href="/warranty">Activate Warranty</a></p>
-    </div>
-    <div class="footer-col">
-      <p class="footer-col-heading">Resources</p>
-      <p><a href="/care-and-maintenance">Care &amp; Maintenance</a></p>
-      <p><a href="/fabrication-guide">Fabrication Guide</a></p>
-      <p><a href="/downloads/sds.pdf" target="_blank">Safety Data Sheet (SDS)</a></p>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>COPYRIGHT &copy; 2026 ALPHA SURFACES – ALL RIGHTS RESERVED &nbsp;|&nbsp; <a href="/privacy.html" style="text-decoration:underline;text-underline-offset:2px;">PRIVACY POLICY</a></p>
-  </div>
-</footer>
 
 <script>
 (function() {
   var slug = document.body.getAttribute('data-slug');
 
-  fetch('../data/stones.json')
+  fetch('/api/public/stones').then(function(r){ if(!r.ok) throw new Error('managed content unavailable'); return r; }).catch(function(){ return fetch('../data/stones.json'); })
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var stone = null;
@@ -382,7 +344,7 @@ document.addEventListener('click', function(e) {
 </script>
 <script src="../animation.js?v=18"></script>
 <script src="../slab-lightbox.js?v=18"></script>
-<script src="../nav.js?v=18"></script>
+<script src="../nav.js?v=20"></script>
 <script src="/newsletter-form.js"></script>
 </body>
 </html>

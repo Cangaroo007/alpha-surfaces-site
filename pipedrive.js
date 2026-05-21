@@ -194,6 +194,21 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
   const ref = typed?.reference || '';
   const orgId = person.org_id?.value || person.org_id || null;
 
+  // Landing-page attribution — when the form was originated by a tracked
+  // outreach URL, prepend an attribution block to the lead note so sales
+  // can see the campaign + AM at a glance. Empty string when the form
+  // arrived without UTM params (organic / direct).
+  const utmSource = fields.utm_source || '';
+  const utmCampaign = fields.utm_campaign || '';
+  const utmContent = fields.utm_content || '';
+  const pid = fields.pid || '';
+  const attribution = (utmSource === 'landing_page' && pid)
+    ? `<b>Landing-page outreach</b><br>` +
+      `Campaign: ${escape(utmCampaign || '—')}<br>` +
+      `Sent by: ${escape(utmContent || '—')}<br>` +
+      `Prospect ID: ${escape(pid)}<br><br>`
+    : '';
+
   switch (formType) {
     case 'Sample Request':
       await createLead({
@@ -201,6 +216,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
         personId: person.id,
         orgId,
         notes:
+          attribution +
           `<b>Sample Request ${escape(ref)}</b><br>` +
           `Stones: ${escape(stoneInterest || 'Not specified')}<br>` +
           `Source: alphasurfaces.com.au/order-sample<br>` +
@@ -215,6 +231,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
         personId: person.id,
         orgId,
         notes:
+          attribution +
           `<b>Enquiry ${escape(ref)}</b><br>` +
           `Reason: ${escape(fields.reason || '—')}<br>` +
           `Message: ${escape(fields.message || '—')}<br>` +
@@ -232,6 +249,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
         personId: person.id,
         orgId,
         notes:
+          attribution +
           `<b>${isPartner ? 'Partner Enquiry' : 'Contact Form'} ${escape(ref)}</b><br>` +
           `Company: ${escape(fields.company || '—')}<br>` +
           `Message: ${escape(fields.message || '—')}<br>` +
