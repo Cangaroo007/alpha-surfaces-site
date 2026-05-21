@@ -145,7 +145,7 @@ const SEED_TICKETS = [
   { title: 'Brochure FlippingBook animation + upload', category: 'content', priority: 'medium', status: 'backlog', requested_by: 'Belinda', assigned_to: 'Sean', source: 'client_email', description: 'Animate the brochure in FlippingBook and embed on the website.' },
   { title: 'SMS notifications on form submission', category: 'feature', priority: 'high', status: 'done', requested_by: 'Sean', assigned_to: 'Sean', source: 'internal', description: 'Twilio SMS to +61417764689 on every form submission.' },
   { title: 'Email notifications on form submission', category: 'feature', priority: 'high', status: 'done', requested_by: 'Sean', assigned_to: 'Sean', source: 'internal', description: 'SendGrid email with all columns to hello@alphasurfaces.com.au on every form submission.' },
-  { title: 'Forms-only login portal at /forms', category: 'feature', priority: 'high', status: 'done', requested_by: 'Sean', assigned_to: 'Sean', source: 'internal', description: 'Separate login for viewing/managing form submissions without admin access.' }
+  { title: 'Manage form submissions in Projects', category: 'feature', priority: 'high', status: 'done', requested_by: 'Sean', assigned_to: 'Sean', source: 'internal', description: 'Operators view and manage form submissions through the Project Tracker forms tab.' }
 ];
 
 // NOTE: Pam is seeded with pam@thisisikon.com.au — flip to pam@alphasurfaces.com.au
@@ -1692,10 +1692,10 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       }
     }
 
-    // Legacy forms password bridge. /forms now redirects into
+    // Legacy forms password bridge. Old /forms URLs now redirect into
     // /projects?view=forms, but staff may still know only the old forms
     // password. Let that password create an operator session that lands in
-    // the Projects forms tab instead of resurrecting a separate /forms app.
+    // the Projects forms tab without resurrecting a separate forms page.
     const legacyFormsHash = readLegacyFormsPasswordHash();
     const legacyFormsEnv = process.env.FORMS_PASSWORD;
     if (await passwordMatches(supplied, legacyFormsHash) || await passwordMatches(supplied, legacyFormsEnv)) {

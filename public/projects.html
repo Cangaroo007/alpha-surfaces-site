@@ -1005,8 +1005,8 @@
     loginWrap.style.display = 'none';
     appEl.style.display = 'flex';
     // Honour ?view=… in the URL first — explicit links should always win
-    // over the saved preference (used by the legacy /forms 301 redirect and
-    // by deep links from emails). Otherwise fall back to the user's saved
+    // over the saved preference (used by the legacy /forms bridge and by
+    // deep links from emails). Otherwise fall back to the user's saved
     // default_view, then to the kanban.
     var qsView = new URLSearchParams(location.search).get('view');
     var landing = null;
