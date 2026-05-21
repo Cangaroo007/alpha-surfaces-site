@@ -26,6 +26,26 @@ const fs      = require('fs');
 // for prod, fallback to ./data for local dev.
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const ATTACHMENTS_DIR = path.join(DATA_DIR, 'attachments');
+const LEGACY_FORMS_PASSWORD_FILE = path.join(DATA_DIR, 'forms-password.json');
+
+function readLegacyFormsPasswordHash() {
+  try {
+    if (!fs.existsSync(LEGACY_FORMS_PASSWORD_FILE)) return null;
+    const data = JSON.parse(fs.readFileSync(LEGACY_FORMS_PASSWORD_FILE, 'utf8'));
+    return data && typeof data.hash === 'string' ? data.hash : null;
+  } catch (err) {
+    console.error('[projects-login] legacy forms password read error:', err.message);
+    return null;
+  }
+}
+
+async function passwordMatches(supplied, stored) {
+  if (!stored) return false;
+  let valid = false;
+  try { valid = await bcrypt.compare(supplied, stored); } catch { valid = false; }
+  if (!valid && !stored.startsWith('$2')) valid = supplied === stored;
+  return valid;
+}
 
 let sgMail = null;
 try { sgMail = require('@sendgrid/mail'); } catch { /* email is optional */ }
@@ -1670,6 +1690,36 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
       } catch (err) {
         console.error('[projects-login] db error:', err.message);
       }
+    }
+
+    // Legacy forms password bridge. /forms now redirects into
+    // /projects?view=forms, but staff may still know only the old forms
+    // password. Let that password create an operator session that lands in
+    // the Projects forms tab instead of resurrecting a separate /forms app.
+    const legacyFormsHash = readLegacyFormsPasswordHash();
+    const legacyFormsEnv = process.env.FORMS_PASSWORD;
+    if (await passwordMatches(supplied, legacyFormsHash) || await passwordMatches(supplied, legacyFormsEnv)) {
+      let linkedUser = null;
+      if (email && typeof email === 'string') {
+        try {
+          const { rows } = await pool.query(
+            'SELECT id, email, name, role, active FROM project_users WHERE LOWER(email) = LOWER($1)',
+            [email.trim()]
+          );
+          if (rows.length && rows[0].active && rows[0].role !== 'viewer') linkedUser = rows[0];
+        } catch (err) {
+          console.error('[projects-login] legacy forms user lookup error:', err.message);
+        }
+      }
+      return issueSession(res, {
+        userId: linkedUser && linkedUser.role === 'operator' ? linkedUser.id : null,
+        email: linkedUser ? linkedUser.email : (email || 'forms@alphasurfaces.com.au'),
+        name: linkedUser ? linkedUser.name : 'Forms',
+        role: 'operator',
+        source: 'forms_password',
+        must_change_password: false,
+        default_view: 'forms'
+      });
     }
 
     // Master password fallback (legacy single-password mode). Logs in as Admin.

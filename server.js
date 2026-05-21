@@ -15,7 +15,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const versions = require('./lib/versions');
 const { initDB, saveSubmission, saveSubscriber, unsubscribeEmail, pool } = require('./db');
 const notifications = require('./notifications');
-const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, generateWeeklyReport, readSettings: readNotifSettings, writeSettings: writeNotifSettings, notifyNewSubmission, checkAndSendTimeAlert, sendFormsResetEmail } = notifications;
+const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, generateWeeklyReport, readSettings: readNotifSettings, writeSettings: writeNotifSettings, notifyNewSubmission, checkAndSendTimeAlert } = notifications;
 const formFallbackQueue = require('./form-fallback-queue');
 const { scheduleAutoTracker } = require('./auto-time-tracker');
 // Track I: typed-form insert helper. Loaded statically (the require below
@@ -125,31 +125,6 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 *
 
 // Active sessions (in-memory, resets on restart)
 const sessions = new Map();
-// Separate session store for the forms-only portal (/forms). Forms users can
-// review and action submissions without receiving full CMS/project access.
-const formsSessions = new Map();
-const formsResetTokens = new Map();
-const FORMS_RESET_TTL_MS = 60 * 60 * 1000;
-const FORMS_PASSWORD_FILE = path.join(DATA_DIR, 'forms-password.json');
-
-function readFormsPasswordFile() {
-  try {
-    if (!fs.existsSync(FORMS_PASSWORD_FILE)) return null;
-    const data = JSON.parse(fs.readFileSync(FORMS_PASSWORD_FILE, 'utf8'));
-    return data && typeof data.hash === 'string' ? data.hash : null;
-  } catch (err) {
-    console.error('[forms-password] read error:', err.message);
-    return null;
-  }
-}
-
-function writeFormsPasswordFile(hash) {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(FORMS_PASSWORD_FILE, JSON.stringify({
-    hash,
-    updated: new Date().toISOString()
-  }, null, 2));
-}
 
 let dbReady = false;
 let dbInitPromise = null;
@@ -358,23 +333,6 @@ function authMiddleware(req, res, next) {
     req.user = pUser;
     return next();
   }
-  res.status(401).json({ error: 'Unauthorized' });
-}
-
-function hasCmsSession(req) {
-  const token = req.cookies?.alpha_session;
-  if (token && sessions.has(token)) return true;
-  const pUser = resolveProjectsUser(req);
-  return !!(pUser && pUser.role === 'super_admin' && !pUser.must_change_password);
-}
-
-function hasFormsSession(req) {
-  const token = req.cookies?.forms_session;
-  return !!(token && formsSessions.has(token));
-}
-
-function requireFormsOrAdmin(req, res, next) {
-  if (hasCmsSession(req) || hasFormsSession(req)) return next();
   res.status(401).json({ error: 'Unauthorized' });
 }
 
@@ -839,114 +797,14 @@ app.get('/api/auth-check', (req, res) => {
   res.json({ authenticated: false });
 });
 
-// ─── Forms-only portal auth ───
-// Jess and showroom staff still use the standalone /forms portal. It keeps a
-// separate password/cookie from the CMS and project tracker.
-app.post('/api/forms-login', loginLimiter, async (req, res) => {
-  const { password } = req.body || {};
-  const supplied = password || '';
-  const fileHash = readFormsPasswordFile();
-  let valid = false;
-
-  if (fileHash) {
-    try { valid = await bcrypt.compare(supplied, fileHash); } catch { valid = false; }
-  }
-  if (!valid) {
-    const envStored = process.env.FORMS_PASSWORD;
-    if (!envStored && !fileHash) {
-      console.warn('[forms-login] no FORMS_PASSWORD env and no forms-password.json');
-      return res.status(503).json({ error: 'Forms login not configured' });
-    }
-    if (envStored) {
-      try { valid = await bcrypt.compare(supplied, envStored); } catch { valid = false; }
-      if (!valid && !envStored.startsWith('$2')) valid = supplied === envStored;
-    }
-  }
-  if (!valid) return res.status(401).json({ error: 'Wrong password' });
-
-  const token = crypto.randomBytes(32).toString('hex');
-  formsSessions.set(token, { created: Date.now() });
-  res.cookie('forms_session', token, {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 86400000
-  });
-  res.json({ ok: true });
-});
-
-app.post('/api/forms-forgot', loginLimiter, async (req, res) => {
-  const generic = { ok: true, message: 'If that email is registered, a reset link has been sent.' };
-  try {
-    const supplied = String(req.body?.email || '').trim().toLowerCase();
-    const expected = (process.env.NOTIFY_EMAIL_TO || 'hello@alphasurfaces.com.au').trim().toLowerCase();
-    if (supplied && supplied === expected) {
-      const token = crypto.randomBytes(32).toString('hex');
-      formsResetTokens.set(token, { created: Date.now() });
-      const base = process.env.SITE_URL || 'https://alphasurfaces.com.au';
-      const resetUrl = `${base}/forms/reset?token=${token}`;
-      sendFormsResetEmail(expected, resetUrl).catch(err =>
-        console.error('[forms-forgot] email error:', err.message)
-      );
-    }
-  } catch (err) {
-    console.error('[forms-forgot] error:', err.message);
-  }
-  res.json(generic);
-});
-
-app.get('/forms/reset', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'forms.html'));
-});
-
-app.post('/api/forms-reset', loginLimiter, async (req, res) => {
-  try {
-    const { token, password } = req.body || {};
-    if (!token || !password) {
-      return res.status(400).json({ ok: false, error: 'Missing token or password.' });
-    }
-    if (typeof password !== 'string' || password.length < 8) {
-      return res.status(400).json({ ok: false, error: 'Password must be at least 8 characters.' });
-    }
-    const entry = formsResetTokens.get(token);
-    if (!entry || (Date.now() - entry.created) > FORMS_RESET_TTL_MS) {
-      formsResetTokens.delete(token);
-      return res.status(400).json({ ok: false, error: 'Invalid or expired reset link. Please request a new one.' });
-    }
-    const hash = await bcrypt.hash(password, 10);
-    writeFormsPasswordFile(hash);
-    formsResetTokens.delete(token);
-    formsSessions.clear();
-    res.json({ ok: true, message: 'Password updated. You can now sign in.' });
-  } catch (err) {
-    console.error('[forms-reset] error:', err.message);
-    res.status(500).json({ ok: false, error: 'Could not update password. Please try again.' });
-  }
-});
-
-app.post('/api/forms-logout', (req, res) => {
-  const token = req.cookies?.forms_session;
-  if (token) formsSessions.delete(token);
-  res.clearCookie('forms_session');
-  res.json({ ok: true });
-});
-
-app.get('/api/forms-auth-check', (req, res) => {
-  res.json({ authenticated: hasCmsSession(req) || hasFormsSession(req) });
-});
-
+// ─── /forms — deprecated, redirects into /projects?view=forms ───
+// Forms are managed inside the project tracker. Keep the old URL working, but
+// avoid permanent/browser-cached redirects while staff bookmarks catch up.
 app.get('/forms', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'forms.html'));
+  res.redirect(302, '/projects?view=forms');
 });
-
-// Some browsers/CDNs may still hold the old 301 from /forms to
-// /projects?view=forms. If that stale redirect is replayed without a project
-// session, show the standalone forms portal anyway.
-app.get('/projects', (req, res, next) => {
-  if (String(req.query.view || '').toLowerCase() === 'forms' && !req.cookies?.projects_session) {
-    return res.sendFile(path.join(__dirname, 'public', 'forms.html'));
-  }
-  next();
+app.get('/forms/reset', (req, res) => {
+  res.redirect(302, '/projects');
 });
 
 // ─── Projects ticket tracker (self-contained module) ───
@@ -1282,7 +1140,7 @@ function buildSubmissionsWhere(q) {
   return { vals, where: where.length ? ' WHERE ' + where.join(' AND ') : '' };
 }
 
-app.get('/api/admin/submissions', requireFormsOrAdmin, async (req, res) => {
+app.get('/api/admin/submissions', authMiddleware, async (req, res) => {
   try {
     const { limit = 50, offset = 0 } = req.query;
     const { vals, where } = buildSubmissionsWhere(req.query);
@@ -1336,7 +1194,7 @@ app.get('/api/admin/submissions', requireFormsOrAdmin, async (req, res) => {
 // "export" as the :id param (which then fails as a Postgres integer cast).
 // Supports an `ids` query param (comma-separated) for selective download
 // from the admin UI checkboxes; falls back to all rows otherwise.
-app.get('/api/admin/submissions/export', requireFormsOrAdmin, async (req, res) => {
+app.get('/api/admin/submissions/export', authMiddleware, async (req, res) => {
   try {
     const { form_type, ids } = req.query;
     const vals = [];
@@ -1433,7 +1291,7 @@ app.get('/api/admin/submissions/export', requireFormsOrAdmin, async (req, res) =
 });
 
 // Single submission with its sample items, for the detail drawer.
-app.get('/api/admin/submissions/:id', requireFormsOrAdmin, async (req, res) => {
+app.get('/api/admin/submissions/:id', authMiddleware, async (req, res) => {
   try {
     const { rows } = await pool.query(
       'SELECT * FROM form_submissions WHERE id = $1', [req.params.id]
@@ -1457,7 +1315,7 @@ app.get('/api/admin/submissions/:id', requireFormsOrAdmin, async (req, res) => {
   }
 });
 
-app.patch('/api/admin/submissions/:id', requireFormsOrAdmin, async (req, res) => {
+app.patch('/api/admin/submissions/:id', authMiddleware, async (req, res) => {
   try {
     const allowed = ['new', 'actioned', 'archived'];
     const status = req.body.status;
