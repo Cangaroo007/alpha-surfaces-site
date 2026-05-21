@@ -16,6 +16,7 @@ const versions = require('./lib/versions');
 const { initDB, saveSubmission, saveSubscriber, unsubscribeEmail, pool } = require('./db');
 const notifications = require('./notifications');
 const { notifyOrderSample, notifyContact, notifySubscribe, sendTestForForm, sendDailyDigest, generateWeeklyReport, readSettings: readNotifSettings, writeSettings: writeNotifSettings, notifyNewSubmission, checkAndSendTimeAlert } = notifications;
+const formFallbackQueue = require('./form-fallback-queue');
 const { scheduleAutoTracker } = require('./auto-time-tracker');
 // Track I: typed-form insert helper. Loaded statically (the require below
 // mounts routes; this property is attached to the module.exports object).
@@ -37,6 +38,7 @@ app.set('trust proxy', 1);
 // ─── Config ───
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'alpha2025';
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+formFallbackQueue.setQueueDir(process.env.FORM_FALLBACK_DIR || path.join(DATA_DIR, 'form-fallback-queue'));
 const CONTENT_FILE = path.join(DATA_DIR, 'content.json');
 const KEYS_FILE = path.join(DATA_DIR, 'keys.json');
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
@@ -123,6 +125,26 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 *
 
 // Active sessions (in-memory, resets on restart)
 const sessions = new Map();
+
+let dbReady = false;
+let dbInitPromise = null;
+async function ensureDatabaseReady() {
+  if (dbReady) return true;
+  if (!dbInitPromise) {
+    dbInitPromise = (async () => {
+      await initDB();
+      await cmsCore.initCms({ pool });
+      dbReady = true;
+      return true;
+    })();
+  }
+  try {
+    return await dbInitPromise;
+  } catch (err) {
+    dbInitPromise = null;
+    throw err;
+  }
+}
 
 // ─── Outreach tracking receiver (MUST be registered before express.json) ───
 // Receiver for landing-page-tracker.js sendBeacon pings. Registered ahead
@@ -315,9 +337,172 @@ function authMiddleware(req, res, next) {
 }
 
 // ─── Public Form API ───
-async function handleForm(req, res, formType) {
+function requestMeta(req, err) {
+  return {
+    ip: req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || null,
+    user_agent: req.headers['user-agent'] || null,
+    referer: req.headers.referer || req.headers.referrer || null,
+    original_error: err && err.message ? err.message : null,
+    queued_at: new Date().toISOString()
+  };
+}
+
+function fallbackReference(id) {
+  return `FB-${String(id || crypto.randomUUID()).replace(/[^a-zA-Z0-9]/g, '').slice(0, 10).toUpperCase()}`;
+}
+
+function submissionName(fields = {}) {
+  return fields.name
+    || `${fields.first_name || ''} ${fields.last_name || ''}`.trim()
+    || null;
+}
+
+function sampleInterest(fields = {}, sampleItems = []) {
+  return fields.stone_interest
+    || fields.stone_name
+    || sampleItems.map(s => s && (s.name || s.slug)).filter(Boolean).join(', ')
+    || null;
+}
+
+function buildNotificationSubmission(formType, fields = {}, sampleItems = [], id, reference, status = 'new') {
+  return {
+    id,
+    form_type: formType,
+    submitted_at: new Date().toISOString(),
+    name: submissionName(fields),
+    email: fields.email || null,
+    phone: fields.phone || null,
+    company: fields.company || null,
+    stone_interest: sampleInterest(fields, sampleItems),
+    message: fields.message || fields.special_instructions || fields.notes || null,
+    postcode: fields.postcode || null,
+    state: fields.state || null,
+    store_location: fields.store_location || null,
+    source: fields.source || null,
+    consent: !!fields.consent,
+    role: fields.i_am_a || fields.role || fields.type || null,
+    reason: fields.reason || fields.enquiry_reason || null,
+    street: fields.street || null,
+    suburb: fields.suburb || null,
+    unit: fields.unit || null,
+    raw_data: fields,
+    status,
+    reference
+  };
+}
+
+function notifySubmissionSafely(submission, label) {
+  notifyNewSubmission(submission).catch(err =>
+    console.error(`[notify] ${label} notification error:`, err.message)
+  );
+}
+
+function trackOutreachConversion(formType, fields, id) {
+  const pid = fields.pid || null;
+  const utmSource = fields.utm_source || null;
+  if (!pid || utmSource !== 'landing_page') return;
+  const conversionType = formType === 'Sample Request' ? 'sample_request'
+    : formType === 'Enquiry' ? 'enquiry'
+    : formType === 'Contact Enquiry' ? 'contact'
+    : 'other';
+  pool.query(
+    `INSERT INTO outreach_conversions
+       (prospect_id, outreach_send_id, form_submission_id, conversion_type)
+     SELECT $1, (SELECT id FROM outreach_sends WHERE prospect_id = $1 ORDER BY sent_at DESC LIMIT 1),
+            $2, $3`,
+    [pid, id, conversionType]
+  ).then(() =>
+    pool.query(
+      `UPDATE outreach_sends SET status = 'converted' WHERE prospect_id = $1`,
+      [pid]
+    )
+  ).catch(err => console.error('[outreach] conversion log error:', err.message));
+}
+
+async function persistPublicFormSubmission(formType, fields, sampleItems, options = {}) {
+  const shouldNotify = options.notify !== false;
+  const shouldSyncPipedrive = options.syncPipedrive !== false;
+  await ensureDatabaseReady();
+  const saved = await saveSubmission(formType, fields, sampleItems);
+  const { id } = saved;
+
+  // Re-fetch the full row so the notification email gets every populated
+  // column. If the insert committed but the read fails during a DB wobble,
+  // keep going with a synthetic row instead of failing the visitor.
+  let submission = buildNotificationSubmission(formType, fields, sampleItems, id, null);
   try {
-    const fields = req.body;
+    const { rows } = await pool.query('SELECT * FROM form_submissions WHERE id = $1', [id]);
+    submission = rows[0] || submission;
+    if (sampleItems.length && !submission.stone_interest) {
+      submission.stone_interest = sampleItems.map(s => s.name).filter(Boolean).join(', ');
+    }
+  } catch (err) {
+    console.error('[form] post-save refetch error:', err.message);
+  }
+
+  if (shouldNotify && !saved.duplicate) notifySubmissionSafely(submission, formType);
+
+  // Track I: also write into the matching typed table so the new per-form
+  // views see the submission alongside the legacy archive. Best-effort -
+  // a failure here mustn't block the public form response.
+  let typed = null;
+  if (!saved.duplicate) {
+    try {
+      if (typeof insertTypedSubmission === 'function') {
+        typed = await insertTypedSubmission(pool, formType, fields, sampleItems);
+      }
+    } catch (err) {
+      console.error('[form] typed insert error:', err.message);
+    }
+  }
+
+  if (!saved.duplicate) trackOutreachConversion(formType, fields, id);
+
+  // Pipedrive: forms -> HOT leads. Fire-and-forget so a Pipedrive 500 /
+  // network blip never blocks the user.
+  if (shouldSyncPipedrive && !saved.duplicate && process.env.PIPEDRIVE_API_TOKEN) {
+    pipedrive.syncFormToPipedrive(formType, fields, sampleItems, typed)
+      .catch(err => console.error('[pipedrive] sync error:', err.message));
+  }
+
+  return { id, reference: typed && typed.reference };
+}
+
+function queueFallbackSubmission(req, kind, formType, fields, sampleItems, err) {
+  const queued = formFallbackQueue.enqueue({
+    kind,
+    formType,
+    fields,
+    sampleItems,
+    meta: requestMeta(req, err)
+  });
+  const reference = fallbackReference(queued.id);
+  return { queued, reference };
+}
+
+function queueFallbackFormResponse(req, res, formType, fields, sampleItems, err) {
+  try {
+    const { queued, reference } = queueFallbackSubmission(req, 'form', formType, fields, sampleItems, err);
+    const submission = buildNotificationSubmission(formType, fields, sampleItems, queued.id, reference, 'queued');
+    submission.message = [
+      submission.message,
+      `Fallback queue reference: ${reference}. Database save will replay automatically.`
+    ].filter(Boolean).join('\n\n');
+    notifySubmissionSafely(submission, `${formType} fallback`);
+    console.warn(`[form-fallback] queued ${formType} as ${reference}:`, err.message);
+    return res.status(202).json({ ok: true, queued: true, id: queued.id, reference });
+  } catch (fallbackErr) {
+    console.error('[form-fallback] queue failed:', fallbackErr.message);
+    return res.status(500).json({ ok: false, error: 'Something went wrong. Please call us on 1300 257 420.' });
+  }
+}
+
+async function handleForm(req, res, formType) {
+  let fallbackFields = req.body || {};
+  let fallbackSampleItems = [];
+  try {
+    const fields = { ...(req.body || {}) };
+    fallbackFields = fields;
     if (!fields.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
       return res.status(400).json({ ok: false, error: 'A valid email address is required.' });
     }
@@ -327,6 +512,7 @@ async function handleForm(req, res, formType) {
         ? (Array.isArray(fields.samples) ? fields.samples : [fields.samples])
             .slice(0, 3).map(slug => ({ slug, name: slug, collection: '' }))
         : [];
+    fallbackSampleItems = sampleItems;
     if (formType === 'Sample Request' && sampleItems.length === 0 && !fields.stone_slug) {
       return res.status(400).json({ ok: false, error: 'Please select at least one sample.' });
     }
@@ -336,71 +522,13 @@ async function handleForm(req, res, formType) {
         name: fields.stone_name || fields.stone_slug,
         collection: fields.stone_collection || ''
       });
+      fallbackSampleItems = sampleItems;
     }
-    const { id } = await saveSubmission(formType, fields, sampleItems);
-
-    // Re-fetch the full row so the notification email gets every populated
-    // column (id, name, role, reason, address, raw_data, etc.). Build a
-    // synthetic stone_interest from the picked sample items so the email
-    // and SMS surface what was actually requested.
-    const { rows } = await pool.query('SELECT * FROM form_submissions WHERE id = $1', [id]);
-    const submission = rows[0] || {};
-    if (sampleItems.length && !submission.stone_interest) {
-      submission.stone_interest = sampleItems.map(s => s.name).filter(Boolean).join(', ');
-    }
-
-    notifyNewSubmission(submission).catch(err =>
-      console.error(`[notify] ${formType} notification error:`, err.message)
-    );
-
-    // Track I: also write into the matching typed table so the new per-form
-    // views see the submission alongside the legacy archive. Best-effort —
-    // a failure here mustn't block the public form response.
-    let typed = null;
-    try {
-      if (typeof insertTypedSubmission === 'function') {
-        typed = await insertTypedSubmission(pool, formType, fields, sampleItems);
-      }
-    } catch (err) {
-      console.error('[form] typed insert error:', err.message);
-    }
-
-    // Outreach attribution — when the form arrived with a landing-page
-    // pid + utm_source, link it back to the originating send and mark the
-    // send as converted so the per-AM dashboard reflects the conversion.
-    // Best-effort: a missing/stale pid must never block the form response.
-    const pid = fields.pid || null;
-    const utmSource = fields.utm_source || null;
-    if (pid && utmSource === 'landing_page') {
-      const conversionType = formType === 'Sample Request' ? 'sample_request'
-        : formType === 'Enquiry' ? 'enquiry'
-        : formType === 'Contact Enquiry' ? 'contact'
-        : 'other';
-      pool.query(
-        `INSERT INTO outreach_conversions
-           (prospect_id, outreach_send_id, form_submission_id, conversion_type)
-         SELECT $1, (SELECT id FROM outreach_sends WHERE prospect_id = $1 ORDER BY sent_at DESC LIMIT 1),
-                $2, $3`,
-        [pid, id, conversionType]
-      ).then(() =>
-        pool.query(
-          `UPDATE outreach_sends SET status = 'converted' WHERE prospect_id = $1`,
-          [pid]
-        )
-      ).catch(err => console.error('[outreach] conversion log error:', err.message));
-    }
-
-    // Pipedrive: forms → HOT leads (or activity/note for walk-ins/warranty).
-    // Fire-and-forget so a Pipedrive 500 / network blip never blocks the user.
-    if (process.env.PIPEDRIVE_API_TOKEN) {
-      pipedrive.syncFormToPipedrive(formType, fields, sampleItems, typed)
-        .catch(err => console.error('[pipedrive] sync error:', err.message));
-    }
-
-    return res.json({ ok: true, id, reference: typed && typed.reference });
+    const result = await persistPublicFormSubmission(formType, fields, sampleItems);
+    return res.json({ ok: true, id: result.id, reference: result.reference });
   } catch (err) {
     console.error(`[form] ${formType} error:`, err.message);
-    return res.status(500).json({ ok: false, error: 'Something went wrong. Please try again.' });
+    return queueFallbackFormResponse(req, res, formType, fallbackFields, fallbackSampleItems, err);
   }
 }
 
@@ -480,14 +608,42 @@ app.post('/api/form-submit', (req, res) => {
   return handleForm(req, res, label);
 });
 
+async function persistShowroomCheckin(fields, options = {}) {
+  const shouldNotify = options.notify !== false;
+  const shouldSyncPipedrive = options.syncPipedrive !== false;
+  await ensureDatabaseReady();
+  const typed = await insertTypedSubmission(pool, 'Showroom Check-In', fields);
+  if (!typed) throw new Error('Could not save check-in.');
+
+  const submission = buildNotificationSubmission(
+    'Showroom Check-In',
+    fields,
+    [],
+    typed.id,
+    typed.reference
+  );
+
+  if (shouldNotify) notifySubmissionSafely(submission, 'Showroom Check-In');
+
+  // Pipedrive: log walk-in as a completed activity on the person record.
+  if (shouldSyncPipedrive && process.env.PIPEDRIVE_API_TOKEN) {
+    pipedrive.syncFormToPipedrive('Showroom Check-In', fields, [], typed)
+      .catch(err => console.error('[pipedrive] showroom sync error:', err.message));
+  }
+
+  return typed;
+}
+
 async function handleShowroomCheckin(req, res) {
+  let fields = null;
   try {
     const f = req.body || {};
     const name  = String(f.name  || '').trim();
     const phone = String(f.phone || '').trim();
     if (!name)  return res.status(400).json({ ok: false, error: 'Name is required.' });
     if (!phone) return res.status(400).json({ ok: false, error: 'Phone is required.' });
-    const fields = {
+    fields = {
+      _client_submission_id: f._client_submission_id || f.client_submission_id || f.submission_uuid || null,
       name,
       phone,
       email: f.email ? String(f.email).trim() : null,
@@ -496,37 +652,12 @@ async function handleShowroomCheckin(req, res) {
       message: f.message || f.notes || null,
       consent: true
     };
-    const typed = await insertTypedSubmission(pool, 'Showroom Check-In', fields);
-    if (!typed) {
-      return res.status(500).json({ ok: false, error: 'Could not save check-in.' });
-    }
-    // Fire the same SMS+email notification path used for typed submissions.
-    // Synthetic submission shape — only the keys the notifier reads.
-    notifyNewSubmission({
-      id: typed.id,
-      form_type: 'Showroom Check-In',
-      submitted_at: new Date(),
-      name,
-      email: fields.email,
-      phone,
-      stone_interest: fields.stone_interest,
-      message: fields.message,
-      source: fields.source,
-      reference: typed.reference,
-      status: 'new',
-      consent: true
-    }).catch(err => console.error('[notify] Showroom Check-In error:', err.message));
-
-    // Pipedrive: log walk-in as a completed activity on the person record.
-    if (process.env.PIPEDRIVE_API_TOKEN) {
-      pipedrive.syncFormToPipedrive('Showroom Check-In', fields, [], typed)
-        .catch(err => console.error('[pipedrive] showroom sync error:', err.message));
-    }
+    const typed = await persistShowroomCheckin(fields);
 
     return res.json({ ok: true, id: typed.id, reference: typed.reference });
   } catch (err) {
     console.error('[form] Showroom Check-In error:', err.message);
-    return res.status(500).json({ ok: false, error: 'Something went wrong. Please try again.' });
+    return queueFallbackFormResponse(req, res, 'Showroom Check-In', fields || req.body || {}, [], err);
   }
 }
 
@@ -538,8 +669,11 @@ function generateUnsubscribeUrl(email) {
 }
 
 app.post('/api/subscribe', async (req, res) => {
+  let fallbackEmail = null;
+  let fallbackMeta = null;
   try {
     const { email, consent } = req.body;
+    fallbackEmail = email;
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ ok: false, error: 'A valid email address is required.' });
     }
@@ -551,6 +685,8 @@ app.post('/api/subscribe', async (req, res) => {
       userAgent: req.headers['user-agent'] || '',
       sourceUrl: req.headers['referer']    || ''
     };
+    fallbackMeta = meta;
+    await ensureDatabaseReady();
     const row = await saveSubscriber(email, meta);
     notifySubscribe(email, row.id, row.consent_timestamp_utc).catch(err =>
       console.error('[notify] Subscribe error:', err.message)
@@ -559,7 +695,23 @@ app.post('/api/subscribe', async (req, res) => {
   } catch (err) {
     if (err.message === 'SUPPRESSED') return res.json({ ok: true });
     console.error('[form] Subscribe error:', err.message);
-    return res.status(500).json({ ok: false, error: 'Something went wrong. Please try again.' });
+    try {
+      const fields = {
+        _client_submission_id: req.body && (req.body._client_submission_id || req.body.client_submission_id || req.body.submission_uuid),
+        email: fallbackEmail || (req.body && req.body.email) || '',
+        consent: true,
+        source: fallbackMeta?.sourceUrl || req.headers.referer || null
+      };
+      const { queued, reference } = queueFallbackSubmission(req, 'subscribe', 'Newsletter', fields, [], err);
+      const submission = buildNotificationSubmission('Newsletter', fields, [], queued.id, reference, 'queued');
+      submission.message = `Fallback queue reference: ${reference}. Subscriber will be saved when the database is available.`;
+      notifySubmissionSafely(submission, 'Newsletter fallback');
+      console.warn(`[form-fallback] queued Newsletter as ${reference}:`, err.message);
+      return res.status(202).json({ ok: true, queued: true, id: queued.id, reference });
+    } catch (fallbackErr) {
+      console.error('[form-fallback] subscribe queue failed:', fallbackErr.message);
+      return res.status(500).json({ ok: false, error: 'Something went wrong. Please call us on 1300 257 420.' });
+    }
   }
 });
 
@@ -2511,6 +2663,85 @@ app.get('/api/admin/outreach/stats', authMiddleware, async (req, res) => {
   }
 });
 
+let fallbackReplayRunning = false;
+async function replayFallbackQueue(limit = 25) {
+  if (fallbackReplayRunning) return { ok: true, skipped: true, reason: 'already running' };
+  fallbackReplayRunning = true;
+  const stats = { ok: true, checked: 0, replayed: 0, failed: 0 };
+  try {
+    const pending = formFallbackQueue.list('pending').slice(0, limit);
+    stats.checked = pending.length;
+    for (const item of pending) {
+      try {
+        if (item.kind === 'subscribe') {
+          try {
+            await ensureDatabaseReady();
+            const row = await saveSubscriber(item.fields.email, {
+              ip: item.meta?.ip || null,
+              userAgent: item.meta?.user_agent || null,
+              sourceUrl: item.fields?.source || item.meta?.referer || null
+            });
+            notifySubscribe(item.fields.email, row.id, row.consent_timestamp_utc).catch(err =>
+              console.error('[notify] replayed Subscribe error:', err.message)
+            );
+            formFallbackQueue.markReplayed(item.id, row.id, null);
+          } catch (err) {
+            if (err.message === 'SUPPRESSED') {
+              formFallbackQueue.markReplayed(item.id, null, 'suppressed');
+            } else {
+              throw err;
+            }
+          }
+        } else if (item.formType === 'Showroom Check-In') {
+          const typed = await persistShowroomCheckin(item.fields || {}, { notify: false });
+          formFallbackQueue.markReplayed(item.id, typed.id, typed.reference);
+        } else {
+          const result = await persistPublicFormSubmission(
+            item.formType,
+            item.fields || {},
+            item.sampleItems || [],
+            { notify: false }
+          );
+          formFallbackQueue.markReplayed(item.id, result.id, result.reference);
+        }
+        stats.replayed += 1;
+        console.log(`[form-fallback] replayed ${item.formType} ${fallbackReference(item.id)}`);
+      } catch (err) {
+        stats.failed += 1;
+        formFallbackQueue.markFailed(item, err);
+        console.error(`[form-fallback] replay failed for ${item.id}:`, err.message);
+      }
+    }
+    return stats;
+  } finally {
+    fallbackReplayRunning = false;
+  }
+}
+
+app.get('/api/admin/form-fallback-queue', authMiddleware, (req, res) => {
+  try {
+    const items = formFallbackQueue.list(null).map(item => {
+      const clone = { ...item };
+      delete clone._file;
+      return clone;
+    });
+    res.json({ ok: true, items });
+  } catch (err) {
+    console.error('[form-fallback] admin list error:', err.message);
+    res.status(500).json({ ok: false, error: 'Failed to read fallback queue' });
+  }
+});
+
+app.post('/api/admin/form-fallback-queue/replay', authMiddleware, async (req, res) => {
+  try {
+    const result = await replayFallbackQueue(100);
+    res.json(result);
+  } catch (err) {
+    console.error('[form-fallback] admin replay error:', err.message);
+    res.status(500).json({ ok: false, error: 'Failed to replay fallback queue' });
+  }
+});
+
 // ─── Catch-all for SPA ───
 app.get('*', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'index.html'));
@@ -2582,26 +2813,38 @@ async function checkWeeklyReport() {
   }
 }
 
-initDB()
-  .then(() => cmsCore.initCms({ pool }))
-  .then(() => {
-    app.listen(PORT, () => console.log(`[server] Listening on port ${PORT}`));
-    // Kick off scheduler — first check after 30s, then every 60s.
-    setTimeout(checkDailyDigest, 30 * 1000);
-    setInterval(checkDailyDigest, 60 * 1000);
-    // Weekly Friday 5pm Brisbane sales report.
-    setInterval(checkWeeklyReport, 5 * 60 * 1000);
-    // Auto time-tracking from GitHub commits — runs at the top of each
-    // hour between 06:00 and 22:00 Brisbane. Silent no-op when
-    // GITHUB_TOKEN is unset.
-    scheduleAutoTracker({ pool, checkAndSendTimeAlert });
-    // Cache the Pipedrive HOT label id once the network is up. Silent
-    // no-op when PIPEDRIVE_API_TOKEN is unset.
-    pipedrive.initPipedriveLabels().catch(err =>
-      console.error('[pipedrive] init labels error:', err.message)
-    );
-  })
-  .catch(err => {
-    console.error('[db] Failed to initialise database:', err);
-    process.exit(1);
-  });
+async function startServer() {
+  try {
+    await ensureDatabaseReady();
+  } catch (err) {
+    console.error('[db] Failed to initialise database; starting in fallback intake mode:', err.message);
+  }
+
+  app.listen(PORT, () => console.log(`[server] Listening on port ${PORT}`));
+  // Kick off scheduler — first check after 30s, then every 60s.
+  setTimeout(checkDailyDigest, 30 * 1000);
+  setInterval(checkDailyDigest, 60 * 1000);
+  // Replay queued public form submissions after transient DB outages.
+  setTimeout(() => replayFallbackQueue().catch(err =>
+    console.error('[form-fallback] startup replay error:', err.message)
+  ), 45 * 1000);
+  setInterval(() => replayFallbackQueue().catch(err =>
+    console.error('[form-fallback] replay scheduler error:', err.message)
+  ), 5 * 60 * 1000);
+  // Weekly Friday 5pm Brisbane sales report.
+  setInterval(checkWeeklyReport, 5 * 60 * 1000);
+  // Auto time-tracking from GitHub commits — runs at the top of each
+  // hour between 06:00 and 22:00 Brisbane. Silent no-op when
+  // GITHUB_TOKEN is unset.
+  scheduleAutoTracker({ pool, checkAndSendTimeAlert });
+  // Cache the Pipedrive HOT label id once the network is up. Silent
+  // no-op when PIPEDRIVE_API_TOKEN is unset.
+  pipedrive.initPipedriveLabels().catch(err =>
+    console.error('[pipedrive] init labels error:', err.message)
+  );
+}
+
+startServer().catch(err => {
+  console.error('[server] Fatal startup error:', err);
+  process.exit(1);
+});

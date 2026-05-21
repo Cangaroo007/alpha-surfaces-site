@@ -1,5 +1,11 @@
 (function(){
   'use strict';
+  if (!window.__alphaFormRescueLoaded) {
+    var rescueScript = document.createElement('script');
+    rescueScript.src = '/form-rescue.js?v=1';
+    rescueScript.async = false;
+    document.head.appendChild(rescueScript);
+  }
   var CONSENT_TEXT='Yes, I\'d like to receive emails from Alpha Surfaces about new collections, products and events. I can unsubscribe anytime.';
   var DISCLAIMER='By subscribing you agree to receive marketing emails from <strong>Alpha Surfaces Pty Ltd</strong> (ABN 21 677 729 350). Your information is handled in accordance with our <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>. You can unsubscribe at any time.';
   function upgradeFooterForms(){

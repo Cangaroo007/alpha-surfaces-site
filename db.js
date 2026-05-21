@@ -3,6 +3,12 @@ const crypto = require('crypto');
 
 const CONSENT_TEXT = 'Yes, I\'d like to receive emails from Alpha Surfaces about new collections, products and events. I can unsubscribe anytime.';
 
+function normalizeClientSubmissionId(fields = {}) {
+  const value = fields._client_submission_id || fields.client_submission_id || fields.submission_uuid;
+  if (!value) return null;
+  return String(value).trim().slice(0, 100) || null;
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
@@ -26,6 +32,7 @@ async function initDB() {
         store_location  VARCHAR(255),
         source          VARCHAR(100),
         consent         BOOLEAN DEFAULT FALSE,
+        client_submission_id VARCHAR(100),
         status          VARCHAR(20)  NOT NULL DEFAULT 'new'
       );
 
@@ -62,6 +69,12 @@ async function initDB() {
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS street VARCHAR(255)`);
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS suburb VARCHAR(255)`);
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS unit VARCHAR(100)`);
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS client_submission_id VARCHAR(100)`);
+    await client.query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_submissions_client_submission_id
+        ON form_submissions(client_submission_id)
+        WHERE client_submission_id IS NOT NULL
+    `);
     console.log('[db] form_submissions migration complete');
 
     // One-time backfill: populate dedicated cols on rows submitted before
@@ -188,8 +201,17 @@ async function saveSubmission(formType, fields, sampleItems = []) {
     throw new Error('A maximum of 3 samples may be requested at one time.');
   }
 
+  const clientSubmissionId = normalizeClientSubmissionId(fields);
   const client = await pool.connect();
   try {
+    if (clientSubmissionId) {
+      const existing = await client.query(
+        'SELECT id, submitted_at FROM form_submissions WHERE client_submission_id = $1 LIMIT 1',
+        [clientSubmissionId]
+      );
+      if (existing.rows.length) return { ...existing.rows[0], duplicate: true };
+    }
+
     await client.query('BEGIN');
 
     const name = fields.name
@@ -199,8 +221,8 @@ async function saveSubmission(formType, fields, sampleItems = []) {
       `INSERT INTO form_submissions
          (form_type, name, email, phone, company, stone_interest, message,
           postcode, state, store_location, source, consent, role, reason,
-          street, suburb, unit, raw_data)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+          street, suburb, unit, raw_data, client_submission_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
        RETURNING id, submitted_at`,
       [
         formType,
@@ -222,7 +244,8 @@ async function saveSubmission(formType, fields, sampleItems = []) {
         fields.unit           || null,
         // ALWAYS store the full payload as a safety net, so any new form
         // field surfaces immediately even before a dedicated column exists.
-        JSON.stringify(fields)
+        JSON.stringify(fields),
+        clientSubmissionId
       ]
     );
 
@@ -240,9 +263,16 @@ async function saveSubmission(formType, fields, sampleItems = []) {
     }
 
     await client.query('COMMIT');
-    return { id, submitted_at };
+    return { id, submitted_at, duplicate: false };
   } catch (err) {
-    await client.query('ROLLBACK');
+    try { await client.query('ROLLBACK'); } catch {}
+    if (err.code === '23505' && clientSubmissionId) {
+      const existing = await client.query(
+        'SELECT id, submitted_at FROM form_submissions WHERE client_submission_id = $1 LIMIT 1',
+        [clientSubmissionId]
+      );
+      if (existing.rows.length) return { ...existing.rows[0], duplicate: true };
+    }
     throw err;
   }
 }

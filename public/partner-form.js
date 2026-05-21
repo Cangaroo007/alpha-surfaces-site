@@ -1,5 +1,11 @@
 (function () {
   'use strict';
+  if (!window.__alphaFormRescueLoaded) {
+    const rescueScript = document.createElement('script');
+    rescueScript.src = '/form-rescue.js?v=1';
+    rescueScript.async = false;
+    document.head.appendChild(rescueScript);
+  }
   document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('form.contact-form');
     if (!form) return;
