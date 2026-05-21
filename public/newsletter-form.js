@@ -2,7 +2,7 @@
   'use strict';
   if (!window.__alphaFormRescueLoaded) {
     var rescueScript = document.createElement('script');
-    rescueScript.src = '/form-rescue.js?v=1';
+    rescueScript.src = '/form-rescue.js?v=2';
     rescueScript.async = false;
     document.head.appendChild(rescueScript);
   }
