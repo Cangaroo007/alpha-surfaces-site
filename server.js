@@ -247,7 +247,7 @@ app.use(
 app.use((req, res, next) => {
   const p = req.path;
   const isAPI = p.startsWith('/api/');
-  const isAdmin = p === '/admin' || p.startsWith('/admin/') || p.startsWith('/projects') || p === '/forms' || p.startsWith('/forms/');
+  const isAdmin = p === '/admin' || p.startsWith('/admin/') || p.startsWith('/projects') || p === '/forms' || p === '/forms.html' || p.startsWith('/forms/');
   const isForm = ['/order-sample', '/enquiry', '/warranty', '/showroom-checkin'].some(f => p.startsWith(f));
   
   if (isAPI || isAdmin || isForm) {
@@ -279,6 +279,16 @@ function sendHtml(res, filePath) {
   res.set('Content-Type', 'text/html; charset=utf-8');
   res.send(renderHtml(filePath));
 }
+
+// ─── /forms — deprecated, redirects into /projects?view=forms ───
+// Forms are managed inside the project tracker. Keep the old URLs working, but
+// avoid permanent/browser-cached redirects while staff bookmarks catch up.
+app.get(['/forms', '/forms/', '/forms.html'], (req, res) => {
+  res.redirect(302, '/projects?view=forms');
+});
+app.get(['/forms/reset', '/forms/reset.html'], (req, res) => {
+  res.redirect(302, '/projects');
+});
 
 // Intercept GET requests that resolve to a public/*.html file so the footer
 // partial gets injected. Runs before express.static. Path traversal is
@@ -795,16 +805,6 @@ app.get('/api/auth-check', (req, res) => {
     return res.json({ authenticated: true, source: 'projects' });
   }
   res.json({ authenticated: false });
-});
-
-// ─── /forms — deprecated, redirects into /projects?view=forms ───
-// Forms are managed inside the project tracker. Keep the old URL working, but
-// avoid permanent/browser-cached redirects while staff bookmarks catch up.
-app.get('/forms', (req, res) => {
-  res.redirect(302, '/projects?view=forms');
-});
-app.get('/forms/reset', (req, res) => {
-  res.redirect(302, '/projects');
 });
 
 // ─── Projects ticket tracker (self-contained module) ───
