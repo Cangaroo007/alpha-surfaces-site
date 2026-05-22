@@ -113,13 +113,18 @@
   }
 
   function loadCollections() {
-    return fetch('/api/public/stones')
+    var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timeoutId = setTimeout(function() { if (controller) controller.abort(); }, 4000);
+    var opts = controller ? { signal: controller.signal } : {};
+    return fetch('/api/public/stones', opts)
       .then(function(res) {
+        clearTimeout(timeoutId);
         if (!res.ok) throw new Error('Managed collections unavailable');
         return res.json();
       })
       .then(normalizeCollections)
       .catch(function() {
+        clearTimeout(timeoutId);
         return FALLBACK_COLLECTIONS;
       });
   }
@@ -300,8 +305,13 @@
     }
   }
 
+  renderMenus(FALLBACK_COLLECTIONS);
+  bindInteractions();
+
   loadCollections().then(function(collections) {
-    renderMenus(collections);
-    bindInteractions();
+    if (collections && collections.length) {
+      renderMenus(collections);
+      bindInteractions();
+    }
   });
 })();
