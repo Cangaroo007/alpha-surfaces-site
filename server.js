@@ -246,12 +246,15 @@ app.use(
 // Cache headers — public pages cached by Cloudflare (failover during outages)
 app.use((req, res, next) => {
   const p = req.path;
-  const isAPI = p.startsWith('/api/');
+  const isPublicAPI = p === '/api/public/stones' || p === '/api/public/collections';
+  const isAPI = p.startsWith('/api/') && !isPublicAPI;
   const isAdmin = p === '/admin' || p.startsWith('/admin/') || p.startsWith('/projects') || p === '/forms' || p === '/forms.html' || p.startsWith('/forms/');
   const isForm = ['/order-sample', '/enquiry', '/warranty', '/showroom-checkin'].some(f => p.startsWith(f));
-  
+
   if (isAPI || isAdmin || isForm) {
     res.set({ 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' });
+  } else if (isPublicAPI) {
+    res.set({ 'Cache-Control': 'public, max-age=300, s-maxage=3600', 'Vary': 'Accept-Encoding' });
   } else if (!p.includes('.') || p.endsWith('.html')) {
     res.set({ 'Cache-Control': 'public, max-age=14400, s-maxage=14400', 'Vary': 'Accept-Encoding' });
   }
