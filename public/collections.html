@@ -51,7 +51,7 @@ img { display: block; max-width: 100%; }
 .intro-advantage p:last-child { margin-bottom: 0; }
 
 /* --- COLLECTION SWATCH --- */
-.coll-swatch { width: 100%; height: 715px; overflow: hidden; position: relative; }
+.coll-swatch { width: 100%; height: 715px; overflow: hidden; position: relative; cursor: pointer; }
 .coll-swatch-img { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease; }
 .coll-swatch-img.active { opacity: 1; animation: slabPan 25s ease-in-out infinite alternate; }
 @keyframes slabPan {
@@ -212,7 +212,7 @@ img { display: block; max-width: 100%; }
 </section>
 
 <!-- COLLECTION SWATCH — changes with active accordion -->
-<section class="coll-swatch" id="coll-swatch">
+<section class="coll-swatch" id="coll-swatch" tabindex="0" role="link" aria-label="Open the currently displayed collection">
   <img class="coll-swatch-img active" data-coll="0" src="images/collection-hero-01.webp" alt="Collection 01 slab">
   <img class="coll-swatch-img" data-coll="1" src="images/collection-hero-02.webp" alt="Collection 02 slab">
   <img class="coll-swatch-img" data-coll="2" src="images/collection-hero-03.webp" alt="Collection 03 slab">
@@ -400,6 +400,7 @@ img { display: block; max-width: 100%; }
       var swatchTitle = document.getElementById('coll-swatch-title');
       var swatchDesc = document.getElementById('coll-swatch-desc');
       var swatchLink = document.getElementById('coll-swatch-link');
+      var swatchSection = document.getElementById('coll-swatch');
       var collCards = [
         { title: 'Collection 01', desc: 'Our entry-level price point offers classic neutrals with textures ranging from fine particles to subtle grains.', anchor: 'collection-01' },
         { title: 'Collection 02', desc: 'Pure whites through to organic neutrals, offering a refined palette for contemporary Australian interiors.', anchor: 'collection-02' },
@@ -421,6 +422,25 @@ img { display: block; max-width: 100%; }
           swatchLink.textContent = 'Visit ' + collCards[idx].title;
           swatchLink.href = '/collections.html#' + collCards[idx].anchor;
         }
+      }
+
+      function openCurrentCollection() {
+        if (!swatchLink || !swatchLink.href) return;
+        window.location.href = swatchLink.href;
+      }
+
+      if (swatchSection) {
+        swatchSection.addEventListener('click', function(e) {
+          if (e && e.target && e.target.closest && e.target.closest('a')) return;
+          openCurrentCollection();
+        });
+        swatchSection.addEventListener('keydown', function(e) {
+          if (!e) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openCurrentCollection();
+          }
+        });
       }
 
       // ── Auto-rotation after 60s idle ──

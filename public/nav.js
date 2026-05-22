@@ -134,6 +134,15 @@
     if (window.innerWidth >= 1024) hoverTimer = setTimeout(function() { if (!trigger.matches(':hover')) megaMenu.classList.remove('open'); }, 350);
   });
 
+  // Desktop/tablet: click to open (supports touch devices where hover isn't available)
+  trigger.addEventListener('click', function(e) {
+    if (window.innerWidth < 1024) return;
+    if (!megaMenu.classList.contains('open')) {
+      e.preventDefault();
+      megaMenu.classList.add('open');
+    }
+  });
+
   // Click outside closes
   document.addEventListener('click', function(e) {
     if (megaMenu.classList.contains('open') && !megaMenu.contains(e.target) && !trigger.contains(e.target)) megaMenu.classList.remove('open');
