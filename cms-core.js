@@ -280,6 +280,16 @@ async function getManagedStones(pool, includeHidden = false) {
      ${includeHidden ? '' : 'WHERE visible = TRUE'}
      ORDER BY sort_order ASC, id ASC`
   );
+
+  // If CMS tables are empty (not seeded), fall back to static stones.json
+  // so surface pages and nav still render correctly.
+  if (!colRes.rows.length) {
+    console.warn('[cms] cms_collections is empty — falling back to static stones.json');
+    if (fs.existsSync(STONES_JSON)) {
+      return JSON.parse(fs.readFileSync(STONES_JSON, 'utf8'));
+    }
+  }
+
   const stoneRes = await pool.query(
     `SELECT * FROM cms_stones
      ${includeHidden ? '' : 'WHERE visible = TRUE'}
