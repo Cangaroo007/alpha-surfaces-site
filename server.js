@@ -2507,7 +2507,7 @@ app.get(['/wp-admin', '/wp-admin/'], (req, res) =>
 // etc.) — used when the external service blocks iframe embedding. Other slugs
 // fall through to the self-hosted StPageFlip viewer.
 const EXTERNAL_CATALOGS = {
-  brochure: 'https://online.flippingbook.com/view/541312945/',
+  brochure: 'https://online.flippingbook.com/view/134563990/',
 };
 app.get('/catalog', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'catalog', 'index.html'));
