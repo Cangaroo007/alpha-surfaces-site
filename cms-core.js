@@ -314,8 +314,15 @@ function mountCms(app, { pool, authMiddleware, dataDir }) {
     try {
       res.json(await getManagedStones(pool, false));
     } catch (err) {
-      console.error('[cms/public/stones]', err.message);
-      if (fs.existsSync(STONES_JSON)) return res.sendFile(STONES_JSON);
+      console.error('[cms/public/stones] DB query failed, falling back to static stones.json:', err.message);
+      try {
+        if (fs.existsSync(STONES_JSON)) {
+          const staticData = JSON.parse(fs.readFileSync(STONES_JSON, 'utf8'));
+          return res.json(staticData);
+        }
+      } catch (readErr) {
+        console.error('[cms/public/stones] Static fallback also failed:', readErr.message);
+      }
       res.status(500).json({ error: 'Failed to load stones' });
     }
   });
