@@ -183,7 +183,18 @@
     mobileMenu.innerHTML = mHtml;
   }
 
-  function bindInteractions() {
+  function closeMobile() {
+    var mobileMenu = document.getElementById('mobile-menu');
+    if (!mobileMenu) return;
+    mobileMenu.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Bound ONCE. These elements (hamburger, COLLECTIONS trigger, CONTACT US
+  // dropdown, document-level listeners) live outside the mobile-menu/mega-menu
+  // content that renderMenus replaces, so re-binding them would attach duplicate
+  // handlers \u2014 the bug that broke the hamburger toggle.
+  function bindNavControls() {
     var megaMenu = document.getElementById('mega-menu');
     var mobileMenu = document.getElementById('mobile-menu');
     var trigger = document.getElementById('collections-trigger');
@@ -220,11 +231,6 @@
         megaMenu.classList.remove('open');
       }
     });
-
-    function closeMobile() {
-      mobileMenu.classList.remove('open');
-      document.body.style.overflow = '';
-    }
 
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
@@ -268,6 +274,13 @@
         document.body.style.overflow = 'hidden';
       }
     });
+  }
+
+  // Bound after EVERY renderMenus. These elements live inside the mobile-menu
+  // content that renderMenus rebuilds, so they must be re-bound each time.
+  function bindMenuInteractions() {
+    var mobileMenu = document.getElementById('mobile-menu');
+    if (!mobileMenu) return;
 
     var collToggle = document.getElementById('mobile-coll-toggle');
     var collPanel = document.getElementById('mobile-coll-panel');
@@ -306,12 +319,13 @@
   }
 
   renderMenus(FALLBACK_COLLECTIONS);
-  bindInteractions();
+  bindNavControls();
+  bindMenuInteractions();
 
   loadCollections().then(function(collections) {
     if (collections && collections.length) {
       renderMenus(collections);
-      bindInteractions();
+      bindMenuInteractions();
     }
   });
 })();
