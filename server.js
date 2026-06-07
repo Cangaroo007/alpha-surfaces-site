@@ -271,9 +271,9 @@ const PUBLIC_DIR = path.resolve(path.join(__dirname, 'public'));
 const FOOTER_PARTIAL = fs.readFileSync(path.join(__dirname, 'views', 'partials', 'footer.html'), 'utf8');
 const FOOTER_MARKER = '<!-- FOOTER -->';
 const FAVICON_TAGS = [
-  '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20260607">',
-  '<link rel="shortcut icon" href="/favicon.ico?v=20260607">',
-  '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20260607">'
+  '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20260607b">',
+  '<link rel="shortcut icon" href="/favicon.ico?v=20260607b">',
+  '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20260607b">'
 ].join('\n');
 
 function renderHtml(filePath) {

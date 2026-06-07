@@ -32,7 +32,7 @@ a { color: inherit; }
 img { display: block; max-width: 100%; }
 
 /* --- HERO --- */
-.hero { position: relative; width: 100%; height: 838px; overflow: hidden; }
+.hero { position: relative; width: 100%; height: 100vh; min-height: 760px; overflow: hidden; }
 .hero img { width: 100%; height: 100%; object-fit: cover; }
 
 /* --- INTRO --- */
@@ -144,7 +144,7 @@ img { display: block; max-width: 100%; }
 
 /* --- MOBILE --- */
 @media (max-width: 1024px) {
-  .hero { height: 400px; }
+  .hero { height: 100svh; min-height: 520px; }
 
   .intro { padding: 60px 24px; }
   .intro-heading, .intro-body { font-size: 20px; }
