@@ -3,9 +3,30 @@ const crypto = require('crypto');
 
 const CONSENT_TEXT = 'Yes, I\'d like to receive emails from Alpha Surfaces about new collections, products and events. I can unsubscribe anytime.';
 
+// Timeout caps so a slow/unreachable database can never hang a request
+// indefinitely. Without these, a stalled connection or query leaves public
+// routes (e.g. /api/public/stones) waiting forever — the browser fetch never
+// resolves, and the collections page renders its shell but never hydrates the
+// slab data. connectionTimeoutMillis fails fast when the DB is unreachable;
+// query_timeout (client side) and statement_timeout (server side) bound any
+// single query so a hung connection is released rather than leaked.
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
+  connectionTimeoutMillis: 5000,
+  idleTimeoutMillis: 30000,
+  query_timeout: 30000,
+  statement_timeout: 30000
+});
+
+// An idle client in the pool can emit 'error' when the database restarts or a
+// connection drops (e.g. "terminating connection due to administrator
+// command"). Without a listener, Node treats it as an unhandled 'error' event
+// and crashes the whole process — which in production triggers a restart and a
+// stale CDN failover page. Log and swallow; in-flight queries still reject to
+// their awaiting caller, which falls back to the static catalog.
+pool.on('error', (err) => {
+  console.error('[db] unexpected idle client error (pool stays up):', err.message);
 });
 
 async function initDB() {

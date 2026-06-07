@@ -275,6 +275,16 @@ app.use((req, res, next) => {
   return sendHtml(res, resolved);
 });
 
+// Browsers auto-request /favicon.ico; without a handler it 404s and the tab
+// shows no icon. Serve the Alpha "A" mark (PNG bytes; modern browsers accept
+// PNG for /favicon.ico). apple-touch-icon.png sits in /public and is served
+// by express.static for iOS home-screen saves.
+app.get('/favicon.ico', (_req, res) => {
+  res.type('image/png');
+  res.set('Cache-Control', 'public, max-age=604800');
+  res.sendFile(path.join(__dirname, 'public', 'favicon-32.png'));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const loginLimiter = rateLimit({

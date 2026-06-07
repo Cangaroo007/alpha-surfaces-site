@@ -28,6 +28,65 @@ function safeJson(value, fallback) {
   try { return JSON.parse(value); } catch { return fallback; }
 }
 
+// Public stone/collection routes must never hang on a slow or unreachable
+// database. The CMS is the source of truth, but the static catalog shipped in
+// public/data/stones.json is a complete, valid fallback. PUBLIC_DB_TIMEOUT_MS
+// bounds how long a public request waits on the DB before serving static data.
+const PUBLIC_DB_TIMEOUT_MS = 6000;
+
+function loadStaticStones() {
+  try {
+    if (fs.existsSync(STONES_JSON)) {
+      return JSON.parse(fs.readFileSync(STONES_JSON, 'utf8'));
+    }
+  } catch (err) {
+    console.error('[cms] failed to read static stones.json:', err.message);
+  }
+  return { collections: [] };
+}
+
+// Reject if `promise` does not settle within `ms`. The underlying DB query may
+// keep running, but pool query_timeout/statement_timeout (see db.js) reap it.
+function withTimeout(promise, ms, label) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error((label || 'operation') + ' timed out after ' + ms + 'ms')),
+      ms
+    );
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
+// Merge any collections/stones present in the static catalog but missing from
+// the CMS response. Guards against a stale seed (e.g. new stones added to
+// stones.json that were never inserted into the CMS tables) silently dropping
+// colours from the public site. CMS data wins on conflicts; static fills gaps.
+function mergeStaticStones(cmsData) {
+  const staticData = loadStaticStones();
+  if (!cmsData || !Array.isArray(cmsData.collections) || !cmsData.collections.length) {
+    return staticData;
+  }
+  const byId = new Map(cmsData.collections.map(c => [c.id, c]));
+  for (const sCol of staticData.collections || []) {
+    const cCol = byId.get(sCol.id);
+    if (!cCol) {
+      cmsData.collections.push(sCol);
+      byId.set(sCol.id, sCol);
+      continue;
+    }
+    const seen = new Set((cCol.stones || []).map(s => s.slug));
+    cCol.stones = cCol.stones || [];
+    for (const sStone of sCol.stones || []) {
+      if (!seen.has(sStone.slug)) {
+        cCol.stones.push(sStone);
+        seen.add(sStone.slug);
+      }
+    }
+  }
+  return cmsData;
+}
+
 function rowToStone(row) {
   const specs = safeJson(row.specs, {});
   const gallery = safeJson(row.gallery, []);
@@ -322,38 +381,37 @@ function mountCms(app, { pool, authMiddleware, dataDir }) {
 
   app.get('/api/public/stones', async (_req, res) => {
     try {
-      res.json(await getManagedStones(pool, false));
+      const data = await withTimeout(
+        getManagedStones(pool, false), PUBLIC_DB_TIMEOUT_MS, 'getManagedStones'
+      );
+      res.json(mergeStaticStones(data));
     } catch (err) {
-      console.error('[cms/public/stones] DB query failed, falling back to static stones.json:', err.message);
-      try {
-        if (fs.existsSync(STONES_JSON)) {
-          const staticData = JSON.parse(fs.readFileSync(STONES_JSON, 'utf8'));
-          return res.json(staticData);
-        }
-      } catch (readErr) {
-        console.error('[cms/public/stones] Static fallback also failed:', readErr.message);
-      }
-      res.status(500).json({ error: 'Failed to load stones' });
+      console.error('[cms/public/stones] DB slow/unavailable, serving static stones.json:', err.message);
+      res.json(loadStaticStones());
     }
+  });
+
+  const toPublicCollections = (data) => ({
+    collections: (data.collections || []).map(c => ({
+      id: c.id,
+      name: c.name,
+      subtitle: c.subtitle,
+      description: c.description,
+      hero_image: c.hero_image,
+      swatch_image: c.swatch_image,
+      stones: (c.stones || []).map(s => ({ slug: s.slug, name: s.name, discontinued: s.discontinued }))
+    }))
   });
 
   app.get('/api/public/collections', async (_req, res) => {
     try {
-      const data = await getManagedStones(pool, false);
-      res.json({
-        collections: data.collections.map(c => ({
-          id: c.id,
-          name: c.name,
-          subtitle: c.subtitle,
-          description: c.description,
-          hero_image: c.hero_image,
-          swatch_image: c.swatch_image,
-          stones: c.stones.map(s => ({ slug: s.slug, name: s.name, discontinued: s.discontinued }))
-        }))
-      });
+      const data = await withTimeout(
+        getManagedStones(pool, false), PUBLIC_DB_TIMEOUT_MS, 'getManagedStones'
+      );
+      res.json(toPublicCollections(mergeStaticStones(data)));
     } catch (err) {
-      console.error('[cms/public/collections]', err.message);
-      res.status(500).json({ error: 'Failed to load collections' });
+      console.error('[cms/public/collections] DB slow/unavailable, serving static stones.json:', err.message);
+      res.json(toPublicCollections(loadStaticStones()));
     }
   });
 

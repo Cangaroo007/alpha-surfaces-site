@@ -308,14 +308,25 @@ img { display: block; max-width: 100%; }
 <!-- FOOTER -->
 
 <script>
-  fetch('/api/public/stones')
-    .then(function(r) {
-      if (!r.ok) throw new Error('managed content unavailable');
-      return r.json();
-    })
-    .catch(function() {
-      return fetch('/data/stones.json').then(function(r) { return r.json(); });
-    })
+  // Bound the managed-content fetch: a hung /api/public/stones (e.g. a stalled
+  // DB upstream) would otherwise never resolve or reject, leaving the page shell
+  // visible but the slab grid permanently un-hydrated. Abort after 8s and fall
+  // back to the static catalog so colours always render.
+  function loadStones() {
+    var controller = new AbortController();
+    var timer = setTimeout(function() { controller.abort(); }, 8000);
+    return fetch('/api/public/stones', { signal: controller.signal })
+      .then(function(r) {
+        clearTimeout(timer);
+        if (!r.ok) throw new Error('managed content unavailable');
+        return r.json();
+      })
+      .catch(function() {
+        clearTimeout(timer);
+        return fetch('/data/stones.json').then(function(r) { return r.json(); });
+      });
+  }
+  loadStones()
     .then(data => {
       const container = document.getElementById('stones-container');
 
