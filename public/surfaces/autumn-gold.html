@@ -146,12 +146,12 @@ img { display: block; max-width: 100%; }
 
 <!-- FOOTER -->
 
+<script src="../public-stones-loader.js?v=1"></script>
 <script>
 (function() {
   var slug = document.body.getAttribute('data-slug');
 
-  fetch('/api/public/stones').then(function(r){ if(!r.ok) throw new Error('managed content unavailable'); return r; }).catch(function(){ return fetch('../data/stones.json'); })
-    .then(function(r) { return r.json(); })
+  window.loadPublicStones('../data/stones.json', slug)
     .then(function(data) {
       var stone = null;
       var collection = null;

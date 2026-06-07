@@ -7,6 +7,7 @@ const multer = require('multer');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const STONES_JSON = path.join(PUBLIC_DIR, 'data', 'stones.json');
 const DOWNLOADS_DIR = path.join(PUBLIC_DIR, 'downloads');
+const PUBLIC_DATA_TIMEOUT_MS = Number(process.env.PUBLIC_CMS_TIMEOUT_MS || 1500);
 
 function slugify(value) {
   return String(value || '')
@@ -26,6 +27,79 @@ function safeJson(value, fallback) {
   if (value == null) return fallback;
   if (typeof value === 'object') return value;
   try { return JSON.parse(value); } catch { return fallback; }
+}
+
+function readStaticStones() {
+  if (!fs.existsSync(STONES_JSON)) return null;
+  return JSON.parse(fs.readFileSync(STONES_JSON, 'utf8'));
+}
+
+function countStones(data) {
+  return (data && data.collections || []).reduce((total, collection) => {
+    return total + ((collection.stones || []).length);
+  }, 0);
+}
+
+function mergeStaticStoneFallback(managedData) {
+  const staticData = readStaticStones();
+  if (!staticData) return managedData;
+  if (!managedData || !Array.isArray(managedData.collections) || !countStones(managedData)) {
+    return staticData;
+  }
+
+  const output = {
+    ...managedData,
+    collections: managedData.collections.map(collection => ({
+      ...collection,
+      stones: [...(collection.stones || [])]
+    }))
+  };
+  const managedSlugs = new Set();
+  const collectionsById = new Map();
+  const collectionsByName = new Map();
+
+  for (const collection of output.collections) {
+    if (collection.id) collectionsById.set(collection.id, collection);
+    if (collection.name) collectionsByName.set(slugify(collection.name), collection);
+    for (const stone of collection.stones || []) {
+      if (stone.slug) managedSlugs.add(stone.slug);
+    }
+  }
+
+  let missing = 0;
+  for (const staticCollection of staticData.collections || []) {
+    const collectionKey = staticCollection.id || slugify(staticCollection.name);
+    let target = collectionsById.get(collectionKey) || collectionsByName.get(slugify(staticCollection.name));
+    if (!target) {
+      target = {
+        ...staticCollection,
+        stones: []
+      };
+      output.collections.push(target);
+      if (collectionKey) collectionsById.set(collectionKey, target);
+      if (staticCollection.name) collectionsByName.set(slugify(staticCollection.name), target);
+    }
+
+    for (const stone of staticCollection.stones || []) {
+      if (!stone.slug || managedSlugs.has(stone.slug)) continue;
+      target.stones.push(stone);
+      managedSlugs.add(stone.slug);
+      missing++;
+    }
+  }
+
+  if (missing) {
+    console.warn(`[cms] merged ${missing} missing static stone(s) into public CMS data`);
+  }
+  return output;
+}
+
+function withTimeout(promise, ms, label) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
 function rowToStone(row) {
@@ -285,9 +359,8 @@ async function getManagedStones(pool, includeHidden = false) {
   // so surface pages and nav still render correctly.
   if (!colRes.rows.length) {
     console.warn('[cms] cms_collections is empty — falling back to static stones.json');
-    if (fs.existsSync(STONES_JSON)) {
-      return JSON.parse(fs.readFileSync(STONES_JSON, 'utf8'));
-    }
+    const staticData = readStaticStones();
+    if (staticData) return staticData;
   }
 
   const stoneRes = await pool.query(
@@ -301,9 +374,10 @@ async function getManagedStones(pool, includeHidden = false) {
     if (!stonesByCollection.has(key)) stonesByCollection.set(key, []);
     stonesByCollection.get(key).push(rowToStone(row));
   }
-  return {
+  const data = {
     collections: colRes.rows.map(row => rowToCollection(row, stonesByCollection.get(row.collection_id) || []))
   };
+  return includeHidden ? data : mergeStaticStoneFallback(data);
 }
 
 function mountCms(app, { pool, authMiddleware, dataDir }) {
@@ -322,14 +396,12 @@ function mountCms(app, { pool, authMiddleware, dataDir }) {
 
   app.get('/api/public/stones', async (_req, res) => {
     try {
-      res.json(await getManagedStones(pool, false));
+      res.json(await withTimeout(getManagedStones(pool, false), PUBLIC_DATA_TIMEOUT_MS, '/api/public/stones'));
     } catch (err) {
       console.error('[cms/public/stones] DB query failed, falling back to static stones.json:', err.message);
       try {
-        if (fs.existsSync(STONES_JSON)) {
-          const staticData = JSON.parse(fs.readFileSync(STONES_JSON, 'utf8'));
-          return res.json(staticData);
-        }
+        const staticData = readStaticStones();
+        if (staticData) return res.json(staticData);
       } catch (readErr) {
         console.error('[cms/public/stones] Static fallback also failed:', readErr.message);
       }
@@ -339,7 +411,7 @@ function mountCms(app, { pool, authMiddleware, dataDir }) {
 
   app.get('/api/public/collections', async (_req, res) => {
     try {
-      const data = await getManagedStones(pool, false);
+      const data = await withTimeout(getManagedStones(pool, false), PUBLIC_DATA_TIMEOUT_MS, '/api/public/collections');
       res.json({
         collections: data.collections.map(c => ({
           id: c.id,
@@ -352,7 +424,25 @@ function mountCms(app, { pool, authMiddleware, dataDir }) {
         }))
       });
     } catch (err) {
-      console.error('[cms/public/collections]', err.message);
+      console.error('[cms/public/collections] DB query failed, falling back to static stones.json:', err.message);
+      try {
+        const data = readStaticStones();
+        if (data) {
+          return res.json({
+            collections: data.collections.map(c => ({
+              id: c.id,
+              name: c.name,
+              subtitle: c.subtitle,
+              description: c.description,
+              hero_image: c.hero_image,
+              swatch_image: c.swatch_image,
+              stones: c.stones.map(s => ({ slug: s.slug, name: s.name, discontinued: s.discontinued }))
+            }))
+          });
+        }
+      } catch (readErr) {
+        console.error('[cms/public/collections] Static fallback also failed:', readErr.message);
+      }
       res.status(500).json({ error: 'Failed to load collections' });
     }
   });

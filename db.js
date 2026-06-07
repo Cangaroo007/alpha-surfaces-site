@@ -11,7 +11,10 @@ function normalizeClientSubmissionId(fields = {}) {
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
+  connectionTimeoutMillis: Number(process.env.PG_CONNECTION_TIMEOUT_MS || 5000),
+  query_timeout: Number(process.env.PG_QUERY_TIMEOUT_MS || 15000),
+  statement_timeout: Number(process.env.PG_STATEMENT_TIMEOUT_MS || 15000)
 });
 
 async function initDB() {
