@@ -270,9 +270,17 @@ app.use((req, res, next) => {
 const PUBLIC_DIR = path.resolve(path.join(__dirname, 'public'));
 const FOOTER_PARTIAL = fs.readFileSync(path.join(__dirname, 'views', 'partials', 'footer.html'), 'utf8');
 const FOOTER_MARKER = '<!-- FOOTER -->';
+const FAVICON_TAGS = [
+  '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20260607">',
+  '<link rel="shortcut icon" href="/favicon.ico?v=20260607">',
+  '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20260607">'
+].join('\n');
 
 function renderHtml(filePath) {
-  const html = fs.readFileSync(filePath, 'utf8');
+  let html = fs.readFileSync(filePath, 'utf8');
+  if (!html.includes('rel="icon"') && html.includes('</head>')) {
+    html = html.replace('</head>', FAVICON_TAGS + '\n</head>');
+  }
   return html.includes(FOOTER_MARKER)
     ? html.replace(FOOTER_MARKER, FOOTER_PARTIAL)
     : html;
@@ -2744,6 +2752,10 @@ app.post('/api/admin/form-fallback-queue/replay', authMiddleware, async (req, re
 
 // ─── Catch-all for SPA ───
 app.get('*', (req, res) => {
+  if (/\.[a-z0-9]{2,8}$/i.test(req.path) && !req.path.endsWith('.html')) {
+    res.set({ 'Cache-Control': 'no-store', 'Pragma': 'no-cache', 'Expires': '0' });
+    return res.status(404).type('text/plain').send('Not found');
+  }
   sendHtml(res, path.join(__dirname, 'public', 'index.html'));
 });
 
