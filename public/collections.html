@@ -291,11 +291,10 @@ img { display: block; max-width: 100%; }
 
 
 <!-- Instagram Feed — @alpha.surfaces -->
-<!-- TODO: Replace static placeholders with live Instagram API feed when credentials received from Belinda -->
 <section class="instagram-section">
   <div class="instagram-header">
     <p class="instagram-title">Follow us on Instagram</p>
-    <a href="https://instagram.com/alphasurfaces" target="_blank" rel="noopener noreferrer" class="instagram-cta" aria-label="Follow Alpha Surfaces on Instagram">@alpha.surfaces</a>
+    <a href="https://www.instagram.com/alpha.surfaces/" target="_blank" rel="noopener noreferrer" class="instagram-cta" aria-label="Follow Alpha Surfaces on Instagram">@alpha.surfaces</a>
   </div>
   <div class="instagram-carousel" id="instagram-carousel">
     <div class="instagram-tile instagram-placeholder"><div class="instagram-placeholder-inner"></div></div>
@@ -309,6 +308,45 @@ img { display: block; max-width: 100%; }
 
 <script src="/public-stones-loader.js?v=2"></script>
 <script>
+  (function loadInstagramFeed() {
+    var carousel = document.getElementById('instagram-carousel');
+    if (!carousel || !window.fetch) return;
+
+    fetch('/api/public/instagram', { headers: { 'Accept': 'application/json' } })
+      .then(function(res) {
+        var contentType = res.headers.get('content-type') || '';
+        if (!res.ok || contentType.indexOf('application/json') === -1) {
+          throw new Error('Instagram feed unavailable');
+        }
+        return res.json();
+      })
+      .then(function(posts) {
+        if (!Array.isArray(posts) || !posts.length) return;
+        var usablePosts = posts.filter(function(post) {
+          return post && post.permalink && post.image;
+        }).slice(0, 4);
+        if (!usablePosts.length) return;
+
+        carousel.innerHTML = '';
+        usablePosts.forEach(function(post) {
+          var tile = document.createElement('a');
+          tile.className = 'instagram-tile';
+          tile.href = post.permalink;
+          tile.target = '_blank';
+          tile.rel = 'noopener noreferrer';
+
+          var image = document.createElement('img');
+          image.src = post.image;
+          image.alt = post.caption || 'Alpha Surfaces Instagram post';
+          image.loading = 'lazy';
+
+          tile.appendChild(image);
+          carousel.appendChild(tile);
+        });
+      })
+      .catch(function() {});
+  })();
+
   window.loadPublicStones('/data/stones.json')
     .then(data => {
       const container = document.getElementById('stones-container');

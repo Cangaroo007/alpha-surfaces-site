@@ -42,6 +42,13 @@ formFallbackQueue.setQueueDir(process.env.FORM_FALLBACK_DIR || path.join(DATA_DI
 const CONTENT_FILE = path.join(DATA_DIR, 'content.json');
 const KEYS_FILE = path.join(DATA_DIR, 'keys.json');
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+const BEHOLD_FEED_URL =
+  (process.env.RAILWAY_ENVIRONMENT_NAME === 'production'
+    ? process.env.BEHOLD_FEED_URL_PRODUCTION
+    : process.env.BEHOLD_FEED_URL_STAGING)
+  || process.env.BEHOLD_FEED_URL || '';
+const IG_TTL = 15 * 60 * 1000;
+let igCache = { at: 0, posts: [] };
 
 // ─── API Keys Management ───
 const KEY_NAMES = [
@@ -224,7 +231,7 @@ app.use(
       ],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://online.flippingbook.com", "https://*.flippingbook.com"],
       imgSrc: [
-        "'self'", "https://res.cloudinary.com", "data:",
+        "'self'", "https://res.cloudinary.com", "https://*.behold.pictures", "data:",
         "https://online.flippingbook.com", "https://*.flippingbook.com",
         "https://www.google-analytics.com", "https://www.googletagmanager.com",
         "https://c.clarity.ms", "https://*.clarity.ms"
@@ -246,7 +253,7 @@ app.use(
 // Cache headers — public pages cached by Cloudflare (failover during outages)
 app.use((req, res, next) => {
   const p = req.path;
-  const isPublicAPI = p === '/api/public/stones' || p === '/api/public/collections';
+  const isPublicAPI = p === '/api/public/stones' || p === '/api/public/collections' || p === '/api/public/instagram';
   const isAPI = p.startsWith('/api/') && !isPublicAPI;
   const isAdmin = p === '/admin' || p.startsWith('/admin/') || p.startsWith('/projects') || p === '/forms' || p === '/forms.html' || p.startsWith('/forms/');
   const isForm = ['/order-sample', '/enquiry', '/warranty', '/showroom-checkin'].some(f => p.startsWith(f));
@@ -259,6 +266,26 @@ app.use((req, res, next) => {
     res.set({ 'Cache-Control': 'public, max-age=14400, s-maxage=14400', 'Vary': 'Accept-Encoding' });
   }
   next();
+});
+
+app.get('/api/public/instagram', async (_req, res) => {
+  try {
+    if (BEHOLD_FEED_URL && Date.now() - igCache.at > IG_TTL) {
+      const r = await fetch(BEHOLD_FEED_URL);
+      if (r.ok) {
+        const data = await r.json();
+        const source = Array.isArray(data.posts) ? data.posts : (Array.isArray(data) ? data : []);
+        const posts = source.slice(0, 4).map(p => ({
+          permalink: p.permalink,
+          caption: (p.caption || '').slice(0, 140),
+          image: p.sizes?.medium?.mediaUrl || p.mediaUrl,
+        }));
+        igCache = { at: Date.now(), posts };
+      }
+    }
+  } catch (e) {}
+  res.set('Cache-Control', 'public, max-age=900');
+  res.json(igCache.posts);
 });
 
 // ─── Shared footer partial (single source of truth) ───
@@ -2466,15 +2493,6 @@ app.get('/kc', (req, res) => {
 app.get('/collections', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'collections.html'));
 });
-
-// TODO: Instagram API endpoint
-// When Belinda provides Instagram credentials, add a /api/instagram route here
-// that fetches the latest 4 posts from the Instagram Graph API and returns
-// { posts: [{ imageUrl, permalink, caption }] }
-// Then update public/collections.html to fetch from this endpoint on page load
-// and replace the .instagram-placeholder tiles with live content.
-// Instagram handle: @alpha.surfaces (unconfirmed — verify with Belinda)
-// Facebook URL: https://facebook.com/alphasurfaces (unconfirmed — verify with Belinda)
 
 // ─── Preview route — shareable URL for Belinda and Jay to review ───
 app.get('/preview', (req, res) => {
