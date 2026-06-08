@@ -384,29 +384,34 @@ img { display: block; max-width: 100%; }
 <script src="sample-modal.js?v=19"></script>
 <script src="/instagram-feed.js?v=1"></script>
 <script>
-// A logo — fade out completely before olive section reaches viewport
+// A logo — fade across the olive statement section
 (function() {
   var overlay = document.querySelector('.hero-logo-overlay');
   var oliveSection = document.querySelector('.statement');
   if (!overlay || !oliveSection) return;
 
+  function clamp(value) {
+    return Math.max(0, Math.min(1, value));
+  }
+
   function updateFade() {
     var rect = oliveSection.getBoundingClientRect();
     var vh = window.innerHeight;
-    var fadeStart = vh * 1.15;
-    var fadeEnd = vh;
+    var sectionHeight = rect.height || oliveSection.offsetHeight || vh;
+    var fadeStart = vh;
+    var fadeEnd = -sectionHeight;
 
-    if (rect.top <= fadeEnd) {
-      // Keep the A fully hidden before the olive block reaches the viewport.
-      overlay.style.opacity = '0';
-      overlay.style.visibility = 'hidden';
-    } else if (rect.top >= fadeStart) {
+    if (rect.top >= fadeStart) {
       overlay.style.visibility = 'visible';
       overlay.style.opacity = '1';
+    } else if (rect.top <= fadeEnd) {
+      overlay.style.opacity = '0';
+      overlay.style.visibility = 'hidden';
     } else {
-      overlay.style.visibility = 'visible';
       var progress = (rect.top - fadeEnd) / (fadeStart - fadeEnd);
-      overlay.style.opacity = String(Math.max(0, Math.min(1, progress)));
+      var opacity = clamp(progress);
+      overlay.style.visibility = 'visible';
+      overlay.style.opacity = String(opacity);
     }
   }
 
