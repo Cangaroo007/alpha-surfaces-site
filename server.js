@@ -231,7 +231,7 @@ app.use(
       ],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://online.flippingbook.com", "https://*.flippingbook.com"],
       imgSrc: [
-        "'self'", "https://res.cloudinary.com", "https://*.behold.pictures", "data:",
+        "'self'", "https://res.cloudinary.com", "https://behold.pictures", "https://*.behold.pictures", "data:",
         "https://online.flippingbook.com", "https://*.flippingbook.com",
         "https://www.google-analytics.com", "https://www.googletagmanager.com",
         "https://c.clarity.ms", "https://*.clarity.ms"
