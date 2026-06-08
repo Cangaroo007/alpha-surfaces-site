@@ -399,7 +399,7 @@ img { display: block; max-width: 100%; }
     var vh = window.innerHeight;
     var sectionHeight = rect.height || oliveSection.offsetHeight || vh;
     var fadeStart = vh;
-    var fadeEnd = -sectionHeight;
+    var fadeEnd = vh - sectionHeight;
 
     if (rect.top >= fadeStart) {
       overlay.style.visibility = 'visible';
