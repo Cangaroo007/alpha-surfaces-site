@@ -2516,6 +2516,10 @@ app.get('/enquiry', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'enquiry.html'));
 });
 
+app.get('/expo-samples', (req, res) => {
+  sendHtml(res, path.join(__dirname, 'public', 'expo-samples.html'));
+});
+
 app.get('/brochure', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'brochure.html'));
 });
