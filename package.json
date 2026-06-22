@@ -22,7 +22,9 @@
     "nodemailer": "^8.0.6",
     "openai": "^6.25.0",
     "pg": "^8.20.0",
-    "puppeteer": "^24.39.1",
     "twilio": "^6.0.0"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.39.1"
   }
 }
