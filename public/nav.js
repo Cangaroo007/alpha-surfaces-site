@@ -42,6 +42,12 @@
     return match ? match[0] : collection.name;
   }
 
+  function isRemovedPublicStone(stone, collection) {
+    var stoneSlug = slug(stone && (stone.slug || stone.name));
+    var collectionId = collection && (collection.id || slug(collection.name || collection.label));
+    return collectionId === 'collection-01' && stoneSlug === 'oyster';
+  }
+
   function normalizeCollections(data) {
     if (!data || !Array.isArray(data.collections)) return FALLBACK_COLLECTIONS;
     return data.collections.map(function(collection) {
@@ -52,6 +58,7 @@
         indoorOutdoor: []
       };
       (collection.stones || []).forEach(function(stone) {
+        if (isRemovedPublicStone(stone, collection)) return;
         var item = {
           name: stone.name,
           slug: stone.slug || slug(stone.name),

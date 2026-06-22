@@ -328,6 +328,10 @@ app.get(['/forms/reset', '/forms/reset.html'], (req, res) => {
   res.redirect(302, '/projects');
 });
 
+app.get(['/surfaces/oyster', '/surfaces/oyster.html'], (req, res) => {
+  res.redirect(301, '/collections#collection-01');
+});
+
 // Intercept GET requests that resolve to a public/*.html file so the footer
 // partial gets injected. Runs before express.static. Path traversal is
 // blocked by ensuring the resolved path stays inside PUBLIC_DIR.
@@ -690,15 +694,18 @@ async function handleShowroomCheckin(req, res) {
     const phone = String(f.phone || '').trim();
     if (!name)  return res.status(400).json({ ok: false, error: 'Name is required.' });
     if (!phone) return res.status(400).json({ ok: false, error: 'Phone is required.' });
+    const role = String(f.i_am_a || f.role || '').trim();
     fields = {
       _client_submission_id: f._client_submission_id || f.client_submission_id || f.submission_uuid || null,
       name,
       phone,
       email: f.email ? String(f.email).trim() : null,
-      stone_interest: f.stone_interest || null,
+      role: role || null,
+      i_am_a: role || null,
+      stone_interest: f.stone_interest || (role ? `I am a: ${role}` : null),
       source: f.source || null,
       message: f.message || f.notes || null,
-      consent: true
+      consent: !!f.consent
     };
     const typed = await persistShowroomCheckin(fields);
 

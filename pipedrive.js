@@ -268,8 +268,11 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
         subject: `Showroom visit — ${name}`,
         note:
           `Walk-in at Kunda Park showroom. ` +
+          `Visitor type: ${role || '—'}. ` +
           `Interests: ${stoneInterest || fields.stone_interest || '—'}. ` +
-          `Source: ${fields.source || '—'}. Notes: ${fields.message || '—'}`,
+          `Source: ${fields.source || '—'}. ` +
+          `Marketing consent: ${fields.consent ? 'Yes' : 'No'}. ` +
+          `Notes: ${fields.message || '—'}`,
         done: 1,
         due_date: new Date().toISOString().split('T')[0],
       });
