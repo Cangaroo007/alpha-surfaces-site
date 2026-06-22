@@ -42,18 +42,6 @@
           "slab": "/images/stones/fraser-slab.webp"
         },
         {
-          "name": "Oyster",
-          "finish": "Polished Finish",
-          "slug": "oyster",
-          "uv_stable": false,
-          "discontinued": false,
-          "images_pending": true,
-          "image": "",
-          "thumbnail": "",
-          "swatch": "",
-          "slab": ""
-        },
-        {
           "name": "Graphite",
           "finish": "Polished Finish",
           "slug": "graphite",

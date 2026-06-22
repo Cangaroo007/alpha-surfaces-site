@@ -269,25 +269,27 @@
       </div>
 
       <div class="field">
-        <label for="email">Email <span class="opt">optional</span></label>
-        <input type="email" id="email" name="email" autocomplete="email" inputmode="email" autocapitalize="off" autocorrect="off">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email" inputmode="email" autocapitalize="off" autocorrect="off">
       </div>
 
       <div class="field">
-        <label>Interested in <span class="opt">tap any that apply</span></label>
-        <div class="chips" id="interests" role="group" aria-label="Stone interest">
-          <button type="button" class="chip" aria-pressed="false" data-value="Marble">Marble</button>
-          <button type="button" class="chip" aria-pressed="false" data-value="Concrete">Concrete</button>
-          <button type="button" class="chip" aria-pressed="false" data-value="Terrazzo">Terrazzo</button>
-          <button type="button" class="chip" aria-pressed="false" data-value="Porcelain">Porcelain</button>
-          <button type="button" class="chip" aria-pressed="false" data-value="Not sure">Not sure</button>
-        </div>
+        <label for="role">I am a</label>
+        <select id="role" name="role" required>
+          <option value="">Select one</option>
+          <option>Homeowner</option>
+          <option>Cabinetmaker / Builder</option>
+          <option>Stonemason</option>
+          <option>Designer / Architect</option>
+          <option>Kitchen Company</option>
+          <option>Tiler</option>
+        </select>
       </div>
 
       <div class="field">
-        <label for="source">How did you hear about us? <span class="opt">optional</span></label>
+        <label for="source">How did you hear about us?</label>
         <select id="source" name="source">
-          <option value="">— Select —</option>
+          <option value="">Select one</option>
           <option>Google</option>
           <option>Instagram</option>
           <option>Referral</option>
@@ -295,6 +297,11 @@
           <option>Trade show</option>
           <option>Other</option>
         </select>
+      </div>
+
+      <div class="field">
+        <label>Marketing information</label>
+        <button type="button" class="chip" id="marketing-consent" aria-pressed="false" data-value="yes">Yes, send me product updates</button>
       </div>
 
       <div class="field">
@@ -321,19 +328,16 @@
       var errorEl  = document.getElementById('error');
       var thanksEl = document.getElementById('thanks');
       var thanksNm = document.getElementById('thanks-name');
-      var chipsEl  = document.getElementById('interests');
+      var consentEl = document.getElementById('marketing-consent');
 
       // Toggle-chip selection.
-      chipsEl.addEventListener('click', function (e) {
-        var chip = e.target.closest('.chip');
-        if (!chip) return;
-        var pressed = chip.getAttribute('aria-pressed') === 'true';
-        chip.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+      consentEl.addEventListener('click', function () {
+        var pressed = consentEl.getAttribute('aria-pressed') === 'true';
+        consentEl.setAttribute('aria-pressed', pressed ? 'false' : 'true');
       });
 
-      function selectedInterests() {
-        return Array.from(chipsEl.querySelectorAll('.chip[aria-pressed="true"]'))
-          .map(function (b) { return b.getAttribute('data-value'); });
+      function hasMarketingConsent() {
+        return consentEl.getAttribute('aria-pressed') === 'true';
       }
 
       function showError(msg) {
@@ -348,9 +352,7 @@
 
       function resetForm() {
         form.reset();
-        chipsEl.querySelectorAll('.chip').forEach(function (c) {
-          c.setAttribute('aria-pressed', 'false');
-        });
+        consentEl.setAttribute('aria-pressed', 'false');
         hideError();
         btn.disabled = false;
         btn.textContent = 'Check in';
@@ -379,20 +381,27 @@
         var name  = (document.getElementById('name').value  || '').trim();
         var phone = (document.getElementById('phone').value || '').trim();
         var email = (document.getElementById('email').value || '').trim();
+        var role  = (document.getElementById('role').value  || '').trim();
+        var source = (document.getElementById('source').value || '').trim();
         if (!name)  return showError('Please enter a name.');
         if (!phone) return showError('Please enter a phone number.');
-        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
           return showError('That email doesn’t look right.');
         }
+        if (!role) return showError('Please select one option for "I am a".');
+        if (!source) return showError('Please select how you heard about us.');
         var payload = {
           _client_submission_id: makeSubmissionId(),
           form_type: 'showroom-checkin',
           name: name,
           phone: phone,
-          email: email || undefined,
-          stone_interest: selectedInterests().join(', ') || undefined,
-          source: document.getElementById('source').value || undefined,
-          message: (document.getElementById('message').value || '').trim() || undefined
+          email: email,
+          role: role,
+          i_am_a: role,
+          stone_interest: 'I am a: ' + role,
+          source: source || undefined,
+          message: (document.getElementById('message').value || '').trim() || undefined,
+          consent: hasMarketingConsent()
         };
         btn.disabled = true;
         btn.textContent = 'Saving…';

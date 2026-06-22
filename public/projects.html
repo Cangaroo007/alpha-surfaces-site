@@ -239,6 +239,10 @@
   .showroom-stats .ss-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; text-align: center; }
   .showroom-stats .ss-num { font-size: 28px; font-weight: 700; color: var(--olive); line-height: 1.1; }
   .showroom-stats .ss-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+  .sample-checklist { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+  .sample-checklist h4 { margin: 0 0 8px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--olive); }
+  .sample-checklist label { display: flex; gap: 7px; align-items: flex-start; padding: 4px 0; font-size: 13px; line-height: 1.35; cursor: pointer; }
+  .sample-checklist input { margin-top: 1px; }
   .wn-row { padding: 8px 12px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 200px 80px 120px; gap: 12px; align-items: center; }
   .wn-row:hover { background: var(--cream-light); cursor: pointer; }
 
@@ -2987,6 +2991,7 @@
   };
   var typedFormsState = { typeKey: null, q: '', status: '', from: '', to: '' };
   var typedSearchDebounce = null;
+  var showroomSampleCollections = null;
 
   // Pull the type-key out of the legacy formsState namespace so existing
   // `formsState.typeKey = ...` writes from the dropdown still work.
@@ -3286,11 +3291,79 @@
       if (!res.ok) throw new Error('HTTP ' + res.status);
       var data = await res.json();
       if (!data.ok) throw new Error(data.error || 'Failed');
+      if (typeKey === 'showroom') await loadShowroomSampleCollections();
       drawer.innerHTML = renderTypedDrawer(typeKey, data.record);
       wireTypedDrawer(typeKey, data.record);
     } catch (err) {
       drawer.innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
     }
+  }
+
+  async function loadShowroomSampleCollections() {
+    if (showroomSampleCollections) return showroomSampleCollections;
+    try {
+      var res = await fetch('/data/stones.json', { credentials: 'same-origin' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      showroomSampleCollections = (data.collections || [])
+        .filter(function (c) { return /^Collection 0[1-5]$/.test(c.name || ''); })
+        .map(function (c) {
+          return {
+            name: c.name,
+            stones: (c.stones || []).filter(function (s) { return !s.discontinued; })
+          };
+        })
+        .filter(function (c) { return c.stones.length; });
+    } catch (_) {
+      showroomSampleCollections = [];
+    }
+    return showroomSampleCollections;
+  }
+
+  function stripSampleNotesBlock(notes) {
+    return String(notes || '').replace(/^Samples given:\n(?:- .+\n?)+\n?/m, '').trim();
+  }
+
+  function selectedSamplesFromNotes(notes) {
+    var out = new Set();
+    var m = String(notes || '').match(/^Samples given:\n((?:- .+\n?)+)/m);
+    if (!m) return out;
+    m[1].split('\n').forEach(function (line) {
+      var name = line.replace(/^-\s*/, '').replace(/\s+\(.+\)$/, '').trim();
+      if (name) out.add(name);
+    });
+    return out;
+  }
+
+  function renderShowroomSampleChecklist(notes) {
+    if (!showroomSampleCollections || !showroomSampleCollections.length) {
+      return '<div class="activity-empty">Sample list unavailable.</div>';
+    }
+    var selected = selectedSamplesFromNotes(notes);
+    return '<div class="sample-checklist">' + showroomSampleCollections.map(function (collection) {
+      var items = collection.stones.map(function (stone) {
+        var checked = selected.has(stone.name) ? ' checked' : '';
+        return '<label><input type="checkbox" class="showroom-sample-check" value="' +
+          escapeAttr(stone.name) + '" data-collection="' + escapeAttr(collection.name) + '"' + checked + '> ' +
+          '<span>' + escapeHtml(stone.name) + '</span></label>';
+      }).join('');
+      return '<div><h4>' + escapeHtml(collection.name) + '</h4>' + items + '</div>';
+    }).join('') + '</div>';
+  }
+
+  function buildShowroomNotesWithSamples(baseNotes) {
+    var picked = Array.from(document.querySelectorAll('.showroom-sample-check:checked')).map(function (el) {
+      return {
+        name: el.value,
+        collection: el.getAttribute('data-collection') || ''
+      };
+    });
+    var clean = String(baseNotes || '').trim();
+    if (!picked.length) return clean;
+    var block = 'Samples given:\n' + picked.map(function (s) {
+      return '- ' + s.name + (s.collection ? ' (' + s.collection + ')' : '');
+    }).join('\n');
+    return block + (clean ? '\n\n' + clean : '');
   }
 
   function typedDrawerFields(typeKey) {
@@ -3359,8 +3432,9 @@
     }
     if (typeKey === 'showroom') {
       return common.concat([
-        { key: 'interests', label: 'Interested in', fmt: 'multiline' },
-        { key: 'source',    label: 'How they heard about us' }
+        { key: 'interests', label: 'Visitor type', fmt: 'multiline' },
+        { key: 'source',    label: 'How they heard about us' },
+        { key: 'consent',   label: 'Marketing consent', fmt: 'boolean' }
       ]);
     }
     return common;
@@ -3408,6 +3482,14 @@
       followUpField = '<div class="field"><label>Follow-up date</label>' +
         '<input type="date" id="typed-drw-followup" value="' + escapeAttr(fud) + '"></div>';
     }
+    var sampleChecklist = '';
+    var notesValue = r.notes || '';
+    if (typeKey === 'showroom') {
+      sampleChecklist = '<div class="drawer-section"><h3>Samples Given</h3>' +
+        renderShowroomSampleChecklist(r.notes || '') +
+        '</div>';
+      notesValue = stripSampleNotesBlock(r.notes || '');
+    }
     return '' +
       '<div class="drawer-header">' +
         '<div><h2>' + escapeHtml(r.reference) + ' — ' + escapeHtml(r.name || '—') + '</h2>' +
@@ -3424,8 +3506,9 @@
         '</div>' +
         '<div class="drawer-section"><h3>Details</h3>' + rows + '</div>' +
         photos +
+        sampleChecklist +
         '<div class="drawer-section"><h3>Notes</h3>' +
-          '<textarea id="typed-drw-notes" rows="4" placeholder="Internal notes…">' + escapeHtml(r.notes || '') + '</textarea>' +
+          '<textarea id="typed-drw-notes" rows="4" placeholder="Internal notes…">' + escapeHtml(notesValue) + '</textarea>' +
         '</div>' +
       '</div>' +
       '<div class="drawer-footer">' +
@@ -3445,6 +3528,9 @@
           status: document.getElementById('typed-drw-status').value,
           notes:  document.getElementById('typed-drw-notes').value
         };
+        if (typeKey === 'showroom') {
+          payload.notes = buildShowroomNotesWithSamples(payload.notes);
+        }
         var fud = document.getElementById('typed-drw-followup');
         if (fud) payload.follow_up_date = fud.value || null;
         var res = await fetch(cfg.endpoint + '/' + r.id, {
