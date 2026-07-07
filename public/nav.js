@@ -15,7 +15,7 @@
   var logoSrc = prefix + 'logos/01 Brandmark/Inverse_white/Alpha Surfaces_Brandmark_Inverse.png';
 
   var FALLBACK_COLLECTIONS = [
-    { id: 'collection-01', label: 'Collection 01', stones: [{ name: 'Brilliance' }, { name: 'Crystal' }, { name: 'Jewel' }, { name: 'Graphite' }, { name: 'Bondi' }, { name: 'Fraser' }, { name: 'Oyster' }] },
+    { id: 'collection-01', label: 'Collection 01', stones: [{ name: 'Brilliance' }, { name: 'Crystal' }, { name: 'Jewel' }, { name: 'Graphite' }, { name: 'Bondi' }, { name: 'Fraser' }] },
     { id: 'collection-02', label: 'Collection 02', stones: [{ name: 'Arctic' }, { name: 'Pearl' }, { name: 'Ash' }, { name: 'Shell' }, { name: 'Carrara' }, { name: 'Oyster Grey' }, { name: 'Earthy Concrete' }] },
     { id: 'collection-03', label: 'Collection 03', stones: [{ name: 'Salt Stone' }, { name: 'Davinci Gris' }, { name: 'Davinci Oro' }, { name: 'Desert Dune' }], indoorOutdoor: [{ name: 'Broome' }, { name: 'Cabarita' }, { name: 'Torquay' }, { name: 'Whitehaven' }] },
     { id: 'collection-04', label: 'Collection 04', stones: [{ name: 'Opal Mist' }, { name: 'Calacatta Leggera' }, { name: 'Metallic Grey' }, { name: 'Statuario Gold' }, { name: 'Eternity' }, { name: 'White Cloud' }, { name: 'Glacier' }, { name: 'Arabescato' }] },
