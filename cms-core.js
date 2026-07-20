@@ -40,6 +40,23 @@ function countStones(data) {
   }, 0);
 }
 
+function isRemovedPublicStone(stone, collection) {
+  const stoneSlug = slugify((stone && (stone.slug || stone.name)) || '');
+  const collectionId = (collection && (collection.id || collection.collection_id)) || slugify(collection && collection.name);
+  return collectionId === 'collection-01' && stoneSlug === 'oyster';
+}
+
+function filterRemovedPublicStones(data) {
+  if (!data || !Array.isArray(data.collections)) return data;
+  return {
+    ...data,
+    collections: data.collections.map(collection => ({
+      ...collection,
+      stones: (collection.stones || []).filter(stone => !isRemovedPublicStone(stone, collection))
+    }))
+  };
+}
+
 function mergeStaticStoneFallback(managedData) {
   const staticData = readStaticStones();
   if (!staticData) return managedData;
@@ -377,7 +394,7 @@ async function getManagedStones(pool, includeHidden = false) {
   const data = {
     collections: colRes.rows.map(row => rowToCollection(row, stonesByCollection.get(row.collection_id) || []))
   };
-  return includeHidden ? data : mergeStaticStoneFallback(data);
+  return includeHidden ? data : filterRemovedPublicStones(mergeStaticStoneFallback(data));
 }
 
 function mountCms(app, { pool, authMiddleware, dataDir }) {

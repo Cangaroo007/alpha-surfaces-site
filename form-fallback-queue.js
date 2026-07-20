@@ -72,6 +72,11 @@ function enqueue(record) {
     formType: record.formType || existing?.formType || 'Unknown',
     fields: record.fields || existing?.fields || {},
     sampleItems: record.sampleItems || existing?.sampleItems || [],
+    pipedrive_synced: existing?.pipedrive_synced || false,
+    pipedrive_synced_at: existing?.pipedrive_synced_at || null,
+    pipedrive_result_id: existing?.pipedrive_result_id || null,
+    pipedrive_last_error: existing?.pipedrive_last_error || null,
+    pipedrive_last_attempt_at: existing?.pipedrive_last_attempt_at || null,
     meta: {
       ...(existing?.meta || {}),
       ...(record.meta || {})

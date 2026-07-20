@@ -199,6 +199,17 @@
   }
   .typed-toolbar input[type=search] { flex: 1; min-width: 220px; }
   .typed-toolbar input:focus, .typed-toolbar select:focus { border-color: var(--olive); }
+  .report-summary { display: grid; grid-template-columns: repeat(4, minmax(140px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .report-card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; }
+  .report-card .num { font-size: 30px; font-weight: 700; color: var(--olive); line-height: 1; }
+  .report-card .lbl { margin-top: 6px; font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .report-grid { display: grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 16px; }
+  .report-panel { background: var(--white); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .report-panel h3 { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--olive); }
+  .report-panel table { width: 100%; border-collapse: collapse; }
+  .report-panel td { padding: 9px 14px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+  .report-panel td:last-child { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+  @media (max-width: 900px) { .report-summary, .report-grid { grid-template-columns: 1fr; } }
 
   .status-pill { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
   .status-pill.s-new                { background: #dbe6fb; color: #1d4ed8; }
@@ -239,6 +250,10 @@
   .showroom-stats .ss-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; text-align: center; }
   .showroom-stats .ss-num { font-size: 28px; font-weight: 700; color: var(--olive); line-height: 1.1; }
   .showroom-stats .ss-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+  .sample-checklist { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+  .sample-checklist h4 { margin: 0 0 8px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--olive); }
+  .sample-checklist label { display: flex; gap: 7px; align-items: flex-start; padding: 4px 0; font-size: 13px; line-height: 1.35; cursor: pointer; }
+  .sample-checklist input { margin-top: 1px; }
   .wn-row { padding: 8px 12px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 200px 80px 120px; gap: 12px; align-items: center; }
   .wn-row:hover { background: var(--cream-light); cursor: pointer; }
 
@@ -748,6 +763,7 @@
             <button type="button" class="nav-dropdown-item" data-form-type="contacts"  role="menuitem">Contacts<span class="nav-dropdown-count" data-count="contacts">0</span></button>
             <button type="button" class="nav-dropdown-item" data-form-type="partners"  role="menuitem">Partners<span class="nav-dropdown-count" data-count="partners">0</span></button>
             <button type="button" class="nav-dropdown-item" data-form-type="showroom"  role="menuitem">Showroom<span class="nav-dropdown-count" data-count="showroom">0</span></button>
+            <button type="button" class="nav-dropdown-item" data-form-type="reports"   role="menuitem">Monthly Reports</button>
             <button type="button" class="nav-dropdown-item nav-dropdown-item--super" data-form-type="newsletter" role="menuitem" id="forms-newsletter-item">Newsletter</button>
           </div>
         </div>
@@ -2975,6 +2991,7 @@
     contacts:   { title: 'Contact Submissions', icon: '✉️', endpoint: '/api/projects/contacts',    statuses: ['new','read','responded','closed','archived'],          layout: 'table' },
     partners:   { title: 'Partner Enquiries',   icon: '🤝', endpoint: '/api/projects/partners',    statuses: ['new','read','meeting_scheduled','approved','declined','archived'], layout: 'table' },
     showroom:   { title: 'Showroom Walk-Ins',   icon: '🏬', endpoint: '/api/projects/showroom',    statuses: ['new','followed_up','converted','no_response','archived'],          layout: 'showroom' },
+    reports:    { title: 'Monthly Reports',     icon: '📊', endpoint: '/api/projects/forms-report', statuses: [], layout: 'report' },
     newsletter: { title: 'Newsletter Subscribers', icon: '📧', endpoint: '/api/projects/newsletter', statuses: ['active','unsubscribed','pending'],                  layout: 'newsletter' }
   };
   var STATUS_LABELS = {
@@ -2985,8 +3002,9 @@
     followed_up: 'Followed Up', converted: 'Converted', no_response: 'No Response',
     active: 'Active', unsubscribed: 'Unsubscribed', pending: 'Pending'
   };
-  var typedFormsState = { typeKey: null, q: '', status: '', from: '', to: '' };
+  var typedFormsState = { typeKey: null, q: '', status: '', from: '', to: '', reportMonth: currentLocalMonth() };
   var typedSearchDebounce = null;
+  var showroomSampleCollections = null;
 
   // Pull the type-key out of the legacy formsState namespace so existing
   // `formsState.typeKey = ...` writes from the dropdown still work.
@@ -2997,6 +3015,11 @@
 
   function statusPill(s) {
     return '<span class="status-pill s-' + escapeAttr(s) + '">' + escapeHtml(STATUS_LABELS[s] || s) + '</span>';
+  }
+
+  function currentLocalMonth() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
   }
 
   async function loadTypedForm(typeKey) {
@@ -3017,6 +3040,11 @@
       // before the data fetch resolves (so search/filter clicks always work).
       host.innerHTML = renderTypedToolbarShell(cfg) + '<div id="typed-body"><div class="empty">Loading…</div></div>';
       wireTypedToolbar(cfg);
+      if (cfg.layout === 'report') {
+        await loadMonthlyFormsReport(cfg);
+        refreshFormsCounts();
+        return;
+      }
 
       var params = new URLSearchParams();
       if (typedFormsState.status) params.set('status', typedFormsState.status);
@@ -3062,6 +3090,16 @@
   }
 
   function renderTypedToolbarShell(cfg) {
+    if (cfg.layout === 'report') {
+      return '<div class="typed-head">' +
+          '<h2>' + escapeHtml(cfg.icon + ' ' + cfg.title) + '</h2>' +
+          '<span class="meta">Loading…</span>' +
+        '</div>' +
+        '<div class="typed-toolbar">' +
+          '<input type="month" id="typed-report-month" value="' + escapeAttr(typedFormsState.reportMonth) + '" title="Report month">' +
+          '<button class="btn-export-forms" id="typed-export" type="button">↓ Export Report CSV</button>' +
+        '</div>';
+    }
     var statusOpts = '<option value="">All statuses</option>' +
       cfg.statuses.map(function (s) {
         var sel = typedFormsState.status === s ? ' selected' : '';
@@ -3083,6 +3121,19 @@
   }
 
   function wireTypedToolbar(cfg) {
+    if (cfg.layout === 'report') {
+      var m = document.getElementById('typed-report-month');
+      if (m) m.addEventListener('change', function (e) {
+        typedFormsState.reportMonth = e.target.value || currentLocalMonth();
+        loadTypedForm('reports');
+      });
+      var rptEx = document.getElementById('typed-export');
+      if (rptEx) rptEx.addEventListener('click', function () {
+        var params = new URLSearchParams({ month: typedFormsState.reportMonth || currentLocalMonth() });
+        window.location.href = cfg.endpoint + '/export?' + params;
+      });
+      return;
+    }
     var q = document.getElementById('typed-q');
     if (q) q.addEventListener('input', function (e) {
       clearTimeout(typedSearchDebounce);
@@ -3116,7 +3167,58 @@
     });
   }
 
-  // Per-type table column definitions. Warranty uses a card layout instead.
+  async function loadMonthlyFormsReport(cfg) {
+    var body = document.getElementById('typed-body');
+    var host = document.getElementById('forms-typed-host');
+    try {
+      var params = new URLSearchParams({ month: typedFormsState.reportMonth || currentLocalMonth() });
+      var res = await fetch(cfg.endpoint + '?' + params, { credentials: 'include' });
+      if (res.status === 401) { showLogin('Session expired — please sign in again.'); return; }
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Failed');
+      var report = data.report || {};
+      var countEl = host.querySelector('.typed-head .meta');
+      if (countEl) countEl.textContent = report.monthLabel || typedFormsState.reportMonth;
+      body.innerHTML = renderMonthlyFormsReport(report);
+    } catch (err) {
+      body.innerHTML = '<div class="empty">Failed to load report: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+	  function renderReportRows(rows) {
+	    if (!rows || !rows.length) {
+	      return '<tr><td colspan="2"><span class="muted">No data for this month.</span></td></tr>';
+	    }
+	    return rows.map(function (r) {
+	      return '<tr><td>' + escapeHtml(r.label || 'Unknown') + '</td><td>' + escapeHtml(r.count || 0) + '</td></tr>';
+	    }).join('');
+	  }
+
+	  function renderMonthlyFormsReport(report) {
+	    var totals = report.totals || {};
+	    var cards = [
+	      ['Sample requests', totals.sample_requests || 0],
+	      ['Showroom visitors', totals.showroom_visitors || 0],
+	      ['Website enquiries', totals.website_enquiries || 0],
+	      ['Warranty activations', totals.warranty_activations || 0]
+	    ].map(function (c) {
+	      return '<div class="report-card"><div class="num">' + escapeHtml(c[1]) + '</div><div class="lbl">' + escapeHtml(c[0]) + '</div></div>';
+	    }).join('');
+	    function panel(title, rows) {
+	      return '<section class="report-panel"><h3>' + escapeHtml(title) + '</h3>' +
+	        '<table><tbody>' + renderReportRows(rows) + '</tbody></table></section>';
+	    }
+	    return '<div class="report-summary">' + cards + '</div>' +
+	      '<div class="report-grid">' +
+	        panel('Sample requests by state', report.sampleByState) +
+	        panel('Sample requests by market type', report.sampleByMarketType) +
+	        panel('Sample requests by colour / surface', report.sampleByColour) +
+	        panel('Website enquiries by source form', report.enquiryBreakdown) +
+	      '</div>';
+	  }
+
+	  // Per-type table column definitions. Warranty uses a card layout instead.
   function typedTableColumns(typeKey) {
     if (typeKey === 'samples') {
       return [
@@ -3190,6 +3292,7 @@
     var v = r[col.key];
     if (col.fmt === 'status') return statusPill(v || 'new');
     if (col.fmt === 'date') return v ? escapeHtml(formatDate(v)) : '—';
+    if (col.fmt === 'datetime') return v ? escapeHtml(formatDate(v, true)) : '—';
     if (v == null || v === '') return '<span class="muted">—</span>';
     if (col.fmt === 'tel') return '<a href="tel:' + escapeAttr(v) + '" onclick="event.stopPropagation()">' + escapeHtml(v) + '</a>';
     if (col.fmt === 'mailto') return '<a href="mailto:' + escapeAttr(v) + '" onclick="event.stopPropagation()">' + escapeHtml(v) + '</a>';
@@ -3286,11 +3389,79 @@
       if (!res.ok) throw new Error('HTTP ' + res.status);
       var data = await res.json();
       if (!data.ok) throw new Error(data.error || 'Failed');
+      if (typeKey === 'showroom') await loadShowroomSampleCollections();
       drawer.innerHTML = renderTypedDrawer(typeKey, data.record);
       wireTypedDrawer(typeKey, data.record);
     } catch (err) {
       drawer.innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
     }
+  }
+
+  async function loadShowroomSampleCollections() {
+    if (showroomSampleCollections) return showroomSampleCollections;
+    try {
+      var res = await fetch('/data/stones.json', { credentials: 'same-origin' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      showroomSampleCollections = (data.collections || [])
+        .filter(function (c) { return /^Collection 0[1-5]$/.test(c.name || ''); })
+        .map(function (c) {
+          return {
+            name: c.name,
+            stones: (c.stones || []).filter(function (s) { return !s.discontinued; })
+          };
+        })
+        .filter(function (c) { return c.stones.length; });
+    } catch (_) {
+      showroomSampleCollections = [];
+    }
+    return showroomSampleCollections;
+  }
+
+  function stripSampleNotesBlock(notes) {
+    return String(notes || '').replace(/^Samples given:\n(?:- .+\n?)+\n?/m, '').trim();
+  }
+
+  function selectedSamplesFromNotes(notes) {
+    var out = new Set();
+    var m = String(notes || '').match(/^Samples given:\n((?:- .+\n?)+)/m);
+    if (!m) return out;
+    m[1].split('\n').forEach(function (line) {
+      var name = line.replace(/^-\s*/, '').replace(/\s+\(.+\)$/, '').trim();
+      if (name) out.add(name);
+    });
+    return out;
+  }
+
+  function renderShowroomSampleChecklist(notes) {
+    if (!showroomSampleCollections || !showroomSampleCollections.length) {
+      return '<div class="activity-empty">Sample list unavailable.</div>';
+    }
+    var selected = selectedSamplesFromNotes(notes);
+    return '<div class="sample-checklist">' + showroomSampleCollections.map(function (collection) {
+      var items = collection.stones.map(function (stone) {
+        var checked = selected.has(stone.name) ? ' checked' : '';
+        return '<label><input type="checkbox" class="showroom-sample-check" value="' +
+          escapeAttr(stone.name) + '" data-collection="' + escapeAttr(collection.name) + '"' + checked + '> ' +
+          '<span>' + escapeHtml(stone.name) + '</span></label>';
+      }).join('');
+      return '<div><h4>' + escapeHtml(collection.name) + '</h4>' + items + '</div>';
+    }).join('') + '</div>';
+  }
+
+  function buildShowroomNotesWithSamples(baseNotes) {
+    var picked = Array.from(document.querySelectorAll('.showroom-sample-check:checked')).map(function (el) {
+      return {
+        name: el.value,
+        collection: el.getAttribute('data-collection') || ''
+      };
+    });
+    var clean = String(baseNotes || '').trim();
+    if (!picked.length) return clean;
+    var block = 'Samples given:\n' + picked.map(function (s) {
+      return '- ' + s.name + (s.collection ? ' (' + s.collection + ')' : '');
+    }).join('\n');
+    return block + (clean ? '\n\n' + clean : '');
   }
 
   function typedDrawerFields(typeKey) {
@@ -3360,7 +3531,8 @@
     if (typeKey === 'showroom') {
       return common.concat([
         { key: 'interests', label: 'Interested in', fmt: 'multiline' },
-        { key: 'source',    label: 'How they heard about us' }
+        { key: 'source',    label: 'How they heard about us' },
+        { key: 'consent',   label: 'Marketing consent', fmt: 'boolean' }
       ]);
     }
     return common;
@@ -3408,6 +3580,14 @@
       followUpField = '<div class="field"><label>Follow-up date</label>' +
         '<input type="date" id="typed-drw-followup" value="' + escapeAttr(fud) + '"></div>';
     }
+    var sampleChecklist = '';
+    var notesValue = r.notes || '';
+    if (typeKey === 'showroom') {
+      sampleChecklist = '<div class="drawer-section"><h3>Samples Given</h3>' +
+        renderShowroomSampleChecklist(r.notes || '') +
+        '</div>';
+      notesValue = stripSampleNotesBlock(r.notes || '');
+    }
     return '' +
       '<div class="drawer-header">' +
         '<div><h2>' + escapeHtml(r.reference) + ' — ' + escapeHtml(r.name || '—') + '</h2>' +
@@ -3424,8 +3604,9 @@
         '</div>' +
         '<div class="drawer-section"><h3>Details</h3>' + rows + '</div>' +
         photos +
+        sampleChecklist +
         '<div class="drawer-section"><h3>Notes</h3>' +
-          '<textarea id="typed-drw-notes" rows="4" placeholder="Internal notes…">' + escapeHtml(r.notes || '') + '</textarea>' +
+          '<textarea id="typed-drw-notes" rows="4" placeholder="Internal notes…">' + escapeHtml(notesValue) + '</textarea>' +
         '</div>' +
       '</div>' +
       '<div class="drawer-footer">' +
@@ -3445,6 +3626,9 @@
           status: document.getElementById('typed-drw-status').value,
           notes:  document.getElementById('typed-drw-notes').value
         };
+        if (typeKey === 'showroom') {
+          payload.notes = buildShowroomNotesWithSamples(payload.notes);
+        }
         var fud = document.getElementById('typed-drw-followup');
         if (fud) payload.follow_up_date = fud.value || null;
         var res = await fetch(cfg.endpoint + '/' + r.id, {

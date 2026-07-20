@@ -2519,6 +2519,143 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
   // its table predates Track I (see db.js) and the schema diverges.
   Object.keys(FORM_TYPES).forEach(mountTypedFormRoutes);
 
+  function csvCell(v) {
+    if (v == null) return '';
+    const s = v instanceof Date ? v.toISOString() : String(v);
+    return (s.includes(',') || s.includes('"') || s.includes('\n'))
+      ? `"${s.replace(/"/g, '""')}"` : s;
+  }
+
+  function currentBrisbaneMonth() {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Australia/Brisbane',
+      year: 'numeric',
+      month: '2-digit'
+    }).formatToParts(new Date());
+    return `${parts.find(p => p.type === 'year').value}-${parts.find(p => p.type === 'month').value}`;
+  }
+
+  async function buildFormsMonthlyReport(month) {
+    const range = monthRange(month);
+    if (!range) {
+      const err = new Error('month must be YYYY-MM');
+      err.status = 400;
+      throw err;
+    }
+    const vals = [range.start, range.end];
+    const monthLabel = new Date(`${range.start}T00:00:00Z`).toLocaleString('en-AU', {
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC'
+    });
+    const [totalsQ, sampleStateQ, sampleMarketQ, sampleColourQ, enquiryBreakdownQ] = await Promise.all([
+      pool.query(`
+	        SELECT
+	          (SELECT COUNT(*)::int FROM sample_requests
+	            WHERE created_at >= $1::date AND created_at < $2::date) AS sample_requests,
+	          (SELECT COUNT(*)::int FROM showroom_checkins
+	            WHERE created_at >= $1::date AND created_at < $2::date) AS showroom_visitors,
+	          (SELECT COUNT(*)::int FROM warranty_activations
+	            WHERE created_at >= $1::date AND created_at < $2::date) AS warranty_activations,
+	          (
+	            (SELECT COUNT(*)::int FROM enquiries
+	              WHERE created_at >= $1::date AND created_at < $2::date)
+	            + (SELECT COUNT(*)::int FROM contact_submissions
+	              WHERE created_at >= $1::date AND created_at < $2::date)
+	            + (SELECT COUNT(*)::int FROM partner_enquiries
+	              WHERE created_at >= $1::date AND created_at < $2::date)
+	          ) AS website_enquiries
+      `, vals),
+      pool.query(`
+	        SELECT COALESCE(NULLIF(TRIM(state), ''), 'Unknown') AS label, COUNT(*)::int AS count
+	          FROM sample_requests
+	         WHERE created_at >= $1::date AND created_at < $2::date
+	         GROUP BY label
+	         ORDER BY count DESC, label ASC
+      `, vals),
+      pool.query(`
+	        SELECT COALESCE(NULLIF(TRIM(role), ''), 'Unknown') AS label, COUNT(*)::int AS count
+	          FROM sample_requests
+	         WHERE created_at >= $1::date AND created_at < $2::date
+	         GROUP BY label
+	         ORDER BY count DESC, label ASC
+      `, vals),
+      pool.query(`
+	        SELECT COALESCE(NULLIF(TRIM(x), ''), 'Unknown') AS label, COUNT(*)::int AS count
+	          FROM sample_requests sr
+	          CROSS JOIN LATERAL regexp_split_to_table(COALESCE(NULLIF(sr.stone_interest, ''), 'Unknown'), '\\s*,\\s*') AS x
+	         WHERE sr.created_at >= $1::date AND sr.created_at < $2::date
+	         GROUP BY label
+	         ORDER BY count DESC, label ASC
+      `, vals),
+      pool.query(`
+	        SELECT label, COUNT(*)::int AS count
+	          FROM (
+	            SELECT 'General enquiry' AS label FROM enquiries
+	             WHERE created_at >= $1::date AND created_at < $2::date
+	            UNION ALL
+	            SELECT 'Contact form' AS label FROM contact_submissions
+	             WHERE created_at >= $1::date AND created_at < $2::date
+	            UNION ALL
+	            SELECT 'Partner enquiry' AS label FROM partner_enquiries
+	             WHERE created_at >= $1::date AND created_at < $2::date
+	          ) x
+	         GROUP BY label
+	         ORDER BY count DESC, label ASC
+      `, vals)
+    ]);
+    return {
+      month,
+      monthLabel,
+      totals: totalsQ.rows[0] || {},
+      sampleByState: sampleStateQ.rows,
+      sampleByMarketType: sampleMarketQ.rows,
+      sampleByColour: sampleColourQ.rows,
+      enquiryBreakdown: enquiryBreakdownQ.rows
+    };
+  }
+
+  router.get('/forms-report', requireFormsAccess, async (req, res) => {
+    try {
+      const report = await buildFormsMonthlyReport(String(req.query.month || currentBrisbaneMonth()));
+      res.json({ ok: true, report });
+    } catch (err) {
+      res.status(err.status || 500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.get('/forms-report/export', requireFormsAccess, async (req, res) => {
+    try {
+      const report = await buildFormsMonthlyReport(String(req.query.month || currentBrisbaneMonth()));
+      const lines = [
+        ['Alpha Surfaces monthly forms report', report.monthLabel].map(csvCell).join(','),
+        '',
+        ['Metric', 'Count'].join(','),
+        ['Sample requests', report.totals.sample_requests || 0].map(csvCell).join(','),
+        ['Showroom visitors', report.totals.showroom_visitors || 0].map(csvCell).join(','),
+        ['Website enquiries', report.totals.website_enquiries || 0].map(csvCell).join(','),
+        ['Warranty activations', report.totals.warranty_activations || 0].map(csvCell).join(','),
+        '',
+        ['Sample requests by state', 'Count'].join(','),
+        ...report.sampleByState.map(r => [r.label, r.count].map(csvCell).join(',')),
+        '',
+        ['Sample requests by market type', 'Count'].join(','),
+        ...report.sampleByMarketType.map(r => [r.label, r.count].map(csvCell).join(',')),
+        '',
+        ['Sample requests by colour / surface', 'Count'].join(','),
+        ...report.sampleByColour.map(r => [r.label, r.count].map(csvCell).join(',')),
+        '',
+        ['Website enquiries by source form', 'Count'].join(','),
+        ...report.enquiryBreakdown.map(r => [r.label, r.count].map(csvCell).join(','))
+      ];
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="forms-report-${report.month}.csv"`);
+      res.send(lines.join('\n'));
+    } catch (err) {
+      res.status(err.status || 500).json({ ok: false, error: err.message });
+    }
+  });
+
   // Aggregated counts across all typed-form tables — powers the nav dropdown
   // badges on the Forms ▾ menu. One query per table, run in parallel.
   router.get('/forms-counts', requireFormsAccess, async (req, res) => {

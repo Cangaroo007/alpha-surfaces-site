@@ -1,8 +1,7 @@
-// Pipedrive integration. Website forms create LEADS (not Deals) tagged HOT
-// in the Leads Inbox; sales qualifies and converts manually. Walk-ins log
-// as 'meeting' activities; warranty activations attach as a note on the
-// person. Best-effort throughout — every call is wrapped so a Pipedrive
-// outage can't fail a public form submit.
+// Pipedrive integration. Public forms create LEADS (not Deals) tagged HOT plus
+// a form-specific label in the Leads Inbox; sales qualifies and converts
+// manually. Showroom check-ins also log a completed meeting activity. Best-
+// effort throughout — a Pipedrive outage can't fail a public form submit.
 
 const PD_BASE = 'https://api.pipedrive.com/v1';
 
@@ -28,6 +27,18 @@ const ROLE_TO_BUSINESS_CATEGORY = {
 };
 
 let PD_HOT_LABEL_ID = null;
+let PD_LEAD_LABELS_BY_NAME = new Map();
+let PD_LABELS_LOADED = false;
+
+const FORM_LEAD_LABELS = {
+  'Sample Request': { name: 'Sample Request', color: 'green' },
+  'Enquiry': { name: 'Website Enquiry', color: 'blue' },
+  'Contact Form': { name: 'Contact Form', color: 'purple' },
+  'Partner Enquiry': { name: 'Partner Enquiry', color: 'yellow' },
+  'Showroom Check-In': { name: 'Showroom Check-In', color: 'orange' },
+  'Warranty Activation': { name: 'Warranty Activation', color: 'red' },
+  'Newsletter': { name: 'Newsletter Signup', color: 'gray' },
+};
 
 function getToken() { return process.env.PIPEDRIVE_API_TOKEN; }
 
@@ -41,7 +52,12 @@ async function pdGet(endpoint, params = {}) {
   }
   try {
     const res = await fetch(url);
-    return await res.json();
+    const data = await res.json().catch(() => null);
+    if (!res.ok || data?.success === false) {
+      console.error('[pipedrive] GET', endpoint, 'failed:', res.status, JSON.stringify(data));
+      return null;
+    }
+    return data;
   } catch (err) {
     console.error('[pipedrive] GET', endpoint, 'failed:', err.message);
     return null;
@@ -57,7 +73,12 @@ async function pdPost(endpoint, body) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    return await res.json();
+    const data = await res.json().catch(() => null);
+    if (!res.ok || data?.success === false) {
+      console.error('[pipedrive] POST', endpoint, 'failed:', res.status, JSON.stringify(data), 'body:', JSON.stringify(body));
+      return null;
+    }
+    return data;
   } catch (err) {
     console.error('[pipedrive] POST', endpoint, 'failed:', err.message);
     return null;
@@ -73,7 +94,12 @@ async function pdPatch(endpoint, body) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    return await res.json();
+    const data = await res.json().catch(() => null);
+    if (!res.ok || data?.success === false) {
+      console.error('[pipedrive] PATCH', endpoint, 'failed:', res.status, JSON.stringify(data), 'body:', JSON.stringify(body));
+      return null;
+    }
+    return data;
   } catch (err) {
     console.error('[pipedrive] PATCH', endpoint, 'failed:', err.message);
     return null;
@@ -149,6 +175,54 @@ async function createLead({ title, personId, orgId, notes, labelIds }) {
   return result?.data || null;
 }
 
+function cacheLeadLabels(labels) {
+  PD_LEAD_LABELS_BY_NAME = new Map();
+  if (!Array.isArray(labels)) return;
+  labels.forEach(label => {
+    const name = String(label.name || '').toLowerCase();
+    if (name) PD_LEAD_LABELS_BY_NAME.set(name, label);
+  });
+  const hot = labels.find(l => String(l.name || '').toLowerCase() === 'hot');
+  if (hot) PD_HOT_LABEL_ID = hot.id;
+  PD_LABELS_LOADED = true;
+}
+
+async function loadLeadLabelsIfNeeded() {
+  if (PD_LABELS_LOADED) return;
+  const labels = await pdGet('leadLabels');
+  if (Array.isArray(labels?.data)) cacheLeadLabels(labels.data);
+}
+
+async function ensureLeadLabel(labelSpec) {
+  if (!labelSpec || !labelSpec.name) return null;
+  await loadLeadLabelsIfNeeded();
+  if (!PD_LABELS_LOADED) return null;
+  const key = String(labelSpec.name).toLowerCase();
+  const existing = PD_LEAD_LABELS_BY_NAME.get(key);
+  if (existing?.id) return existing.id;
+
+  const created = await pdPost('leadLabels', {
+    name: labelSpec.name,
+    color: labelSpec.color || 'gray'
+  });
+  const label = created?.data;
+  if (label?.id) {
+    PD_LEAD_LABELS_BY_NAME.set(key, label);
+    console.log(`[pipedrive] created lead label: ${labelSpec.name} (${label.id})`);
+    return label.id;
+  }
+  return null;
+}
+
+async function labelIdsForForm(formType, labelKey) {
+  await loadLeadLabelsIfNeeded();
+  const labels = [];
+  if (PD_HOT_LABEL_ID) labels.push(PD_HOT_LABEL_ID);
+  const formLabelId = await ensureLeadLabel(FORM_LEAD_LABELS[labelKey || formType]);
+  if (formLabelId && !labels.includes(formLabelId)) labels.push(formLabelId);
+  return labels.length ? labels : null;
+}
+
 // Cache the workspace's "hot" label UUID so we don't look it up on every
 // lead create. Safe to call on every boot — silent no-op without a token.
 async function initPipedriveLabels() {
@@ -156,8 +230,7 @@ async function initPipedriveLabels() {
   try {
     const labels = await pdGet('leadLabels');
     if (Array.isArray(labels?.data)) {
-      const hot = labels.data.find(l => String(l.name || '').toLowerCase() === 'hot');
-      if (hot) PD_HOT_LABEL_ID = hot.id;
+      cacheLeadLabels(labels.data);
       console.log(`[pipedrive] labels loaded, hot=${PD_HOT_LABEL_ID || 'NOT FOUND'}`);
     }
   } catch (err) {
@@ -170,9 +243,8 @@ function escape(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// Form-type → Pipedrive object mapping. Sample/Enquiry/Contact/Partner
-// produce HOT leads; Showroom check-ins log a completed meeting activity;
-// warranty activations attach as a person note (not a sales lead).
+// Form-type → Pipedrive object mapping. Every public form creates a lead with
+// HOT + form-specific labels. Showroom check-ins also log a completed meeting.
 async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
   if (!getToken()) return;
   const name = fields.name
@@ -211,10 +283,11 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
 
   switch (formType) {
     case 'Sample Request':
-      await createLead({
+      return await createLead({
         title: `Sample Request — ${name}${stoneInterest ? ' (' + stoneInterest + ')' : ''}`,
         personId: person.id,
         orgId,
+        labelIds: await labelIdsForForm(formType),
         notes:
           attribution +
           `<b>Sample Request ${escape(ref)}</b><br>` +
@@ -223,13 +296,13 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
           `Role: ${escape(role || '—')}<br>` +
           `Message: ${escape(fields.message || fields.special_instructions || '—')}`,
       });
-      break;
 
     case 'Enquiry':
-      await createLead({
+      return await createLead({
         title: `Enquiry — ${name}: ${fields.reason || 'General'}`,
         personId: person.id,
         orgId,
+        labelIds: await labelIdsForForm(formType),
         notes:
           attribution +
           `<b>Enquiry ${escape(ref)}</b><br>` +
@@ -237,17 +310,17 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
           `Message: ${escape(fields.message || '—')}<br>` +
           `Source: alphasurfaces.com.au/enquiry`,
       });
-      break;
 
     case 'Contact Enquiry': {
       // store_location → trade contact form (always partner). Otherwise a
       // populated company also signals partner; bare-email contact form
       // without a company is a general consumer contact.
       const isPartner = !!(fields.store_location || (fields.company && String(fields.company).trim()));
-      await createLead({
+      return await createLead({
         title: `${isPartner ? 'Partner' : 'Contact'} — ${name}${isPartner && fields.company ? ' (' + fields.company + ')' : ''}`,
         personId: person.id,
         orgId,
+        labelIds: await labelIdsForForm(formType, isPartner ? 'Partner Enquiry' : 'Contact Form'),
         notes:
           attribution +
           `<b>${isPartner ? 'Partner Enquiry' : 'Contact Form'} ${escape(ref)}</b><br>` +
@@ -255,12 +328,24 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
           `Message: ${escape(fields.message || '—')}<br>` +
           `Source: alphasurfaces.com.au/contact`,
       });
-      break;
     }
 
     case 'Showroom Check-In':
-      // Walk-ins aren't sales leads — log a completed meeting so the
-      // person record reflects the visit but we don't pollute the inbox.
+      // Walk-ins create a form-specific lead and a completed meeting so the
+      // visit appears in the Leads Inbox and on the person timeline.
+      const showroomLead = await createLead({
+        title: `Showroom Check-In — ${name}${stoneInterest ? ' (' + stoneInterest + ')' : ''}`,
+        personId: person.id,
+        orgId,
+        labelIds: await labelIdsForForm(formType),
+        notes:
+          `<b>Showroom Check-In ${escape(ref)}</b><br>` +
+          `Visitor type: ${escape(role || '—')}<br>` +
+          `Interests: ${escape(stoneInterest || fields.stone_interest || '—')}<br>` +
+          `Source: ${escape(fields.source || '—')}<br>` +
+          `Marketing consent: ${fields.consent ? 'Yes' : 'No'}<br>` +
+          `Notes: ${escape(fields.message || '—')}`,
+      });
       await pdPost('activities', {
         person_id: person.id,
         org_id: orgId || undefined,
@@ -268,29 +353,45 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
         subject: `Showroom visit — ${name}`,
         note:
           `Walk-in at Kunda Park showroom. ` +
+          `Visitor type: ${role || '—'}. ` +
           `Interests: ${stoneInterest || fields.stone_interest || '—'}. ` +
-          `Source: ${fields.source || '—'}. Notes: ${fields.message || '—'}`,
+          `Source: ${fields.source || '—'}. ` +
+          `Marketing consent: ${fields.consent ? 'Yes' : 'No'}. ` +
+          `Notes: ${fields.message || '—'}`,
         done: 1,
         due_date: new Date().toISOString().split('T')[0],
       });
       console.log(`[pipedrive] logged showroom activity for ${name}`);
-      break;
+      return showroomLead;
 
     case 'Warranty Activation':
-      await pdPost('notes', {
-        person_id: person.id,
-        content:
+      return await createLead({
+        title: `Warranty Activation — ${name}${fields.stone_interest || fields.stone_name ? ' (' + (fields.stone_interest || fields.stone_name) + ')' : ''}`,
+        personId: person.id,
+        orgId,
+        labelIds: await labelIdsForForm(formType),
+        notes:
           `<b>Warranty Activation ${escape(ref)}</b><br>` +
           `Stone: ${escape(fields.stone_interest || fields.stone_name || '—')}<br>` +
           `Fabricator: ${escape(fields.fabricator || '—')}<br>` +
           `Purchase date: ${escape(fields.purchase_date || '—')}<br>` +
           `Source: alphasurfaces.com.au/warranty`,
       });
-      break;
+
+    case 'Newsletter':
+      return await createLead({
+        title: `Newsletter Signup — ${name || fields.email}`,
+        personId: person.id,
+        orgId,
+        labelIds: await labelIdsForForm(formType),
+        notes:
+          `<b>Newsletter Signup ${escape(ref)}</b><br>` +
+          `Email: ${escape(fields.email || '—')}<br>` +
+          `Source: ${escape(fields.source || fields.sourceUrl || 'alphasurfaces.com.au')}`,
+      });
 
     default:
-      // Unknown form types — silently skip.
-      break;
+      return null;
   }
 }
 

@@ -328,6 +328,10 @@ app.get(['/forms/reset', '/forms/reset.html'], (req, res) => {
   res.redirect(302, '/projects');
 });
 
+app.get(['/surfaces/oyster', '/surfaces/oyster.html'], (req, res) => {
+  res.redirect(301, '/collections#collection-01');
+});
+
 // Intercept GET requests that resolve to a public/*.html file so the footer
 // partial gets injected. Runs before express.static. Path traversal is
 // blocked by ensuring the resolved path stays inside PUBLIC_DIR.
@@ -528,6 +532,28 @@ function queueFallbackSubmission(req, kind, formType, fields, sampleItems, err) 
   return { queued, reference };
 }
 
+function syncQueuedSubmissionToPipedrive(queued, formType, fields, sampleItems, reference) {
+  if (!process.env.PIPEDRIVE_API_TOKEN || queued.pipedrive_synced) return Promise.resolve(null);
+  return pipedrive.syncFormToPipedrive(formType, fields || {}, sampleItems || [], {
+    id: queued.id,
+    reference
+  }).then(result => {
+    if (!result) return;
+    formFallbackQueue.update(queued.id, {
+      pipedrive_synced: true,
+      pipedrive_synced_at: new Date().toISOString(),
+      pipedrive_result_id: result.id || null
+    });
+    console.log(`[pipedrive] fallback synced ${formType} ${reference}`);
+  }).catch(syncErr => {
+    formFallbackQueue.update(queued.id, {
+      pipedrive_last_error: syncErr.message || String(syncErr),
+      pipedrive_last_attempt_at: new Date().toISOString()
+    });
+    console.error(`[pipedrive] fallback sync error for ${formType} ${reference}:`, syncErr.message);
+  });
+}
+
 function queueFallbackFormResponse(req, res, formType, fields, sampleItems, err) {
   try {
     const { queued, reference } = queueFallbackSubmission(req, 'form', formType, fields, sampleItems, err);
@@ -537,6 +563,7 @@ function queueFallbackFormResponse(req, res, formType, fields, sampleItems, err)
       `Fallback queue reference: ${reference}. Database save will replay automatically.`
     ].filter(Boolean).join('\n\n');
     notifySubmissionSafely(submission, `${formType} fallback`);
+    syncQueuedSubmissionToPipedrive(queued, formType, fields, sampleItems, reference);
     console.warn(`[form-fallback] queued ${formType} as ${reference}:`, err.message);
     return res.status(202).json({ ok: true, queued: true, id: queued.id, reference });
   } catch (fallbackErr) {
@@ -686,19 +713,26 @@ async function handleShowroomCheckin(req, res) {
   let fields = null;
   try {
     const f = req.body || {};
-    const name  = String(f.name  || '').trim();
+    const name = String(f.name || '').trim();
     const phone = String(f.phone || '').trim();
-    if (!name)  return res.status(400).json({ ok: false, error: 'Name is required.' });
+    if (!name) return res.status(400).json({ ok: false, error: 'Name is required.' });
     if (!phone) return res.status(400).json({ ok: false, error: 'Phone is required.' });
+    const role = String(f.i_am_a || f.role || '').trim();
+    const interests = Array.isArray(f.interests)
+      ? f.interests.map(v => String(v || '').trim()).filter(Boolean)
+      : String(f.interests || f.stone_interest || '').split(',').map(v => v.trim()).filter(Boolean);
     fields = {
       _client_submission_id: f._client_submission_id || f.client_submission_id || f.submission_uuid || null,
       name,
       phone,
       email: f.email ? String(f.email).trim() : null,
-      stone_interest: f.stone_interest || null,
+      role: role || null,
+      i_am_a: role || null,
+      interests,
+      stone_interest: interests.length ? interests.join(', ') : null,
       source: f.source || null,
       message: f.message || f.notes || null,
-      consent: true
+      consent: !!f.consent
     };
     const typed = await persistShowroomCheckin(fields);
 
@@ -739,6 +773,15 @@ app.post('/api/subscribe', async (req, res) => {
     notifySubscribe(email, row.id, row.consent_timestamp_utc).catch(err =>
       console.error('[notify] Subscribe error:', err.message)
     );
+    if (process.env.PIPEDRIVE_API_TOKEN) {
+      pipedrive.syncFormToPipedrive('Newsletter', {
+        email,
+        name: email,
+        source: meta.sourceUrl,
+        consent: true
+      }, [], { id: row.id, reference: `NL-${row.id}` })
+        .catch(err => console.error('[pipedrive] newsletter sync error:', err.message));
+    }
     return res.json({ ok: true });
   } catch (err) {
     if (err.message === 'SUPPRESSED') return res.json({ ok: true });
@@ -754,6 +797,7 @@ app.post('/api/subscribe', async (req, res) => {
       const submission = buildNotificationSubmission('Newsletter', fields, [], queued.id, reference, 'queued');
       submission.message = `Fallback queue reference: ${reference}. Subscriber will be saved when the database is available.`;
       notifySubmissionSafely(submission, 'Newsletter fallback');
+      syncQueuedSubmissionToPipedrive(queued, 'Newsletter', fields, [], reference);
       console.warn(`[form-fallback] queued Newsletter as ${reference}:`, err.message);
       return res.status(202).json({ ok: true, queued: true, id: queued.id, reference });
     } catch (fallbackErr) {
@@ -2516,10 +2560,6 @@ app.get('/enquiry', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'enquiry.html'));
 });
 
-app.get('/expo-samples', (req, res) => {
-  sendHtml(res, path.join(__dirname, 'public', 'expo-samples.html'));
-});
-
 app.get('/brochure', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'brochure.html'));
 });
@@ -2714,6 +2754,11 @@ async function replayFallbackQueue(limit = 25) {
             notifySubscribe(item.fields.email, row.id, row.consent_timestamp_utc).catch(err =>
               console.error('[notify] replayed Subscribe error:', err.message)
             );
+            syncQueuedSubmissionToPipedrive(item, 'Newsletter', {
+              ...(item.fields || {}),
+              name: item.fields?.name || item.fields?.email,
+              source: item.fields?.source || item.meta?.referer || null
+            }, [], `NL-${row.id}`);
             formFallbackQueue.markReplayed(item.id, row.id, null);
           } catch (err) {
             if (err.message === 'SUPPRESSED') {
@@ -2723,14 +2768,17 @@ async function replayFallbackQueue(limit = 25) {
             }
           }
         } else if (item.formType === 'Showroom Check-In') {
-          const typed = await persistShowroomCheckin(item.fields || {}, { notify: false });
+          const typed = await persistShowroomCheckin(item.fields || {}, {
+            notify: false,
+            syncPipedrive: !item.pipedrive_synced
+          });
           formFallbackQueue.markReplayed(item.id, typed.id, typed.reference);
         } else {
           const result = await persistPublicFormSubmission(
             item.formType,
             item.fields || {},
             item.sampleItems || [],
-            { notify: false }
+            { notify: false, syncPipedrive: !item.pipedrive_synced }
           );
           formFallbackQueue.markReplayed(item.id, result.id, result.reference);
         }
