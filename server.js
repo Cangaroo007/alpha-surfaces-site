@@ -225,7 +225,7 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: [
         "'self'", "'unsafe-inline'", "'unsafe-eval'",
-        "https://cdn.jsdelivr.net", "https://online.flippingbook.com",
+        "https://cdn.jsdelivr.net", "https://online.flippingbook.com", "https://d33i2vgywgme2s.cloudfront.net",
         "https://www.googletagmanager.com", "https://www.google-analytics.com",
         "https://www.clarity.ms", "https://*.clarity.ms"
       ],

@@ -39,17 +39,21 @@ img { display: block; max-width: 100%; }
   align-items: center;
   justify-content: center;
   padding: 16px;
-  min-height: calc(100vh - 75px - 220px); /* nav 75 + desktop footer ~220 */
+  min-height: calc(100vh - 75px);
 }
 .brochure-frame .fbo-embed {
   display: block;
   width: 100%;
-  max-width: 1400px;
+  max-width: min(1600px, calc((100vh - 95px) * 1.5));
+  margin: 0 auto;
 }
 @media (max-width: 900px) {
   .brochure-frame {
-    min-height: calc(100vh - 75px - 50px); /* nav 75 + compact footer ~50 */
+    min-height: auto;
     padding: 8px;
+  }
+  .brochure-frame .fbo-embed {
+    max-width: 100%;
   }
 }
 
@@ -101,12 +105,16 @@ img { display: block; max-width: 100%; }
 <nav class="nav" id="main-nav"></nav>
 
 <main class="brochure-frame">
-  <iframe src="https://online.flippingbook.com/view/134563990/" width="100%" style="border:none; min-height:calc(100vh - 200px);" allowfullscreen></iframe>
+  <a href="https://online.flippingbook.com/view/499416455/" class="fbo-embed"
+     data-fbo-id="558f4db6bd" data-fbo-ratio="3:2" data-fbo-lightbox="no"
+     data-fbo-width="100%" data-fbo-height="auto" data-fbo-version="1"
+     style="max-width: 100%">AS-Brochure-Web-180626-Hyperlinks</a>
+  <script async defer src="https://online.flippingbook.com/EmbedScriptUrl.aspx?m=redir&hid=499416455"></script>
 </main>
 
 <!-- FOOTER -->
 
-<script src="nav.js?v=22"></script>
+<script src="nav.js?v=21"></script>
 <script src="/newsletter-form.js"></script>
 </body>
 </html>

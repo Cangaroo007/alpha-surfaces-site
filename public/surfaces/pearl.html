@@ -78,7 +78,7 @@ img { display: block; max-width: 100%; }
 /* --- STONE GRID --- */
 .stones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 54px 54px; }
 .stone-card { text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; }
-.stone-card-image { position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #1a1a0a; }
+.stone-card-image { position: relative; width: 100%; aspect-ratio: 7/5; overflow: hidden; background: #1a1a0a; }
 .stone-card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
 .stone-card:hover .stone-card-image img { transform: scale(1.04); }
 .stone-card-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Concrette S', serif; font-size: 18px; color: rgba(255,255,255,0.25); font-style: italic; }
@@ -258,7 +258,7 @@ img { display: block; max-width: 100%; }
       if (galleryImages.length > 0) {
         fullSwatch.innerHTML = '<img src="' + galleryImages[0] + '" alt="' + stone.name + ' lifestyle">';
       } else if (hasImage) {
-        fullSwatch.innerHTML = '<img src="' + stone.image + '" alt="' + stone.name + ' surface">';
+        fullSwatch.innerHTML = '<img src="' + (stone.slab || stone.image) + '" alt="' + stone.name + ' surface" loading="lazy">';
       } else {
         fullSwatch.innerHTML = '<div class="full-swatch-placeholder">' + stone.name + '</div>';
       }
