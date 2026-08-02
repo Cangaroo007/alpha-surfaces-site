@@ -11,7 +11,15 @@ function normalizeClientSubmissionId(fields = {}) {
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  ssl: (function () {
+    // Managed Postgres (Railway) requires SSL. A local Postgres usually does
+    // not offer it and refuses the connection outright. Enable SSL only for an
+    // explicitly remote host, so `node server.js` works locally with no setup.
+    var url = process.env.DATABASE_URL || '';
+    if (!url) return false;                       // unset -> local socket
+    if (/localhost|127\.0\.0\.1|::1/.test(url)) return false;
+    return { rejectUnauthorized: false };
+  })(),
   connectionTimeoutMillis: Number(process.env.PG_CONNECTION_TIMEOUT_MS || 5000),
   query_timeout: Number(process.env.PG_QUERY_TIMEOUT_MS || 15000),
   statement_timeout: Number(process.env.PG_STATEMENT_TIMEOUT_MS || 15000)
