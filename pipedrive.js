@@ -11,6 +11,17 @@ const PD_BASE = 'https://api.pipedrive.com/v1';
 // already carries rather than overwritten — see mergeSetField().
 const FIELD_BUSINESS_CATEGORY = 'da25035c39ec621856e3252165feaf9141423b88';
 const FIELD_PRODUCT_CATEGORY  = '6c3a7edb24cde1d21864dcb96693e76fc7bcd116';
+// Single-select. Added so submissions can be broken down by state — Pipedrive
+// has no native address field on a person, so the state given on the form was
+// previously dropped on the floor.
+const FIELD_STATE = 'b53442866baff353ea710225b82f3519ece695cd';
+const STATE_OPTION = {
+  QLD: 233, NSW: 234, VIC: 235, SA: 236,
+  WA: 237, TAS: 238, NT: 239, ACT: 240,
+};
+function stateOptionId(state) {
+  return STATE_OPTION[String(state || '').trim().toUpperCase()] || null;
+}
 
 // Product Category option ids, as configured in the workspace.
 const PRODUCT_CATEGORY = { engineered_stone: 187, porcelain_tiles: 188 };
@@ -139,9 +150,10 @@ async function pdPatch(endpoint, body) {
 
 // Email-first dedup: same email → same person. Falls back to creating a
 // new person, optionally attaching to a matching/created organization.
-async function findOrCreatePerson({ name, email, phone, company, role, interestedIn }) {
+async function findOrCreatePerson({ name, email, phone, company, role, interestedIn, state }) {
   const bcId = businessCategoryIdFor(role);
   const pcIds = productCategoryIdsFor(interestedIn);
+  const stateId = stateOptionId(state);
   if (email) {
     const search = await pdGet('persons/search', { term: email, fields: 'email', limit: 1 });
     const item = search?.data?.items?.[0]?.item;
@@ -150,7 +162,7 @@ async function findOrCreatePerson({ name, email, phone, company, role, intereste
       // Existing people used to be returned untouched, so a repeat visitor
       // never picked up a category. Enrich in place, merging rather than
       // overwriting. Best-effort — a failure here must not block the form.
-      await enrichPerson(item.id, bcId, pcIds).catch(err =>
+      await enrichPerson(item.id, bcId, pcIds, stateId).catch(err =>
         console.error('[pipedrive] person enrich failed:', err.message));
       return item;
     }
@@ -175,6 +187,7 @@ async function findOrCreatePerson({ name, email, phone, company, role, intereste
 
   if (bcId) personData[FIELD_BUSINESS_CATEGORY] = String(bcId);
   if (pcIds.length) personData[FIELD_PRODUCT_CATEGORY] = pcIds.join(',');
+  if (stateId) personData[FIELD_STATE] = stateId;
 
   const result = await pdPost('persons', personData);
   if (result?.data?.id) {
@@ -189,8 +202,8 @@ async function findOrCreatePerson({ name, email, phone, company, role, intereste
 // the current values first so multi-select entries aren't flattened — one
 // contact in the workspace already carries "191,195" (Cabinet Maker + Tile
 // Outlet) and a bare assignment would drop one of them.
-async function enrichPerson(personId, bcId, pcIds) {
-  if (!personId || (!bcId && !(pcIds && pcIds.length))) return;
+async function enrichPerson(personId, bcId, pcIds, stateId) {
+  if (!personId || (!bcId && !(pcIds && pcIds.length) && !stateId)) return;
   const current = await pdGet(`persons/${personId}`);
   const p = current?.data;
   if (!p) return;
@@ -203,6 +216,9 @@ async function enrichPerson(personId, bcId, pcIds) {
     const merged = mergeSetField(p[FIELD_PRODUCT_CATEGORY], pcIds);
     if (merged) patch[FIELD_PRODUCT_CATEGORY] = merged;
   }
+  // State is single-select: fill it when blank, never overwrite an answer
+  // someone has already given.
+  if (stateId && !p[FIELD_STATE]) patch[FIELD_STATE] = stateId;
   if (!Object.keys(patch).length) return;
   await pdPatch(`persons/${personId}`, patch);
   console.log(`[pipedrive] enriched person ${personId}:`, Object.keys(patch).join(', '));
@@ -278,6 +294,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
     company: fields.company || fields.store_location,
     role,
     interestedIn,
+    state: fields.state,
   });
   if (!person?.id) return;
 
@@ -314,6 +331,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
           `Stones: ${escape(stoneInterest || 'Not specified')}<br>` +
           `Source: alphasurfaces.com.au/order-sample<br>` +
           `Role: ${escape(role || '—')}<br>` +
+          `State: ${escape(fields.state || '—')}<br>` +
           `Message: ${escape(fields.message || fields.special_instructions || '—')}`,
       });
       break;
