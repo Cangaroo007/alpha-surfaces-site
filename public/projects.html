@@ -3169,7 +3169,9 @@
         { key: 'created_at',    label: 'Date / Time', fmt: 'datetime' },
         { key: 'name',          label: 'Name' },
         { key: 'phone',         label: 'Phone',    fmt: 'tel' },
-        { key: 'interests',     label: 'Interests', truncate: 40 },
+        { key: 'interests',     label: 'Interested in' },
+        { key: 'visitor_type',  label: 'Visitor type', truncate: 22 },
+        { key: 'state',         label: 'State' },
         { key: 'source',        label: 'Source' },
         { key: 'status',        label: 'Status',   fmt: 'status' }
       ];
@@ -3432,9 +3434,11 @@
     }
     if (typeKey === 'showroom') {
       return common.concat([
-        { key: 'interests', label: 'Visitor type', fmt: 'multiline' },
-        { key: 'source',    label: 'How they heard about us' },
-        { key: 'consent',   label: 'Marketing consent', fmt: 'boolean' }
+        { key: 'interests',    label: 'Interested in' },
+        { key: 'visitor_type', label: 'Visitor type' },
+        { key: 'state',        label: 'State' },
+        { key: 'source',       label: 'How they heard about us' },
+        { key: 'consent',      label: 'Marketing consent', fmt: 'boolean' }
       ]);
     }
     return common;

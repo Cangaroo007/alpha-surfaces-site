@@ -287,6 +287,30 @@
       </div>
 
       <div class="field">
+        <label for="interested_in">Interested in</label>
+        <select id="interested_in" name="interested_in" required>
+          <option value="">Select one</option>
+          <option>Engineered Stone</option>
+          <option>Tiles</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="state">State <span class="opt">optional</span></label>
+        <select id="state" name="state">
+          <option value="">Select one</option>
+          <option>QLD</option>
+          <option>NSW</option>
+          <option>VIC</option>
+          <option>SA</option>
+          <option>WA</option>
+          <option>TAS</option>
+          <option>NT</option>
+          <option>ACT</option>
+        </select>
+      </div>
+
+      <div class="field">
         <label for="source">How did you hear about us?</label>
         <select id="source" name="source">
           <option value="">Select one</option>
@@ -382,6 +406,8 @@
         var phone = (document.getElementById('phone').value || '').trim();
         var email = (document.getElementById('email').value || '').trim();
         var role  = (document.getElementById('role').value  || '').trim();
+        var interestedIn = (document.getElementById('interested_in').value || '').trim();
+        var state  = (document.getElementById('state').value  || '').trim();
         var source = (document.getElementById('source').value || '').trim();
         if (!name)  return showError('Please enter a name.');
         if (!phone) return showError('Please enter a phone number.');
@@ -389,6 +415,7 @@
           return showError('That email doesn’t look right.');
         }
         if (!role) return showError('Please select one option for "I am a".');
+        if (!interestedIn) return showError('Please select what they are interested in.');
         if (!source) return showError('Please select how you heard about us.');
         var payload = {
           _client_submission_id: makeSubmissionId(),
@@ -398,7 +425,9 @@
           email: email,
           role: role,
           i_am_a: role,
-          stone_interest: 'I am a: ' + role,
+          interested_in: interestedIn,
+          state: state || undefined,
+          stone_interest: interestedIn,
           source: source || undefined,
           message: (document.getElementById('message').value || '').trim() || undefined,
           consent: hasMarketingConsent()

@@ -702,7 +702,13 @@ async function handleShowroomCheckin(req, res) {
       email: f.email ? String(f.email).trim() : null,
       role: role || null,
       i_am_a: role || null,
-      stone_interest: f.stone_interest || (role ? `I am a: ${role}` : null),
+      // `interested_in` is the product category the visitor came in for
+      // (Engineered Stone / Porcelain Tiles) — it maps straight onto the
+      // Pipedrive Product Category field. Distinct from `i_am_a`, which is
+      // who they are; the two used to be conflated in one column.
+      interested_in: f.interested_in ? String(f.interested_in).trim() : null,
+      state: f.state ? String(f.state).trim().toUpperCase() : null,
+      stone_interest: f.interested_in ? String(f.interested_in).trim() : (f.stone_interest || null),
       source: f.source || null,
       message: f.message || f.notes || null,
       consent: !!f.consent

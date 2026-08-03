@@ -6,25 +6,82 @@
 
 const PD_BASE = 'https://api.pipedrive.com/v1';
 
-// Pipedrive person custom-field keys (provided by the workspace).
-// Business Category is mapped from form `i_am_a` / `role` strings.
+// Pipedrive person custom-field keys (provided by the workspace). Both are
+// multi-select ('set') fields, so values are merged with whatever the person
+// already carries rather than overwritten — see mergeSetField().
 const FIELD_BUSINESS_CATEGORY = 'da25035c39ec621856e3252165feaf9141423b88';
-// Product Category is left for future enrichment (Alpha Surfaces=187,
-// Porcelain Tiles=188); we don't set it from forms today.
-// const FIELD_PRODUCT_CATEGORY  = '6c3a7edb24cde1d21864dcb96693e76fc7bcd116';
+const FIELD_PRODUCT_CATEGORY  = '6c3a7edb24cde1d21864dcb96693e76fc7bcd116';
 
-const ROLE_TO_BUSINESS_CATEGORY = {
-  homeowner: null,
-  builder: 194,
-  developer: 194,
-  architect: 190,
-  designer: 192,
-  fabricator: 189,
-  stonemason: 189,
-  retailer: 195,
-  stockist: 195,
-  pool: 193,
-  cabinet: 191,
+// Product Category option ids, as configured in the workspace.
+const PRODUCT_CATEGORY = { engineered_stone: 187, porcelain_tiles: 188 };
+
+// Free-text role/interest → Product Category option id.
+function productCategoryIdsFor(text) {
+  const t = String(text || '').toLowerCase();
+  const ids = [];
+  if (/engineered|alpha|stone|benchtop/.test(t)) ids.push(PRODUCT_CATEGORY.engineered_stone);
+  if (/tile|porcelain/.test(t))                  ids.push(PRODUCT_CATEGORY.porcelain_tiles);
+  return ids;
+}
+
+// Business Category option ids (workspace): 189 Stonemason, 190 Architect,
+// 191 Cabinet Maker, 192 Designer, 193 Pool Builder, 194 Builder/Developer,
+// 195 Tile Outlet.
+//
+// ORDER MATTERS — first match wins, so more specific patterns come first.
+// 'cabinet' precedes 'builder' so "Cabinetmaker / Builder" lands on Cabinet
+// Maker. 'architect' precedes 'designer', which keeps "Designer / Architect"
+// resolving to Architect exactly as it always has; flip those two lines if
+// Belinda would rather that combined option read as Designer.
+const ROLE_TO_BUSINESS_CATEGORY = [
+  ['homeowner',  null],
+  ['stonemason', 189],
+  ['fabricator', 189],
+  ['cabinet',    191],
+  ['kitchen',    191],
+  ['tiler',      195],
+  ['tile',       195],
+  ['retailer',   195],
+  ['stockist',   195],
+  ['architect',  190],
+  ['designer',   192],
+  ['pool',       193],
+  ['builder',    194],
+  ['developer',  194],
+];
+
+function businessCategoryIdFor(role) {
+  const r = String(role || '').toLowerCase();
+  for (const [key, val] of ROLE_TO_BUSINESS_CATEGORY) {
+    if (val && r.includes(key)) return val;
+  }
+  return null;
+}
+
+// Both custom fields are multi-select. Pipedrive returns them as a
+// comma-separated string of option ids; assigning a bare id would wipe any
+// other value the person already carries. Merge instead, and return null
+// when there is nothing new to add so the caller can skip the write.
+function mergeSetField(existing, addIds) {
+  const have = String(existing || '')
+    .split(',').map(s => s.trim()).filter(Boolean);
+  const merged = have.slice();
+  for (const id of addIds || []) {
+    if (id && !merged.includes(String(id))) merged.push(String(id));
+  }
+  if (merged.length === have.length) return null;
+  return merged.join(',');
+}
+
+// Custom activity type created in the workspace for iPad walk-ins. Counting
+// them relies on this key — generic 'meeting' is indistinguishable from every
+// other rep meeting in the account.
+const SHOWROOM_ACTIVITY_TYPE = process.env.PIPEDRIVE_SHOWROOM_ACTIVITY_TYPE || 'showroom_visit';
+
+// Forms whose product line is implied by the form itself.
+const PRODUCT_INTEREST_BY_FORM = {
+  'Sample Request':      'engineered stone',
+  'Warranty Activation': 'engineered stone',
 };
 
 let PD_HOT_LABEL_ID = null;
@@ -82,12 +139,19 @@ async function pdPatch(endpoint, body) {
 
 // Email-first dedup: same email → same person. Falls back to creating a
 // new person, optionally attaching to a matching/created organization.
-async function findOrCreatePerson({ name, email, phone, company, role }) {
+async function findOrCreatePerson({ name, email, phone, company, role, interestedIn }) {
+  const bcId = businessCategoryIdFor(role);
+  const pcIds = productCategoryIdsFor(interestedIn);
   if (email) {
     const search = await pdGet('persons/search', { term: email, fields: 'email', limit: 1 });
     const item = search?.data?.items?.[0]?.item;
     if (item?.id) {
       console.log(`[pipedrive] found existing person: ${item.name} (ID: ${item.id})`);
+      // Existing people used to be returned untouched, so a repeat visitor
+      // never picked up a category. Enrich in place, merging rather than
+      // overwriting. Best-effort — a failure here must not block the form.
+      await enrichPerson(item.id, bcId, pcIds).catch(err =>
+        console.error('[pipedrive] person enrich failed:', err.message));
       return item;
     }
   }
@@ -109,13 +173,8 @@ async function findOrCreatePerson({ name, email, phone, company, role }) {
     if (orgId) personData.org_id = orgId;
   }
 
-  const r = String(role || '').toLowerCase();
-  for (const [key, val] of Object.entries(ROLE_TO_BUSINESS_CATEGORY)) {
-    if (val && r.includes(key)) {
-      personData[FIELD_BUSINESS_CATEGORY] = val;
-      break;
-    }
-  }
+  if (bcId) personData[FIELD_BUSINESS_CATEGORY] = String(bcId);
+  if (pcIds.length) personData[FIELD_PRODUCT_CATEGORY] = pcIds.join(',');
 
   const result = await pdPost('persons', personData);
   if (result?.data?.id) {
@@ -124,6 +183,29 @@ async function findOrCreatePerson({ name, email, phone, company, role }) {
     console.warn('[pipedrive] person create returned no id for', email || name);
   }
   return result?.data || null;
+}
+
+// Merge Business/Product Category onto a person that already exists. Reads
+// the current values first so multi-select entries aren't flattened — one
+// contact in the workspace already carries "191,195" (Cabinet Maker + Tile
+// Outlet) and a bare assignment would drop one of them.
+async function enrichPerson(personId, bcId, pcIds) {
+  if (!personId || (!bcId && !(pcIds && pcIds.length))) return;
+  const current = await pdGet(`persons/${personId}`);
+  const p = current?.data;
+  if (!p) return;
+  const patch = {};
+  if (bcId) {
+    const merged = mergeSetField(p[FIELD_BUSINESS_CATEGORY], [bcId]);
+    if (merged) patch[FIELD_BUSINESS_CATEGORY] = merged;
+  }
+  if (pcIds && pcIds.length) {
+    const merged = mergeSetField(p[FIELD_PRODUCT_CATEGORY], pcIds);
+    if (merged) patch[FIELD_PRODUCT_CATEGORY] = merged;
+  }
+  if (!Object.keys(patch).length) return;
+  await pdPatch(`persons/${personId}`, patch);
+  console.log(`[pipedrive] enriched person ${personId}:`, Object.keys(patch).join(', '));
 }
 
 // Creates a LEAD (Leads Inbox), not a Deal. Always tags HOT — every web
@@ -179,12 +261,23 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
     || `${fields.first_name || ''} ${fields.last_name || ''}`.trim()
     || 'Unknown';
   const role = fields.i_am_a || fields.role || fields.type || '';
+  // Product interest → Pipedrive Product Category. The showroom iPad sends an
+  // explicit `interested_in` (Engineered Stone / Tiles). Sample requests and
+  // warranty activations are Alpha stone by definition, so they're mapped by
+  // form type rather than by parsing stone names — "Opal Mist" contains no
+  // word that would match. Anything else falls back to free text, which
+  // simply yields no category when it matches nothing.
+  const interestedIn = fields.interested_in
+    || PRODUCT_INTEREST_BY_FORM[formType]
+    || fields.stone_interest
+    || role;
   const person = await findOrCreatePerson({
     name,
     email: fields.email,
     phone: fields.phone,
     company: fields.company || fields.store_location,
     role,
+    interestedIn,
   });
   if (!person?.id) return;
 
@@ -259,24 +352,30 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
     }
 
     case 'Showroom Check-In':
-      // Walk-ins aren't sales leads — log a completed meeting so the
-      // person record reflects the visit but we don't pollute the inbox.
+      // Walk-ins aren't sales leads, so they stay out of the Leads Inbox and
+      // log as a completed activity instead. The type is the workspace's
+      // custom 'showroom_visit' (not generic 'meeting') so the saved filter
+      // "Showroom Visits (iPad check-ins)" can count them. Pipedrive has no
+      // custom fields on activities, so the visit detail stays in the note —
+      // the reportable attributes live on the person record instead.
       await pdPost('activities', {
         person_id: person.id,
         org_id: orgId || undefined,
-        type: 'meeting',
+        type: SHOWROOM_ACTIVITY_TYPE,
         subject: `Showroom visit — ${name}`,
         note:
-          `Walk-in at Kunda Park showroom. ` +
-          `Visitor type: ${role || '—'}. ` +
-          `Interests: ${stoneInterest || fields.stone_interest || '—'}. ` +
-          `Source: ${fields.source || '—'}. ` +
-          `Marketing consent: ${fields.consent ? 'Yes' : 'No'}. ` +
-          `Notes: ${fields.message || '—'}`,
+          `Walk-in at Kunda Park showroom.\n` +
+          `Visitor type: ${fields.i_am_a || role || '—'}\n` +
+          `Interested in: ${fields.interested_in || '—'}\n` +
+          `State: ${fields.state || '—'}\n` +
+          `Source: ${fields.source || '—'}\n` +
+          `Marketing consent: ${fields.consent ? 'Yes' : 'No'}\n` +
+          `Notes: ${fields.message || '—'}\n` +
+          `Reference: ${ref || '—'}`,
         done: 1,
         due_date: new Date().toISOString().split('T')[0],
       });
-      console.log(`[pipedrive] logged showroom activity for ${name}`);
+      console.log(`[pipedrive] logged showroom visit for ${name}`);
       break;
 
     case 'Warranty Activation':
@@ -305,4 +404,8 @@ module.exports = {
   createLead,
   syncFormToPipedrive,
   initPipedriveLabels,
+  // Exported for tests — pure helpers, no network.
+  businessCategoryIdFor,
+  productCategoryIdsFor,
+  mergeSetField,
 };

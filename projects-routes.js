@@ -815,6 +815,28 @@ async function initSchema(pool) {
   `);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_sc_status  ON showroom_checkins(status)`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_sc_created ON showroom_checkins(created_at DESC)`);
+  // `interests` was carrying the visitor's role as the literal string
+  // "I am a: Homeowner" — there was never a product-interest field on the
+  // iPad. Visitor type now has its own column and `interests` holds what the
+  // visitor is actually interested in (Engineered Stone / Porcelain Tiles),
+  // which is what Belinda's report needs. State added so walk-ins can join
+  // the same state breakdown as sample requests and warranties.
+  await pool.query(`ALTER TABLE showroom_checkins ADD COLUMN IF NOT EXISTS visitor_type VARCHAR(100)`);
+  await pool.query(`ALTER TABLE showroom_checkins ADD COLUMN IF NOT EXISTS state        VARCHAR(10)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_sc_interests ON showroom_checkins(interests)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_sc_state     ON showroom_checkins(state)`);
+  // One-off, idempotent: lift legacy "I am a: X" values out of `interests`
+  // into visitor_type so historic walk-ins report alongside new ones.
+  try {
+    await pool.query(`
+      UPDATE showroom_checkins
+         SET visitor_type = TRIM(SUBSTRING(interests FROM 'I am a:(.*)')),
+             interests    = NULL
+       WHERE interests LIKE 'I am a:%'
+         AND visitor_type IS NULL`);
+  } catch (err) {
+    console.error('[projects/backfill] showroom visitor_type error:', err.message);
+  }
 
   // Polymorphic activity log — one row covers any of the typed form tables
   // above. The (form_type, record_id) composite index keeps the per-record
@@ -1415,11 +1437,15 @@ async function insertTypedSubmission(pool, legacyFormType, fields, sampleItems =
       } else if (typeKey === 'showroom') {
         result = await pool.query(
           `INSERT INTO showroom_checkins
-             (reference, name, email, phone, interests, source, notes, consent)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+             (reference, name, email, phone, interests, visitor_type, state,
+              source, notes, consent)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
            RETURNING id, reference`,
           [ref, name, fields.email || null, fields.phone,
-           stoneInterest, fields.source || null,
+           fields.interested_in || null,
+           fields.i_am_a || fields.role || null,
+           fields.state || null,
+           fields.source || null,
            fields.message || fields.notes || null, consent]
         );
       } else {
@@ -2307,7 +2333,7 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
           if (typeKey === 'enquiry' || typeKey === 'partner' || typeKey === 'contact') cols.push('message');
           if (typeKey === 'sample') cols.push('stone_interest');
           if (typeKey === 'warranty') cols.push('stone_name', 'fabricator', 'suburb');
-          if (typeKey === 'showroom') cols.push('phone', 'interests', 'notes', 'source');
+          if (typeKey === 'showroom') cols.push('phone', 'interests', 'visitor_type', 'state', 'notes', 'source');
           where.push('(' + cols.map(c => `${c} ILIKE $${i}`).join(' OR ') + ')');
         }
         const whereSql = where.length ? ' WHERE ' + where.join(' AND ') : '';
