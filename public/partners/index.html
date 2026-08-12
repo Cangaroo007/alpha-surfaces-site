@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Alpha Surfaces — Partner Hub (Sales)</title>
+<style>
+*,*:before,*:after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;background:#faf9f3;color:#14130c;font-size:14px;line-height:1.4}
+header{background:#564d22;color:white;padding:32px 40px}
+header h1{font-family:Georgia,serif;font-weight:700;font-size:30px;margin-bottom:6px}
+header p{opacity:0.78}
+main{padding:32px 40px;max-width:1500px;margin:0 auto}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:24px}
+.stat{background:white;padding:16px 20px;border-radius:6px;border:1px solid #e8e6dc}
+.stat .num{font-size:28px;font-weight:700;color:#564d22}
+.stat .lbl{font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:#777;margin-top:4px}
+.filters{background:white;border:1px solid #e8e6dc;padding:16px;border-radius:6px;margin-bottom:16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.filters input,.filters select{padding:8px 12px;border:1px solid #d8d4c5;border-radius:4px;font:inherit;background:white}
+.filters input{flex:1;min-width:240px}
+section{margin-bottom:32px}
+h2{font-family:Georgia,serif;font-size:22px;margin-bottom:14px;color:#564d22}
+table{width:100%;border-collapse:collapse;background:white;border:1px solid #e8e6dc;border-radius:6px;overflow:hidden}
+thead{background:#564d22;color:white}
+th{text-align:left;padding:11px 14px;font-size:12px;text-transform:uppercase;letter-spacing:0.4px;font-weight:600}
+tbody td{padding:11px 14px;border-top:1px solid #eee;font-size:13px;vertical-align:middle}
+tbody tr:hover{background:#fafaf3}
+.state-tag{display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;background:#eee;color:#444}
+.state-VIC{background:#E8F0FE;color:#1A56DB}
+.state-NSW{background:#FFEBE6;color:#C5341B}
+.state-QLD{background:#F4E8FF;color:#6B21A8}
+.tier{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:700;letter-spacing:0.4px}
+.tier-A{background:#D9E1F2;color:#1F3864}
+.tier-B{background:#FFF2CC;color:#7A5D00}
+.tier-C{background:#FCE4D6;color:#9B1C1C}
+a{color:#564d22;font-weight:500}
+.count{margin-left:auto;font-size:13px;color:#666}
+.utm-builder{background:#fef9e7;border:1px solid #f4d774;padding:14px 16px;border-radius:6px;margin-bottom:24px;font-size:13px}
+.utm-builder code{background:white;padding:2px 6px;border-radius:3px;font-family:Menlo,monospace;font-size:12px}
+</style>
+<!-- ALPHA_ANALYTICS_V1 -->
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W0841557EV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-W0841557EV');
+</script>
+<!-- Microsoft Clarity -->
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "wsphsnhr52");
+</script>
+</head><body>
+<header>
+  <h1>Alpha Surfaces — Partner Page Hub</h1>
+  <p>150 custom landing pages. Sales-only view. Each page lives at <code style="background:rgba(255,255,255,0.15);padding:2px 6px;border-radius:3px;">alphasurfaces.com.au/partners/[slug]</code></p>
+</header>
+<main>
+  <div class="stats">
+    <div class="stat"><div class="num">150</div><div class="lbl">Total pages</div></div>
+    <div class="stat"><div class="num">100</div><div class="lbl">Influencer pages</div></div>
+    <div class="stat"><div class="num">50</div><div class="lbl">Mason pages</div></div>
+    <div class="stat"><div class="num">56</div><div class="lbl">Tier A targets</div></div>
+    <div class="stat"><div class="num">74</div><div class="lbl">Tier B targets</div></div>
+    <div class="stat"><div class="num">20</div><div class="lbl">Tier C targets</div></div>
+  </div>
+
+  <div class="utm-builder">
+    <strong>UTM tracking is baked in.</strong> When sharing a page, add UTM params like:
+    <code>?utm_source=linkedin&utm_medium=dm&utm_campaign=q3_2026&utm_content=[your-rep-name]</code> —
+    page views with attribution will POST to <code>/api/track</code>; form submissions include the UTMs and route to Pipedrive via <code>/api/partner-lead</code>.
+  </div>
+
+  <div class="filters">
+    <input type="text" id="search" placeholder="Search by name, category…">
+    <select id="state"><option value="">All states</option><option>VIC</option><option>NSW</option><option>QLD</option><option>national</option></select>
+    <select id="priority"><option value="">All priorities</option><option>A</option><option>B</option><option>C</option></select>
+    <span class="count" id="count"></span>
+  </div>
+
+  <section>
+    <h2>100 Influencers</h2>
+    <table id="t-inf">
+      <thead><tr><th>State</th><th>Tier</th><th>Organisation</th><th>Scale</th><th>Page</th></tr></thead>
+      <tbody>
+        <tr data-cat="Kitchen retail chain" data-priority="A" data-state="QLD HQ — national">
+          <td><span class="state-tag state-QLD">QLD HQ — national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Kitchen Connection (KWB Group)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Kitchen retail chain</div></td>
+          <td style="font-size:13px;color:#555;">100+ showrooms across QLD/NSW/VIC/SA/WA — flagship of KWB Group (Joyce Corp ASX:JYC)</td>
+          <td><a href="/partners/kitchen-connection.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Kitchen retail chain" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Freedom Kitchens (Amart)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Kitchen retail chain</div></td>
+          <td style="font-size:13px;color:#555;">Multi-state retail chain owned by Amart (acquired June 2025)</td>
+          <td><a href="/partners/freedom-kitchens.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Kitchen retail chain" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Kinsman Kitchens (Wesfarmers/Bunnings)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Kitchen retail chain</div></td>
+          <td style="font-size:13px;color:#555;">Wesfarmers/Bunnings-owned national chain — DIY+installer model</td>
+          <td><a href="/partners/kinsman-kitchens.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Kitchen retail chain" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>IKEA Australia Kitchens</strong><div style="font-size:12px;color:#777;margin-top:3px;">Kitchen retail chain</div></td>
+          <td style="font-size:13px;color:#555;">10 stores nationally + online — massive flat-pack kitchen volume</td>
+          <td><a href="/partners/ikea-au-kitchens.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Kitchen retail chain" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Harvey Norman Kitchens</strong><div style="font-size:12px;color:#777;margin-top:3px;">Kitchen retail chain</div></td>
+          <td style="font-size:13px;color:#555;">100+ Harvey Norman complexes carrying kitchen displays</td>
+          <td><a href="/partners/harvey-norman-kitchens.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Kitchen retail chain" data-priority="C" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Bunnings Trade Kitchens</strong><div style="font-size:12px;color:#777;margin-top:3px;">Kitchen retail chain</div></td>
+          <td style="font-size:13px;color:#555;">Bunnings Trade kitchen channel — Wesfarmers-owned</td>
+          <td><a href="/partners/bunnings-trade-kitchens.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="A" data-state="VIC HQ — national">
+          <td><span class="state-tag state-VIC">VIC HQ — national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Metricon Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">~5,500 homes/yr — Australia's largest project home builder</td>
+          <td><a href="/partners/metricon.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="A" data-state="NSW HQ — multi-brand">
+          <td><span class="state-tag state-NSW">NSW HQ — multi-brand</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>MJH Group (McDonald Jones)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">3,000+ homes/yr across McDonald Jones, Brighton Homes, Wilson Homes, Mojo Homes, Complete Homes</td>
+          <td><a href="/partners/mjh-group.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="A" data-state="VIC HQ">
+          <td><span class="state-tag state-VIC">VIC HQ</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Henley Properties Group</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">Multi-state via Henley, Plantation Homes, Mainvue brands</td>
+          <td><a href="/partners/henley-properties.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="B" data-state="VIC HQ">
+          <td><span class="state-tag state-VIC">VIC HQ</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Burbank Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">Top-5 VIC project home builder</td>
+          <td><a href="/partners/burbank-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="B" data-state="VIC HQ">
+          <td><span class="state-tag state-VIC">VIC HQ</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Simonds Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">ASX-listed (ASX:SIO); ~1,500-2,000 homes/yr</td>
+          <td><a href="/partners/simonds-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Coral Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">Top-3 QLD project home builder</td>
+          <td><a href="/partners/coral-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Plantation Homes (Henley QLD)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">QLD arm of Henley Group</td>
+          <td><a href="/partners/plantation-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Stylemaster Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">Top-5 QLD project home builder</td>
+          <td><a href="/partners/stylemaster-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Clarendon Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">Tier-1 NSW + QLD project home builder</td>
+          <td><a href="/partners/clarendon-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="B" data-state="national franchise">
+          <td><span class="state-tag state-national">national franchise</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>GJ Gardner Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">National franchise — 70+ franchises in AU</td>
+          <td><a href="/partners/gj-gardner-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Eden Brae Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">NSW premium project home builder</td>
+          <td><a href="/partners/eden-brae-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Carlisle Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">VIC project home builder; growing post-Porter Davis market share</td>
+          <td><a href="/partners/carlisle-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="C" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Hamlan Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">VIC mid-market builder</td>
+          <td><a href="/partners/hamlan-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="C" data-state="VIC/SA">
+          <td><span class="state-tag state-VIC">VIC/SA</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Sherridon Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">VIC + SA mid-market</td>
+          <td><a href="/partners/sherridon-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="C" data-state="national franchise">
+          <td><span class="state-tag state-national">national franchise</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Hotondo Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">National franchise — 50+ franchises</td>
+          <td><a href="/partners/hotondo-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="C" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Mojo Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">NSW project home builder — MJH Group subsidiary</td>
+          <td><a href="/partners/mojo-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="C" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Privium Group</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">QLD growth corridor builder</td>
+          <td><a href="/partners/privium-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Volume builder" data-priority="C" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Hallmark Homes</strong><div style="font-size:12px;color:#777;margin-top:3px;">Volume builder</div></td>
+          <td style="font-size:13px;color:#555;">QLD mid-tier</td>
+          <td><a href="/partners/hallmark-homes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Mirvac</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">ASX:MGR — major residential developer + Mirvac Design in-house</td>
+          <td><a href="/partners/mirvac.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="A" data-state="NSW HQ">
+          <td><span class="state-tag state-NSW">NSW HQ</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Meriton</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">Australia's largest apartment developer (Harry Triguboff)</td>
+          <td><a href="/partners/meriton.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Lendlease (Residential)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">ASX:LLC — listed major developer + Lendlease Construction</td>
+          <td><a href="/partners/lendlease.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Stockland</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">ASX:SGP — communities + apartments + retail</td>
+          <td><a href="/partners/stockland.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Frasers Property Australia</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">ASX:FRC — strong sustainability mandate</td>
+          <td><a href="/partners/frasers-property-au.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Sekisui House Australia</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">Japanese-backed major developer; West Village Brisbane flagship</td>
+          <td><a href="/partners/sekisui-house-au.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Brookfield Multiplex (developer arm)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">Global dev + build (Brookfield Asset Mgmt)</td>
+          <td><a href="/partners/brookfield-multiplex-dev.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Cbus Property</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">Super-fund-backed developer</td>
+          <td><a href="/partners/cbus-property.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="C" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>ISPT</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">Industry super property</td>
+          <td><a href="/partners/ispt.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Aria Property Group</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">QLD premium apartment specialist</td>
+          <td><a href="/partners/aria-property.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="C" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Sunland Group</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">Listed QLD luxury developer</td>
+          <td><a href="/partners/sunland-group.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="C" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>AVJennings</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">ASX:AVJ — communities + apartments</td>
+          <td><a href="/partners/avjennings.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="C" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Dennis Family Corporation</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">VIC family-owned master-planned communities</td>
+          <td><a href="/partners/dennis-family.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Beulah</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">Melbourne luxury developer — STH BNK by Beulah project</td>
+          <td><a href="/partners/beulah.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Multi-res developer" data-priority="C" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Sterling Global</strong><div style="font-size:12px;color:#777;margin-top:3px;">Multi-res developer</div></td>
+          <td style="font-size:13px;color:#555;">QLD luxury developer</td>
+          <td><a href="/partners/sterling-global.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Tier-1 builder" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Multiplex</strong><div style="font-size:12px;color:#777;margin-top:3px;">Tier-1 builder</div></td>
+          <td style="font-size:13px;color:#555;">Tier-1 hospitality/multi-res builder — pre-qualification panel</td>
+          <td><a href="/partners/multiplex.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Tier-1 builder" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Hutchinson Builders</strong><div style="font-size:12px;color:#777;margin-top:3px;">Tier-1 builder</div></td>
+          <td style="font-size:13px;color:#555;">Scott Hutchinson + open supplier registration portal</td>
+          <td><a href="/partners/hutchinson-builders.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Tier-1 builder" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Lendlease Construction</strong><div style="font-size:12px;color:#777;margin-top:3px;">Tier-1 builder</div></td>
+          <td style="font-size:13px;color:#555;">Sustainability-led pre-qual; EPD-required</td>
+          <td><a href="/partners/lendlease-construction.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Tier-1 builder" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>John Holland</strong><div style="font-size:12px;color:#777;margin-top:3px;">Tier-1 builder</div></td>
+          <td style="font-size:13px;color:#555;">Infrastructure + commercial — material approval rigor</td>
+          <td><a href="/partners/john-holland.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Tier-1 builder" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Built</strong><div style="font-size:12px;color:#777;margin-top:3px;">Tier-1 builder</div></td>
+          <td style="font-size:13px;color:#555;">Design-build sweet spot — premium fitout</td>
+          <td><a href="/partners/built-nsw.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Tier-1 builder" data-priority="B" data-state="VIC/NSW">
+          <td><span class="state-tag state-VIC">VIC/NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Roberts Co</strong><div style="font-size:12px;color:#777;margin-top:3px;">Tier-1 builder</div></td>
+          <td style="font-size:13px;color:#555;">Growth-mode builder; new supplier panels forming</td>
+          <td><a href="/partners/roberts-co.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Tier-1 builder" data-priority="C" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Bensons Construction</strong><div style="font-size:12px;color:#777;margin-top:3px;">Tier-1 builder</div></td>
+          <td style="font-size:13px;color:#555;">Mid-tier VIC commercial</td>
+          <td><a href="/partners/bensons-construction.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Tier-1 builder" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Richard Crookes Constructions</strong><div style="font-size:12px;color:#777;margin-top:3px;">Tier-1 builder</div></td>
+          <td style="font-size:13px;color:#555;">NSW multi-res + commercial specialist</td>
+          <td><a href="/partners/richard-crookes.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Tier-1 builder" data-priority="C" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>BESIX Watpac</strong><div style="font-size:12px;color:#777;margin-top:3px;">Tier-1 builder</div></td>
+          <td style="font-size:13px;color:#555;">Mixed-use + apartment specialist</td>
+          <td><a href="/partners/watpac.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Tier-1 builder" data-priority="C" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>CPB Contractors</strong><div style="font-size:12px;color:#777;margin-top:3px;">Tier-1 builder</div></td>
+          <td style="font-size:13px;color:#555;">Heavy infrastructure — limited residential overlap</td>
+          <td><a href="/partners/cpb-contractors.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Tier-1 builder" data-priority="C" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>ADCO Constructions</strong><div style="font-size:12px;color:#777;margin-top:3px;">Tier-1 builder</div></td>
+          <td style="font-size:13px;color:#555;">Mid-tier — bid-by-bid spec</td>
+          <td><a href="/partners/adco-constructions.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Tier-1 builder" data-priority="C" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Hansen Yuncken</strong><div style="font-size:12px;color:#777;margin-top:3px;">Tier-1 builder</div></td>
+          <td style="font-size:13px;color:#555;">Hospitality + healthcare specialty</td>
+          <td><a href="/partners/hansen-yuncken.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Marriott International Australia</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">30+ AU hotels; brand-standards spec process</td>
+          <td><a href="/partners/marriott-international-au.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Accor Asia Pacific</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">Largest AU hotel operator; ESG-aligned spec</td>
+          <td><a href="/partners/accor-asia-pacific.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>IHG Hotels Australia</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">Major refurb pipeline AU</td>
+          <td><a href="/partners/ihg-au.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Hilton Worldwide AU</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">Premium brand spec discipline</td>
+          <td><a href="/partners/hilton-au.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="C" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Wyndham Destinations Asia Pacific</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">Volume-tier hotel operator</td>
+          <td><a href="/partners/wyndham-ap.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="A" data-state="VIC/WA/NSW">
+          <td><span class="state-tag state-VIC">VIC/WA/NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Crown Resorts</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">In-house design; multi-property refurb pipeline</td>
+          <td><a href="/partners/crown-resorts.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="B" data-state="NSW/QLD">
+          <td><span class="state-tag state-NSW">NSW/QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>The Star Entertainment Group</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">QLD Brisbane Queen's Wharf reset</td>
+          <td><a href="/partners/star-entertainment.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Event Hospitality & Entertainment</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">QT brand premium spec via Nic Graham</td>
+          <td><a href="/partners/event-hospitality.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Ovolo Group</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">Design-led boutique — fast spec cycle</td>
+          <td><a href="/partners/ovolo-group.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Solotel</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">Premium Sydney venue rollouts</td>
+          <td><a href="/partners/solotel.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Merivale</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">Justin Hemmes premium hospitality empire</td>
+          <td><a href="/partners/merivale.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="C" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Mantle Group Hospitality</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">Multi-state pub+restaurant rollout</td>
+          <td><a href="/partners/mantle-group.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Ghanem Group</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">GC/Brisbane premium restaurant fitouts</td>
+          <td><a href="/partners/ghanem-group.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Hospitality group" data-priority="C" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-C">C</span></td>
+          <td><strong>Howard Smith Wharves</strong><div style="font-size:12px;color:#777;margin-top:3px;">Hospitality group</div></td>
+          <td style="font-size:13px;color:#555;">Single precinct — narrow but premium</td>
+          <td><a href="/partners/howard-smith-wharves.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Bates Smart</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Hospitality king — Crown, Hyatt, Ace, Westin, InterContinental</td>
+          <td><a href="/partners/bates-smart.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Cox Architecture</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Product Aware co-founder; national reach</td>
+          <td><a href="/partners/cox-architecture.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>BVN</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Workplace + hospitality spec leader</td>
+          <td><a href="/partners/bvn.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Woods Bagot</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">AU hospitality spec; Domenic Alvaro design director</td>
+          <td><a href="/partners/woods-bagot.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Hassell</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Workplace + civic — large spec footprint</td>
+          <td><a href="/partners/hassell.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Fender Katsalidis</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Tall-tower residential — high-end spec</td>
+          <td><a href="/partners/fender-katsalidis.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Rothelowman</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">High-density residential national</td>
+          <td><a href="/partners/rothelowman.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Hayball</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Education + multi-res spec</td>
+          <td><a href="/partners/hayball.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Crone Partners</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">NSW commercial + residential</td>
+          <td><a href="/partners/crone-partners.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect+Interior" data-priority="A" data-state="VIC HQ">
+          <td><span class="state-tag state-VIC">VIC HQ</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Carr</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect+Interior</div></td>
+          <td style="font-size:13px;color:#555;">Hospitality stream; Sue Carr legacy</td>
+          <td><a href="/partners/carr.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>DKO Architecture</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Hospitality fitout reach</td>
+          <td><a href="/partners/dko-architecture.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Plus Studio (Plus Architecture)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">11-studio practice; rebranded Aug 2025</td>
+          <td><a href="/partners/plus-studio.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Elenberg Fraser</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Melbourne towers — bold spec</td>
+          <td><a href="/partners/elenberg-fraser.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>ARM Architecture</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Pazzi-named client; major civic projects</td>
+          <td><a href="/partners/arm-architecture.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>NH Architecture</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Mid-large practice; multi-director</td>
+          <td><a href="/partners/nh-architecture.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Mirvac Design</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Captive in-house — specifies for all Mirvac dev</td>
+          <td><a href="/partners/mirvac-design.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="A" data-state="QLD HQ">
+          <td><span class="state-tag state-QLD">QLD HQ</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>DBI Design</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">W Brisbane, Jewel; QLD hospitality king</td>
+          <td><a href="/partners/dbi-design.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Bureau Proberts</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Brisbane One; partner-led</td>
+          <td><a href="/partners/bureau-proberts.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="B" data-state="QLD HQ">
+          <td><span class="state-tag state-QLD">QLD HQ</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Cottee Parker</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">QLD multi-res major</td>
+          <td><a href="/partners/cottee-parker.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Architect" data-priority="B" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Nettleton Tribe</strong><div style="font-size:12px;color:#777;margin-top:3px;">Architect</div></td>
+          <td style="font-size:13px;color:#555;">Multi-res + retail spec</td>
+          <td><a href="/partners/nettleton-tribe.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="A" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Hecker Guthrie</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Rosie Chambers direct New Business email; editorial halo</td>
+          <td><a href="/partners/hecker-guthrie.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>BKH (Burley Katon Halliday)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Iain Halliday founder; Mosman House etc.</td>
+          <td><a href="/partners/bkh.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="A" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Rob Mills Architecture & Interiors</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Direct contact@; founder-led aesthetic decisions</td>
+          <td><a href="/partners/rob-mills.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="A" data-state="national">
+          <td><span class="state-tag state-national">national</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>SJB</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Hospitality stream; multi-disciplinary</td>
+          <td><a href="/partners/sjb.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="A" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>GIA Renovations</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Carmel Wylie + Olivia Cirocco — multi-award winners specifying directly</td>
+          <td><a href="/partners/gia-renovations.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="A" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>AM Interior Studio</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Ashley Maddison KBDi 2025 Designer of Year</td>
+          <td><a href="/partners/am-interior-studio.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Earthborne By Design</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Paul Coulson sole principal; KBDi profile</td>
+          <td><a href="/partners/earthborne-by-design.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Studio Minosa</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Darren Genner + Simona Castagna co-founders; KBDi 2025 winner</td>
+          <td><a href="/partners/studio-minosa.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Birdblack Design</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Sarah Nolen KBDi Australian Kitchen Designer 2024</td>
+          <td><a href="/partners/birdblack-design.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>A1 Design Studio</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Bav Kizilkaya KBDi Bathroom Designer 2025</td>
+          <td><a href="/partners/a1-design-studio.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Paiano Design</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Eliesha Keenan KBDi Kitchen Designer 2025</td>
+          <td><a href="/partners/paiano-design.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Designstory Interiors</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Lyndel Donaldson KBDi commercial 2025</td>
+          <td><a href="/partners/designstory-interiors.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Nic Graham & Associates</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">QT brand designer; W Brisbane hotel rooms</td>
+          <td><a href="/partners/nic-graham.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Wood Marsh</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Hospitality + luxury residential</td>
+          <td><a href="/partners/wood-marsh.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Interior designer" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Tonkin Zulaikha Greer (TZG)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Interior designer</div></td>
+          <td style="font-size:13px;color:#555;">Hospitality + heritage adaptive reuse</td>
+          <td><a href="/partners/tzg.html" target="_blank">Open page →</a></td>
+        </tr></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>50 Stone Masons</h2>
+    <table id="t-mas">
+      <thead><tr><th>State</th><th>Tier</th><th>Fabricator</th><th>Scale</th><th>Page</th></tr></thead>
+      <tbody>
+        <tr data-cat="Mason — Premium architectural" data-priority="A" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Pazzi Marble & Granite</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Premium architectural</div></td>
+          <td style="font-size:13px;color:#555;">Richest publicly disclosed trade network of any VIC fabricator</td>
+          <td><a href="/partners/pazzi-marble-granite.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Commercial" data-priority="A" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Baron Forge</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Commercial</div></td>
+          <td style="font-size:13px;color:#555;">Crown, Australia 108, Fed Sq landmark portfolio</td>
+          <td><a href="/partners/baron-forge.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Mixed residential" data-priority="A" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Cutting Edge Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Mixed residential</div></td>
+          <td style="font-size:13px;color:#555;">Broadest brand carry in VIC; David Schlieper MD</td>
+          <td><a href="/partners/cutting-edge-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Volume residential" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>United Stone Melbourne</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Volume residential</div></td>
+          <td style="font-size:13px;color:#555;">Vertically integrated; B2C-direct</td>
+          <td><a href="/partners/united-stone-melbourne.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Residential+commercial" data-priority="A" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Multiform Stone Industries</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Residential+commercial</div></td>
+          <td style="font-size:13px;color:#555;">Vic Barillaro MD with LinkedIn; Neolith partner</td>
+          <td><a href="/partners/multiform-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Renovation" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Stone Interiors</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Renovation</div></td>
+          <td style="font-size:13px;color:#555;">Caesarstone partner; long-tenured</td>
+          <td><a href="/partners/stone-interiors-vic.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Volume residential" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>M2M Marble & Granite</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Volume residential</div></td>
+          <td style="font-size:13px;color:#555;">Caesarstone partner; regional VIC reach</td>
+          <td><a href="/partners/m2m-marble.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Residential+commercial" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Top Notch Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Residential+commercial</div></td>
+          <td style="font-size:13px;color:#555;">Williamstown North; broad capability</td>
+          <td><a href="/partners/top-notch-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Hospitality" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Adriatic Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Hospitality</div></td>
+          <td style="font-size:13px;color:#555;">Crown Casino, Park Hyatt credits; Angelo Perez owner</td>
+          <td><a href="/partners/adriatic-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Builder channel" data-priority="A" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Eaglestone Creations</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Builder channel</div></td>
+          <td style="font-size:13px;color:#555;">Explicit Builder Range portfolio; CDK partner</td>
+          <td><a href="/partners/eaglestone-creations.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Commercial" data-priority="A" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>European Marble Centre</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Commercial</div></td>
+          <td style="font-size:13px;color:#555;">Landmark project list (330 Collins, Crown, Hilton, Langham)</td>
+          <td><a href="/partners/european-marble-centre.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason+brand — Silica-free" data-priority="A" data-state="VIC/QLD">
+          <td><span class="state-tag state-VIC">VIC/QLD</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>YDL Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason+brand — Silica-free</div></td>
+          <td style="font-size:13px;color:#555;">Standout post-ban product; Jerry Li Director</td>
+          <td><a href="/partners/ydl-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason+supplier — Hybrid" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Baasar Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason+supplier — Hybrid</div></td>
+          <td style="font-size:13px;color:#555;">Strongest Houzz signal MEL natural stone; Abhishek Chatter MD</td>
+          <td><a href="/partners/baasar-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Caesarstone MOS" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Apex Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Caesarstone MOS</div></td>
+          <td style="font-size:13px;color:#555;">Caesarstone Master of Stone certified; Samantha Robertson BDM</td>
+          <td><a href="/partners/apex-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Multi-unit" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Dimension Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Multi-unit</div></td>
+          <td style="font-size:13px;color:#555;">MEL + Geelong + QLD reach</td>
+          <td><a href="/partners/dimension-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Commercial+res" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>MSM Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Commercial+res</div></td>
+          <td style="font-size:13px;color:#555;">Dandenong South in-house mfg + design</td>
+          <td><a href="/partners/msm-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Architect-channel" data-priority="B" data-state="VIC">
+          <td><span class="state-tag state-VIC">VIC</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Classique Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Architect-channel</div></td>
+          <td style="font-size:13px;color:#555;">20+ years; 20-strong mason team</td>
+          <td><a href="/partners/classique-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Porcelain specialist" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Stone Lab</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Porcelain specialist</div></td>
+          <td style="font-size:13px;color:#555;">Fabricated CDK Sydney Showroom; Neolith/Laminam specialist</td>
+          <td><a href="/partners/stone-lab.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Commercial" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Royal Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Commercial</div></td>
+          <td style="font-size:13px;color:#555;">Strongest commercial fit-out credentials Sydney indep fabs</td>
+          <td><a href="/partners/royal-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Mixed" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Stone-Tech</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Mixed</div></td>
+          <td style="font-size:13px;color:#555;">Est. 1983; Jacqui + Mandy principals</td>
+          <td><a href="/partners/stone-tech.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Cosentino authorised" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Made in Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Cosentino authorised</div></td>
+          <td style="font-size:13px;color:#555;">Samantha Dollar owner; Cosentino-authorised fabricator</td>
+          <td><a href="/partners/made-in-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Premium natural stone" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Euro Marble</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Premium natural stone</div></td>
+          <td style="font-size:13px;color:#555;">Marrickville premium; 150+ natural stone variations</td>
+          <td><a href="/partners/euro-marble.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Multi-brand" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Universal Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Multi-brand</div></td>
+          <td style="font-size:13px;color:#555;">12 natural-stone importer relationships — one-stop fabricator</td>
+          <td><a href="/partners/universal-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Volume" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Stone Factory Fabrications</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Volume</div></td>
+          <td style="font-size:13px;color:#555;">Wetherill Park; 300 stone lines</td>
+          <td><a href="/partners/stone-factory-fabrications.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason+brand — National" data-priority="A" data-state="NSW HQ">
+          <td><span class="state-tag state-NSW">NSW HQ</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>WK Stone / Quantum Quartz</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason+brand — National</div></td>
+          <td style="font-size:13px;color:#555;">National brand owner; Quantum Zero silica-free post-ban</td>
+          <td><a href="/partners/wk-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Architect-specifier" data-priority="A" data-state="NSW HQ">
+          <td><span class="state-tag state-NSW">NSW HQ</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Artedomus (fabrication arm)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Architect-specifier</div></td>
+          <td style="font-size:13px;color:#555;">Premium architect-magnet; BKH/Shaun Lockyer projects</td>
+          <td><a href="/partners/artedomus-fabrication.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason+supplier — Disclosure leader" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Sareen Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason+supplier — Disclosure leader</div></td>
+          <td style="font-size:13px;color:#555;">Most disciplined credit-your-collaborator site NSW</td>
+          <td><a href="/partners/sareen-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Caesarstone MOS" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Feature Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Caesarstone MOS</div></td>
+          <td style="font-size:13px;color:#555;">David Jones flagship Sydney refurb; Caesarstone MOS</td>
+          <td><a href="/partners/feature-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Caesarstone MOS" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Casa Marble</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Caesarstone MOS</div></td>
+          <td style="font-size:13px;color:#555;">Tony Delpopolo Director; Caesarstone MOS</td>
+          <td><a href="/partners/casa-marble.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason+supplier — Premium natural" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Harmony Stone Gallery</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason+supplier — Premium natural</div></td>
+          <td style="font-size:13px;color:#555;">Vahid Nouri MD with LinkedIn; 3,000m² Marrickville</td>
+          <td><a href="/partners/harmony-stone-gallery.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Builder-led" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Benchmark Stonemasons</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Builder-led</div></td>
+          <td style="font-size:13px;color:#555;">Called out by Neolith, Smartstone, Caesarstone as preferred</td>
+          <td><a href="/partners/benchmark-stonemasons.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Premium res" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Granite & Marble Works</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Premium res</div></td>
+          <td style="font-size:13px;color:#555;">Est. 1990; trade-channel oriented</td>
+          <td><a href="/partners/granite-marble-works.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Distributor+Mason — Laminam exclusive" data-priority="A" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Studio Porcelain (Laminam NSW)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Distributor+Mason — Laminam exclusive</div></td>
+          <td style="font-size:13px;color:#555;">Laminam NSW exclusive distributor — channel anchor</td>
+          <td><a href="/partners/studio-porcelain.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Illawarra regional" data-priority="B" data-state="NSW">
+          <td><span class="state-tag state-NSW">NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Superior Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Illawarra regional</div></td>
+          <td style="font-size:13px;color:#555;">Carlo + Angela owner couple; 31+ years; Neolith pivot</td>
+          <td><a href="/partners/superior-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Multi-res+commercial king" data-priority="A" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Stonecorp Queensland</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Multi-res+commercial king</div></td>
+          <td style="font-size:13px;color:#555;">Most project-credentialed QLD fabricator; Mitchell Clemett GM</td>
+          <td><a href="/partners/stonecorp-qld.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Premium specifier" data-priority="A" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>NV Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Premium specifier</div></td>
+          <td style="font-size:13px;color:#555;">Premium specifier brand carry (Artedomus, Signorino)</td>
+          <td><a href="/partners/nv-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Premium res" data-priority="A" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Designer Stone QLD</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Premium res</div></td>
+          <td style="font-size:13px;color:#555;">2,000sqm Brendale showroom — QLD's largest</td>
+          <td><a href="/partners/designer-stone-qld.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Premium res+hospitality" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Made of Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Premium res+hospitality</div></td>
+          <td style="font-size:13px;color:#555;">Four installation crews; CNC + automated</td>
+          <td><a href="/partners/made-of-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Premium res+bespoke" data-priority="A" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-A">A</span></td>
+          <td><strong>Brisbane Granite & Marble</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Premium res+bespoke</div></td>
+          <td style="font-size:13px;color:#555;">Eamonn Donaghy Director — direct mobile + LinkedIn</td>
+          <td><a href="/partners/brisbane-granite-marble.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Volume residential" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Banks Benchtops</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Volume residential</div></td>
+          <td style="font-size:13px;color:#555;">QLD claimed highest residential throughput; 3 showrooms</td>
+          <td><a href="/partners/banks-benchtops.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Commercial+multi-res" data-priority="B" data-state="QLD/NSW">
+          <td><span class="state-tag state-QLD">QLD/NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Universal Marble & Granite (QLD)</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Commercial+multi-res</div></td>
+          <td style="font-size:13px;color:#555;">Cross-state operator with multi-res capability</td>
+          <td><a href="/partners/universal-marble-granite-qld.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Mixed" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>CMG Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Mixed</div></td>
+          <td style="font-size:13px;color:#555;">Paula direct named email; 18+ years</td>
+          <td><a href="/partners/cmg-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — GC+Northern Rivers" data-priority="B" data-state="QLD/NSW">
+          <td><span class="state-tag state-QLD">QLD/NSW</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Hot Rock Granite</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — GC+Northern Rivers</div></td>
+          <td style="font-size:13px;color:#555;">Burleigh Heads HQ; SEQ + Northern Rivers reach</td>
+          <td><a href="/partners/hot-rock-granite.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Porcelain specialist" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>MJG Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Porcelain specialist</div></td>
+          <td style="font-size:13px;color:#555;">Jewel Surfers Paradise association; founded 2019</td>
+          <td><a href="/partners/mjg-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Zero-silica champion" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Southeast Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Zero-silica champion</div></td>
+          <td style="font-size:13px;color:#555;">Only Tier-2 with named project credits beyond Stonecorp</td>
+          <td><a href="/partners/southeast-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Trade channel" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Stone Concepts QLD</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Trade channel</div></td>
+          <td style="font-size:13px;color:#555;">Caboolture; trade-channel positioning</td>
+          <td><a href="/partners/stone-concepts-qld.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Mixed" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Heritage Stone QLD</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Mixed</div></td>
+          <td style="font-size:13px;color:#555;">10+ years; Redcliffe/Moreton Bay catchment</td>
+          <td><a href="/partners/heritage-stone-qld.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — Sunshine Coast leader" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Northcoast Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — Sunshine Coast leader</div></td>
+          <td style="font-size:13px;color:#555;">Self-described largest SC stonemasonry factory</td>
+          <td><a href="/partners/northcoast-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — FNQ regional leader" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Hutchby Stone</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — FNQ regional leader</div></td>
+          <td style="font-size:13px;color:#555;">Bryce Hutchby family principal; 70+ yrs combined exp</td>
+          <td><a href="/partners/hutchby-stone.html" target="_blank">Open page →</a></td>
+        </tr>
+        <tr data-cat="Mason — NQ regional leader" data-priority="B" data-state="QLD">
+          <td><span class="state-tag state-QLD">QLD</span></td>
+          <td><span class="tier tier-B">B</span></td>
+          <td><strong>Quality Stone International</strong><div style="font-size:12px;color:#777;margin-top:3px;">Mason — NQ regional leader</div></td>
+          <td style="font-size:13px;color:#555;">Townsville builder/cabinetmaker/architect gatekeeper</td>
+          <td><a href="/partners/quality-stone-intl.html" target="_blank">Open page →</a></td>
+        </tr></tbody>
+    </table>
+  </section>
+</main>
+<script>
+function filter() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const st = document.getElementById('state').value;
+  const pr = document.getElementById('priority').value;
+  let count = 0;
+  document.querySelectorAll('tbody tr').forEach(tr => {
+    const cat = tr.dataset.cat || '';
+    const stt = tr.dataset.state || '';
+    const prr = tr.dataset.priority || '';
+    const text = tr.textContent.toLowerCase();
+    let show = true;
+    if (q && !text.includes(q)) show = false;
+    if (st && !stt.includes(st)) show = false;
+    if (pr && prr !== pr) show = false;
+    tr.style.display = show ? '' : 'none';
+    if (show) count++;
+  });
+  document.getElementById('count').textContent = count + ' showing';
+}
+['search','state','priority'].forEach(id => {
+  document.getElementById(id).addEventListener('input', filter);
+  document.getElementById(id).addEventListener('change', filter);
+});
+filter();
+</script>
+<!-- ALPHA_LP_TRACKER_V1 -->
+<script src="/landing-page-tracker.js"></script>
+</body></html>

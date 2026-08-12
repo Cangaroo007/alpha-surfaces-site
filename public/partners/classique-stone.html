@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Alpha Surfaces × Classique Stone — Partner Brief</title>
+<meta name="description" content="Alpha specifier program for your architects + co-marketing + spec-execution priority.">
+
+<!-- Open Graph for sharing -->
+<meta property="og:title" content="Alpha Surfaces × Classique Stone">
+<meta property="og:description" content="Alpha specifier program for your architects + co-marketing + spec-execution priority.">
+<meta property="og:type" content="website">
+
+<style>
+/* === FONTS — Alpha brand stack === */
+@font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --olive: #564d22;
+  --olive-dark: #3d370d;
+  --cream: #f3f1e6;
+  --paper: #faf9f3;
+  --ink: #14130c;
+  --ink-soft: #5a5648;
+  --line: rgba(0,0,0,0.08);
+  --hi: #c47a36;  /* warm accent */
+  --tier-a: #2d6b3e;
+  --tier-b: #b3851e;
+  --tier-c: #88554a;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: 'Degular', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400; line-height: 1.45; font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--olive); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { display: block; max-width: 100%; }
+
+.serif { font-family: 'Concrette S', Georgia, serif; }
+.uppercase { text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* === TOP BAR === */
+.topbar {
+  position: sticky; top: 0; z-index: 100; background: var(--paper);
+  border-bottom: 1px solid var(--line); padding: 14px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.topbar-left { display: flex; align-items: center; gap: 24px; }
+.topbar .logo { font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; color: var(--olive); }
+.topbar .partner-tag { font-family: 'Degular', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-soft); padding: 4px 10px; background: var(--cream); border-radius: 20px; }
+.topbar-nav { display: flex; gap: 28px; }
+.topbar-nav a { font-size: 13px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--ink-soft); }
+
+/* === HERO === */
+.hero {
+  position: relative; padding: 88px 80px 100px; background: var(--olive); color: white;
+  overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08), transparent 60%),
+              radial-gradient(circle at 80% 70%, rgba(196,122,54,0.18), transparent 50%);
+  pointer-events: none;
+}
+.hero-inner { position: relative; max-width: 1280px; margin: 0 auto; }
+.hero-prefix {
+  font-family: 'Degular', sans-serif; font-size: 13px; text-transform: uppercase;
+  letter-spacing: 1.5px; opacity: 0.7; margin-bottom: 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.hero-prefix .pill {
+  background: rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 12px;
+  font-size: 11px; letter-spacing: 0.6px;
+}
+.hero-prefix .tier {
+  padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.6px;
+}
+.hero-prefix .tier-A { background: rgba(45,107,62,0.95); color: white; }
+.hero-prefix .tier-B { background: rgba(179,133,30,0.95); color: white; }
+.hero-prefix .tier-C { background: rgba(136,85,74,0.85); color: white; }
+
+.hero h1 {
+  font-family: 'Concrette S', serif; font-weight: 700;
+  font-size: clamp(40px, 5.5vw, 72px); line-height: 1.04;
+  letter-spacing: -0.02em; max-width: 1000px; margin-bottom: 22px;
+}
+.hero .sub {
+  font-family: 'Concrette S', serif; font-weight: 400;
+  font-size: clamp(18px, 2vw, 24px); line-height: 1.4;
+  opacity: 0.88; max-width: 720px; margin-bottom: 40px;
+}
+.hero-logos {
+  display: flex; align-items: center; gap: 30px;
+  padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.18);
+  max-width: 600px;
+}
+.hero-logos .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; opacity: 0.65; }
+.hero-logos .partnership {
+  display: flex; align-items: center; gap: 18px;
+  font-family: 'Concrette S', serif; font-weight: 700;
+  font-size: 22px;
+}
+.hero-logos .partnership img { height: 38px; max-width: 140px; object-fit: contain; background: rgba(255,255,255,0.95); padding: 8px; border-radius: 6px; }
+.hero-logos .partnership .x { opacity: 0.5; font-size: 24px; }
+
+/* === KEY FACTS BAR === */
+.facts {
+  background: var(--cream); padding: 28px 80px;
+  border-bottom: 1px solid var(--line);
+}
+.facts-inner {
+  max-width: 1280px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
+}
+.fact { }
+.fact .l { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-soft); margin-bottom: 6px; }
+.fact .v { font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; line-height: 1.3; color: var(--ink); }
+
+/* === SECTION === */
+section.s { padding: 80px 80px; }
+section.s-tight { padding: 60px 80px; }
+.s-inner { max-width: 1280px; margin: 0 auto; }
+.s-label {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--olive); margin-bottom: 14px; font-weight: 500;
+}
+.s-heading {
+  font-family: 'Concrette S', serif; font-weight: 700;
+  font-size: clamp(28px, 3.5vw, 44px); line-height: 1.1;
+  letter-spacing: -0.015em; margin-bottom: 28px; max-width: 800px;
+}
+.s-lead {
+  font-family: 'Concrette S', serif; font-weight: 400;
+  font-size: 20px; line-height: 1.5; color: var(--ink-soft);
+  margin-bottom: 48px; max-width: 700px;
+}
+
+/* === WHY ALPHA — value props === */
+.why-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
+}
+.why-card {
+  background: var(--cream); padding: 32px 28px; border-radius: 4px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.why-card .n { font-family: 'Concrette S', serif; font-weight: 700; font-size: 36px; color: var(--olive); opacity: 0.45; line-height: 1; }
+.why-card .h { font-family: 'Concrette S', serif; font-weight: 700; font-size: 18px; line-height: 1.3; }
+.why-card .b { font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+
+/* === COLLECTIONS === */
+.collections { background: var(--cream); }
+.collection-block { margin-bottom: 60px; }
+.collection-block:last-child { margin-bottom: 0; }
+.col-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 24px; }
+.col-name { font-family: 'Concrette S', serif; font-weight: 700; font-size: 22px; }
+.col-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-soft); padding: 4px 10px; background: white; border-radius: 12px; }
+.col-tag.alpha-zero { background: var(--olive); color: white; }
+.stone-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+.stone-card { background: white; padding: 0; border-radius: 4px; overflow: hidden; }
+.stone-card .swatch { aspect-ratio: 1; background-size: cover; background-position: center; position: relative; }
+.stone-card .swatch::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 60%, rgba(0,0,0,0.05));
+}
+.stone-card .info { padding: 14px 16px; }
+.stone-card .info .nm { font-family: 'Concrette S', serif; font-weight: 700; font-size: 14px; line-height: 1.2; margin-bottom: 4px; }
+.stone-card .info .ms { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* === BRIEF — sales context === */
+.brief-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 64px; }
+.brief-left { }
+.brief-block { margin-bottom: 36px; }
+.brief-block:last-child { margin-bottom: 0; }
+.brief-h { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--olive); margin-bottom: 10px; font-weight: 600; }
+.brief-body { font-size: 16px; line-height: 1.55; color: var(--ink); }
+.brief-body ul { list-style: none; padding: 0; }
+.brief-body li { padding: 8px 0 8px 24px; position: relative; border-bottom: 1px solid var(--line); }
+.brief-body li:last-child { border-bottom: none; }
+.brief-body li::before { content: '→'; position: absolute; left: 0; top: 8px; color: var(--olive); font-weight: 700; }
+
+.brief-right {
+  background: var(--cream); padding: 36px 32px; border-radius: 4px;
+  position: sticky; top: 100px;
+}
+.contact-card { margin-bottom: 32px; }
+.contact-card:last-child { margin-bottom: 0; }
+.contact-card .h { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--ink-soft); margin-bottom: 8px; }
+.contact-card .nm { font-family: 'Concrette S', serif; font-weight: 700; font-size: 17px; line-height: 1.2; margin-bottom: 4px; }
+.contact-card .tt { font-size: 14px; color: var(--ink-soft); margin-bottom: 10px; line-height: 1.4; }
+.contact-card .rr { font-size: 13px; color: var(--ink-soft); margin-bottom: 10px; font-style: italic; }
+.contact-card .lk { font-size: 13px; }
+.contact-card .lk a { display: inline-block; margin-right: 12px; }
+
+/* === CTA === */
+.cta { background: var(--olive); color: white; padding: 80px 80px; }
+.cta-inner { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+.cta h2 { font-family: 'Concrette S', serif; font-weight: 700; font-size: clamp(28px, 3.5vw, 44px); line-height: 1.1; margin-bottom: 20px; }
+.cta p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 18px; line-height: 1.5; opacity: 0.88; margin-bottom: 32px; max-width: 480px; }
+.rep-card { background: rgba(255,255,255,0.08); padding: 28px 24px; border-radius: 4px; backdrop-filter: blur(4px); }
+.rep-card .h { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.65; margin-bottom: 10px; }
+.rep-card .nm { font-family: 'Concrette S', serif; font-weight: 700; font-size: 22px; margin-bottom: 4px; }
+.rep-card .rl { font-size: 14px; opacity: 0.78; margin-bottom: 20px; }
+.rep-card .links { display: flex; flex-direction: column; gap: 10px; }
+.rep-card .links a { color: white; font-size: 15px; padding: 10px 14px; background: rgba(255,255,255,0.1); border-radius: 4px; transition: background 0.15s; }
+.rep-card .links a:hover { background: rgba(255,255,255,0.18); text-decoration: none; }
+
+/* === FORM === */
+.form-section { background: white; padding: 80px 80px; border-top: 1px solid var(--line); }
+.form-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.4fr; gap: 80px; align-items: start; }
+.form-left h3 { font-family: 'Concrette S', serif; font-weight: 700; font-size: 32px; line-height: 1.1; margin-bottom: 20px; }
+.form-left p { font-size: 16px; line-height: 1.5; color: var(--ink-soft); margin-bottom: 24px; }
+.form-options { display: flex; flex-direction: column; gap: 12px; }
+.form-options li { list-style: none; font-size: 14px; color: var(--ink-soft); padding-left: 24px; position: relative; }
+.form-options li::before { content: '✓'; position: absolute; left: 0; color: var(--olive); font-weight: 700; }
+
+.partner-form { display: flex; flex-direction: column; gap: 24px; }
+.fg { display: flex; flex-direction: column; gap: 6px; }
+.fg label { font-size: 13px; color: var(--ink-soft); }
+.fg label .req { color: var(--hi); }
+.fg input, .fg select, .fg textarea {
+  border: none; border-bottom: 1px solid var(--ink); background: transparent;
+  font-family: 'Degular', sans-serif; font-size: 16px; padding: 8px 0;
+  outline: none; color: var(--ink);
+}
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-bottom-color: var(--olive); }
+.fg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px;
+  background: var(--olive); color: white; border: none; border-radius: 4px;
+  font-family: 'Degular', sans-serif; font-weight: 500; font-size: 15px;
+  cursor: pointer; transition: background 0.15s;
+}
+.btn:hover { background: var(--olive-dark); }
+.btn-row { display: flex; justify-content: flex-end; }
+.form-status {
+  padding: 14px 18px; border-radius: 4px; font-size: 14px;
+  background: rgba(45,107,62,0.1); color: var(--tier-a); display: none;
+}
+.form-status.show { display: block; }
+.form-status.error { background: rgba(176,40,40,0.1); color: #b02828; }
+
+/* === FOOTER === */
+footer { background: var(--ink); color: white; padding: 40px 80px; }
+.footer-inner { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+footer .meta { font-size: 12px; opacity: 0.6; }
+footer .meta a { color: white; }
+
+/* === RESPONSIVE === */
+@media (max-width: 1024px) {
+  .topbar { padding: 12px 20px; }
+  .topbar-nav { display: none; }
+  .hero { padding: 56px 24px 60px; }
+  .facts { padding: 24px 24px; }
+  .facts-inner { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  section.s { padding: 48px 24px; }
+  section.s-tight { padding: 36px 24px; }
+  .why-grid { grid-template-columns: 1fr; gap: 20px; }
+  .stone-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .brief-grid { grid-template-columns: 1fr; gap: 40px; }
+  .brief-right { position: static; }
+  .cta { padding: 56px 24px; }
+  .cta-inner { grid-template-columns: 1fr; gap: 40px; }
+  .form-section { padding: 48px 24px; }
+  .form-grid { grid-template-columns: 1fr; gap: 40px; }
+  .fg-row { grid-template-columns: 1fr; gap: 24px; }
+}
+</style>
+<!-- ALPHA_ANALYTICS_V1 -->
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W0841557EV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-W0841557EV');
+</script>
+<!-- Microsoft Clarity -->
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "wsphsnhr52");
+</script>
+</head>
+<body data-slug="classique-stone" data-category="cat-architect">
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">Alpha Surfaces</span>
+    <span class="partner-tag">× Classique Stone</span>
+  </div>
+  <nav class="topbar-nav">
+    <a href="#brief">Brief</a>
+    <a href="#collections">Collections</a>
+    <a href="#contact">Get in touch</a>
+  </nav>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-prefix">
+      <span class="pill">Mason — Architect-channel</span>
+      <span class="tier tier-B">Priority Tier B</span>
+      <span class="pill">VIC</span>
+    </div>
+    <h1>Architect-channel partnership for your shop.</h1>
+    <p class="sub">Alpha specifier program for your architects + co-marketing + spec-execution priority.</p>
+    <div class="hero-logos">
+      <div class="partnership">
+        <span>Alpha Surfaces</span>
+        <span class="x">×</span>
+        <img src="https://logo.clearbit.com/classiquestone.com.au" alt="Classique Stone logo" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+        <span style="display:none; font-family:'Concrette S', serif; font-weight:700;">Classique Stone</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="facts">
+  <div class="facts-inner">
+    <div class="fact"><div class="l">Scale</div><div class="v">20+ years; 20-strong mason team</div></div>
+    <div class="fact"><div class="l">Go-to-market</div><div class="v">See classiquestone.com.au for go-to-market detail.</div></div>
+    <div class="fact"><div class="l">Currently spec'd</div><div class="v">Unknown — confirm at outreach</div></div>
+    <div class="fact"><div class="l">Spec-setting power</div><div class="v">Owner-led; architect-channel oriented</div></div>
+  </div>
+</section>
+
+<section class="s" id="why">
+  <div class="s-inner">
+    <div class="s-label">Why Alpha for Classique Stone</div>
+    <h2 class="s-heading">The case for a partnership.</h2>
+    <div class="why-grid">
+      <div class="why-card"><div class="n">01</div><div class="h">Alpha specifier program supports your architects</div></div><div class="why-card"><div class="n">02</div><div class="h">Co-marketing</div></div><div class="why-card"><div class="n">03</div><div class="h">Spec-execution priority</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="s collections" id="collections">
+  <div class="s-inner">
+    <div class="s-label">Curated for Classique Stone</div>
+    <h2 class="s-heading">Recommended collections from our 40-stone range.</h2>
+    <p class="s-lead">Hand-picked stones across 4 collections, tailored to Classique Stone's aesthetic and customer base.</p>
+    
+    <div class="collection-block">
+      <div class="col-head">
+        <span class="col-name">Collection 02 — Naturals</span>
+        <span class="col-tag ">3 stones</span>
+      </div>
+      <div class="stone-grid">
+        <div class="stone-card">
+          <div class="swatch" style="background: #F3F1E6;"></div>
+          <div class="info"><div class="nm">Carrara</div><div class="ms">Polished</div></div>
+        </div>
+        <div class="stone-card">
+          <div class="swatch" style="background: #F0EDE3;"></div>
+          <div class="info"><div class="nm">Shell</div><div class="ms">Polished</div></div>
+        </div>
+        <div class="stone-card">
+          <div class="swatch" style="background: #C0B9A6;"></div>
+          <div class="info"><div class="nm">Oyster Grey</div><div class="ms">Matte</div></div>
+        </div></div>
+    </div>
+    
+    <div class="collection-block">
+      <div class="col-head">
+        <span class="col-name">Collection 04 — Veined</span>
+        <span class="col-tag ">3 stones</span>
+      </div>
+      <div class="stone-grid">
+        <div class="stone-card">
+          <div class="swatch" style="background: #EFE9D8;"></div>
+          <div class="info"><div class="nm">Calacatta Leggera</div><div class="ms">Polished</div></div>
+        </div>
+        <div class="stone-card">
+          <div class="swatch" style="background: #F5F2EA;"></div>
+          <div class="info"><div class="nm">White Cloud</div><div class="ms">Matte</div></div>
+        </div>
+        <div class="stone-card">
+          <div class="swatch" style="background: #EFE6D2;"></div>
+          <div class="info"><div class="nm">Statuario Gold</div><div class="ms">Polished</div></div>
+        </div></div>
+    </div>
+    
+    <div class="collection-block">
+      <div class="col-head">
+        <span class="col-name">Collection 05 — Statement</span>
+        <span class="col-tag ">3 stones</span>
+      </div>
+      <div class="stone-grid">
+        <div class="stone-card">
+          <div class="swatch" style="background: #E8D9D0;"></div>
+          <div class="info"><div class="nm">Calacatta Viola</div><div class="ms">Polished</div></div>
+        </div>
+        <div class="stone-card">
+          <div class="swatch" style="background: #EDE7DA;"></div>
+          <div class="info"><div class="nm">Arabescato</div><div class="ms">Polished</div></div>
+        </div>
+        <div class="stone-card">
+          <div class="swatch" style="background: #E5C896;"></div>
+          <div class="info"><div class="nm">Autumn Gold</div><div class="ms">Polished</div></div>
+        </div></div>
+    </div>
+    
+    <div class="collection-block">
+      <div class="col-head">
+        <span class="col-name">Alpha Zero — Silica-free Range</span>
+        <span class="col-tag alpha-zero">3 stones</span>
+      </div>
+      <div class="stone-grid">
+        <div class="stone-card">
+          <div class="swatch" style="background: #EDE6D0;"></div>
+          <div class="info"><div class="nm">Calacatta Oro</div><div class="ms">Polished — Silica-free</div></div>
+        </div>
+        <div class="stone-card">
+          <div class="swatch" style="background: #CDC4B0;"></div>
+          <div class="info"><div class="nm">Silver Travertine</div><div class="ms">Matte — Silica-free</div></div>
+        </div>
+        <div class="stone-card">
+          <div class="swatch" style="background: #E1DBC9;"></div>
+          <div class="info"><div class="nm">Crystello</div><div class="ms">Matte — Silica-free</div></div>
+        </div></div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="s" id="brief">
+  <div class="s-inner">
+    <div class="s-label">Sales brief</div>
+    <h2 class="s-heading">Engagement playbook.</h2>
+    <div class="brief-grid">
+      <div class="brief-left">
+        <div class="brief-block">
+          <div class="brief-h">Opening hook</div>
+          <div class="brief-body">Your architects need stone they can spec confidently. Alpha's specifier program supports them, and you fabricate the spec.</div>
+        </div>
+        <div class="brief-block">
+          <div class="brief-h">Target market</div>
+          <div class="brief-body">See company website.</div>
+        </div>
+        <div class="brief-block">
+          <div class="brief-h">Win condition</div>
+          <div class="brief-body">Alpha specified by your architect + you fabricate.</div>
+        </div>
+        
+        <div class="brief-block">
+          <div class="brief-h">Notes &amp; watch-outs</div>
+          <div class="brief-body">Brief generated from category pattern — refine before sending.</div>
+        </div>
+      </div>
+      <aside class="brief-right">
+        <div class="contact-card">
+          <div class="h">Decision unit — start here</div>
+          
+        <div style="padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid rgba(0,0,0,0.08);">
+          <div class="nm">Classique Stone contact</div>
+          <div class="tt">Leadership team</div>
+          <div class="rr">Decision-maker</div>
+          
+          <div class="lk" style="color:var(--ink-soft);font-size:12px;">Via classiquestone.com.au</div>
+          
+        </div>
+        
+        </div>
+        <div class="contact-card">
+          <div class="h">Brief source</div>
+          <div class="tt" style="font-size:12px;">classiquestone.com.au</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="contact">
+  <div class="cta-inner">
+    <div>
+      <h2>Ready to start the conversation?</h2>
+      <p>This page is for Classique Stone's leadership team and their advisers. Belinda will personally respond — typically within one business day.</p>
+    </div>
+    <div class="rep-card">
+      <div class="h">Your Alpha Surfaces contact</div>
+      <div class="nm">Belinda Kelaher</div>
+      <div class="rl">Partner Program Lead, Alpha Surfaces</div>
+      <div class="links">
+        <a href="mailto:belinda@alphasurfaces.com.au?subject=Partner enquiry — Classique Stone">Email Belinda</a>
+        <a href="tel:+610400000000">Call +61 (0)400 000 000</a>
+        <a href="https://calendly.com/belinda-alphasurfaces" target="_blank" rel="noopener">Book a 30-minute call</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="form-section">
+  <div class="form-grid">
+    <div class="form-left">
+      <h3>Request a curated sample box</h3>
+      <p>We'll send Classique Stone-relevant stones cut to swatch size, with full technical and EPD documentation.</p>
+      <ul class="form-options">
+        <li>Curated collection (featured stones above) — 6 swatches</li>
+        <li>Full range box — 40 swatches across 6 collections</li>
+        <li>Alpha Zero silica-free range — 10 swatches</li>
+        <li>Custom selection (call Belinda first)</li>
+      </ul>
+    </div>
+    <form class="partner-form" id="partnerForm" novalidate>
+      <input type="hidden" name="partner_slug" value="classique-stone">
+      <input type="hidden" name="partner_name" value="Classique Stone">
+      <input type="hidden" name="category" value="Mason — Architect-channel">
+      <input type="hidden" name="utm_source" value="" id="utm_source">
+      <input type="hidden" name="utm_medium" value="" id="utm_medium">
+      <input type="hidden" name="utm_campaign" value="" id="utm_campaign">
+      <input type="hidden" name="utm_content" value="" id="utm_content">
+      <input type="hidden" name="referrer" value="" id="referrer">
+
+      <div class="fg-row">
+        <div class="fg">
+          <label for="f_first">First name <span class="req">*</span></label>
+          <input type="text" name="first_name" id="f_first" required>
+        </div>
+        <div class="fg">
+          <label for="f_last">Last name <span class="req">*</span></label>
+          <input type="text" name="last_name" id="f_last" required>
+        </div>
+      </div>
+      <div class="fg-row">
+        <div class="fg">
+          <label for="f_email">Email <span class="req">*</span></label>
+          <input type="email" name="email" id="f_email" required>
+        </div>
+        <div class="fg">
+          <label for="f_phone">Phone <span class="req">*</span></label>
+          <input type="tel" name="phone" id="f_phone" required>
+        </div>
+      </div>
+      <div class="fg">
+        <label for="f_role">Your role at Classique Stone</label>
+        <input type="text" name="role" id="f_role" placeholder="e.g. Procurement Manager">
+      </div>
+      <div class="fg">
+        <label for="f_box">Sample box requested</label>
+        <select name="sample_box" id="f_box">
+          <option value="curated">Curated collection (recommended above)</option>
+          <option value="full">Full range — 40 swatches</option>
+          <option value="alpha-zero">Alpha Zero silica-free range</option>
+          <option value="custom">Custom (call Belinda first)</option>
+          <option value="none">Skip samples — just want a call</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label for="f_msg">Anything else?</label>
+        <textarea name="message" id="f_msg" rows="3" placeholder="Specific projects, timing, decision-makers to loop in…"></textarea>
+      </div>
+      <div class="form-status" id="formStatus"></div>
+      <div class="btn-row">
+        <button type="submit" class="btn">Send request</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <strong>Alpha Surfaces</strong> · alphasurfaces.com.au/partners/classique-stone
+    </div>
+    <div class="meta">
+      Page prepared specifically for Classique Stone. Confidential — not for redistribution.
+    </div>
+  </div>
+</footer>
+
+<script>
+// === Alpha × Partner — Roadrunner-wired tracking ===
+(function() {
+  var ROADRUNNER_API = (window.ROADRUNNER_API_URL || "https://roadrunner.alphasurfaces.com.au").replace(/\/$/, "");
+  var slug = document.body.dataset.slug;
+  var params = new URLSearchParams(window.location.search);
+  var pid = params.get("pid") || "";
+  var utm = {
+    utm_source: params.get("utm_source") || "",
+    utm_medium: params.get("utm_medium") || "",
+    utm_campaign: params.get("utm_campaign") || "",
+    utm_content: params.get("utm_content") || ""
+  };
+  ["utm_source","utm_medium","utm_campaign","utm_content"].forEach(function(k) {
+    var el = document.getElementById(k); if (el) el.value = utm[k];
+  });
+  var ref = document.getElementById("referrer"); if (ref) ref.value = document.referrer || "";
+
+  // --- Form submission (Roadrunner /api/partners-public/:slug/lead) ---
+  var form = document.getElementById("partnerForm");
+  if (form) {
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      var status = document.getElementById("formStatus");
+      if (status) { status.className = "form-status"; status.textContent = ""; }
+      var fd = new FormData(form);
+      var data = {};
+      fd.forEach(function(v, k) { data[k] = v; });
+      data.partner_slug = slug;
+      data.pid = pid || undefined;
+      var url = ROADRUNNER_API + "/api/partners-public/" + encodeURIComponent(slug) + "/lead";
+      fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) })
+        .then(function(r) {
+          if (!r.ok) throw new Error("submit failed");
+          return r.json();
+        })
+        .then(function() {
+          if (status) {
+            status.classList.add("show");
+            status.textContent = "Thanks — Belinda will be in touch within one business day.";
+          }
+          form.reset();
+        })
+        .catch(function() {
+          if (status) {
+            status.classList.add("show", "error");
+            status.textContent = "Sorry — please email belinda@alphasurfaces.com.au directly.";
+          }
+        });
+    });
+  }
+})();
+</script>
+<!-- ALPHA_LP_TRACKER_V1 -->
+<script src="/landing-page-tracker.js"></script>
+</body>
+</html>

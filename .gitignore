@@ -3,3 +3,4 @@ data/keys.json
 data/versions/
 data/notifications.json
 .DS_Store
+.cw-tmp/

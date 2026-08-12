@@ -25,6 +25,9 @@ const { insertTypedSubmission } = require('./projects-routes');
 // Pipedrive Leads Inbox (forms → HOT leads). All calls are wrapped so a
 // Pipedrive outage can't fail the form response.
 const pipedrive = require('./pipedrive');
+// Fire-and-forget mirror of website engagement into RoadRunner (CRM). Gated on
+// ROADRUNNER_INGEST_URL + ROADRUNNER_API_KEY; off (no-op) when either is unset.
+const roadrunner = require('./roadrunner');
 const cmsCore = require('./cms-core');
 
 const app = express();
@@ -206,6 +209,13 @@ app.post('/api/tracking/landing-page',
          WHERE prospect_id = $1 AND status = 'sent'`,
         [pid]
       );
+
+      // Mirror this engagement into RoadRunner (CRM). Fire-and-forget: never
+      // awaited and self-swallows errors, so it can't delay or break the page.
+      roadrunner.forwardEngagement({
+        pid, campaign, am_email, page,
+        duration_seconds, max_scroll_pct, cta_clicks, referrer
+      }).catch(() => {});
 
       res.sendStatus(200);
     } catch (err) {
@@ -469,6 +479,17 @@ function trackOutreachConversion(formType, fields, id) {
       [pid]
     )
   ).catch(err => console.error('[outreach] conversion log error:', err.message));
+
+  // Mirror the conversion into RoadRunner (CRM). Fire-and-forget: self-swallows
+  // errors so a RoadRunner outage never affects the form response.
+  roadrunner.forwardConversion({
+    pid,
+    campaign: fields.utm_campaign || fields.campaign || null,
+    account_manager: fields.utm_content || fields.am_email || null,
+    page: fields.page || null,
+    conversion_type: conversionType,
+    referrer: fields.referrer || null
+  }).catch(() => {});
 }
 
 async function persistPublicFormSubmission(formType, fields, sampleItems, options = {}) {
