@@ -6,7 +6,55 @@
 
 // Overridable so the integration can be pointed at a sandbox workspace or a
 // local stub in tests. Unset in production — defaults to the real API.
-const PD_BASE = process.env.PIPEDRIVE_API_BASE || 'https://api.pipedrive.com/v1';
+// warnIfPipedriveMisrouted() below makes an override impossible to miss at boot.
+const DEFAULT_PD_BASE = 'https://api.pipedrive.com/v1';
+const PD_BASE = process.env.PIPEDRIVE_API_BASE || DEFAULT_PD_BASE;
+
+// Boot-time guard. An override means every lead, person and note this process
+// writes goes somewhere other than the real CRM — silent data loss that looks
+// exactly like a working integration. Never blocks startup; just refuses to be
+// missed in the logs.
+//
+// NOTE ON THE SIGNAL: Railway sets NODE_ENV=production on BOTH staging and
+// production (see the comment at server.js:1013), so NODE_ENV alone cannot
+// tell them apart — keyed on it, this would scream "PRODUCTION" on a perfectly
+// deliberate staging sandbox override and quickly become noise people ignore.
+// RAILWAY_ENVIRONMENT_NAME decides how loud to be; NODE_ENV still contributes,
+// so a non-Railway deployment with NODE_ENV=production is still treated as
+// deployed rather than local. Returns the severity, for tests.
+function warnIfPipedriveMisrouted() {
+  const override = process.env.PIPEDRIVE_API_BASE;
+  if (!override) return 'default';
+  const norm = v => String(v || '').trim().replace(/\/+$/, '');
+  if (norm(override) === norm(DEFAULT_PD_BASE)) return 'default';
+
+  const envName = (process.env.RAILWAY_ENVIRONMENT_NAME || '').toLowerCase();
+  const bar = '='.repeat(72);
+
+  if (envName === 'production') {
+    console.error(bar);
+    console.error('!!  PIPEDRIVE MISROUTE — PRODUCTION IS NOT TALKING TO PIPEDRIVE  !!');
+    console.error(`!!  PIPEDRIVE_API_BASE = ${override}`);
+    console.error(`!!  expected            = ${DEFAULT_PD_BASE}`);
+    console.error('!!  Every lead, person and note is going to that host instead.');
+    console.error('!!  Unset PIPEDRIVE_API_BASE in Railway and redeploy.');
+    console.error(bar);
+    return 'production-misroute';
+  }
+
+  if (envName || process.env.NODE_ENV === 'production') {
+    console.warn(bar);
+    console.warn(`[pipedrive] API base overridden on "${envName || 'deployed'}" environment`);
+    console.warn(`[pipedrive]   PIPEDRIVE_API_BASE = ${override}`);
+    console.warn(`[pipedrive]   default            = ${DEFAULT_PD_BASE}`);
+    console.warn('[pipedrive] Intentional for a sandbox; a mistake anywhere else.');
+    console.warn(bar);
+    return 'deployed-override';
+  }
+
+  console.warn(`[pipedrive] API base overridden for local dev: ${override}`);
+  return 'local-override';
+}
 
 // Pipedrive person custom-field keys (provided by the workspace). Both are
 // multi-select ('set') fields, so values are merged with whatever the person
@@ -338,6 +386,33 @@ async function matchFabricatorOrganisation(fabricator) {
   return { status: 'unmatched', org: null, target };
 }
 
+// Pipedrive date fields accept YYYY-MM-DD and nothing else — that's the whole
+// reason 'Installation date' is created as a `date` field rather than a
+// varchar: only a real date field is filterable and sortable in the CRM.
+// The form already sends YYYY-MM-DD (<input type="date">, checked server-side
+// by isRealIsoDate), but a payload replayed from the fallback queue or built
+// from a Postgres DATE can arrive as a full ISO timestamp, and hand-entered
+// data as DD/MM/YYYY. Coerce what's recognisable; return null for anything
+// else so the caller skips the field rather than posting a string Pipedrive
+// will reject — a rejected value takes the whole patch, and the other four
+// fields with it.
+function toPipedriveDate(value) {
+  const raw = String(value == null ? '' : value).trim();
+  if (!raw) return null;
+  let y, m, d;
+  const iso = /^(\d{4})-(\d{2})-(\d{2})(?:[T\s].*)?$/.exec(raw);
+  const au  = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(raw);
+  if (iso)      { [, y, m, d] = iso; }
+  else if (au)  { [, d, m, y] = au; }   // DD/MM/YYYY — Australian convention
+  else return null;
+  const out = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  // Reject impossible calendar dates (2026-02-31 and friends) rather than
+  // letting Pipedrive silently roll them forward.
+  const parsed = new Date(`${out}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== out) return null;
+  return out;
+}
+
 // Write the five structured warranty fields onto the person. Latest
 // activation wins: someone activating a second benchtop has newer, more
 // relevant detail, and the append-only notes keep the full history. Skips
@@ -350,9 +425,19 @@ async function setWarrantyPersonFields(personId, fields, ref) {
   for (const def of WARRANTY_PERSON_FIELDS) {
     const key = process.env[def.env];
     if (!key) continue;
-    const value = def.from(fields, ref);
-    if (value == null || String(value).trim() === '') continue;
-    patch[key] = String(value).trim();
+    const raw = def.from(fields, ref);
+    if (raw == null || String(raw).trim() === '') continue;
+    let value;
+    if (def.type === 'date') {
+      value = toPipedriveDate(raw);
+      if (!value) {
+        console.warn(`[pipedrive] skipping ${def.name}: "${raw}" is not a date Pipedrive accepts`);
+        continue;
+      }
+    } else {
+      value = String(raw).trim();
+    }
+    patch[key] = value;
     written.push(def.name);
   }
   if (!written.length) return [];
@@ -600,7 +685,10 @@ module.exports = {
   initPipedriveLabels,
   matchFabricatorOrganisation,
   setWarrantyPersonFields,
+  warnIfPipedriveMisrouted,
   WARRANTY_PERSON_FIELDS,
+  DEFAULT_PD_BASE,
+  toPipedriveDate,
   // Exported for tests — pure helpers, no network.
   businessCategoryIdFor,
   productCategoryIdsFor,

@@ -116,9 +116,11 @@ async function main() {
     for (const r of mistyped) {
       console.log(`    ${r.def.name}: is "${r.actualType}", expected "${r.def.type}"`);
     }
-    console.log('  Pipedrive cannot change a field\'s type after creation. Either rename the');
-    console.log('  existing field and re-run, or accept the type — the sync writes strings');
-    console.log('  and Pipedrive will coerce where it can.\n');
+    console.log('  Pipedrive cannot change a field\'s type after creation. Rename the existing');
+    console.log('  field (or delete it, if it holds nothing) and re-run to get the right type.');
+    console.log('  The sync writes a normalised YYYY-MM-DD to date fields either way, but a');
+    console.log('  date held in a varchar is NOT filterable or sortable in the CRM — which is');
+    console.log('  the entire reason Installation date is a date field.\n');
   }
 
   console.log('Nothing here creates deals, pipelines or organisations.');

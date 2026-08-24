@@ -2950,6 +2950,10 @@ async function startServer() {
   // hour between 06:00 and 22:00 Brisbane. Silent no-op when
   // GITHUB_TOKEN is unset.
   scheduleAutoTracker({ pool, checkAndSendTimeAlert });
+  // Shout if PIPEDRIVE_API_BASE points anywhere other than the real API — an
+  // override means every lead, person and note goes to the wrong host while
+  // looking completely healthy. Warns only; never blocks startup.
+  pipedrive.warnIfPipedriveMisrouted();
   // Cache the Pipedrive HOT label id once the network is up. Silent
   // no-op when PIPEDRIVE_API_TOKEN is unset.
   pipedrive.initPipedriveLabels().catch(err =>
