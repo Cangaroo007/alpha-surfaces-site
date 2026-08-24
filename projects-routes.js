@@ -493,6 +493,33 @@ The website caches aggressively. If changes don't appear:
 
 // ─── DB migration + seed ──────────────────────────────────────────────────
 async function initSchema(pool) {
+  // project_users MUST be created first: tickets.blocked_set_by_user_id,
+  // ticket_reviews.reviewer_id and ticket_attachments.user_id all carry a
+  // foreign key to it. Created later, those FKs fail on a virgin database and
+  // — because initSchema is fire-and-forget at the mount site — everything
+  // after the first failure is silently skipped, leaving the app running with
+  // no typed form tables at all.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS project_users (
+      id                   SERIAL PRIMARY KEY,
+      email                VARCHAR(255) UNIQUE NOT NULL,
+      name                 VARCHAR(100) NOT NULL,
+      role                 VARCHAR(20)  DEFAULT 'member',
+      password_hash        VARCHAR(255) NOT NULL,
+      last_login           TIMESTAMPTZ,
+      created_at           TIMESTAMPTZ DEFAULT NOW(),
+      active               BOOLEAN      DEFAULT TRUE,
+      must_change_password BOOLEAN      DEFAULT TRUE
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_users_email ON project_users(LOWER(email))`);
+  // Backfill the flag on existing production DBs that were created before
+  // Track G — every existing seeded user is on the shared default password.
+  await pool.query(
+    `ALTER TABLE project_users
+       ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT TRUE`
+  );
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS tickets (
       id            SERIAL PRIMARY KEY,
@@ -574,27 +601,6 @@ async function initSchema(pool) {
     )
   `);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_attachments_ticket ON ticket_attachments(ticket_id)`);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS project_users (
-      id                   SERIAL PRIMARY KEY,
-      email                VARCHAR(255) UNIQUE NOT NULL,
-      name                 VARCHAR(100) NOT NULL,
-      role                 VARCHAR(20)  DEFAULT 'member',
-      password_hash        VARCHAR(255) NOT NULL,
-      last_login           TIMESTAMPTZ,
-      created_at           TIMESTAMPTZ DEFAULT NOW(),
-      active               BOOLEAN      DEFAULT TRUE,
-      must_change_password BOOLEAN      DEFAULT TRUE
-    )
-  `);
-  await pool.query(`CREATE INDEX IF NOT EXISTS idx_users_email ON project_users(LOWER(email))`);
-  // Backfill the flag on existing production DBs that were created before
-  // Track G — every existing seeded user is on the shared default password.
-  await pool.query(
-    `ALTER TABLE project_users
-       ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT TRUE`
-  );
 
   // Per-user landing view preference (Track D). 'kanban' is the historical
   // default and matches what the front-end falls back to. Allowed values
