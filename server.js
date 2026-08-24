@@ -570,6 +570,43 @@ function queueFallbackFormResponse(req, res, formType, fields, sampleItems, err)
   }
 }
 
+// Warranty activation is the one public form with fields the visitor can't
+// improvise — batch/lot come off the invoice or slab label, and the two dates
+// have to be consistent with each other. Everything here mirrors the checks
+// in public/warranty.html so a bypassed client can't write a half-populated
+// activation. Scoped to 'Warranty Activation' only: every other form keeps
+// the email-only check it has always had.
+const WARRANTY_APPLICATIONS   = ['Kitchen benchtop', 'Bathroom benchtop', 'Laundry benchtop', 'Other'];
+const WARRANTY_COVERAGE_TYPES = ['Residential', 'Commercial'];
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function isRealIsoDate(v) {
+  if (!ISO_DATE_RE.test(String(v || ''))) return false;
+  const d = new Date(`${v}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === v;
+}
+
+function validateWarrantyFields(fields) {
+  const text = k => String(fields[k] == null ? '' : fields[k]).trim();
+  if (!text('stone_name') && !text('stone_interest')) return 'Please tell us the stone colour.';
+  if (!text('batch_number')) return 'Batch number is required. It\u2019s on your invoice or the slab label.';
+  if (!text('lot_number'))   return 'Lot number is required. It\u2019s on your invoice or the slab label.';
+  if (!WARRANTY_APPLICATIONS.includes(text('application'))) {
+    return 'Please select the application.';
+  }
+  if (!WARRANTY_COVERAGE_TYPES.includes(text('coverage_type'))) {
+    return 'Please select the warranty type.';
+  }
+  if (!text('fabricator')) return 'Please tell us the fabricator or installer.';
+  const purchase = text('purchase_date');
+  const install  = text('installation_date');
+  if (!isRealIsoDate(purchase)) return 'Please enter a valid purchase date.';
+  if (!isRealIsoDate(install))  return 'Please enter a valid installation date.';
+  // Both are real ISO dates here, so a plain string compare is a date compare.
+  if (install < purchase) return 'Installation date can\u2019t be before the purchase date.';
+  return null;
+}
+
 async function handleForm(req, res, formType) {
   let fallbackFields = req.body || {};
   let fallbackSampleItems = [];
@@ -578,6 +615,14 @@ async function handleForm(req, res, formType) {
     fallbackFields = fields;
     if (!fields.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
       return res.status(400).json({ ok: false, error: 'A valid email address is required.' });
+    }
+    if (formType === 'Warranty Activation') {
+      // `warranty_type` is accepted as an alias so an older cached copy of
+      // warranty.html doesn't fail validation mid-deploy. coverage_type is
+      // the canonical name — warranty_number is a different thing entirely.
+      if (!fields.coverage_type && fields.warranty_type) fields.coverage_type = fields.warranty_type;
+      const warrantyError = validateWarrantyFields(fields);
+      if (warrantyError) return res.status(400).json({ ok: false, error: warrantyError });
     }
     const sampleItems = fields.sampleItems
       ? fields.sampleItems.slice(0, 3)

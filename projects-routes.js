@@ -753,6 +753,18 @@ async function initSchema(pool) {
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_wa_status  ON warranty_activations(status)`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_wa_created ON warranty_activations(created_at DESC)`);
 
+  // Warranty detail captured from mid-2026 onward. All nullable so the rows
+  // activated before these fields existed still read and render. Note
+  // coverage_type (Residential / Commercial) is the cover the customer is
+  // claiming — NOT warranty_number (AW-YYYY-XXXX), which is assigned by
+  // Belinda on approval.
+  await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS batch_number      VARCHAR(100)`);
+  await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS lot_number        VARCHAR(100)`);
+  await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS application      VARCHAR(50)`);
+  await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS coverage_type    VARCHAR(20)`);
+  await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS installation_date DATE`);
+  await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS photo_consent     BOOLEAN DEFAULT FALSE`);
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS contact_submissions (
       id              SERIAL PRIMARY KEY,
@@ -1395,20 +1407,26 @@ async function insertTypedSubmission(pool, legacyFormType, fields, sampleItems =
            message, consent]
         );
       } else if (typeKey === 'warranty') {
-        const purchase = fields.purchase_date && /^\d{4}-\d{2}-\d{2}/.test(String(fields.purchase_date))
-          ? fields.purchase_date : null;
+        const isoDate = v => (v && /^\d{4}-\d{2}-\d{2}/.test(String(v))) ? v : null;
+        const purchase = isoDate(fields.purchase_date);
+        const install  = isoDate(fields.installation_date);
         result = await pool.query(
           `INSERT INTO warranty_activations
              (reference, name, email, phone, street, suburb, state, postcode,
-              stone_name, purchase_date, fabricator, retailer, invoice_number,
-              installation_photos, consent)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+              stone_name, batch_number, lot_number, application, coverage_type,
+              purchase_date, installation_date, fabricator, retailer, invoice_number,
+              installation_photos, photo_consent, consent)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)
            RETURNING id, reference`,
           [ref, name, fields.email, fields.phone || '',
            fields.street || '', fields.suburb || '', fields.state || '', fields.postcode || '',
            fields.stone_name || fields.stone_interest || '',
-           purchase, fields.fabricator || '', fields.retailer || null, fields.invoice_number || null,
+           fields.batch_number || null, fields.lot_number || null,
+           fields.application || null,
+           fields.coverage_type || fields.warranty_type || null,
+           purchase, install, fields.fabricator || '', fields.retailer || null, fields.invoice_number || null,
            Array.isArray(fields.installation_photos) ? fields.installation_photos : [],
+           !!fields.photo_consent,
            consent]
         );
       } else if (typeKey === 'contact') {
@@ -2332,7 +2350,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
           if (typeKey === 'sample' || typeKey === 'enquiry' || typeKey === 'partner') cols.push('company');
           if (typeKey === 'enquiry' || typeKey === 'partner' || typeKey === 'contact') cols.push('message');
           if (typeKey === 'sample') cols.push('stone_interest');
-          if (typeKey === 'warranty') cols.push('stone_name', 'fabricator', 'suburb');
+          if (typeKey === 'warranty') cols.push('stone_name', 'fabricator', 'suburb',
+            'batch_number', 'lot_number', 'application', 'coverage_type');
           if (typeKey === 'showroom') cols.push('phone', 'interests', 'visitor_type', 'state', 'notes', 'source');
           where.push('(' + cols.map(c => `${c} ILIKE $${i}`).join(' OR ') + ')');
         }

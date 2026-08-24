@@ -229,6 +229,8 @@
   .warranty-card .wc-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
   .warranty-card .wc-stone { font-size: 13.5px; color: var(--text); margin-bottom: 8px; }
   .warranty-card .wc-stone strong { color: var(--olive); }
+  .warranty-card .wc-use { font-size: 12.5px; color: var(--text); font-weight: 600; margin-bottom: 4px; }
+  .warranty-card .wc-ids { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; margin-bottom: 8px; }
   .warranty-card .wc-meta { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; }
   .warranty-card .wc-photos { display: flex; gap: 6px; }
   .warranty-card .wc-photos img { width: 56px; height: 56px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
@@ -3216,6 +3218,12 @@
         : '<div class="wc-no-photos">No photos uploaded</div>';
       var locationParts = [r.suburb, r.state, r.postcode].filter(Boolean).join(' ');
       var purchase = r.purchase_date ? formatDate(r.purchase_date) : '—';
+      var install  = r.installation_date ? formatDate(r.installation_date) : null;
+      var useParts = [r.application, r.coverage_type].filter(Boolean).join(' · ');
+      var idParts  = [
+        r.batch_number ? 'Batch ' + r.batch_number : null,
+        r.lot_number   ? 'Lot '   + r.lot_number   : null
+      ].filter(Boolean).join(' · ');
       return '<div class="warranty-card" data-id="' + r.id + '">' +
         '<div class="wc-head">' +
           '<div>' +
@@ -3227,8 +3235,11 @@
         '</div>' +
         '<div class="wc-stone"><strong>' + escapeHtml(r.stone_name || '—') + '</strong>' +
           (r.fabricator ? ' · ' + escapeHtml(r.fabricator) : '') + '</div>' +
+        (useParts ? '<div class="wc-use">' + escapeHtml(useParts) + '</div>' : '') +
+        (idParts  ? '<div class="wc-ids">' + escapeHtml(idParts) + '</div>' : '') +
         '<div class="wc-meta">' +
           '<span>Purchased ' + escapeHtml(purchase) + '</span>' +
+          (install ? '<span>Installed ' + escapeHtml(install) + '</span>' : '') +
           (r.retailer ? '<span>via ' + escapeHtml(r.retailer) + '</span>' : '') +
           (r.invoice_number ? '<span>Invoice ' + escapeHtml(r.invoice_number) + '</span>' : '') +
         '</div>' +
@@ -3416,20 +3427,29 @@
       ]);
     }
     if (typeKey === 'warranty') {
+      // "Warranty type" (coverage_type — what the customer declared) is kept
+      // well clear of "Warranty number" (AW-…, assigned on approval) so the
+      // two similarly-named fields don't get read as one.
       return common.concat([
         { key: 'street',         label: 'Street' },
         { key: 'suburb',         label: 'Suburb' },
         { key: 'state',          label: 'State' },
         { key: 'postcode',       label: 'Postcode' },
         { key: 'stone_name',     label: 'Stone' },
+        { key: 'batch_number',   label: 'Batch number' },
+        { key: 'lot_number',     label: 'Lot number' },
+        { key: 'application',    label: 'Application' },
+        { key: 'coverage_type',  label: 'Warranty type' },
         { key: 'purchase_date',  label: 'Purchase date', fmt: 'date' },
+        { key: 'installation_date', label: 'Installation date', fmt: 'date' },
         { key: 'fabricator',     label: 'Fabricator' },
         { key: 'retailer',       label: 'Retailer' },
         { key: 'invoice_number', label: 'Invoice number' },
+        { key: 'photo_consent',  label: 'Photo consent', fmt: 'boolean' },
+        { key: 'consent',        label: 'Consent', fmt: 'boolean' },
         { key: 'warranty_number',label: 'Warranty number' },
         { key: 'approved_at',    label: 'Approved at', fmt: 'datetime' },
-        { key: 'approved_by',    label: 'Approved by' },
-        { key: 'consent',        label: 'Consent', fmt: 'boolean' }
+        { key: 'approved_by',    label: 'Approved by' }
       ]);
     }
     if (typeKey === 'showroom') {

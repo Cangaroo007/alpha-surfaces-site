@@ -396,17 +396,29 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
       console.log(`[pipedrive] logged showroom visit for ${name}`);
       break;
 
-    case 'Warranty Activation':
+    case 'Warranty Activation': {
+      // Batch + lot are what makes a future claim traceable back to the slab,
+      // so they lead the note. coverage_type is the cover the customer
+      // declared (Residential / Commercial) — not the AW- warranty number,
+      // which Belinda assigns on approval and never reaches Pipedrive.
+      const photoCount = Array.isArray(fields.installation_photos) ? fields.installation_photos.length : 0;
       await pdPost('notes', {
         person_id: person.id,
         content:
           `<b>Warranty Activation ${escape(ref)}</b><br>` +
           `Stone: ${escape(fields.stone_interest || fields.stone_name || '—')}<br>` +
+          `Batch: ${escape(fields.batch_number || '—')} · Lot: ${escape(fields.lot_number || '—')}<br>` +
+          `Application: ${escape(fields.application || '—')}<br>` +
+          `Warranty type: ${escape(fields.coverage_type || fields.warranty_type || '—')}<br>` +
           `Fabricator: ${escape(fields.fabricator || '—')}<br>` +
           `Purchase date: ${escape(fields.purchase_date || '—')}<br>` +
+          `Installation date: ${escape(fields.installation_date || '—')}<br>` +
+          `Installation photos: ${photoCount ? photoCount + ' attached' : 'none'}` +
+          `${fields.photo_consent ? ' (approved for social media)' : ''}<br>` +
           `Source: alphasurfaces.com.au/warranty`,
       });
       break;
+    }
 
     default:
       // Unknown form types — silently skip.

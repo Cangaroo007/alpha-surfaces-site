@@ -64,8 +64,10 @@ img { display: block; max-width: 100%; }
   background-size: 12px 6px;
   padding-right: 24px;
 }
+.field-help { font-family: 'Degular', sans-serif; font-size: 12px; line-height: 1.45; color: rgba(0,0,0,0.55); margin-top: 2px; }
 .field-error { font-family: 'Degular', sans-serif; font-size: 12px; color: var(--red); margin-top: 2px; display: none; }
 .field-error.show { display: block; }
+.field-group[hidden] { display: none; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
 
@@ -99,6 +101,9 @@ img { display: block; max-width: 100%; }
 .photo-thumb .photo-remove:hover { background: rgba(220,38,38,0.85); }
 .photo-thumb.is-uploading::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.6) url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%2210%22 stroke=%22%23564D22%22 stroke-width=%222%22 fill=%22none%22 stroke-dasharray=%2240 60%22%3E%3CanimateTransform attributeName=%22transform%22 type=%22rotate%22 from=%220 12 12%22 to=%22360 12 12%22 dur=%221s%22 repeatCount=%22indefinite%22/%3E%3C/circle%3E%3C/svg%3E') center/24px no-repeat; }
 .photo-error { font-family: 'Degular', sans-serif; font-size: 12px; color: var(--red); margin-top: 8px; }
+.photo-consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(86,77,34,0.18); }
+.photo-consent input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--olive); cursor: pointer; flex-shrink: 0; margin-top: 1px; }
+.photo-consent label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 12px; color: rgba(0,0,0,0.65); line-height: 1.5; cursor: pointer; }
 
 .consent-row { display: flex; align-items: flex-start; gap: 12px; }
 .consent-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--olive); cursor: pointer; flex-shrink: 0; margin-top: 2px; }
@@ -260,13 +265,63 @@ img { display: block; max-width: 100%; }
         <div class="field-row">
           <div class="field-group">
             <label class="field-label" for="stone_interest">Stone colour / name <span class="req">*</span></label>
-            <input id="stone_interest" name="stone_interest" type="text" class="field-input" placeholder="e.g. Calacatta Leggera" required>
-            <div class="field-error" data-for="stone_interest">Please enter the stone name.</div>
+            <select id="stone_interest" name="stone_interest" class="field-select" required>
+              <option value="">- Select -</option>
+              <option value="__other__">Other / not listed</option>
+            </select>
+            <div class="field-error" data-for="stone_interest">Please select the stone colour.</div>
           </div>
           <div class="field-group">
             <label class="field-label" for="purchase_date">Purchase date <span class="req">*</span></label>
             <input id="purchase_date" name="purchase_date" type="date" class="field-input" required>
             <div class="field-error" data-for="purchase_date">Please enter the purchase date.</div>
+          </div>
+        </div>
+        <div class="field-group" id="stone-other-group" hidden>
+          <label class="field-label" for="stone_other">Stone colour / name <span class="req">*</span></label>
+          <input id="stone_other" name="stone_other" type="text" class="field-input" placeholder="e.g. Oyster">
+          <div class="field-help">Enter the colour name exactly as it appears on your invoice or slab label.</div>
+          <div class="field-error" data-for="stone_other">Please enter the stone colour name.</div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" for="batch_number">Batch number <span class="req">*</span></label>
+            <input id="batch_number" name="batch_number" type="text" class="field-input" required>
+            <div class="field-help">Found on your invoice or the slab label &mdash; ask your fabricator if unsure</div>
+            <div class="field-error" data-for="batch_number">Please enter the batch number.</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="lot_number">Lot number <span class="req">*</span></label>
+            <input id="lot_number" name="lot_number" type="text" class="field-input" required>
+            <div class="field-help">Found on your invoice or the slab label &mdash; ask your fabricator if unsure</div>
+            <div class="field-error" data-for="lot_number">Please enter the lot number.</div>
+          </div>
+        </div>
+        <div class="field-row-3">
+          <div class="field-group">
+            <label class="field-label" for="application">Application <span class="req">*</span></label>
+            <select id="application" name="application" class="field-select" required>
+              <option value="">- Select -</option>
+              <option value="Kitchen benchtop">Kitchen benchtop</option>
+              <option value="Bathroom benchtop">Bathroom benchtop</option>
+              <option value="Laundry benchtop">Laundry benchtop</option>
+              <option value="Other">Other</option>
+            </select>
+            <div class="field-error" data-for="application">Please select the application.</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="coverage_type">Warranty type <span class="req">*</span></label>
+            <select id="coverage_type" name="coverage_type" class="field-select" required>
+              <option value="">- Select -</option>
+              <option value="Residential">Residential</option>
+              <option value="Commercial">Commercial</option>
+            </select>
+            <div class="field-error" data-for="coverage_type">Please select the warranty type.</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="installation_date">Installation date <span class="req">*</span></label>
+            <input id="installation_date" name="installation_date" type="date" class="field-input" required>
+            <div class="field-error" data-for="installation_date">Please enter the installation date.</div>
           </div>
         </div>
         <div class="field-group">
@@ -287,13 +342,17 @@ img { display: block; max-width: 100%; }
         <div class="photo-upload" id="photo-upload">
           <div class="photo-upload-cta">
             <span style="font-size:18px;line-height:1">&#128247;</span>
-            <span><strong>Installation photos</strong> &mdash; up to 3 images.</span>
+            <span><strong>Installation photos</strong> &mdash; optional</span>
             <button type="button" id="photo-pick-btn" style="margin-left:auto">Choose photos</button>
             <input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple style="display:none">
           </div>
-          <div class="photo-upload-help">Drag-and-drop also works. JPG, PNG, WebP or HEIC, max 5MB each.</div>
+          <div class="photo-upload-help">Photos aren't required &mdash; you can submit this form without them. They just help us assess any future claim faster. Up to 3 images; drag-and-drop also works. JPG, PNG, WebP or HEIC, max 5MB each.</div>
           <div class="photo-thumbs" id="photo-thumbs"></div>
           <div class="photo-error" id="photo-error" aria-live="polite"></div>
+          <div class="photo-consent">
+            <input type="checkbox" id="photo_consent" name="photo_consent">
+            <label for="photo_consent">I'm happy for Alpha Surfaces to use my installation photos on social media and marketing. Optional &mdash; leaving this unticked doesn't affect your warranty.</label>
+          </div>
         </div>
       </div>
 
@@ -315,6 +374,7 @@ img { display: block; max-width: 100%; }
 
 <script src="nav.js?v=22"></script>
 <script src="/newsletter-form.js"></script>
+<script src="/public-stones-loader.js?v=2"></script>
 <script>
 (function () {
   'use strict';
@@ -346,7 +406,7 @@ img { display: block; max-width: 100%; }
     banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  function validate(d) {
+  function validate(d, stone) {
     var ok = true;
     if (!d.name)                                { showFieldError('name');           ok = false; }
     if (!d.email || !EMAIL_RE.test(d.email))    { showFieldError('email');          ok = false; }
@@ -355,12 +415,101 @@ img { display: block; max-width: 100%; }
     if (!d.suburb)                              { showFieldError('suburb');         ok = false; }
     if (!d.state)                               { showFieldError('state');          ok = false; }
     if (!d.postcode || !/^\d{4}$/.test(d.postcode)) { showFieldError('postcode');   ok = false; }
-    if (!d.stone_interest)                      { showFieldError('stone_interest'); ok = false; }
+    // Stone: either a pick from the generated list, or the free-text box the
+    // "Other / not listed" option reveals. When the stone data fails to load
+    // the select is retired entirely and only the free-text box is checked.
+    if (stoneSelectMode && !stone.choice)       { showFieldError('stone_interest'); ok = false; }
+    if ((!stoneSelectMode || stone.choice === OTHER_VALUE) && !stone.other) {
+      showFieldError('stone_other');    ok = false;
+    }
+    if (!d.batch_number)                        { showFieldError('batch_number');   ok = false; }
+    if (!d.lot_number)                          { showFieldError('lot_number');     ok = false; }
+    if (!d.application)                         { showFieldError('application');    ok = false; }
+    if (!d.coverage_type)                       { showFieldError('coverage_type');  ok = false; }
     if (!d.purchase_date)                       { showFieldError('purchase_date');  ok = false; }
+    if (!d.installation_date) {
+      showFieldError('installation_date', 'Please enter the installation date.');
+      ok = false;
+    }
+    // Only compare once both dates are real ISO dates — an incomplete or
+    // malformed date is already reported by its own required check above.
+    if (DATE_RE.test(d.purchase_date) && DATE_RE.test(d.installation_date)
+        && d.installation_date < d.purchase_date) {
+      showFieldError('installation_date', 'Installation date can\u2019t be before the purchase date.');
+      ok = false;
+    }
     if (!d.fabricator)                          { showFieldError('fabricator');     ok = false; }
     if (!d.consent)                             { showFieldError('consent');        ok = false; }
     return ok;
   }
+
+  // ── Stone colour select ──
+  // Options are generated from the live stone data (managed API first, then
+  // the checked-in public/data/stones.json) via public-stones-loader.js —
+  // never hard-coded, so a new colour in the CMS appears here on its own.
+  // Alpha Zero is included as its own group: run-out stock is still being
+  // installed and those owners still need to activate a warranty.
+  var OTHER_VALUE = '__other__';
+  var DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  var stoneSelect     = document.getElementById('stone_interest');
+  var stoneOtherGroup = document.getElementById('stone-other-group');
+  var stoneOtherInput = document.getElementById('stone_other');
+  var stoneSelectMode = true;
+
+  function syncStoneOther() {
+    var show = !stoneSelectMode || stoneSelect.value === OTHER_VALUE;
+    stoneOtherGroup.hidden = !show;
+    if (!show) stoneOtherInput.value = '';
+  }
+
+  // Fallback when stone data is unavailable: drop the select and take the
+  // colour as free text, exactly as this field worked before. Better a plain
+  // text box than a form nobody can submit.
+  function useFreeTextStone() {
+    stoneSelectMode = false;
+    stoneSelect.removeAttribute('required');
+    stoneSelect.closest('.field-group').hidden = true;
+    stoneOtherInput.placeholder = 'e.g. Calacatta Leggera';
+    syncStoneOther();
+  }
+
+  function populateStones(data) {
+    var collections = (data && data.collections) || [];
+    var html = '<option value="">- Select -</option>' +
+      '<option value="' + OTHER_VALUE + '">Other / not listed</option>' +
+      '<option value="" disabled>\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</option>';
+    var total = 0;
+    collections.forEach(function (c) {
+      var stones = (c.stones || []).filter(function (st) { return st && st.name; });
+      if (!stones.length) return;
+      html += '<optgroup label="' + escapeAttr(c.name || 'Collection') + '">' +
+        stones.map(function (st) {
+          return '<option value="' + escapeAttr(st.name) + '">' + escapeHtml(st.name) + '</option>';
+        }).join('') +
+      '</optgroup>';
+      total += stones.length;
+    });
+    if (!total) throw new Error('No stones in payload');
+    stoneSelect.innerHTML = html;
+  }
+
+  function escapeHtml(v) {
+    return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function escapeAttr(v) { return escapeHtml(v); }
+
+  if (typeof window.loadPublicStones === 'function') {
+    window.loadPublicStones('/data/stones.json')
+      .then(populateStones)
+      .catch(function (err) {
+        if (window.console && console.warn) console.warn('[warranty] stone list unavailable:', err.message);
+        useFreeTextStone();
+      });
+  } else {
+    useFreeTextStone();
+  }
+  stoneSelect.addEventListener('change', syncStoneOther);
 
   // ── Photo upload ──
   // Photos are uploaded to /api/warranty-upload as soon as they're picked, so
@@ -452,6 +601,16 @@ img { display: block; max-width: 100%; }
     clearErrors();
 
     var fd = new FormData(form);
+    // The colour that goes to the server is always a plain name — either the
+    // picked option or whatever "Other / not listed" revealed. Downstream
+    // (DB, email, Pipedrive) sees the same shape it always has.
+    var stone = {
+      choice: fd.get('stone_interest') || '',
+      other:  (fd.get('stone_other')   || '').trim()
+    };
+    var stoneName = (stoneSelectMode && stone.choice !== OTHER_VALUE)
+      ? stone.choice.trim()
+      : stone.other;
     var data = {
       form_type:      'warranty',
       name:           (fd.get('name')           || '').trim(),
@@ -461,18 +620,24 @@ img { display: block; max-width: 100%; }
       suburb:         (fd.get('suburb')         || '').trim(),
       state:          fd.get('state')           || '',
       postcode:       (fd.get('postcode')       || '').trim(),
-      stone_interest: (fd.get('stone_interest') || '').trim(),
-      stone_name:     (fd.get('stone_interest') || '').trim(),
+      stone_interest: stoneName,
+      stone_name:     stoneName,
+      batch_number:   (fd.get('batch_number')   || '').trim(),
+      lot_number:     (fd.get('lot_number')     || '').trim(),
+      application:    fd.get('application')     || '',
+      coverage_type:  fd.get('coverage_type')   || '',
       purchase_date:  fd.get('purchase_date')   || '',
+      installation_date: fd.get('installation_date') || '',
       fabricator:     (fd.get('fabricator')     || '').trim(),
       retailer:       (fd.get('retailer')       || '').trim(),
       invoice_number: (fd.get('invoice_number') || '').trim(),
       installation_photos: photoUrls.slice(),
+      photo_consent:  fd.get('photo_consent') === 'on',
       consent:        fd.get('consent') === 'on',
       source:         'warranty-page'
     };
 
-    if (!validate(data)) return;
+    if (!validate(data, stone)) return;
 
     btn.disabled = true;
     btn.classList.add('loading');

@@ -1308,11 +1308,17 @@ function buildSubmissionEmailHTML(s) {
   const knownKeys = new Set([
     'id','form_type','submitted_at','name','email','phone','company','role',
     'reason','unit','street','suburb','postcode','state','store_location',
-    'stone_interest','message','source','consent','status','raw_data'
+    'stone_interest','message','source','consent','status','raw_data',
+    // Warranty activation detail — rendered in its own group below instead of
+    // being dumped into "Additional data" under raw snake_case keys. No other
+    // form submits these, so every other form's email is unchanged.
+    'batch_number','lot_number','application','coverage_type','warranty_type',
+    'purchase_date','installation_date','fabricator','retailer','invoice_number',
+    'installation_photos','photo_consent','stone_other'
   ]);
 
-  const rows = (entries) => entries.map(([key, label, formatter]) => {
-    const val = s[key];
+  const rowsOf = (src, entries) => entries.map(([key, label, formatter]) => {
+    const val = src[key];
     if (val == null || val === '' || (typeof val === 'boolean' && key !== 'consent' && val === false)) return '';
     const formatted = formatter ? formatter(val) : escapeHtml(String(val));
     return `<tr>
@@ -1320,6 +1326,7 @@ function buildSubmissionEmailHTML(s) {
       <td style="padding:10px 0;color:#222;font-size:15px;line-height:1.5;vertical-align:top">${formatted}</td>
     </tr>`;
   }).filter(Boolean).join('');
+  const rows = (entries) => rowsOf(s, entries);
 
   const sections = groups.map(g => {
     const r = rows(g.keys);
@@ -1329,6 +1336,57 @@ function buildSubmissionEmailHTML(s) {
       <table cellpadding="0" cellspacing="0" border="0" width="100%">${r}</table>
     </td></tr>`;
   }).filter(Boolean).join('');
+
+  // Warranty activations carry product detail that form_submissions has no
+  // dedicated columns for — it lives in raw_data. Given its own group so the
+  // batch/lot numbers and the two dates read in order.
+  let warrantySection = '';
+  if (String(s.form_type || '') === 'Warranty Activation') {
+    const rd = (s.raw_data && typeof s.raw_data === 'object') ? s.raw_data : {};
+    const photos = Array.isArray(rd.installation_photos) ? rd.installation_photos : [];
+    // House convention: DD/MM/YYYY customer-facing. These arrive as ISO from
+    // the date inputs; anything unparseable is passed through untouched.
+    const auDate = v => {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v || ''));
+      return m ? `${m[3]}/${m[2]}/${m[1]}` : (v || '');
+    };
+    const w = {
+      batch_number:      rd.batch_number || '',
+      lot_number:        rd.lot_number   || '',
+      application:       rd.application  || '',
+      coverage_type:     rd.coverage_type || rd.warranty_type || '',
+      purchase_date:     auDate(rd.purchase_date),
+      installation_date: auDate(rd.installation_date),
+      fabricator:        rd.fabricator || '',
+      retailer:          rd.retailer || '',
+      invoice_number:    rd.invoice_number || '',
+      installation_photos: photos.length
+        ? photos.map((u, i) => `<a href="${escapeAttr(u)}" style="color:#564D22">Photo ${i + 1}</a>`).join(' &middot; ')
+        : 'None uploaded (optional)',
+      photo_consent:     rd.photo_consent
+        ? '\u2713 May be used on social media / marketing'
+        : '\u2014 Not approved for social media use'
+    };
+    const wRows = rowsOf(w, [
+      ['batch_number',       'Batch number'],
+      ['lot_number',         'Lot number'],
+      ['application',        'Application'],
+      ['coverage_type',      'Warranty type'],
+      ['purchase_date',      'Purchase date'],
+      ['installation_date',  'Installation date'],
+      ['fabricator',         'Fabricator / installer'],
+      ['retailer',           'Retailer'],
+      ['invoice_number',     'Invoice number'],
+      ['installation_photos','Installation photos', v => v],
+      ['photo_consent',      'Photo consent']
+    ]);
+    if (wRows) {
+      warrantySection = `<tr><td style="padding:24px 32px 8px 32px">
+        <h2 style="margin:0 0 8px;color:#564D22;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid #e8e3d3;padding-bottom:8px">Warranty Details</h2>
+        <table cellpadding="0" cellspacing="0" border="0" width="100%">${wRows}</table>
+      </td></tr>`;
+    }
+  }
 
   // Additional data — anything in raw_data not already in a known column,
   // and aliases like first_name/last_name that we already merged into `name`.
@@ -1368,7 +1426,7 @@ function buildSubmissionEmailHTML(s) {
         <p style="margin:0;color:#f3f1e6;font-size:13px;letter-spacing:.12em;text-transform:uppercase">Alpha Surfaces</p>
         <h1 style="margin:6px 0 0;color:#fff;font-size:22px;font-weight:600">New ${escapeHtml(formatFormType(s.form_type))} #${s.id || ''}</h1>
       </td></tr>
-      ${sections}
+      ${sections}${warrantySection}
       ${extraSection}
       <tr><td style="padding:24px 32px 32px 32px">
         <a href="${escapeAttr(formsUrl)}" style="display:inline-block;background:#564D22;color:#fff;padding:12px 24px;text-decoration:none;font-size:13px;letter-spacing:.06em;text-transform:uppercase;border-radius:4px">View in admin</a>
