@@ -4,7 +4,9 @@
 // person. Best-effort throughout — every call is wrapped so a Pipedrive
 // outage can't fail a public form submit.
 
-const PD_BASE = 'https://api.pipedrive.com/v1';
+// Overridable so the integration can be pointed at a sandbox workspace or a
+// local stub in tests. Unset in production — defaults to the real API.
+const PD_BASE = process.env.PIPEDRIVE_API_BASE || 'https://api.pipedrive.com/v1';
 
 // Pipedrive person custom-field keys (provided by the workspace). Both are
 // multi-select ('set') fields, so values are merged with whatever the person
@@ -83,6 +85,20 @@ function mergeSetField(existing, addIds) {
   if (merged.length === have.length) return null;
   return merged.join(',');
 }
+
+// Warranty person custom-field keys. Unlike the fields above these are NOT
+// hard-coded: the keys are 40-char hashes that differ per workspace, so they
+// come from env. Run `node scripts/pipedrive-warranty-fields.js` once to
+// create the fields and print the exact assignments to paste into Railway.
+// Every one is optional — an unset key means that field is simply skipped,
+// so a partially-configured workspace still syncs whatever it can.
+const WARRANTY_PERSON_FIELDS = [
+  { env: 'PIPEDRIVE_FIELD_FABRICATOR',        name: 'Fabricator / installer', type: 'varchar', from: f => f.fabricator },
+  { env: 'PIPEDRIVE_FIELD_RETAILER',          name: 'Retailer / stockist',    type: 'varchar', from: f => f.retailer },
+  { env: 'PIPEDRIVE_FIELD_STONE_COLOUR',      name: 'Stone colour',           type: 'varchar', from: f => f.stone_name || f.stone_interest },
+  { env: 'PIPEDRIVE_FIELD_INSTALLATION_DATE', name: 'Installation date',      type: 'date',    from: f => f.installation_date },
+  { env: 'PIPEDRIVE_FIELD_WARRANTY_REFERENCE', name: 'Warranty reference',    type: 'varchar', from: (f, ref) => ref },
+];
 
 // Custom activity type created in the workspace for iPad walk-ins. Counting
 // them relies on this key — generic 'meeting' is indistinguishable from every
@@ -268,6 +284,87 @@ function escape(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// ─── Warranty: structured person fields + fabricator → organisation ───
+
+// Normalise a business name for comparison. Deliberately conservative: it
+// folds case, punctuation and trailing legal-entity suffixes, and nothing
+// else. Stripping words like "Australia" or "Group" would fold genuinely
+// different businesses together, and a wrong org link is worse than none —
+// it silently reassigns a customer to another company's record.
+const ORG_SUFFIXES = /\s+(pty\s+ltd|pty\s+limited|pty|ltd|limited|inc|incorporated|p\s+l)$/;
+
+function normaliseOrgName(name) {
+  let n = String(name || '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  // Suffixes can stack ("Coast Stone Pty Ltd" → strip "pty ltd"); loop until
+  // stable so "… Pty Ltd Ltd" and similar data-entry noise still land.
+  let prev;
+  do { prev = n; n = n.replace(ORG_SUFFIXES, '').trim(); } while (n !== prev);
+  return n;
+}
+
+// Look for an existing organisation whose normalised name is exactly the
+// fabricator's. Returns { status, org } where status is one of:
+//   'matched'    — exactly one organisation matched, safe to link
+//   'ambiguous'  — several distinct organisations matched, so we link none
+//   'unmatched'  — nothing matched
+//   'error'      — the search itself failed; NOT the same as unmatched, and
+//                  deliberately separate so a Pipedrive outage can't quietly
+//                  depress the match rate we report on.
+// NEVER creates an organisation: an auto-created org per fabricator typo
+// would fill the workspace with near-duplicates that someone has to merge
+// by hand. Unmatched fabricators stay in the note and in the custom field.
+async function matchFabricatorOrganisation(fabricator) {
+  const target = normaliseOrgName(fabricator);
+  if (target.length < 3) return { status: 'unmatched', org: null, target };
+  const search = await pdGet('organizations/search', { term: fabricator, limit: 10 });
+  // pdGet returns null when the request threw — a network failure, not a miss.
+  if (search == null) return { status: 'error', org: null, target };
+  const items = search?.data?.items || [];
+  const hits = [];
+  for (const entry of items) {
+    const org = entry?.item;
+    if (!org?.id) continue;
+    if (normaliseOrgName(org.name) === target && !hits.some(h => h.id === org.id)) {
+      hits.push({ id: org.id, name: org.name });
+    }
+  }
+  if (hits.length === 1) return { status: 'matched', org: hits[0], target };
+  if (hits.length > 1)   return { status: 'ambiguous', org: null, target, candidates: hits };
+  return { status: 'unmatched', org: null, target };
+}
+
+// Write the five structured warranty fields onto the person. Latest
+// activation wins: someone activating a second benchtop has newer, more
+// relevant detail, and the append-only notes keep the full history. Skips
+// any field whose env key isn't configured and any empty value, so a
+// half-configured workspace still writes what it can.
+async function setWarrantyPersonFields(personId, fields, ref) {
+  if (!personId) return [];
+  const patch = {};
+  const written = [];
+  for (const def of WARRANTY_PERSON_FIELDS) {
+    const key = process.env[def.env];
+    if (!key) continue;
+    const value = def.from(fields, ref);
+    if (value == null || String(value).trim() === '') continue;
+    patch[key] = String(value).trim();
+    written.push(def.name);
+  }
+  if (!written.length) return [];
+  // pdPatch swallows transport errors and returns null; don't claim success
+  // on the back of that, or an outage reads as a clean write in the logs.
+  const result = await pdPatch(`persons/${personId}`, patch);
+  if (!result || result.success === false) {
+    throw new Error(`person field write rejected (${written.length} field(s))`);
+  }
+  return written;
+}
+
 // Form-type → Pipedrive object mapping. Sample/Enquiry/Contact/Partner
 // produce HOT leads; Showroom check-ins log a completed meeting activity;
 // warranty activations attach as a person note (not a sales lead).
@@ -397,26 +494,93 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
       break;
 
     case 'Warranty Activation': {
-      // Batch + lot are what makes a future claim traceable back to the slab,
-      // so they lead the note. coverage_type is the cover the customer
-      // declared (Residential / Commercial) — not the AW- warranty number,
-      // which Belinda assigns on approval and never reaches Pipedrive.
+      // Warranty activations are not sales leads and never become deals —
+      // warranty_activations in Postgres stays the system of record. Pipedrive
+      // gets the sales-relevant subset: five structured person fields (so the
+      // data is filterable/reportable), an optional organisation link, and the
+      // note as the human-readable summary.
+      //
+      // Each step is independently guarded. A failure in one must not stop the
+      // others, and none of them may fail the submission — the caller in
+      // server.js is already fire-and-forget, and this keeps a partial outage
+      // from costing us the note as well as the fields.
       const photoCount = Array.isArray(fields.installation_photos) ? fields.installation_photos.length : 0;
-      await pdPost('notes', {
-        person_id: person.id,
-        content:
-          `<b>Warranty Activation ${escape(ref)}</b><br>` +
-          `Stone: ${escape(fields.stone_interest || fields.stone_name || '—')}<br>` +
-          `Batch: ${escape(fields.batch_number || '—')} · Lot: ${escape(fields.lot_number || '—')}<br>` +
-          `Application: ${escape(fields.application || '—')}<br>` +
-          `Warranty type: ${escape(fields.coverage_type || fields.warranty_type || '—')}<br>` +
-          `Fabricator: ${escape(fields.fabricator || '—')}<br>` +
-          `Purchase date: ${escape(fields.purchase_date || '—')}<br>` +
-          `Installation date: ${escape(fields.installation_date || '—')}<br>` +
-          `Installation photos: ${photoCount ? photoCount + ' attached' : 'none'}` +
-          `${fields.photo_consent ? ' (approved for social media)' : ''}<br>` +
-          `Source: alphasurfaces.com.au/warranty`,
-      });
+      const coverage = fields.coverage_type || fields.warranty_type || '';
+
+      // 1. Structured fields on the person.
+      try {
+        const written = await setWarrantyPersonFields(person.id, fields, ref);
+        if (written.length) {
+          console.log(`[pipedrive] warranty fields set on person ${person.id}: ${written.join(', ')}`);
+        } else {
+          console.warn('[pipedrive] no warranty person fields configured — ' +
+            'run scripts/pipedrive-warranty-fields.js and set the PIPEDRIVE_FIELD_* env vars');
+        }
+      } catch (err) {
+        console.error('[pipedrive] warranty field write failed:', err.message);
+      }
+
+      // 2. Fabricator → organisation, match-only. Logged either way so the
+      // hit rate is visible in the Railway logs over time; grep
+      // '[pipedrive] fabricator' to measure it.
+      let orgNote = '';
+      if (fields.fabricator && String(fields.fabricator).trim()) {
+        try {
+          const m = await matchFabricatorOrganisation(fields.fabricator);
+          if (m.status === 'matched') {
+            console.log(`[pipedrive] fabricator matched: "${fields.fabricator}" → org ${m.org.id} (${m.org.name})`);
+            // Only fill an empty org — never move a person who is already
+            // attached to an organisation someone chose deliberately.
+            if (!orgId) {
+              await pdPatch(`persons/${person.id}`, { org_id: m.org.id });
+              console.log(`[pipedrive] linked person ${person.id} → org ${m.org.id}`);
+            } else if (String(orgId) !== String(m.org.id)) {
+              orgNote = `<br><i>Fabricator "${escape(fields.fabricator)}" matches organisation ` +
+                `${escape(m.org.name)} (#${m.org.id}), but this person is already linked to ` +
+                `organisation #${escape(orgId)} — left as is.</i>`;
+              console.log(`[pipedrive] fabricator matched but person ${person.id} already on org ${orgId}`);
+            }
+          } else if (m.status === 'ambiguous') {
+            const names = (m.candidates || []).map(c => `${c.name} (#${c.id})`).join(', ');
+            console.log(`[pipedrive] fabricator ambiguous: "${fields.fabricator}" → ${names}`);
+            orgNote = `<br><i>Fabricator "${escape(fields.fabricator)}" matches more than one ` +
+              `organisation (${escape(names)}) — not linked, please pick one.</i>`;
+          } else if (m.status === 'error') {
+            // Not a miss — say so, so the hit rate stays honest.
+            console.error(`[pipedrive] fabricator lookup errored: "${fields.fabricator}" — org match skipped`);
+          } else {
+            console.log(`[pipedrive] fabricator unmatched: "${fields.fabricator}" (normalised "${m.target}")`);
+            orgNote = `<br><i>Fabricator "${escape(fields.fabricator)}" has no matching organisation ` +
+              `in Pipedrive — not linked, and nothing was created automatically.</i>`;
+          }
+        } catch (err) {
+          console.error('[pipedrive] fabricator org match failed:', err.message);
+        }
+      }
+
+      // 3. The note stays the human-readable summary, leading with batch/lot —
+      // those are what make a future claim traceable back to the slab.
+      try {
+        await pdPost('notes', {
+          person_id: person.id,
+          content:
+            `<b>Warranty Activation ${escape(ref)}</b><br>` +
+            `Batch: ${escape(fields.batch_number || '—')} · Lot: ${escape(fields.lot_number || '—')}<br>` +
+            `Stone: ${escape(fields.stone_interest || fields.stone_name || '—')}<br>` +
+            `Application: ${escape(fields.application || '—')}<br>` +
+            `Warranty type: ${escape(coverage || '—')}<br>` +
+            `Fabricator: ${escape(fields.fabricator || '—')}<br>` +
+            `Retailer: ${escape(fields.retailer || '—')}<br>` +
+            `Purchase date: ${escape(fields.purchase_date || '—')}<br>` +
+            `Installation date: ${escape(fields.installation_date || '—')}<br>` +
+            `Installation photos: ${photoCount ? photoCount + ' attached' : 'none'}` +
+            `${fields.photo_consent ? ' (approved for social media)' : ''}<br>` +
+            `Source: alphasurfaces.com.au/warranty` +
+            orgNote,
+        });
+      } catch (err) {
+        console.error('[pipedrive] warranty note failed:', err.message);
+      }
       break;
     }
 
@@ -434,8 +598,12 @@ module.exports = {
   createLead,
   syncFormToPipedrive,
   initPipedriveLabels,
+  matchFabricatorOrganisation,
+  setWarrantyPersonFields,
+  WARRANTY_PERSON_FIELDS,
   // Exported for tests — pure helpers, no network.
   businessCategoryIdFor,
   productCategoryIdsFor,
   mergeSetField,
+  normaliseOrgName,
 };
