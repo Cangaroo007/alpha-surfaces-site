@@ -4,3 +4,7 @@ data/versions/
 data/notifications.json
 .DS_Store
 .cw-tmp/
+
+# Pipedrive working files — data, not code
+*.csv
+pipedrive_*_probe.py

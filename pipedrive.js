@@ -76,6 +76,85 @@ function stateOptionId(state) {
 // Product Category option ids, as configured in the workspace.
 const PRODUCT_CATEGORY = { engineered_stone: 187, porcelain_tiles: 188 };
 
+// ---------------------------------------------------------------------------
+// Lead custom fields. Created on DEAL (leads have no field editor of their own
+// and inherit deal fields). Verified 25 Aug 2026: the v1 API writes these on
+// lead creation and they render in the UI — but NO API can read them back.
+// v2 has no /leads endpoint at all. Reporting on these lives in Pipedrive
+// Insights, in-app. Do not build a RoadRunner report that expects to read them.
+// ---------------------------------------------------------------------------
+const DEAL_FIELD_LEAD_TYPE          = '09908c69b05242596fb067beb464faea1d592e2a';
+const DEAL_FIELD_ENQUIRY_REASON     = 'dc25b1d68eb4a267b14e9203ee367de6523cb9b1';
+const DEAL_FIELD_STONEMASON_COMPANY = 'd01847a937b603ad3cb0bd176c3b7eff9e69b305';
+const DEAL_FIELD_STONES_OF_INTEREST = '462063d3a735bd8fbd4b544441f8705843608c0d';
+const DEAL_FIELD_SAMPLES_SENT       = '616cf43baf8535455eda9cf21e184d9130843787';
+const DEAL_FIELD_LEAD_STAGE         = '4335c1fe2d07a89272099dda48907c9baa497b4c';
+const DEAL_FIELD_CAMPAIGN_UTM       = 'f65dc11532e2b5f67f5bac83a7003999a121fbb3';
+
+const LEAD_STAGE_NEW = 308;
+
+// Free-text role → Lead type option id. Keys are lowercased on lookup.
+// Legacy website values (Fabricator, Builder, Architect/Designer,
+// Retailer/Stockist) are mapped so leads created before the form was fixed
+// still land correctly. 'architect/designer' is genuinely ambiguous and is
+// deliberately absent — better blank than wrong.
+const LEAD_TYPE_OPTION = {
+  'homeowner': 292,
+  'stonemason': 293, 'fabricator': 293,
+  'cabinet maker': 294, 'cabinetmaker': 294, 'joiner': 294,
+  'cabinet maker / kitchen company': 294,
+  'project home builder': 295,
+  'builder/developer': 296, 'builder / developer': 296,
+  'builder': 296, 'developer': 296,
+  'architect': 297,
+  'interior designer': 298, 'designer': 298,
+  'tile outlet': 299, 'tile outlet / retailer': 299,
+  'retailer/stockist': 299, 'retailer / stockist': 299,
+  'other': 300,
+};
+function leadTypeIdFor(role) {
+  return LEAD_TYPE_OPTION[String(role || '').trim().toLowerCase()] || null;
+}
+
+const ENQUIRY_REASON_OPTION = {
+  'sample request': 301, 'sample': 301, 'order a sample': 301,
+  'warranty': 302,
+  'general enquiry': 303, 'general': 303, 'product information': 303,
+  'technical question': 303,
+  'partner enquiry': 304, 'partner': 304, 'trade enquiry': 304,
+  'partnership': 304,
+  'where to buy': 305, 'stockist': 305, 'stockist enquiry': 305,
+  'find a stockist': 305,
+  'pricing': 306, 'price': 306, 'quote': 306, 'request a quote': 306,
+  'other': 307,
+};
+function enquiryReasonIdFor(reason) {
+  return ENQUIRY_REASON_OPTION[String(reason || '').trim().toLowerCase()] || null;
+}
+
+// Builds the custom-field payload for a lead. Only non-empty values are
+// included, so an unmapped role leaves the field blank rather than guessing.
+function buildLeadFields({ role, reason, stones, campaign, stonemasonOrgId } = {}) {
+  const out = { [DEAL_FIELD_LEAD_STAGE]: LEAD_STAGE_NEW };
+  const t = leadTypeIdFor(role);
+  if (t) out[DEAL_FIELD_LEAD_TYPE] = t;
+  const r = enquiryReasonIdFor(reason);
+  if (r) out[DEAL_FIELD_ENQUIRY_REASON] = r;
+  if (stones) out[DEAL_FIELD_STONES_OF_INTEREST] = String(stones).slice(0, 255);
+  if (campaign) out[DEAL_FIELD_CAMPAIGN_UTM] = String(campaign).slice(0, 255);
+  if (stonemasonOrgId) out[DEAL_FIELD_STONEMASON_COMPANY] = stonemasonOrgId;
+  return out;
+}
+
+// utm_source / utm_medium / utm_campaign, collapsed to one readable string.
+function buildCampaignString(f) {
+  const parts = [f.utm_source, f.utm_medium, f.utm_campaign]
+    .map(v => String(v || '').trim()).filter(Boolean);
+  if (!parts.length) return '';
+  const content = String(f.utm_content || '').trim();
+  return parts.join(' / ') + (content ? ` (${content})` : '');
+}
+
 // Free-text role/interest → Product Category option id.
 function productCategoryIdsFor(text) {
   const t = String(text || '').toLowerCase();
@@ -243,8 +322,11 @@ async function findOrCreatePerson({ name, email, phone, company, role, intereste
     if (orgItem?.id) {
       orgId = orgItem.id;
     } else {
-      const orgResult = await pdPost('organizations', { name: company });
-      orgId = orgResult?.data?.id || null;
+      // Match an existing organisation, but NEVER create one. Between May and
+      // Aug 2026 this branch created 152 orgs with no category and no real
+      // contact — homeowners typing a builder's name, a school, a suburb.
+      // An unmatched company name is a job for Jess, not for a fuzzy search.
+      console.log(`[pipedrive] no org match for "${company}" — leaving unlinked for manual review`);
     }
     if (orgId) personData.org_id = orgId;
   }
@@ -290,7 +372,7 @@ async function enrichPerson(personId, bcId, pcIds, stateId) {
 
 // Creates a LEAD (Leads Inbox), not a Deal. Always tags HOT — every web
 // form is an active outreach. Optional follow-up note attached to the lead.
-async function createLead({ title, personId, orgId, notes, labelIds }) {
+async function createLead({ title, personId, orgId, notes, labelIds, leadFields }) {
   if (!personId) return null;
   const leadData = {
     title,
@@ -301,6 +383,14 @@ async function createLead({ title, personId, orgId, notes, labelIds }) {
     ? labelIds
     : (PD_HOT_LABEL_ID ? [PD_HOT_LABEL_ID] : null);
   if (labels) leadData.label_ids = labels;
+  // Custom fields go in the same POST body, keyed by field hash. Pipedrive
+  // returns 200 regardless of whether it recognised them, so a change here
+  // must be verified in the UI, not from the response.
+  if (leadFields) {
+    for (const [k, v] of Object.entries(leadFields)) {
+      if (v !== null && v !== undefined && v !== '') leadData[k] = v;
+    }
+  }
 
   const result = await pdPost('leads', leadData);
   const leadId = result?.data?.id;
@@ -490,6 +580,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
   // outreach URL, prepend an attribution block to the lead note so sales
   // can see the campaign + AM at a glance. Empty string when the form
   // arrived without UTM params (organic / direct).
+  const campaign = buildCampaignString(fields);
   const utmSource = fields.utm_source || '';
   const utmCampaign = fields.utm_campaign || '';
   const utmContent = fields.utm_content || '';
@@ -507,6 +598,16 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
         title: `Sample Request — ${name}${stoneInterest ? ' (' + stoneInterest + ')' : ''}`,
         personId: person.id,
         orgId,
+        leadFields: buildLeadFields({
+          role,
+          // /order-sample has its own reason select. 'Find a stockist' is a
+          // Where-to-buy lead, not a sample request — keep it.
+          reason: (fields.reason && String(fields.reason).trim().toLowerCase() !== 'sample')
+            ? fields.reason
+            : 'Sample request',
+          stones: stoneInterest,
+          campaign,
+        }),
         notes:
           attribution +
           `<b>Sample Request ${escape(ref)}</b><br>` +
@@ -523,6 +624,12 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
         title: `Enquiry — ${name}: ${fields.reason || 'General'}`,
         personId: person.id,
         orgId,
+        leadFields: buildLeadFields({
+          role,
+          reason: fields.reason || 'General enquiry',
+          stones: stoneInterest,
+          campaign,
+        }),
         notes:
           attribution +
           `<b>Enquiry ${escape(ref)}</b><br>` +
@@ -541,6 +648,11 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
         title: `${isPartner ? 'Partner' : 'Contact'} — ${name}${isPartner && fields.company ? ' (' + fields.company + ')' : ''}`,
         personId: person.id,
         orgId,
+        leadFields: buildLeadFields({
+          role,
+          reason: isPartner ? 'Partner enquiry' : 'General enquiry',
+          campaign,
+        }),
         notes:
           attribution +
           `<b>${isPartner ? 'Partner Enquiry' : 'Contact Form'} ${escape(ref)}</b><br>` +
@@ -681,6 +793,10 @@ module.exports = {
   pdPatch,
   findOrCreatePerson,
   createLead,
+  buildLeadFields,
+  leadTypeIdFor,
+  enquiryReasonIdFor,
+  buildCampaignString,
   syncFormToPipedrive,
   initPipedriveLabels,
   matchFabricatorOrganisation,
