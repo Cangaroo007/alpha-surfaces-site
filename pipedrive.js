@@ -311,7 +311,7 @@ async function pdPatch(endpoint, body) {
 
 // Email-first dedup: same email → same person. Falls back to creating a
 // new person, optionally attaching to a matching/created organization.
-async function findOrCreatePerson({ name, email, phone, company, role, interestedIn, state }) {
+async function findOrCreatePerson({ name, email, phone, company, role, interestedIn, state, consent }) {
   const bcId = businessCategoryIdFor(role);
   const pcIds = productCategoryIdsFor(interestedIn);
   const stateId = stateOptionId(state);
@@ -323,7 +323,7 @@ async function findOrCreatePerson({ name, email, phone, company, role, intereste
       // Existing people used to be returned untouched, so a repeat visitor
       // never picked up a category. Enrich in place, merging rather than
       // overwriting. Best-effort — a failure here must not block the form.
-      await enrichPerson(item.id, bcId, pcIds, stateId).catch(err =>
+      await enrichPerson(item.id, bcId, pcIds, stateId, !!consent).catch(err =>
         console.error('[pipedrive] person enrich failed:', err.message));
       return item;
     }
@@ -352,6 +352,10 @@ async function findOrCreatePerson({ name, email, phone, company, role, intereste
   if (bcId) personData[FIELD_BUSINESS_CATEGORY] = String(bcId);
   if (pcIds.length) personData[FIELD_PRODUCT_CATEGORY] = pcIds.join(',');
   if (stateId) personData[FIELD_STATE] = stateId;
+  // Marketing consent. Pipedrive's built-in marketing_status is what its own
+  // Campaigns feature reads, so it goes there rather than a custom field.
+  // Only ever set to subscribed on an explicit tick — never inferred.
+  personData.marketing_status = consent ? 'subscribed' : 'no_consent';
 
   const result = await pdPost('persons', personData);
   if (result?.data?.id) {
@@ -366,7 +370,7 @@ async function findOrCreatePerson({ name, email, phone, company, role, intereste
 // the current values first so multi-select entries aren't flattened — one
 // contact in the workspace already carries "191,195" (Cabinet Maker + Tile
 // Outlet) and a bare assignment would drop one of them.
-async function enrichPerson(personId, bcId, pcIds, stateId) {
+async function enrichPerson(personId, bcId, pcIds, stateId, consentGiven) {
   if (!personId || (!bcId && !(pcIds && pcIds.length) && !stateId)) return;
   const current = await pdGet(`persons/${personId}`);
   const p = current?.data;
@@ -383,6 +387,13 @@ async function enrichPerson(personId, bcId, pcIds, stateId) {
   // State is single-select: fill it when blank, never overwrite an answer
   // someone has already given.
   if (stateId && !p[FIELD_STATE]) patch[FIELD_STATE] = stateId;
+  // Consent only ever moves upward. A repeat visitor who ticks the box is
+  // subscribed; one who doesn't tick it is left exactly as they were. Never
+  // downgrade someone who has already opted in, and never touch unsubscribed.
+  if (consentGiven && p.marketing_status !== 'subscribed'
+      && p.marketing_status !== 'unsubscribed') {
+    patch.marketing_status = 'subscribed';
+  }
   if (!Object.keys(patch).length) return;
   await pdPatch(`persons/${personId}`, patch);
   console.log(`[pipedrive] enriched person ${personId}:`, Object.keys(patch).join(', '));
@@ -585,6 +596,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
     role,
     interestedIn,
     state: fields.state,
+    consent: !!fields.consent,
   });
   if (!person?.id) return;
 
@@ -639,6 +651,8 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
           `Source: alphasurfaces.com.au/order-sample<br>` +
           `Role: ${escape(role || '—')}<br>` +
           `State: ${escape(fields.state || '—')}<br>` +
+          // Spam Act: record that consent was given, when, and via which form.
+          `Marketing consent: ${fields.consent ? 'YES — ' + new Date().toISOString().slice(0, 10) + ' via /order-sample' : 'no'}<br>` +
           stonemasonNote(fields) +
           `Message: ${escape(fields.message || fields.special_instructions || '—')}`,
       });
