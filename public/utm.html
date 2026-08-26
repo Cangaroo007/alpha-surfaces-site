@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Campaign link builder — Alpha Surfaces</title>
+<style>
+  body{font-family:system-ui,-apple-system,sans-serif;background:#f3f1e6;color:#2b2b2b;margin:0;padding:2rem 1rem;line-height:1.6}
+  .wrap{max-width:640px;margin:0 auto}
+  h1{font-size:1.4rem;color:#564D22;margin:0 0 .25rem}
+  p.sub{margin:0 0 2rem;color:#6b6759;font-size:.95rem}
+  label{display:block;font-size:.85rem;color:#564D22;margin:1rem 0 .3rem;font-weight:500}
+  input,select{width:100%;box-sizing:border-box;padding:.6rem .7rem;border:1px solid #cfc9b4;border-radius:4px;font-size:1rem;background:#fff}
+  .hint{font-size:.8rem;color:#8a8574;margin-top:.25rem}
+  .out{margin-top:2rem;padding:1rem;background:#564D22;color:#f3f1e6;border-radius:4px;word-break:break-all;font-family:ui-monospace,monospace;font-size:.85rem}
+  button{margin-top:.75rem;padding:.6rem 1.2rem;background:#564D22;color:#f3f1e6;border:0;border-radius:4px;font-size:.95rem;cursor:pointer}
+  .warn{margin-top:1.5rem;padding:.75rem 1rem;background:#fff;border-left:3px solid #A5382B;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Campaign link builder</h1>
+  <p class="sub">Build the link before you post it. Every campaign link must come from here so the reporting matches.</p>
+
+  <label for="page">Where should it land?</label>
+  <select id="page">
+    <option value="/order-sample">Order a sample</option>
+    <option value="/enquiry">Enquiry</option>
+    <option value="/">Home page</option>
+  </select>
+
+  <label for="src">Source — where the link is posted</label>
+  <select id="src">
+    <option value="meta">meta (Facebook / Instagram ads)</option>
+    <option value="instagram">instagram (organic post)</option>
+    <option value="email">email</option>
+    <option value="qr">qr (sticker, catalogue, sample box)</option>
+    <option value="partner">partner</option>
+  </select>
+
+  <label for="camp">Campaign — what you're running</label>
+  <input id="camp" placeholder="spring26-samples">
+  <div class="hint">Lowercase, hyphens, no spaces. Include the year.</div>
+
+  <label for="cont">Creative — which version (optional)</label>
+  <input id="cont" placeholder="carousel-a">
+
+  <div class="out" id="out">—</div>
+  <button id="copy">Copy link</button>
+
+  <div class="warn">
+    <strong>One rule.</strong> This link must go straight to the form. If it points somewhere that then links onward, the tracking is lost at that hop and the lead arrives with no campaign.
+  </div>
+</div>
+<script>
+var $=function(i){return document.getElementById(i)};
+function clean(s){return String(s||'').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}
+function build(){
+  var base='https://alphasurfaces.com.au'+$('page').value;
+  var p=['utm_source='+clean($('src').value)];
+  var c=clean($('camp').value); if(c)p.push('utm_campaign='+c);
+  var t=clean($('cont').value); if(t)p.push('utm_content='+t);
+  $('out').textContent=base+'?'+p.join('&');
+}
+['page','src','camp','cont'].forEach(function(i){$(i).addEventListener('input',build);$(i).addEventListener('change',build)});
+$('copy').addEventListener('click',function(){
+  navigator.clipboard.writeText($('out').textContent);
+  this.textContent='Copied';var b=this;setTimeout(function(){b.textContent='Copy link'},1500);
+});
+build();
+</script>
+</body>
+</html>
