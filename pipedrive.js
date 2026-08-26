@@ -147,6 +147,24 @@ function buildLeadFields({ role, reason, stones, campaign, stonemasonOrgId } = {
 }
 
 // utm_source / utm_medium / utm_campaign, collapsed to one readable string.
+// Human-readable stonemason line for the lead note. An unmatched name is
+// kept here on purpose — Stonemason (company) is an org field and cannot
+// hold text, and Jess links the right record when she processes the lead.
+function stonemasonNote(f) {
+  const status = String(f.stonemason_status || '').trim();
+  if (!status) return '';
+  const typed = String(f.stonemason_name || '').trim();
+  if (status === 'yes') {
+    if (f.stonemason_org_id) return `Stonemason: ${escape(typed)} (linked)<br>`;
+    if (typed) return `Stonemason: ${escape(typed)} — NOT MATCHED, please identify and link<br>`;
+    return 'Stonemason: says they have one, none named<br>';
+  }
+  if (status === 'no')      return 'Stonemason: NONE — asked to be connected with one<br>';
+  if (status === 'unsure')  return 'Stonemason: not sure yet — ask again at follow-up<br>';
+  if (status === 'decline') return 'Stonemason: preferred not to say — do not chase<br>';
+  return '';
+}
+
 function buildCampaignString(f) {
   const parts = [f.utm_source, f.utm_medium, f.utm_campaign]
     .map(v => String(v || '').trim()).filter(Boolean);
@@ -599,6 +617,12 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
         personId: person.id,
         orgId,
         leadFields: buildLeadFields({
+          // Sprint B. A matched org id becomes a real link on the lead and
+          // fires the referral automation. "Connect me with one" is handled
+          // by Jess, who refers the nearest stonemason and logs it.
+          stonemasonOrgId: fields.stonemason_org_id
+            ? Number(fields.stonemason_org_id)
+            : null,
           role,
           // /order-sample has its own reason select. 'Find a stockist' is a
           // Where-to-buy lead, not a sample request — keep it.
@@ -615,6 +639,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
           `Source: alphasurfaces.com.au/order-sample<br>` +
           `Role: ${escape(role || '—')}<br>` +
           `State: ${escape(fields.state || '—')}<br>` +
+          stonemasonNote(fields) +
           `Message: ${escape(fields.message || fields.special_instructions || '—')}`,
       });
       break;

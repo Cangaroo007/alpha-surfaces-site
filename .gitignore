@@ -8,3 +8,4 @@ data/notifications.json
 # Pipedrive working files — data, not code
 *.csv
 pipedrive_*_probe.py
+*.bak-*
