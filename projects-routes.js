@@ -770,6 +770,32 @@ async function initSchema(pool) {
   await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS coverage_type    VARCHAR(20)`);
   await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS installation_date DATE`);
   await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS photo_consent     BOOLEAN DEFAULT FALSE`);
+  // Claim tracking + CRM links, read by the RoadRunner warranty register at
+  // /warranties. Added here rather than in RoadRunner because this table
+  // belongs to the website — RoadRunner holds a read-only connection to it and
+  // must never migrate a schema it does not own.
+  //
+  // stonemason_org_id: the customer types their stonemason as free text, so it
+  // cannot be resolved at submit time. pipedrive.js already attempts a name
+  // match and writes the outcome into the note; this column is where Jess's
+  // confirmed match lands once someone has actually checked it.
+  //
+  // pipedrive_project_id stays null: /api/v2/projects returns 402
+  // "Required suites missing" under both auth schemes, so the Projects add-on
+  // is not on the plan and nothing can populate it yet.
+  await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS stonemason_org_id    BIGINT`);
+  await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS pipedrive_person_id  BIGINT`);
+  await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS pipedrive_project_id BIGINT`);
+  await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS claim_status         TEXT DEFAULT 'registered'`);
+  await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS claim_opened_at      TIMESTAMPTZ`);
+  await pool.query(`ALTER TABLE warranty_activations ADD COLUMN IF NOT EXISTS claim_notes          TEXT`);
+  // Existing rows predate the column and would otherwise sit at NULL, which
+  // reads as "no claim state" rather than the true "registered, no claim".
+  await pool.query(`UPDATE warranty_activations SET claim_status = 'registered' WHERE claim_status IS NULL`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_wa_claim_status ON warranty_activations(claim_status)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_wa_batch        ON warranty_activations(batch_number)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_wa_lot          ON warranty_activations(lot_number)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_wa_stonemason_org ON warranty_activations(stonemason_org_id)`);
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS contact_submissions (
