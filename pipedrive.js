@@ -801,7 +801,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
           person_id: person.id,
           content:
             `<b>Warranty Activation ${escape(ref)}</b><br>` +
-            `Batch: ${escape(fields.batch_number || '—')} · Lot: ${escape(fields.lot_number || '—')}<br>` +
+            `Batch: ${escape(fields.batch_number || '—')} · Shade: ${escape(fields.lot_number || '—')}<br>` +
             `Stone: ${escape(fields.stone_interest || fields.stone_name || '—')}<br>` +
             `Application: ${escape(fields.application || '—')}<br>` +
             `Warranty type: ${escape(coverage || '—')}<br>` +

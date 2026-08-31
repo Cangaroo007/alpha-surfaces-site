@@ -590,7 +590,7 @@ function validateWarrantyFields(fields) {
   const text = k => String(fields[k] == null ? '' : fields[k]).trim();
   if (!text('stone_name') && !text('stone_interest')) return 'Please tell us the stone colour.';
   if (!text('batch_number')) return 'Batch number is required. It\u2019s on your invoice or the slab label.';
-  if (!text('lot_number'))   return 'Lot number is required. It\u2019s on your invoice or the slab label.';
+  if (!text('lot_number'))   return 'Shade is required. It\u2019s on your invoice or the underside of the slab.';
   if (!WARRANTY_APPLICATIONS.includes(text('application'))) {
     return 'Please select the application.';
   }
