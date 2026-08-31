@@ -459,6 +459,24 @@ function notifySubmissionSafely(submission, label) {
   );
 }
 
+// Customer-facing confirmation for the two forms that have one. Separate from
+// notifySubmissionSafely, which alerts staff — these go to the person who
+// submitted. Never awaited and never rethrows: a mail failure must leave the
+// submission itself untouched.
+function notifyConfirmationSafely(formType, submission, sampleItems, reference) {
+  let send = null;
+  if (formType === 'Sample Request') {
+    send = notifications.sendSampleConfirmationEmail(submission, sampleItems, reference);
+  } else if (formType === 'Warranty Activation') {
+    send = notifications.sendWarrantyConfirmationEmail(submission, reference);
+  }
+  if (send && typeof send.catch === 'function') {
+    send.catch(err =>
+      console.error(`[notify] ${formType} confirmation error:`, err && err.message)
+    );
+  }
+}
+
 function trackOutreachConversion(formType, fields, id) {
   const pid = fields.pid || null;
   const utmSource = fields.utm_source || null;
@@ -527,6 +545,14 @@ async function persistPublicFormSubmission(formType, fields, sampleItems, option
     } catch (err) {
       console.error('[form] typed insert error:', err.message);
     }
+  }
+
+  // Customer confirmation. Fires AFTER the typed insert because that is where
+  // the WA-/SR- reference is minted — the warranty email exists mainly to give
+  // the customer a durable copy of it. Fire-and-forget: notifyConfirmationSafely
+  // swallows everything, so SendGrid being down can never fail a registration.
+  if (!saved.duplicate) {
+    notifyConfirmationSafely(formType, submission, sampleItems, typed && typed.reference);
   }
 
   if (!saved.duplicate) trackOutreachConversion(formType, fields, id);
@@ -2590,6 +2616,13 @@ app.get('/warranty', (req, res) => {
 });
 app.get('/warranty-terms', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'warranty-terms.html'));
+});
+// /order-sample had no extensionless route, so it fell through to the catch-all
+// and quietly served the homepage — the form was only ever reachable at
+// /order-sample.html. server.js:269 already treats '/order-sample' as a form
+// path, so the clean URL was always the intent. Matches /warranty and /enquiry.
+app.get('/order-sample', (req, res) => {
+  sendHtml(res, path.join(__dirname, 'public', 'order-sample.html'));
 });
 app.get('/enquiry', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'enquiry.html'));

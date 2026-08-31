@@ -1452,6 +1452,162 @@ function escapeHtml(s) {
 }
 function escapeAttr(s) { return escapeHtml(s); }
 
+// ─── Customer confirmation emails ────────────────────────────────────────
+//
+// Transport is SendGrid, deliberately, and this is the first customer-facing
+// mail in the app that uses it.
+//
+// The other candidate was the nodemailer/SMTP path that sends the newsletter
+// welcome (sendEmailTo / getMailTransport above). That path is dead in this
+// deployment: SMTP_USER, SMTP_PASS and SMTP_HOST are unset in BOTH the
+// production and staging Railway environments, so getMailTransport() returns
+// null and every send through it is skipped with a warning. The newsletter
+// welcome has therefore never actually reached a subscriber. SendGrid, by
+// contrast, delivered 266 of 266 attempts in August with one bounce, and is
+// what already carries every staff notification. Building on the working
+// transport is not a second mail stack — it is the only one.
+//
+// These are transactional service messages about something the person just
+// did, not marketing, so they are NOT gated on the marketing consent checkbox
+// and carry no unsubscribe link. Gating a "we received your request" receipt
+// on a marketing opt-in would withhold it from exactly the people who ticked
+// nothing, which is most of them.
+
+function customerEmailChrome(heading, bodyHtml) {
+  return `<!DOCTYPE html><html lang="en-AU"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${escapeHtml(heading)} — Alpha Surfaces</title></head>
+<body style="margin:0;padding:0;background:#f3f1e6;font-family:'Helvetica Neue',Arial,sans-serif">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f3f1e6">
+  <tr><td align="center" style="padding:48px 16px">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+      <tr><td style="background:#564D22;padding:28px 32px">
+        <p style="margin:0;color:#f3f1e6;font-size:13px;letter-spacing:.12em;text-transform:uppercase">Alpha Surfaces</p>
+        <h1 style="margin:6px 0 0;color:#fff;font-size:22px;font-weight:600">${escapeHtml(heading)}</h1>
+      </td></tr>
+      <tr><td style="padding:32px">${bodyHtml}</td></tr>
+      <tr><td style="padding:20px 32px;background:#f7f4e8;color:#999;font-size:12px;line-height:1.6;text-align:center">
+        Alpha Surfaces Pty Ltd &middot; ABN 21 677 729 350<br>
+        13 Enterprise Street, Kunda Park QLD 4556<br>
+        1300 257 420 &middot; info@alphasurfaces.com.au
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>`;
+}
+
+/** Recipient must be a real address — never hand SendGrid a blank or a typo. */
+function validRecipient(email) {
+  const v = String(email || '').trim();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? v : null;
+}
+
+function firstNameOf(submission) {
+  const n = (submission && (submission.name || submission.first_name)) || '';
+  const first = String(n).trim().split(/\s+/)[0];
+  return first || null;
+}
+
+// Sample request — confirms receipt and lists the stones, because "your request
+// has been received" without saying what was requested is not a receipt.
+async function sendSampleConfirmationEmail(submission, sampleItems, reference) {
+  const to = validRecipient(submission && submission.email);
+  if (!to) { console.warn('[notify] sample confirmation skipped — no valid recipient'); return false; }
+  if (!configureSendgrid()) {
+    console.warn('[notify] SENDGRID_API_KEY not set — skipping sample confirmation');
+    return false;
+  }
+  const first = firstNameOf(submission);
+  const items = Array.isArray(sampleItems) ? sampleItems : [];
+  const rows = items.map(i => {
+    const qty = Math.max(1, parseInt(i && i.quantity, 10) || 1);
+    const nm = escapeHtml((i && (i.name || i.slug)) || 'Sample');
+    return `<li style="margin:0 0 6px">${nm}${qty > 1 ? ` <span style="color:#6b6759">&times; ${qty}</span>` : ''}</li>`;
+  }).join('');
+  const body = `
+        <p style="margin:0 0 20px;color:#222;font-size:15px;line-height:1.6">${first ? `Hi ${escapeHtml(first)},` : 'Hello,'}</p>
+        <p style="margin:0 0 20px;color:#222;font-size:15px;line-height:1.6">Thanks &mdash; we have your sample request.</p>
+        ${rows ? `<p style="margin:0 0 8px;color:#222;font-size:15px;line-height:1.6">You asked for:</p>
+        <ul style="margin:0 0 20px;padding-left:20px;color:#222;font-size:15px;line-height:1.6">${rows}</ul>` : ''}
+        <p style="margin:0 0 20px;color:#222;font-size:15px;line-height:1.6">We will be in touch within 2&ndash;3 business days to confirm delivery.</p>
+        ${reference ? `<p style="margin:0 0 20px;color:#6b6759;font-size:14px;line-height:1.6">Your reference is <strong style="color:#564D22">${escapeHtml(reference)}</strong>.</p>` : ''}
+        <p style="margin:0;color:#6b6759;font-size:14px;line-height:1.6">If anything looks wrong, reply to this email or call us on 1300&nbsp;257&nbsp;420.</p>`;
+  try {
+    await sgMail.send({
+      to,
+      from: NOTIFY_EMAIL_FROM(),
+      replyTo: NOTIFY_EMAIL_TO(),
+      subject: 'We have your sample request — Alpha Surfaces',
+      html: customerEmailChrome('Sample request received', body)
+    });
+    console.log('[notify] sample confirmation sent to', to, reference || '(no reference)');
+    return true;
+  } catch (err) {
+    const detail = err.response?.body?.errors ? JSON.stringify(err.response.body.errors) : err.message;
+    console.error('[notify] sample confirmation error:', detail);
+    return false;
+  }
+}
+
+// Warranty registration — the reference is the whole point. It is generated by
+// insertTypedSubmission into warranty_activations as WA-NNNN and shown on screen
+// once; without this email the customer has no durable copy of it. No new
+// reference is minted here — if the typed insert did not return one, the receipt
+// still goes out without that line rather than inventing a number that matches
+// nothing in the database.
+async function sendWarrantyConfirmationEmail(submission, reference) {
+  const to = validRecipient(submission && submission.email);
+  if (!to) { console.warn('[notify] warranty confirmation skipped — no valid recipient'); return false; }
+  if (!configureSendgrid()) {
+    console.warn('[notify] SENDGRID_API_KEY not set — skipping warranty confirmation');
+    return false;
+  }
+  if (!reference) {
+    console.warn('[notify] warranty confirmation has no WA- reference — sending receipt without it');
+  }
+  const first = firstNameOf(submission);
+  const raw = (submission && submission.raw_data) || {};
+  const stone = submission.stone_interest || raw.stone_name || '';
+  const addr = [raw.street, raw.suburb, raw.state, raw.postcode].filter(Boolean).join(' ');
+  const detail = [
+    stone ? ['Stone', stone] : null,
+    raw.batch_number ? ['Batch', raw.batch_number] : null,
+    addr ? ['Installed at', addr] : null
+  ].filter(Boolean).map(([k, v]) =>
+    `<tr><td style="padding:4px 16px 4px 0;color:#6b6759;font-size:14px;vertical-align:top">${escapeHtml(k)}</td>` +
+    `<td style="padding:4px 0;color:#222;font-size:14px">${escapeHtml(v)}</td></tr>`).join('');
+  const body = `
+        <p style="margin:0 0 20px;color:#222;font-size:15px;line-height:1.6">${first ? `Hi ${escapeHtml(first)},` : 'Hello,'}</p>
+        <p style="margin:0 0 20px;color:#222;font-size:15px;line-height:1.6">Your Alpha Surfaces warranty registration has been received.</p>
+        ${reference ? `<table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;background:#f7f4e8;border-radius:6px">
+          <tr><td style="padding:16px 20px">
+            <p style="margin:0 0 4px;color:#6b6759;font-size:12px;letter-spacing:.08em;text-transform:uppercase">Your reference</p>
+            <p style="margin:0;color:#564D22;font-size:22px;font-weight:600;letter-spacing:.04em">${escapeHtml(reference)}</p>
+          </td></tr></table>
+        <p style="margin:0 0 20px;color:#222;font-size:15px;line-height:1.6">Keep this reference &mdash; quote it in any future warranty enquiry.</p>` : ''}
+        ${detail ? `<table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px">${detail}</table>` : ''}
+        <p style="margin:0 0 20px;color:#222;font-size:15px;line-height:1.6">Nothing further is needed from you. We will be in touch if we have any questions about the registration.</p>
+        <p style="margin:0;color:#6b6759;font-size:14px;line-height:1.6">If any detail is wrong, reply to this email or call us on 1300&nbsp;257&nbsp;420.</p>`;
+  try {
+    await sgMail.send({
+      to,
+      from: NOTIFY_EMAIL_FROM(),
+      replyTo: NOTIFY_EMAIL_TO(),
+      subject: reference
+        ? `Warranty registered — ${reference} — Alpha Surfaces`
+        : 'Warranty registration received — Alpha Surfaces',
+      html: customerEmailChrome('Warranty registered', body)
+    });
+    console.log('[notify] warranty confirmation sent to', to, reference || '(no reference)');
+    return true;
+  } catch (err) {
+    const d = err.response?.body?.errors ? JSON.stringify(err.response.body.errors) : err.message;
+    console.error('[notify] warranty confirmation error:', d);
+    return false;
+  }
+}
+
 module.exports = {
   setSettingsPath,
   readSettings,
@@ -1467,6 +1623,9 @@ module.exports = {
   sendSubmissionSMS,
   sendSubmissionEmail,
   notifyNewSubmission,
+  // Customer-facing confirmations (SendGrid — see note above the definitions)
+  sendSampleConfirmationEmail,
+  sendWarrantyConfirmationEmail,
   sendFormsResetEmail,
   checkAndSendTimeAlert,
   // Review/approval workflow

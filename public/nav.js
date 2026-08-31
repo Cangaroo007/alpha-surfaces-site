@@ -98,6 +98,7 @@
       '<div class="nav-dropdown" id="contact-dropdown">' +
         '<a href="/#contact" class="nav-link nav-dropdown-trigger" id="contact-trigger">CONTACT US</a>' +
         '<div class="nav-dropdown-menu" id="contact-dropdown-menu">' +
+          '<a href="/order-sample" class="nav-dropdown-item">Order a Sample</a>' +
           '<a href="/#contact" class="nav-dropdown-item">Contact Us</a>' +
           '<a href="/enquiry" class="nav-dropdown-item">General Enquiry</a>' +
           '<a href="/warranty" class="nav-dropdown-item">Activate Warranty</a>' +
@@ -183,6 +184,7 @@
       '<a href="/#contact" class="mobile-menu-link" style="flex:1;">CONTACT US</a>' +
       '<button class="mobile-toggle-btn" id="mobile-contact-toggle"><span class="toggle-icon">+</span></button></div>' +
       '<div class="mobile-contact-panel" id="mobile-contact-panel">' +
+        '<a href="/order-sample" class="mobile-sub-link">Order a Sample</a>' +
         '<a href="/#contact" class="mobile-sub-link">Contact Us</a>' +
         '<a href="/enquiry" class="mobile-sub-link">General Enquiry</a>' +
         '<a href="/warranty" class="mobile-sub-link">Activate Warranty</a>' +

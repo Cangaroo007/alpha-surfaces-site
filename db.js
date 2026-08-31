@@ -52,7 +52,8 @@ async function initDB() {
         submission_id   INTEGER NOT NULL REFERENCES form_submissions(id) ON DELETE CASCADE,
         stone_slug      VARCHAR(100) NOT NULL,
         stone_name      VARCHAR(255) NOT NULL,
-        collection      VARCHAR(50)
+        collection      VARCHAR(50),
+        quantity        INTEGER NOT NULL DEFAULT 1
       );
 
       CREATE INDEX IF NOT EXISTS idx_submissions_form_type
@@ -81,6 +82,10 @@ async function initDB() {
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS suburb VARCHAR(255)`);
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS unit VARCHAR(100)`);
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS client_submission_id VARCHAR(100)`);
+    // Sprint B: stonemasons restocking their own sample rack order more than one
+    // of a colour. DEFAULT 1 keeps every pre-existing row correct — before this
+    // column a row simply meant one piece.
+    await client.query(`ALTER TABLE sample_request_items ADD COLUMN IF NOT EXISTS quantity INTEGER NOT NULL DEFAULT 1`);
     await client.query(`
       CREATE UNIQUE INDEX IF NOT EXISTS idx_submissions_client_submission_id
         ON form_submissions(client_submission_id)
@@ -268,11 +273,14 @@ async function saveSubmission(formType, fields, sampleItems = []) {
 
     if (formType === 'Sample Request' && sampleItems.length > 0) {
       for (const item of sampleItems) {
+        // Clamp server-side: the stepper caps at 10, but the request body is
+        // whatever the client chose to send.
+        const qty = Math.min(10, Math.max(1, parseInt(item.quantity, 10) || 1));
         await client.query(
           `INSERT INTO sample_request_items
-            (submission_id, stone_slug, stone_name, collection)
-           VALUES ($1,$2,$3,$4)`,
-          [id, item.slug, item.name, item.collection || null]
+            (submission_id, stone_slug, stone_name, collection, quantity)
+           VALUES ($1,$2,$3,$4,$5)`,
+          [id, item.slug, item.name, item.collection || null, qty]
         );
       }
     }
