@@ -633,6 +633,26 @@ function validateWarrantyFields(fields) {
   return null;
 }
 
+// The state list on /enquiry — the same eight the sample form offers. Kept
+// here rather than trusting the select, because the client is not the
+// boundary: anything can POST to /api/form-submit.
+const AU_STATES = ['QLD', 'NSW', 'VIC', 'SA', 'WA', 'TAS', 'NT', 'ACT'];
+
+function validateEnquiryFields(fields) {
+  const text = k => String(fields[k] == null ? '' : fields[k]).trim();
+  // Role drives the Pipedrive lead type, lead routing and the stonemason
+  // question. It was optional on the form and unenforced here, so leads were
+  // arriving with no type at all.
+  if (!text('role')) return 'Please tell us which one you are.';
+  if (!text('suburb')) return 'Suburb is required.';
+  if (!AU_STATES.includes(text('state').toUpperCase())) return 'Please select your state.';
+  // Every state above is Australian, so a postcode is exactly four digits.
+  if (!/^\d{4}$/.test(text('postcode'))) return 'Please enter a 4-digit postcode.';
+  if (!text('reason')) return 'Please select a reason for your enquiry.';
+  if (!text('message')) return 'Please include a message.';
+  return null;
+}
+
 async function handleForm(req, res, formType) {
   let fallbackFields = req.body || {};
   let fallbackSampleItems = [];
@@ -641,6 +661,13 @@ async function handleForm(req, res, formType) {
     fallbackFields = fields;
     if (!fields.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
       return res.status(400).json({ ok: false, error: 'A valid email address is required.' });
+    }
+    if (formType === 'Enquiry') {
+      const enquiryError = validateEnquiryFields(fields);
+      if (enquiryError) return res.status(400).json({ ok: false, error: enquiryError });
+      // Normalise before anything persists it, so 'qld' and 'QLD' are one
+      // value in the database and one option in Pipedrive.
+      fields.state = String(fields.state).trim().toUpperCase();
     }
     if (formType === 'Warranty Activation') {
       // `warranty_type` is accepted as an alias so an older cached copy of

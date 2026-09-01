@@ -62,6 +62,8 @@ img { display: block; max-width: 100%; }
 .field-error { font-family: 'Degular', sans-serif; font-size: 12px; color: var(--red); margin-top: 2px; min-height: 0; display: none; }
 .field-error.show { display: block; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+/* Suburb needs the room; State and Postcode are both short and fixed-width. */
+.field-row-3 { grid-template-columns: 2fr 1fr 1fr; }
 
 .consent-row { display: flex; align-items: flex-start; gap: 12px; }
 .consent-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--olive); cursor: pointer; flex-shrink: 0; margin-top: 2px; }
@@ -121,7 +123,7 @@ img { display: block; max-width: 100%; }
   .enquiry-left { width: 100%; position: static; }
   .enquiry-heading { font-size: 32px; }
   .enquiry-form { padding: 32px 24px; }
-  .field-row { grid-template-columns: 1fr; gap: 28px; }
+  .field-row, .field-row-3 { grid-template-columns: 1fr; gap: 28px; }
   .btn-submit { width: 100%; align-self: stretch; }
   .footer { padding: 30px 24px; }
   .footer-inner { grid-template-columns: 1fr; gap: 32px; }
@@ -197,8 +199,8 @@ img { display: block; max-width: 100%; }
           <input id="company" name="company" type="text" class="field-input" autocomplete="organization">
         </div>
         <div class="field-group">
-          <label class="field-label" for="role">I am a&hellip;</label>
-          <select id="role" name="role" class="field-select">
+          <label class="field-label" for="role">I am a&hellip; <span class="req">*</span></label>
+          <select id="role" name="role" class="field-select" required>
             <option value="">- Select -</option>
             <option value="Homeowner">Homeowner</option>
             <option value="Stonemason">Stonemason</option>
@@ -210,6 +212,35 @@ img { display: block; max-width: 100%; }
             <option value="Tile outlet">Tile outlet / retailer</option>
             <option value="Other">Other</option>
           </select>
+          <div class="field-error" data-for="role">Please tell us which one you are.</div>
+        </div>
+      </div>
+
+      <div class="field-row field-row-3">
+        <div class="field-group">
+          <label class="field-label" for="suburb">Suburb <span class="req">*</span></label>
+          <input id="suburb" name="suburb" type="text" class="field-input" autocomplete="address-level2" required>
+          <div class="field-error" data-for="suburb">Please enter your suburb.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="state">State <span class="req">*</span></label>
+          <select id="state" name="state" class="field-select" required>
+            <option value="">- Select -</option>
+            <option value="QLD">QLD</option>
+            <option value="NSW">NSW</option>
+            <option value="VIC">VIC</option>
+            <option value="SA">SA</option>
+            <option value="WA">WA</option>
+            <option value="TAS">TAS</option>
+            <option value="NT">NT</option>
+            <option value="ACT">ACT</option>
+          </select>
+          <div class="field-error" data-for="state">Please select your state.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="postcode">Postcode <span class="req">*</span></label>
+          <input id="postcode" name="postcode" type="text" class="field-input" inputmode="numeric" autocomplete="postal-code" maxlength="4" required>
+          <div class="field-error" data-for="postcode">Please enter a 4-digit postcode.</div>
         </div>
       </div>
 
@@ -221,7 +252,7 @@ img { display: block; max-width: 100%; }
           <option value="Pricing">Pricing</option>
           <option value="Where to buy">Where to buy / find a stonemason</option>
           <option value="Partner enquiry">Partnership</option>
-          <option value="General enquiry">Technical question</option>
+          <option value="Technical question">Technical question</option>
           <option value="Other">Other</option>
         </select>
         <div class="field-error" data-for="reason">Please select a reason.</div>
@@ -272,6 +303,8 @@ img { display: block; max-width: 100%; }
   var banner = document.getElementById('form-banner');
 
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Every state in the list is Australian, so a postcode here is four digits.
+  var POSTCODE_RE = /^\d{4}$/;
 
   function clearErrors() {
     banner.className = 'form-banner';
@@ -301,6 +334,12 @@ img { display: block; max-width: 100%; }
     if (!data.name)                            { showFieldError('name');    ok = false; }
     if (!data.email || !EMAIL_RE.test(data.email)) { showFieldError('email'); ok = false; }
     if (!data.phone)                           { showFieldError('phone');   ok = false; }
+    // Role drives the Pipedrive lead type, who the lead routes to, and whether
+    // the stonemason question is asked — it was optional and unenforced.
+    if (!data.role)                            { showFieldError('role');    ok = false; }
+    if (!data.suburb)                          { showFieldError('suburb');  ok = false; }
+    if (!data.state)                           { showFieldError('state');   ok = false; }
+    if (!POSTCODE_RE.test(data.postcode))      { showFieldError('postcode'); ok = false; }
     if (!data.reason)                          { showFieldError('reason');  ok = false; }
     if (!data.message)                         { showFieldError('message'); ok = false; }
     if (!data.consent)                         { showFieldError('consent'); ok = false; }
@@ -319,6 +358,9 @@ img { display: block; max-width: 100%; }
       phone:   (fd.get('phone')   || '').trim(),
       company: (fd.get('company') || '').trim(),
       role:    fd.get('role')    || '',
+      suburb:   (fd.get('suburb')   || '').trim(),
+      state:    fd.get('state')     || '',
+      postcode: (fd.get('postcode') || '').trim(),
       reason:  fd.get('reason')  || '',
       message: (fd.get('message') || '').trim(),
       consent: fd.get('consent') === 'on',

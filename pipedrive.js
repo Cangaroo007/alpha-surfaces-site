@@ -120,7 +120,10 @@ const ENQUIRY_REASON_OPTION = {
   'sample request': 301, 'sample': 301, 'order a sample': 301,
   'warranty': 302,
   'general enquiry': 303, 'general': 303, 'product information': 303,
-  'technical question': 303,
+  // Option 319, added to the Enquiry reason field 1 Sep 2026. Technical
+  // questions used to share 303 with product information, which made the two
+  // indistinguishable in reporting even though they need different answers.
+  'technical question': 319, 'technical': 319,
   'partner enquiry': 304, 'partner': 304, 'trade enquiry': 304,
   'partnership': 304,
   'where to buy': 305, 'stockist': 305, 'stockist enquiry': 305,
