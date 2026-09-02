@@ -2652,6 +2652,12 @@ app.get('/warranty-terms', (req, res) => {
 // path, so the clean URL was always the intent. Matches /warranty and /enquiry.
 // Standalone pages, served raw. No nav partial injected, and registered
 // explicitly so they don't fall through to the catch-all like /order-sample did.
+app.get(['/review/3-september', '/review/3-september.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'review-3-september.html'));
+});
+app.get(['/agenda/3-september', '/agenda/3-september.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-3sep.html'));
+});
 app.get(['/stockout-preview', '/stockout-preview.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'stockout-preview.html'));
 });
