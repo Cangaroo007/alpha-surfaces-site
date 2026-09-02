@@ -469,6 +469,8 @@ function notifyConfirmationSafely(formType, submission, sampleItems, reference) 
     send = notifications.sendSampleConfirmationEmail(submission, sampleItems, reference);
   } else if (formType === 'Warranty Activation') {
     send = notifications.sendWarrantyConfirmationEmail(submission, reference);
+  } else if (formType === 'Enquiry') {
+    send = notifications.sendEnquiryConfirmationEmail(submission, reference);
   }
   if (send && typeof send.catch === 'function') {
     send.catch(err =>

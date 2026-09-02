@@ -1615,6 +1615,50 @@ async function sendWarrantyConfirmationEmail(submission, reference) {
   }
 }
 
+// Enquiry — the page promises a reply within 24 hours, so the receipt says the
+// same thing. Echoes the reason and their own words back, because a receipt that
+// doesn't say what was received is just an autoresponder. No reference is minted
+// here; if the typed insert produced one it is shown, otherwise the line is
+// omitted rather than inventing a number that matches nothing.
+async function sendEnquiryConfirmationEmail(submission, reference) {
+  const to = validRecipient(submission && submission.email);
+  if (!to) { console.warn('[notify] enquiry confirmation skipped — no valid recipient'); return false; }
+  if (!configureSendgrid()) {
+    console.warn('[notify] SENDGRID_API_KEY not set — skipping enquiry confirmation');
+    return false;
+  }
+  const first = firstNameOf(submission);
+  const reason = (submission && submission.reason) || '';
+  const message = (submission && submission.message) || '';
+  const body = `
+        <p style="margin:0 0 20px;color:#222;font-size:15px;line-height:1.6">${first ? `Hi ${escapeHtml(first)},` : 'Hello,'}</p>
+        <p style="margin:0 0 20px;color:#222;font-size:15px;line-height:1.6">Thanks &mdash; we have your enquiry and will be in touch within 24 hours.</p>
+        ${reason ? `<table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px">
+          <tr><td style="padding:4px 16px 4px 0;color:#6b6759;font-size:14px;vertical-align:top">Regarding</td>
+              <td style="padding:4px 0;color:#222;font-size:14px">${escapeHtml(reason)}</td></tr></table>` : ''}
+        ${message ? `<p style="margin:0 0 8px;color:#6b6759;font-size:13px;letter-spacing:.06em;text-transform:uppercase">Your message</p>
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 24px;background:#f7f4e8;border-radius:6px">
+          <tr><td style="padding:16px 20px;color:#222;font-size:14px;line-height:1.6;white-space:pre-wrap">${escapeHtml(message)}</td></tr>
+        </table>` : ''}
+        ${reference ? `<p style="margin:0 0 20px;color:#6b6759;font-size:14px;line-height:1.6">Your reference is <strong style="color:#564D22">${escapeHtml(reference)}</strong>.</p>` : ''}
+        <p style="margin:0;color:#6b6759;font-size:14px;line-height:1.6">If anything looks wrong, reply to this email or call us on 1300&nbsp;257&nbsp;420.</p>`;
+  try {
+    await sgMail.send({
+      to,
+      from: NOTIFY_EMAIL_FROM(),
+      replyTo: NOTIFY_EMAIL_TO(),
+      subject: 'We have your enquiry — Alpha Surfaces',
+      html: customerEmailChrome('Enquiry received', body)
+    });
+    console.log('[notify] enquiry confirmation sent to', to, reference || '(no reference)');
+    return true;
+  } catch (err) {
+    const d = err.response?.body?.errors ? JSON.stringify(err.response.body.errors) : err.message;
+    console.error('[notify] enquiry confirmation error:', d);
+    return false;
+  }
+}
+
 module.exports = {
   setSettingsPath,
   readSettings,
@@ -1633,6 +1677,7 @@ module.exports = {
   // Customer-facing confirmations (SendGrid — see note above the definitions)
   sendSampleConfirmationEmail,
   sendWarrantyConfirmationEmail,
+  sendEnquiryConfirmationEmail,
   sendFormsResetEmail,
   checkAndSendTimeAlert,
   // Review/approval workflow
