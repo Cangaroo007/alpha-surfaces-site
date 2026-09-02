@@ -131,6 +131,17 @@ const ENQUIRY_REASON_OPTION = {
   'pricing': 306, 'price': 306, 'quote': 306, 'request a quote': 306,
   'other': 307,
 };
+// Marketing consent must come from a checkbox that actually asks about
+// marketing. /order-sample's box does ("I agree to receive updates from
+// Alpha Surfaces") and is optional. /enquiry's `consent` box is REQUIRED and
+// asks only for permission to reply to the enquiry — treating that as a
+// marketing opt-in is not express consent under the Spam Act. /enquiry posts
+// a separate optional `marketing_consent` box for that purpose.
+function marketingConsentFor(formType, fields) {
+  if (formType === 'Enquiry') return !!fields.marketing_consent;
+  return !!fields.consent;
+}
+
 function enquiryReasonIdFor(reason) {
   return ENQUIRY_REASON_OPTION[String(reason || '').trim().toLowerCase()] || null;
 }
@@ -599,7 +610,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
     role,
     interestedIn,
     state: fields.state,
-    consent: !!fields.consent,
+    consent: marketingConsentFor(formType, fields),
   });
   if (!person?.id) return;
 
@@ -676,6 +687,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
           attribution +
           `<b>Enquiry ${escape(ref)}</b><br>` +
           `Reason: ${escape(fields.reason || '—')}<br>` +
+          `Marketing consent: ${fields.marketing_consent ? 'YES — ' + new Date().toISOString().slice(0, 10) + ' via /enquiry' : 'no'}<br>` +
           `Message: ${escape(fields.message || '—')}<br>` +
           `Source: alphasurfaces.com.au/enquiry`,
       });

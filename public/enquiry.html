@@ -270,6 +270,11 @@ img { display: block; max-width: 100%; }
       </div>
       <div class="field-error" data-for="consent" style="margin-top:-12px">Please tick the consent box to continue.</div>
 
+      <div class="consent-row" style="margin-top:4px">
+        <input type="checkbox" id="marketing_consent" name="marketing_consent">
+        <label for="marketing_consent">I'd also like to receive emails from Alpha Surfaces about new collections, products and events. I can unsubscribe anytime.</label>
+      </div>
+
       <button type="submit" class="btn-submit" id="submit-btn">
         <span class="spinner"></span>
         <span class="btn-label">Send enquiry</span>
@@ -364,6 +369,7 @@ img { display: block; max-width: 100%; }
       reason:  fd.get('reason')  || '',
       message: (fd.get('message') || '').trim(),
       consent: fd.get('consent') === 'on',
+      marketing_consent: fd.get('marketing_consent') === 'on',
       source:  'enquiry-page',
       // Outreach attribution — populated by the hidden field block
       // at the top of the form when the visitor arrived via a tracked URL.
