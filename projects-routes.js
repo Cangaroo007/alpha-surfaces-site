@@ -4349,7 +4349,8 @@ module.exports = function mountProjects(app, { pool, sessions, loginLimiter }) {
   }
   // Same cadence as the daily-digest scheduler in server.js. The day-string
   // gate above prevents re-firing once we've swept for the day.
-  setTimeout(checkBlockerNag, 35 * 1000);
+  // DISABLED 1 Sep 2026 — boot-time blocker nag sweep retired at client request.
+  // setTimeout(checkBlockerNag, 35 * 1000);
   // DISABLED 1 Sep 2026 — project tracker blocker nags retired at client request.
   // setInterval(checkBlockerNag, 60 * 1000);
 
