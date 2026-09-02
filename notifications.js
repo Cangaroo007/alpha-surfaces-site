@@ -225,16 +225,23 @@ async function notifySubscribe(email, id) {
     </body></html>`;
   await Promise.all([
     fanoutInstant('newsletter', sms, subject, html),
-    transport ? transport.sendMail({
-      from: process.env.SMTP_USER,
+    // 2 Sep 2026 — moved off the dead SMTP/nodemailer path onto SendGrid.
+    // SMTP_HOST/USER/PASS were never set in either environment, so every
+    // welcome since launch was silently skipped.
+    (configureSendgrid() ? sgMail.send({
       to: email,
+      from: NOTIFY_EMAIL_FROM(),
+      replyTo: NOTIFY_EMAIL_TO(),
       subject: 'Welcome to Alpha Surfaces',
       html: welcomeHtml,
       headers: {
         'List-Unsubscribe': `<${unsubUrl}>`,
         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
       }
-    }) : Promise.resolve()
+    }).then(() => console.log('[notify] newsletter welcome sent to', email))
+      .catch(err => console.error('[notify] newsletter welcome error:',
+        err.response?.body?.errors ? JSON.stringify(err.response.body.errors) : err.message))
+    : Promise.resolve(console.warn('[notify] SENDGRID_API_KEY not set — skipping newsletter welcome')))
   ]);
 }
 
