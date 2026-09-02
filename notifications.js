@@ -1659,6 +1659,11 @@ async function sendEnquiryConfirmationEmail(submission, reference) {
   }
 }
 
+function retiredNotifier(label) {
+  console.log('[notify] suppressed — ' + label + ' (retired 2 Sep 2026)');
+  return Promise.resolve({ sent: [], suppressed: true });
+}
+
 module.exports = {
   setSettingsPath,
   readSettings,
@@ -1679,15 +1684,16 @@ module.exports = {
   sendWarrantyConfirmationEmail,
   sendEnquiryConfirmationEmail,
   sendFormsResetEmail,
-  checkAndSendTimeAlert,
-  // Review/approval workflow
-  notifyReviewersRequested,
-  notifyApproverRequested,
-  notifyApproved,
-  notifyChangesRequested,
-  notifyReviewerFeedback,
-  // Blocker system + ticket status
-  sendBlockerNotice,
-  sendBlockerNagEmail,
-  sendTicketStatusEmail
+  // Retired 2 Sep 2026 at client request. Stubbed at the export boundary so
+  // no trigger path can reach a sender, whatever calls it. Hour logging from
+  // commits is unaffected — only the alert email is suppressed.
+  checkAndSendTimeAlert:    () => retiredNotifier('time cap alert'),
+  notifyReviewersRequested: () => retiredNotifier('reviewers requested'),
+  notifyApproverRequested:  () => retiredNotifier('approver requested'),
+  notifyApproved:           () => retiredNotifier('approved'),
+  notifyChangesRequested:   () => retiredNotifier('changes requested'),
+  notifyReviewerFeedback:   () => retiredNotifier('reviewer feedback'),
+  sendBlockerNotice:        () => retiredNotifier('blocker notice'),
+  sendBlockerNagEmail:      () => retiredNotifier('blocker nag'),
+  sendTicketStatusEmail:    () => retiredNotifier('ticket status')
 };
