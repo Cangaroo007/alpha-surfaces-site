@@ -75,6 +75,10 @@ async function initDB() {
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS stone_interest VARCHAR(255)`);
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS source VARCHAR(100)`);
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS consent BOOLEAN DEFAULT FALSE`);
+    // 2 Sep 2026 — /enquiry's `consent` box is a REQUIRED permission-to-reply
+    // tick, not a marketing opt-in. Marketing consent is its own optional box
+    // and needs its own column, or the CSV export overstates the opt-in list.
+    await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS marketing_consent BOOLEAN DEFAULT FALSE`);
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS postcode VARCHAR(20)`);
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS state VARCHAR(50)`);
     await client.query(`ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS store_location VARCHAR(255)`);
@@ -241,8 +245,8 @@ async function saveSubmission(formType, fields, sampleItems = []) {
       `INSERT INTO form_submissions
          (form_type, name, email, phone, company, stone_interest, message,
           postcode, state, store_location, source, consent, role, reason,
-          street, suburb, unit, raw_data, client_submission_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
+          street, suburb, unit, raw_data, client_submission_id, marketing_consent)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)
        RETURNING id, submitted_at`,
       [
         formType,
@@ -265,7 +269,10 @@ async function saveSubmission(formType, fields, sampleItems = []) {
         // ALWAYS store the full payload as a safety net, so any new form
         // field surfaces immediately even before a dedicated column exists.
         JSON.stringify(fields),
-        clientSubmissionId
+        clientSubmissionId,
+        // /order-sample's own consent box IS a marketing box, so it counts
+        // for both. /enquiry posts marketing_consent separately.
+        (fields.marketing_consent || (formType === 'Sample Request' && fields.consent)) ? true : false
       ]
     );
 
