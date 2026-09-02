@@ -21,6 +21,18 @@
   --display:'Concrette S',Georgia,serif;--body:'Degular','Helvetica Neue',Arial,sans-serif;
 }
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
+section[id]{scroll-margin-top:14px}
+ol.ag li[id]{scroll-margin-top:70px}
+.h2row{display:flex;align-items:baseline;gap:16px;margin:0 0 20px;
+  padding-bottom:9px;border-bottom:1px solid var(--rule-2)}
+.h2row h2{margin:0;padding:0;border:0;flex:1}
+.back{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--olive);text-decoration:none;white-space:nowrap;opacity:.75}
+.back:hover{opacity:1;text-decoration:underline}
+ol.ag a.t{text-decoration:none;color:var(--ink);display:block}
+ol.ag a.t:hover{color:var(--olive);text-decoration:underline}
+ol.ag li{cursor:default}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);
   font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
 .wrap{max-width:900px;margin:0 auto;padding:0 24px}
@@ -92,8 +104,8 @@ footer{margin-top:52px;padding:22px 0 60px;border-top:1px solid var(--rule-2);
   <p class="who">Belinda · Pam · Olivia · Sean &nbsp;·&nbsp; 60 minutes</p>
 </div></section>
 
-<section><div class="wrap">
-  <h2>The number</h2>
+<section id="number"><div class="wrap">
+  <div class="h2row"><h2>The number</h2><a class="back" href="#ag-02">&uarr; Agenda</a></div>
   <div class="big">
     <div class="n">7%</div>
     <p>of completed activities in the last six months carry a <b>person</b>. Only 5% carry
@@ -108,33 +120,33 @@ footer{margin-top:52px;padding:22px 0 60px;border-top:1px solid var(--rule-2);
   </div>
 </div></section>
 
-<section><div class="wrap">
+<section id="agenda"><div class="wrap">
   <h2>Agenda</h2>
   <ol class="ag">
-    <li><span class="slot">01</span><div><div class="t">Delivered since Wednesday</div>
+    <li id="ag-01"><span class="slot">01</span><div><a class="t" href="#sprints">Delivered since Wednesday &rsaquo;</a>
       <div class="n2">Seven commits to production. Enquiry confirmations live, consent split,
       newsletter welcome fixed after 746 unacknowledged subscribers.</div></div><span class="min">5 min</span></li>
-    <li><span class="slot">02</span><div><div class="t">The activity audit</div>
+    <li id="ag-02"><span class="slot">02</span><div><a class="t" href="#number">The activity audit &rsaquo;</a>
       <div class="n2">The 7% finding, and what it means for how we train.</div></div><span class="min">10 min</span></li>
-    <li><span class="slot">03</span><div><div class="t">Training program — lock the dates</div>
+    <li id="ag-03"><span class="slot">03</span><div><a class="t" href="#training">Training program — lock the dates &rsaquo;</a>
       <div class="n2">Three non-negotiables, four sessions. Full plan below — we lock the four dates in this meeting.</div></div><span class="min">15 min</span></li>
-    <li><span class="slot">04</span><div><div class="t">Lead stages — two routing decisions</div>
+    <li id="ag-04"><span class="slot">04</span><div><a class="t" href="#decisions">Lead stages — two routing decisions &rsaquo;</a>
       <div class="n2">Five stages plus an outcome. Homeowner settled; trade routing needs the room.</div></div><span class="min">10 min</span></li>
-    <li><span class="slot">05</span><div><div class="t">Sample form by user type</div>
+    <li id="ag-05"><span class="slot">05</span><div><a class="t" href="#decisions">Sample form by user type &rsaquo;</a>
       <div class="n2">Field spec drafted. Five open questions.</div></div><span class="min">10 min</span></li>
-    <li><span class="slot">06</span><div><div class="t">Sample stock-out — try it on your phone</div>
+    <li id="ag-06"><span class="slot">06</span><div><a class="t" href="#properties">Sample stock-out — try it on your phone &rsaquo;</a>
       <div class="n2">Working preview. Replaces both printed sheets, writes to Pipedrive,
       queues a record for Datapel.</div></div><span class="min">5 min</span></li>
-    <li><span class="slot">07</span><div><div class="t">Awards campaign — first page live</div>
+    <li id="ag-07"><span class="slot">07</span><div><a class="t" href="#properties">Awards campaign — first page live &rsaquo;</a>
       <div class="n2">Fergus Builders, seven wins, second year running. 207 of 254 award
       winners are not in the CRM at all.</div></div><span class="min">5 min</span></li>
-    <li><span class="slot">08</span><div><div class="t">Blocked on you</div>
+    <li id="ag-08"><span class="slot">08</span><div><a class="t" href="#decisions">Blocked on you &rsaquo;</a>
       <div class="n2">Belinda's voice recording still holds up the entire automation build.</div></div><span class="min">5 min</span></li>
   </ol>
 </div></section>
 
-<section><div class="wrap">
-  <h2 id="training">Training program — week of 8 September</h2>
+<section id="training"><div class="wrap">
+  <div class="h2row"><h2>Training program — week of 8 September</h2><a class="back" href="#ag-03">&uarr; Agenda</a></div>
 
   <div class="big" >
     <p style="margin-top:0"><b>The three non-negotiables.</b> If the team does nothing else,
@@ -204,8 +216,8 @@ footer{margin-top:52px;padding:22px 0 60px;border-top:1px solid var(--rule-2);
   add-on, manual relationship entry. Teaching everything is how nothing gets used.</p>
 </div></section>
 
-<section><div class="wrap">
-  <h2>Live properties</h2>
+<section id="properties"><div class="wrap">
+  <div class="h2row"><h2>Live properties</h2><a class="back" href="#ag-06">&uarr; Agenda</a></div>
   <div class="links">
     <a class="new" href="#training">Training program<small>Week of 8 September — four sessions to lock</small></a>
     <a class="new" href="https://review.alphasurfaces.com.au/stockout-preview.html?v=2">Sample stock-out<small>New — open on a phone</small></a>
@@ -220,8 +232,8 @@ footer{margin-top:52px;padding:22px 0 60px;border-top:1px solid var(--rule-2);
   </div>
 </div></section>
 
-<section><div class="wrap">
-  <h2>Decisions needed today</h2>
+<section id="decisions"><div class="wrap">
+  <div class="h2row"><h2>Decisions needed today</h2><a class="back" href="#ag-08">&uarr; Agenda</a></div>
   <div class="cards">
     <div class="card"><h3>Belinda</h3><ul>
       <li>Is training session 1 mandatory, and when?</li>
@@ -254,8 +266,8 @@ footer{margin-top:52px;padding:22px 0 60px;border-top:1px solid var(--rule-2);
   </div>
 </div></section>
 
-<section><div class="wrap">
-  <h2>Sprints</h2>
+<section id="sprints"><div class="wrap">
+  <div class="h2row"><h2>Sprints</h2><a class="back" href="#ag-01">&uarr; Agenda</a></div>
   <div class="scroll"><table>
     <thead><tr><th></th><th>Sprint</th><th>State</th><th>What remains</th></tr></thead>
     <tbody>
@@ -278,8 +290,8 @@ footer{margin-top:52px;padding:22px 0 60px;border-top:1px solid var(--rule-2);
   </table></div>
 </div></section>
 
-<section><div class="wrap">
-  <h2>Reference documents</h2>
+<section id="docs"><div class="wrap">
+  <div class="h2row"><h2>Reference documents</h2><a class="back" href="#agenda">&uarr; Agenda</a></div>
   <div class="docs">
     <div>Activity audit — 2 Sep</div>
     <div>Training program outline — 2 Sep</div>
