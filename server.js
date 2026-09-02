@@ -3005,7 +3005,8 @@ async function startServer() {
     console.error('[form-fallback] replay scheduler error:', err.message)
   ), 5 * 60 * 1000);
   // Weekly Friday 5pm Brisbane sales report.
-  setInterval(checkWeeklyReport, 5 * 60 * 1000);
+  // DISABLED 1 Sep 2026 — weekly sales report retired at client request.
+  // setInterval(checkWeeklyReport, 5 * 60 * 1000);
   // Auto time-tracking from GitHub commits — runs at the top of each
   // hour between 06:00 and 22:00 Brisbane. Silent no-op when
   // GITHUB_TOKEN is unset.
