@@ -2650,6 +2650,15 @@ app.get('/warranty-terms', (req, res) => {
 // and quietly served the homepage — the form was only ever reachable at
 // /order-sample.html. server.js:269 already treats '/order-sample' as a form
 // path, so the clean URL was always the intent. Matches /warranty and /enquiry.
+// Standalone pages, served raw. No nav partial injected, and registered
+// explicitly so they don't fall through to the catch-all like /order-sample did.
+app.get(['/stockout-preview', '/stockout-preview.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'stockout-preview.html'));
+});
+app.get(['/congratulations/fergus-builders', '/congratulations/fergus-builders.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'congratulations-fergus-builders.html'));
+});
+
 app.get('/order-sample', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'order-sample.html'));
 });
