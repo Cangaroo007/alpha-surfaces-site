@@ -5,351 +5,506 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Sales System Review — 3 September | Alpha Surfaces</title>
+<link rel="stylesheet" href="/nav.css?v=23">
 <style>
-@font-face{font-family:'Concrette S';src:url('/fonts/Web/ConcretteS-Regular.woff2') format('woff2'),url('/fonts/Web/ConcretteS-Regular.woff') format('woff');font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:'Concrette S';src:url('/fonts/Web/ConcretteS-Medium.woff2') format('woff2'),url('/fonts/Web/ConcretteS-Medium.woff') format('woff');font-weight:500;font-style:normal;font-display:swap}
-@font-face{font-family:'Concrette S';src:url('/fonts/Web/ConcretteS-Bold.woff2') format('woff2'),url('/fonts/Web/ConcretteS-Bold.woff') format('woff');font-weight:700;font-style:normal;font-display:swap}
-@font-face{font-family:'Degular';src:url('/fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'),url('/fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff');font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:'Degular';src:url('/fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'),url('/fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff');font-weight:500;font-style:normal;font-display:swap}
-@font-face{font-family:'Degular';src:url('/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'),url('/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff');font-weight:600;font-style:normal;font-display:swap}
-:root{
-  --cream:#f3f1e6;--white:#ffffff;--black:#000000;--olive:#564d22;--gray:#cccccc;
-  --red:#f56c6c;--border:rgba(0,0,0,0.1);
-  --paper:var(--cream);--panel:var(--white);--ink:var(--black);
-  --muted:#5a553f;--faint:#8b8672;--rule:var(--border);--rule-2:rgba(0,0,0,0.2);
-  --olive-soft:#e6e2d0;--red-soft:#fbe4e4;--gray-soft:#eceade;
-  --display:'Concrette S',Georgia,serif;--body:'Degular','Helvetica Neue',Arial,sans-serif;
+/* --- FONTS (absolute paths - this page is not at the site root) --- */
+@font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('/fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('/fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('/fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('/fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('/fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --olive:#564d22; --cream:#f3f1e6; --white:#ffffff; --black:#000000;
+        --red:#f56c6c; --gray:#cccccc; --border:rgba(0,0,0,0.1); }
+html { scroll-behavior: smooth; overflow-x: clip; }
+body { background:#f5f5f5; color:var(--black); font-family:'Degular',sans-serif;
+       font-weight:400; line-height:1.2; overflow-x:clip; max-width:100vw; }
+a { color: inherit; }
+img { display:block; max-width:100%; }
+
+/* --- PAGE HEADER, on the .hero-tagline pattern --- */
+.ag-head { background: var(--cream); text-align: center; padding: 72px 24px 56px; }
+.ag-eyebrow { font-family:'Degular',sans-serif; font-weight:600; font-size:13px;
+  letter-spacing:0.16em; text-transform:uppercase; color:var(--olive); margin-bottom:22px; }
+.ag-head h1 { font-family:'Concrette S',serif; font-weight:600; font-size:62px;
+  color:#564D22; letter-spacing:0; line-height:1.05; }
+.ag-head .ag-meta { font-family:'Degular',sans-serif; font-size:16px; color:var(--black);
+  margin-top:20px; opacity:.7; }
+
+/* --- OLIVE STATEMENT BAND --- */
+.ag-statement { background: var(--olive); padding: 100px 171px; }
+.ag-statement-inner { max-width:1100px; margin:0 auto; }
+.ag-stat-figure { font-family:'Concrette S',serif; font-weight:700; font-size:120px;
+  line-height:1; color:var(--white); margin-bottom:24px; }
+.ag-statement p { font-family:'Concrette S',serif; font-weight:500; font-size:42px;
+  line-height:1.2; color:var(--white); max-width:1100px; }
+.ag-statement p.ag-sub { font-weight:400; font-size:22px; line-height:1.35;
+  color:rgba(255,255,255,0.82); margin-top:28px; max-width:820px; }
+
+/* --- CONTENT BANDS, on the .about / .gallery pattern --- */
+.ag-band { padding: 80px 161px; }
+.ag-band--cream { background: var(--cream); }
+.ag-band--white { background: var(--white); }
+.ag-inner { max-width: 1100px; margin: 0 auto; }
+.ag-bandhead { display:flex; align-items:baseline; justify-content:space-between;
+  gap:24px; margin-bottom:44px; border-bottom:1px solid var(--border); padding-bottom:18px; }
+.ag-bandhead h2 { font-family:'Concrette S',serif; font-weight:400; font-size:42px;
+  color:var(--black); line-height:1.1; }
+.ag-back { font-family:'Degular',sans-serif; font-weight:500; font-size:13px;
+  letter-spacing:0.08em; text-transform:uppercase; color:var(--olive);
+  text-decoration:underline; text-underline-offset:3px; white-space:nowrap; }
+
+/* --- AGENDA LIST --- */
+.ag-list { list-style:none; }
+.ag-list li { display:grid; grid-template-columns:64px 1fr auto; gap:24px;
+  align-items:baseline; padding:22px 0; border-bottom:1px solid var(--border);
+  scroll-margin-top:120px; }
+.ag-list li:last-child { border-bottom:0; }
+.ag-num { font-family:'Concrette S',serif; font-weight:700; font-size:20px; color:var(--olive); }
+.ag-item-title { font-family:'Concrette S',serif; font-weight:500; font-size:24px;
+  color:var(--black); text-decoration:none; display:block; line-height:1.2; }
+.ag-item-title:hover { color:var(--olive); text-decoration:underline; text-underline-offset:4px; }
+.ag-item-note { font-family:'Degular',sans-serif; font-size:16px; line-height:1.45;
+  color:var(--black); opacity:.68; margin-top:8px; max-width:62ch; }
+.ag-mins { font-family:'Degular',sans-serif; font-size:13px; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--olive); white-space:nowrap; }
+
+/* --- PROSE --- */
+.ag-lead { font-family:'Concrette S',serif; font-weight:400; font-size:20px;
+  line-height:1.35; max-width:60ch; margin-bottom:16px; }
+.ag-note { font-family:'Degular',sans-serif; font-size:16px; line-height:1.5;
+  max-width:66ch; opacity:.72; margin-top:18px; }
+
+/* --- NUMBERED HABITS --- */
+.ag-habits { list-style:none; counter-reset:h; display:grid; gap:22px; margin-top:8px; }
+.ag-habits li { counter-increment:h; padding-left:56px; position:relative;
+  font-family:'Degular',sans-serif; font-size:17px; line-height:1.5; max-width:70ch; }
+.ag-habits li::before { content:counter(h); position:absolute; left:0; top:-2px;
+  font-family:'Concrette S',serif; font-weight:700; font-size:26px; color:var(--olive); }
+
+/* --- LINK PANELS, on the .feature-panel pattern --- */
+.ag-panels { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.ag-panel { display:block; text-decoration:none; background:var(--white);
+  border:1px solid var(--border); padding:24px 22px 26px; transition:border-color .2s ease; }
+.ag-band--white .ag-panel { background:var(--cream); }
+.ag-panel:hover { border-color:var(--olive); }
+.ag-panel-name { font-family:'Concrette S',serif; font-weight:500; font-size:20px;
+  color:var(--black); line-height:1.2; }
+.ag-panel-desc { font-family:'Degular',sans-serif; font-size:14px; line-height:1.4;
+  color:var(--black); opacity:.65; margin-top:8px; }
+.ag-panel-cta { font-family:'Degular',sans-serif; font-weight:500; font-size:13px;
+  letter-spacing:0.08em; color:var(--olive); text-decoration:underline;
+  text-underline-offset:3px; margin-top:14px; display:inline-block; }
+.ag-panel--new { border-left:3px solid var(--olive); }
+
+/* --- PERSON CARDS --- */
+.ag-people { display:grid; gap:24px; }
+.ag-person { background:var(--cream); padding:30px 32px; }
+.ag-band--cream .ag-person { background:var(--white); }
+.ag-person h3 { font-family:'Concrette S',serif; font-weight:700; font-size:28px;
+  color:var(--olive); margin-bottom:18px; }
+.ag-person ul { list-style:none; display:grid; gap:14px; }
+.ag-person li { font-family:'Degular',sans-serif; font-size:16px; line-height:1.5;
+  padding-left:20px; position:relative; max-width:78ch; }
+.ag-person li::before { content:''; position:absolute; left:0; top:10px;
+  width:8px; height:1px; background:var(--olive); }
+.ag-person li b { font-weight:600; }
+.ag-person li i { font-style:italic; }
+
+/* --- TABLES --- */
+.ag-scroll { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-family:'Degular',sans-serif; font-size:15px; }
+th { text-align:left; font-weight:600; font-size:11px; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--olive); padding:0 16px 12px 0;
+  border-bottom:1px solid var(--border); white-space:nowrap; }
+td { padding:14px 16px 14px 0; border-bottom:1px solid var(--border);
+  vertical-align:top; line-height:1.45; }
+td:last-child, th:last-child { padding-right:0; }
+.ag-key { font-family:'Concrette S',serif; font-weight:700; font-size:17px;
+  color:var(--olive); width:28px; }
+.ag-sess { font-family:'Concrette S',serif; font-weight:500; font-size:18px; }
+.ag-pill { display:inline-block; font-family:'Degular',sans-serif; font-weight:600;
+  font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:5px 10px;
+  border-radius:8px; white-space:nowrap; }
+.ag-pill--go { background:var(--olive); color:var(--cream); }
+.ag-pill--wait { background:rgba(86,77,34,0.12); color:var(--olive); }
+.ag-pill--stop { background:rgba(245,108,108,0.16); color:#9c3125; }
+
+/* --- DOC LIST --- */
+.ag-docs { columns:2; column-gap:48px; font-family:'Degular',sans-serif;
+  font-size:15px; line-height:1.6; }
+.ag-docs div { break-inside:avoid; padding:6px 0; opacity:.75; }
+
+/* --- FOOTER (site pattern) --- */
+.footer { background:var(--white); border-top:1px solid var(--border); padding:50px 60px 40px; }
+.footer-inner { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:40px; }
+.footer-col-heading { font-family:'Concrette S',serif; font-weight:700; font-size:14px;
+  color:var(--black); margin-bottom:10px; }
+.footer-col p, .footer-col a { font-family:'Degular',sans-serif; font-weight:400;
+  font-size:13px; color:var(--black); line-height:1.6; }
+.footer-col a { text-decoration:underline; text-underline-offset:2px; }
+.footer-col a:hover { color:var(--olive); }
+.footer-bottom { border-top:1px solid var(--border); margin-top:30px; padding-top:20px; }
+.footer-bottom p { font-family:'Degular',sans-serif; font-weight:400; font-size:11px;
+  letter-spacing:0.46px; text-transform:uppercase; color:var(--black); }
+
+/* --- MOBILE, matching the site breakpoint --- */
+@media (max-width: 1024px) {
+  .ag-head { padding:44px 24px 36px; }
+  .ag-head h1 { font-size:32px; }
+  .ag-statement { padding:44px 24px; }
+  .ag-stat-figure { font-size:72px; }
+  .ag-statement p { font-size:24px; line-height:1.15; font-weight:400; }
+  .ag-statement p.ag-sub { font-size:17px; }
+  .ag-band { padding:44px 24px; }
+  .ag-bandhead { flex-direction:column; gap:10px; margin-bottom:28px; }
+  .ag-bandhead h2 { font-size:28px; }
+  .ag-list li { grid-template-columns:40px 1fr; gap:14px; padding:18px 0; }
+  .ag-item-title { font-size:20px; }
+  .ag-mins { grid-column:2; }
+  .ag-panels { grid-template-columns:1fr; }
+  .ag-person { padding:22px 20px; }
+  .ag-person h3 { font-size:22px; }
+  .ag-docs { columns:1; }
+  .footer { padding:44px 24px 20px; }
+  .footer-inner { grid-template-columns:1fr; gap:32px; }
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-section[id]{scroll-margin-top:14px}
-ol.ag li[id]{scroll-margin-top:70px}
-.h2row{display:flex;align-items:baseline;gap:16px;margin:0 0 20px;
-  padding-bottom:9px;border-bottom:1px solid var(--rule-2)}
-.h2row h2{margin:0;padding:0;border:0;flex:1}
-.back{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--olive);text-decoration:none;white-space:nowrap;opacity:.75}
-.back:hover{opacity:1;text-decoration:underline}
-ol.ag a.t{text-decoration:none;color:var(--ink);display:block}
-ol.ag a.t:hover{color:var(--olive);text-decoration:underline}
-ol.ag li{cursor:default}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);
-  font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:900px;margin:0 auto;padding:0 24px}
-a{color:var(--olive)}
-.mast{border-bottom:1px solid var(--rule-2);padding:20px 0;background:var(--white)}
-.mast .wrap{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-.logo{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:.16em;text-transform:uppercase}
-.tag{font-family:var(--body);font-weight:500;font-size:11.5px;letter-spacing:.18em;
-  color:var(--faint);text-transform:uppercase;margin-left:auto}
-.hero{padding:54px 0 38px;border-bottom:1px solid var(--rule-2)}
-.eyebrow{font-weight:600;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--olive);margin:0 0 18px}
-h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,6.5vw,58px);line-height:1;
-  letter-spacing:-.01em;margin:0 0 16px}
-.who{font-size:14.5px;color:var(--muted)}
-h2{font-family:var(--display);font-weight:500;font-size:14px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--olive);margin:0 0 20px;padding-bottom:9px;
-  border-bottom:1px solid var(--rule-2)}
-section{padding:44px 0 0}
-.big{background:var(--white);border:1px solid var(--rule);border-left:4px solid var(--olive);padding:26px}
-.big .n{font-family:var(--display);font-weight:700;font-size:clamp(56px,12vw,92px);line-height:.85;
-  letter-spacing:-.03em;color:var(--olive)}
-.big p{margin:16px 0 0;max-width:60ch}
-.big p:first-of-type{font-size:18px}
-ol.ag{list-style:none;margin:0;padding:0}
-ol.ag li{display:grid;grid-template-columns:32px 1fr auto;gap:16px;align-items:baseline;
-  padding:14px 0;border-bottom:1px solid var(--rule)}
-.slot{font-family:var(--display);font-weight:700;font-size:15px;color:var(--olive)}
-.t{font-family:var(--display);font-weight:500;font-size:18px}
-.n2{font-size:14px;color:var(--muted);margin-top:3px;max-width:60ch}
-.min{font-size:12.5px;color:var(--faint);white-space:nowrap}
-.cards{display:grid;gap:12px}
-.card{background:var(--white);border:1px solid var(--rule);padding:16px 18px}
-.card h3{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--olive);margin:0 0 10px}
-.card ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:15px}
-.scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:14.5px}
-th{text-align:left;font-weight:600;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--faint);padding:0 12px 8px 0;border-bottom:1px solid var(--rule-2);white-space:nowrap}
-td{padding:10px 12px 10px 0;border-bottom:1px solid var(--rule);vertical-align:top}
-.k{font-family:var(--display);font-weight:700;color:var(--olive);width:24px}
-.pill{display:inline-block;font-weight:600;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
-  padding:3px 8px;border-radius:2px;white-space:nowrap}
-.go{background:var(--olive);color:var(--cream)}
-.wt{background:var(--olive-soft);color:var(--olive)}
-.st{background:var(--red-soft);color:#a33b3b}
-.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
-.links a{display:block;background:var(--white);border:1px solid var(--rule);padding:13px 15px;
-  text-decoration:none;color:var(--ink);font-weight:500;font-size:15px}
-.links a:hover{border-color:var(--olive)}
-.links a small{display:block;font-weight:400;font-size:12.5px;color:var(--faint);margin-top:2px}
-.links a.new{border-left:4px solid var(--olive)}
-.docs{columns:2;column-gap:30px;font-size:14.5px;color:var(--muted)}
-.docs div{break-inside:avoid;padding:5px 0}
-footer{margin-top:52px;padding:22px 0 60px;border-top:1px solid var(--rule-2);
-  font-size:12.5px;color:var(--faint)}
-@media (max-width:620px){.docs{columns:1}ol.ag li{grid-template-columns:28px 1fr}.min{grid-column:2}}
 </style>
 </head>
 <body>
-<header class="mast"><div class="wrap">
-  <span class="logo">Alpha Surfaces</span><span class="tag">Sales System Review</span>
-</div></header>
 
-<section class="hero"><div class="wrap">
-  <p class="eyebrow">Agenda &amp; status · sent ahead as promised</p>
+<nav class="nav" id="main-nav"></nav>
+
+<header class="ag-head">
+  <p class="ag-eyebrow">Sales System Review</p>
   <h1>Thursday 3 September</h1>
-  <p class="who">Belinda · Pam · Olivia · Sean &nbsp;·&nbsp; 60 minutes</p>
-</div></section>
+  <p class="ag-meta">Belinda · Pam · Olivia · Sean &nbsp;—&nbsp; 60 minutes</p>
+</header>
 
-<section id="number"><div class="wrap">
-  <div class="h2row"><h2>The number</h2><a class="back" href="#ag-02">&uarr; Agenda</a></div>
-  <div class="big">
-    <div class="n">7%</div>
-    <p>of completed activities in the last six months carry a <b>person</b>. Only 5% carry
-    both a person and a company — 199 records out of 3,973.</p>
-    <p style="color:var(--muted);font-size:15.5px">The team logged 3,973 activities in six
-    months, about sixteen a day. The work is happening; the CRM cannot see who it was with.
-    A 6% rate identical across meetings and calls is a workflow default, not effort — it is
-    what happens when you log from the organisation record instead of the contact.</p>
-    <p style="color:var(--muted);font-size:15.5px">Also corrected: <b>485</b> activities open
-    and never closed, not 293. And showroom check-in is inverted — 67 walk-ins, every one
-    recording a person and no business.</p>
+<section class="ag-statement" id="number">
+  <div class="ag-statement-inner">
+    <div class="ag-stat-figure">7%</div>
+    <p>Only seven per cent of completed activities carry a person. Five per cent carry both a
+    person and a company — 199 records out of 3,973.</p>
+    <p class="ag-sub">The team logged 3,973 activities in six months, about sixteen a day. The
+    work is happening; the CRM cannot see who it was with. A six per cent rate identical
+    across meetings and calls is a workflow default, not effort — it is what happens when you
+    log from the organisation record instead of the contact.</p>
+    <p class="ag-sub">Also corrected: <b>485</b> activities open and never closed, not 293.
+    And showroom check-in is inverted — 67 walk-ins, every one recording a person and no
+    business.</p>
   </div>
-</div></section>
+</section>
 
-<section id="agenda"><div class="wrap">
-  <h2>Agenda</h2>
-  <ol class="ag">
-    <li id="ag-01"><span class="slot">01</span><div><a class="t" href="#sprints">Delivered since Wednesday &rsaquo;</a>
-      <div class="n2">Seven commits to production. Enquiry confirmations live, consent split,
-      newsletter welcome fixed after 746 unacknowledged subscribers.</div></div><span class="min">5 min</span></li>
-    <li id="ag-02"><span class="slot">02</span><div><a class="t" href="#number">The activity audit &rsaquo;</a>
-      <div class="n2">The 7% finding, and what it means for how we train.</div></div><span class="min">10 min</span></li>
-    <li id="ag-03"><span class="slot">03</span><div><a class="t" href="#training">Training program — lock the dates &rsaquo;</a>
-      <div class="n2">Three non-negotiables, four sessions. Full plan below — we lock the four dates in this meeting.</div></div><span class="min">15 min</span></li>
-    <li id="ag-04"><span class="slot">04</span><div><a class="t" href="#decisions">Lead stages — two routing decisions &rsaquo;</a>
-      <div class="n2">Five stages plus an outcome. Homeowner settled; trade routing needs the room.</div></div><span class="min">10 min</span></li>
-    <li id="ag-05"><span class="slot">05</span><div><a class="t" href="#decisions">Sample form by user type &rsaquo;</a>
-      <div class="n2">Field spec drafted. Five open questions.</div></div><span class="min">10 min</span></li>
-    <li id="ag-06"><span class="slot">06</span><div><a class="t" href="#properties">Sample stock-out — try it on your phone &rsaquo;</a>
-      <div class="n2">Working preview. Replaces both printed sheets, writes to Pipedrive,
-      queues a record for Datapel.</div></div><span class="min">5 min</span></li>
-    <li id="ag-07"><span class="slot">07</span><div><a class="t" href="#properties">Awards campaign — first page live &rsaquo;</a>
-      <div class="n2">Fergus Builders, seven wins, second year running. 207 of 254 award
-      winners are not in the CRM at all.</div></div><span class="min">5 min</span></li>
-    <li id="ag-08"><span class="slot">08</span><div><a class="t" href="#decisions">Blocked on you &rsaquo;</a>
-      <div class="n2">Belinda's voice recording still holds up the entire automation build.</div></div><span class="min">5 min</span></li>
-  </ol>
-</div></section>
-
-<section id="training"><div class="wrap">
-  <div class="h2row"><h2>Training program — week of 8 September</h2><a class="back" href="#ag-03">&uarr; Agenda</a></div>
-
-  <div class="big" >
-    <p style="margin-top:0"><b>The three non-negotiables.</b> If the team does nothing else,
-    these fix most of what the audit found. Everything else is optional by comparison.</p>
-    <ol style="margin:14px 0 0;padding-left:20px;display:grid;gap:10px">
-      <li><b>Every activity carries a company AND a person.</b> No company, it didn't happen.
-        No person, we can never contact them again. Two taps — and it fixes the 7%.</li>
-      <li><b>Tick it done, and pick the right type</b> — and the type must say whether it was a
-        formal meeting or a sample drop. Fixes the 485 open activities and makes the
-        six-a-day KPI measurable.</li>
-      <li><b>Never leave a visit without booking the next one.</b> Turns the CRM into a call
-        cycle instead of a logbook.</li>
+<section class="ag-band ag-band--cream" id="agenda">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>Agenda</h2></div>
+    <ol class="ag-list">
+      <li id="ag-01"><span class="ag-num">01</span><div>
+        <a class="ag-item-title" href="#sprints">Delivered since Wednesday</a>
+        <p class="ag-item-note">Seven commits to production. Enquiry confirmations live,
+        consent split, newsletter welcome fixed after 746 unacknowledged subscribers.</p>
+      </div><span class="ag-mins">5 min</span></li>
+      <li id="ag-02"><span class="ag-num">02</span><div>
+        <a class="ag-item-title" href="#number">The activity audit</a>
+        <p class="ag-item-note">The 7% finding, and what it means for how we train.</p>
+      </div><span class="ag-mins">10 min</span></li>
+      <li id="ag-03"><span class="ag-num">03</span><div>
+        <a class="ag-item-title" href="#training">Training program — lock the dates</a>
+        <p class="ag-item-note">Three non-negotiables, four sessions. Full plan below — we lock
+        the four dates in this meeting.</p>
+      </div><span class="ag-mins">15 min</span></li>
+      <li id="ag-04"><span class="ag-num">04</span><div>
+        <a class="ag-item-title" href="#decisions">Lead stages — two routing decisions</a>
+        <p class="ag-item-note">Five stages plus an outcome. Homeowner settled; trade routing
+        needs the room.</p>
+      </div><span class="ag-mins">10 min</span></li>
+      <li id="ag-05"><span class="ag-num">05</span><div>
+        <a class="ag-item-title" href="#decisions">Sample form by user type</a>
+        <p class="ag-item-note">Field spec drafted. Five open questions.</p>
+      </div><span class="ag-mins">10 min</span></li>
+      <li id="ag-06"><span class="ag-num">06</span><div>
+        <a class="ag-item-title" href="#properties">Sample stock-out — try it on your phone</a>
+        <p class="ag-item-note">Working preview. Replaces both printed sheets, writes to
+        Pipedrive, queues a record for Datapel.</p>
+      </div><span class="ag-mins">5 min</span></li>
+      <li id="ag-07"><span class="ag-num">07</span><div>
+        <a class="ag-item-title" href="#properties">Awards campaign — first page live</a>
+        <p class="ag-item-note">Fergus Builders, seven wins, second year running. 207 of 254
+        award winners are not in the CRM at all.</p>
+      </div><span class="ag-mins">5 min</span></li>
+      <li id="ag-08"><span class="ag-num">08</span><div>
+        <a class="ag-item-title" href="#decisions">Blocked on you</a>
+        <p class="ag-item-note">Belinda's voice recording still holds up the entire automation
+        build.</p>
+      </div><span class="ag-mins">5 min</span></li>
     </ol>
-    <p style="color:var(--muted);font-size:15px">Start from the <b>contact</b> record, not the
-    organisation. That one change in where you begin is the whole fix — no extra field to
-    remember.</p>
   </div>
+</section>
 
-  <div class="scroll" style="margin-top:22px"><table>
-    <thead><tr><th></th><th>Session</th><th>Who</th><th>Length</th><th>Date &amp; time</th></tr></thead>
-    <tbody>
-      <tr><td class="k">1</td>
-        <td><b>The three non-negotiables</b><div class="n2">Live on a phone. Everyone logs one
-          real visit properly before they leave the room.</div></td>
-        <td>All reps — Pam, Caroline, Stacey, Laura, Jen, Belinda</td>
-        <td>45 min</td><td><span class="pill st">To lock</span></td></tr>
-      <tr><td class="k">2</td>
-        <td><b>Sample processing</b><div class="n2">Email → Pipedrive. Lead type, enquiry reason,
-          stones, samples sent. Plus the monthly summary she sends Belinda.</div></td>
-        <td>Jess — Belinda first, then Sean</td>
-        <td>60 min</td><td><span class="pill st">To lock</span></td></tr>
-      <tr><td class="k">3</td>
-        <td><b>Admin self-service</b><div class="n2">Batch uploads, users, field options,
-          RoadRunner + SSO. Worked example: create the Sample drop activity type.</div></td>
-        <td>Olivia</td>
-        <td>60 min</td><td><span class="pill st">To lock</span></td></tr>
-      <tr><td class="k">4</td>
-        <td><b>Trip planner + six-week cycles</b><div class="n2">Prove it with Pam before it
-          goes wider. Meeting vs sample drop in the run sheet.</div></td>
-        <td>Pam first, then reps</td>
-        <td>45 min</td><td><span class="pill st">To lock</span></td></tr>
-    </tbody>
-  </table></div>
+<section class="ag-band ag-band--white" id="training">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>Training program — week of 8 September</h2>
+      <a class="ag-back" href="#ag-03">↑ Agenda</a></div>
+    <p class="ag-lead">The three non-negotiables. If the team does nothing else, these fix most
+    of what the audit found. Everything else is optional by comparison.</p>
+    <ol class="ag-habits">
+      <li><b>Every activity carries a company AND a person.</b> No company, it didn't happen.
+      No person, we can never contact them again. Two taps — and it fixes the 7%.</li>
+      <li><b>Tick it done, and pick the right type</b> — and the type must say whether it was a
+      formal meeting or a sample drop. Fixes the 485 open activities and makes the
+      six-a-day KPI measurable.</li>
+      <li><b>Never leave a visit without booking the next one.</b> Turns the CRM into a call
+      cycle instead of a logbook.</li>
+    </ol>
+    <p class="ag-note">Start from the <b>contact</b> record, not the organisation. That one
+    change in where you begin is the whole fix — no extra field to remember.</p>
 
-  <p style="color:var(--muted);font-size:15px;max-width:62ch;margin-top:18px">
-  <b>Then, permanently:</b> the six-number scoreboard published every Monday. The program does
-  not end with the sessions — the scoreboard is what makes it stick, and it has not run since
-  17 August.</p>
+    <div class="ag-scroll" style="margin-top:44px"><table>
+      <thead><tr><th></th><th>Session</th><th>Who</th><th>Length</th><th>Date &amp; time</th></tr></thead>
+      <tbody>
+        <tr><td class="ag-key">1</td>
+          <td><span class="ag-sess">The three non-negotiables</span><br>Live on a phone.
+            Everyone logs one real visit properly before they leave the room.</td>
+          <td>All reps — Pam, Caroline, Stacey, Laura, Jen, Belinda</td><td>45 min</td>
+          <td><span class="ag-pill ag-pill--stop">To lock</span></td></tr>
+        <tr><td class="ag-key">2</td>
+          <td><span class="ag-sess">Sample processing</span><br>Email → Pipedrive. Lead type,
+            enquiry reason, stones, samples sent. Plus the monthly summary she sends Belinda.</td>
+          <td>Jess — Belinda first, then Sean</td><td>60 min</td>
+          <td><span class="ag-pill ag-pill--stop">To lock</span></td></tr>
+        <tr><td class="ag-key">3</td>
+          <td><span class="ag-sess">Admin self-service</span><br>Batch uploads, users, field
+            options, RoadRunner + SSO. Worked example: create the Sample drop activity type.</td>
+          <td>Olivia</td><td>60 min</td>
+          <td><span class="ag-pill ag-pill--stop">To lock</span></td></tr>
+        <tr><td class="ag-key">4</td>
+          <td><span class="ag-sess">Trip planner + six-week cycles</span><br>Prove it with Pam
+            before it goes wider. Meeting vs sample drop in the run sheet.</td>
+          <td>Pam first, then reps</td><td>45 min</td>
+          <td><span class="ag-pill ag-pill--stop">To lock</span></td></tr>
+      </tbody>
+    </table></div>
 
-  <h2 style="margin-top:40px">How we know it worked — 30 days</h2>
-  <div class="scroll"><table>
-    <thead><tr><th>Measure</th><th>Now</th><th>Target</th></tr></thead>
-    <tbody>
-      <tr><td><b>Activities with a person</b></td><td>7%</td><td><b>60%</b></td></tr>
-      <tr><td>Activities with a company</td><td>61%</td><td>85%</td></tr>
-      <tr><td>Activities with both</td><td>5%</td><td>55%</td></tr>
-      <tr><td>Formal meetings vs sample drops</td><td>indistinguishable</td><td>split and reported</td></tr>
-      <tr><td>Open, never closed (excl. leave)</td><td>485</td><td>under 100</td></tr>
-      <tr><td>Showroom visits with a company</td><td>0%</td><td>90% — a code fix, not a habit</td></tr>
-      <tr><td>Relationships in the CRM</td><td>61</td><td>250</td></tr>
-      <tr><td>Leads with any activity</td><td>~0 of 80</td><td>all of them</td></tr>
-    </tbody>
-  </table></div>
+    <p class="ag-note"><b>Then, permanently:</b> the six-number scoreboard published every
+    Monday. The program does not end with the sessions — the scoreboard is what makes it
+    stick, and it has not run since 17 August.</p>
 
-  <p style="color:var(--muted);font-size:15px;max-width:62ch;margin-top:18px">
-  <b>Not trained yet, deliberately:</b> deals and pipelines, custom reports, the Projects
-  add-on, manual relationship entry. Teaching everything is how nothing gets used.</p>
-</div></section>
-
-<section id="properties"><div class="wrap">
-  <div class="h2row"><h2>Live properties</h2><a class="back" href="#ag-06">&uarr; Agenda</a></div>
-  <div class="links">
-    <a class="new" href="#training">Training program<small>Week of 8 September — four sessions to lock</small></a>
-    <a class="new" href="https://review.alphasurfaces.com.au/stockout-preview.html?v=2">Sample stock-out<small>New — open on a phone</small></a>
-    <a class="new" href="https://review.alphasurfaces.com.au/congratulations/fergus-builders">Fergus Builders congratulations<small>New — awards campaign</small></a>
-    <a href="https://roadrunner.alphasurfaces.com.au/reports/coverage">Contact coverage by rep<small>RoadRunner</small></a>
-    <a href="https://roadrunner.alphasurfaces.com.au/reports/stonemasons">Stonemason reach<small>RoadRunner</small></a>
-    <a href="https://roadrunner.alphasurfaces.com.au/trips">Trip planner<small>RoadRunner</small></a>
-    <a href="https://roadrunner.alphasurfaces.com.au/warranties">Warranty register<small>RoadRunner</small></a>
-    <a href="https://roadrunner.alphasurfaces.com.au/forms">Forms dashboard<small>Sample requests, exportable</small></a>
-    <a href="https://review.alphasurfaces.com.au/order-sample.html">Sample request form<small>Live site</small></a>
-    <a href="https://review.alphasurfaces.com.au/utm">Campaign link builder<small>Live site</small></a>
+    <div class="ag-scroll" style="margin-top:44px"><table>
+      <thead><tr><th>How we know it worked — 30 days</th><th>Now</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td><b>Activities with a person</b></td><td>7%</td><td><b>60%</b></td></tr>
+        <tr><td>Activities with a company</td><td>61%</td><td>85%</td></tr>
+        <tr><td>Activities with both</td><td>5%</td><td>55%</td></tr>
+        <tr><td>Formal meetings vs sample drops</td><td>indistinguishable</td><td>split and reported</td></tr>
+        <tr><td>Open, never closed (excl. leave)</td><td>485</td><td>under 100</td></tr>
+        <tr><td>Showroom visits with a company</td><td>0%</td><td>90% — a code fix, not a habit</td></tr>
+        <tr><td>Relationships in the CRM</td><td>61</td><td>250</td></tr>
+        <tr><td>Leads with any activity</td><td>~0 of 80</td><td>all of them</td></tr>
+      </tbody>
+    </table></div>
+    <p class="ag-note"><b>Not trained yet, deliberately:</b> deals and pipelines, custom
+    reports, the Projects add-on, manual relationship entry. Teaching everything is how
+    nothing gets used.</p>
   </div>
-</div></section>
+</section>
 
-<section id="decisions"><div class="wrap">
-  <div class="h2row"><h2>Decisions needed today</h2><a class="back" href="#ag-08">&uarr; Agenda</a></div>
-  <div class="cards">
-    <div class="card"><h3>Belinda</h3><ul>
-      <li>Is training session 1 mandatory, and when?</li>
-      <li>Will you run the six-number scoreboard weekly? Without it this decays in a fortnight.</li>
-      <li>Approve a <b>Sample drop</b> activity type — counts as coverage, not as one of your six a day.</li>
-      <li>Approve the <b>not-contactable</b> flag.</li>
-      <li>Do stonemason sample requests skip the inbox and go straight to the rep?</li>
-      <li>Cabinet makers and builders — rep call, or nurture sequence?</li>
-      <li>Sample limits: 2 homeowner / 5 specifier / 10 per stone trade. Do A4 boards exist?</li>
-      <li><b>The voice recording on follow-up automations.</b> Fourth ask.</li>
-      <li>Olivia to Pipedrive Administrator.</li>
-    </ul></div>
-    <div class="card"><h3>Pam</h3><ul>
-      <li><b>Datapel Breeze API credentials</b> — eight questions sent separately.</li>
-      <li>Territory definitions from each rep. Blocking trip planning since 24 August.</li>
-      <li>Test the trip planner.</li>
-    </ul></div>
-    <div class="card"><h3>Olivia</h3><ul>
-      <li><b>NSW stonemason master list — done, ready to upload.</b> The revised workbook you
-        sent (Laura, Belinda, unallocated and your own tabs) has been processed into
-        <b>215 unique businesses</b>: duplicates removed, and the state filled in from the
-        postcode for the 86 rows where it was blank. They go into Pipedrive as organisations
-        with Business Category = Stonemason.</li>
-      <li><b>Two businesses appear on two reps' tabs.</b> <i>North Coast Marble &amp; Granite</i>
-        is on Laura's and Belinda's; <i>Site Stone Pty Ltd</i> is on Laura's and yours. Each
-        needs one owner before upload, or we create duplicates and the wrong rep gets the
-        account.</li>
-      <li><b>140 of the 215 have no contact name</b> — company record only. Pipedrive
-        Campaigns and Klaviyo can only email <i>people</i>, so those 140 are invisible to any
-        marketing until someone is named. Do we upload now and add contacts over time, or
-        hold the list until it's complete?</li>
-      <li><b>One address to eyeball:</b> Pacific Stone, Beard 2620. That postcode straddles
-        the ACT/NSW border so it can't be resolved automatically.</li>
-      <li><b>Sample stock-out form</b> — the digital replacement for the printed NSW and QLD
-        stock-out sheets. Four things only you can answer:
-        <br>· <b>How many pieces in a carton</b>, for each size (100×100, 100×300, 150×300,
-        400×300)? The sheets record Pcs and Ctn separately, so without this we can't turn a
-        stock-out into a single number for Datapel.
-        <br>· <b>Is 400×300 only Collection 05?</b> That's what both printed sheets show.
-        <br>· <b>Who is allowed to hand out samples without recording it?</b> If the answer is
-        anyone, stock counts will never reconcile.
-        <br>· <b>Is Oyster Grey discontinued?</b> Our notes say yes, but the website's stone
-        data says it's active — and the new form takes its colour list from the website, so
-        whichever is wrong needs fixing first.</li>
-      <li><b>CPD dates and materials.</b> Belinda wants to email our own architect and
-        designer database to drive attendance, and nothing can be scheduled or written until
-        the dates exist.</li>
-      <li><b>The five further relationship spreadsheets.</b> These map which cabinet makers
-        and builders work with which stonemasons. There are only <b>61 relationships in the
-        entire CRM</b> today, so this is most of Sprint J in one import.</li>
-    </ul></div>
-    <div class="card"><h3>Jess</h3><ul>
-      <li><b>Which Australia Post account do you use — MyPost Business, or eParcel/Parcel Send
-        with an account number?</b> You currently re-key every sample address by hand, 12–15 a
-        day. Australia Post only gives direct API access to eParcel and StarTrack contract
-        customers: on that account we can print labels and write tracking numbers
-        automatically. MyPost Business has no API at all, so instead we'd generate a
-        spreadsheet you upload in one go. Either way the re-keying stops — the answer just
-        decides which we build. If you're not sure, check whether there's an account number on
-        the Australia Post invoice.</li>
-      <li><b>Should showroom walk-in samples go through the new stock-out form too?</b>
-        Right now the showroom check-in records a person's name and phone but never the
-        business they're from — 67 walk-ins in six months that can't be linked to any account.
-        Recording them on the stock-out form would capture the samples and fix that gap at the
-        same time.</li>
-    </ul></div>
+<section class="ag-band ag-band--cream" id="properties">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>Live properties</h2>
+      <a class="ag-back" href="#ag-06">↑ Agenda</a></div>
+    <div class="ag-panels">
+      <a class="ag-panel ag-panel--new" href="#training">
+        <span class="ag-panel-name">Training program</span>
+        <span class="ag-panel-desc">Week of 8 September — four sessions to lock</span>
+        <span class="ag-panel-cta">On this page</span></a>
+      <a class="ag-panel ag-panel--new" href="https://review.alphasurfaces.com.au/stockout-preview.html?v=2">
+        <span class="ag-panel-name">Sample stock-out</span>
+        <span class="ag-panel-desc">New — open it on a phone</span>
+        <span class="ag-panel-cta">Try it</span></a>
+      <a class="ag-panel ag-panel--new" href="https://review.alphasurfaces.com.au/congratulations/fergus-builders">
+        <span class="ag-panel-name">Fergus Builders congratulations</span>
+        <span class="ag-panel-desc">New — awards campaign, first page</span>
+        <span class="ag-panel-cta">View</span></a>
+      <a class="ag-panel" href="https://roadrunner.alphasurfaces.com.au/reports/coverage">
+        <span class="ag-panel-name">Contact coverage by rep</span>
+        <span class="ag-panel-desc">RoadRunner — recency by rep, drill-through</span>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel" href="https://roadrunner.alphasurfaces.com.au/reports/stonemasons">
+        <span class="ag-panel-name">Stonemason reach</span>
+        <span class="ag-panel-desc">RoadRunner</span>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel" href="https://roadrunner.alphasurfaces.com.au/trips">
+        <span class="ag-panel-name">Trip planner</span>
+        <span class="ag-panel-desc">RoadRunner — anchors, radii, run sheet</span>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel" href="https://roadrunner.alphasurfaces.com.au/warranties">
+        <span class="ag-panel-name">Warranty register</span>
+        <span class="ag-panel-desc">RoadRunner — searchable, batch and shade</span>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel" href="https://roadrunner.alphasurfaces.com.au/forms">
+        <span class="ag-panel-name">Forms dashboard</span>
+        <span class="ag-panel-desc">Sample requests, exportable — Jess's monthly summary</span>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel" href="https://review.alphasurfaces.com.au/order-sample.html">
+        <span class="ag-panel-name">Sample request form</span>
+        <span class="ag-panel-desc">Live site</span>
+        <span class="ag-panel-cta">Open</span></a>
+    </div>
   </div>
-</div></section>
+</section>
 
-<section id="sprints"><div class="wrap">
-  <div class="h2row"><h2>Sprints</h2><a class="back" href="#ag-01">&uarr; Agenda</a></div>
-  <div class="scroll"><table>
-    <thead><tr><th></th><th>Sprint</th><th>State</th><th>What remains</th></tr></thead>
-    <tbody>
-      <tr><td class="k">A</td><td>Lead capture &amp; handling</td><td><span class="pill st">Blocked</span></td><td>Stages redesigned. Sequences wait on the voice recording</td></tr>
-      <tr><td class="k">B</td><td>Forms by user type</td><td><span class="pill wt">Building</span></td><td>Production audited, build brief written. No role branching live yet</td></tr>
-      <tr><td class="k">C</td><td>Campaign landing pages</td><td><span class="pill st">Blocked</span></td><td>Kate's creatives, Meta pixel, Claire intro</td></tr>
-      <tr><td class="k">D</td><td>Data completion</td><td><span class="pill wt">Active</span></td><td>Owner sync approved, still not run. 1,051 with no postcode</td></tr>
-      <tr><td class="k">E</td><td>Top 50 &amp; reporting</td><td><span class="pill st">Blocked</span></td><td>Built and tested. Needs Breeze credentials</td></tr>
-      <tr><td class="k">F</td><td>Trip planning</td><td><span class="pill st">Blocked</span></td><td>Rep territories. Pam to test</td></tr>
-      <tr><td class="k">G</td><td>Targeting research</td><td><span class="pill go">Delivered</span></td><td>QMB list to hand to Olivia</td></tr>
-      <tr><td class="k">H</td><td>Training &amp; handover</td><td><span class="pill wt">Started</span></td><td>Program outlined. Dates not booked. <b>Biggest risk</b></td></tr>
-      <tr><td class="k">I</td><td>Sample stock tracking</td><td><span class="pill wt">Building</span></td><td>Mobile form live for review. Four answers from Olivia</td></tr>
-      <tr><td class="k">J</td><td>Relationship mapping</td><td><span class="pill st">Blocked</span></td><td>61 links. Waiting on Belinda's cleaned sheet</td></tr>
-      <tr><td class="k">K</td><td>Team self-service</td><td><span class="pill st">Not started</span></td><td>Add or remove a rep, retire a colour</td></tr>
-      <tr><td class="k">L</td><td>NSW stonemason list</td><td><span class="pill wt">Ready</span></td><td>215 unique orgs, upload-ready</td></tr>
-      <tr><td class="k">M</td><td>Friction removal</td><td><span class="pill wt">Active</span></td><td>Australia Post researched. Waiting on Jess</td></tr>
-      <tr><td class="k">N</td><td>CPD &amp; specifier campaign</td><td><span class="pill wt">Active</span></td><td>272 CPD firms classified, top 25 enriched</td></tr>
-      <tr><td class="k">O</td><td>Platform hygiene</td><td><span class="pill wt">Active</span></td><td>Three verification tests outstanding</td></tr>
-    </tbody>
-  </table></div>
-</div></section>
+<section class="ag-band ag-band--white" id="decisions">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>Decisions needed today</h2>
+      <a class="ag-back" href="#ag-08">↑ Agenda</a></div>
+    <div class="ag-people">
 
-<section id="docs"><div class="wrap">
-  <div class="h2row"><h2>Reference documents</h2><a class="back" href="#agenda">&uarr; Agenda</a></div>
-  <div class="docs">
-    <div>Activity audit — 2 Sep</div>
-    <div>Training program outline — 2 Sep</div>
-    <div>Lead stages design — 2 Sep</div>
-    <div>Sample form field spec — 2 Sep</div>
-    <div>Sprint B build brief — 2 Sep</div>
-    <div>Sample stock tracking, Sprint I — 2 Sep</div>
-    <div>Australia Post integration plan — 2 Sep</div>
-    <div>Datapel → RoadRunner integration design — 2 Sep</div>
-    <div>Datapel Breeze setup checklist — 2 Sep</div>
-    <div>Datapel runbook — 2 Sep</div>
-    <div>CPD Live target list — 2 Sep</div>
-    <div>Outstanding sprint list — 2 Sep</div>
-    <div>MBQld award winners vs CRM — 31 Aug</div>
-    <div>QLD postcode demand mapping — 26 Aug</div>
+      <div class="ag-person"><h3>Belinda</h3><ul>
+        <li>Is training session 1 mandatory, and when?</li>
+        <li>Will you run the six-number scoreboard weekly? Without it this decays in a fortnight.</li>
+        <li>Approve a <b>Sample drop</b> activity type — counts as coverage, not as one of your six a day.</li>
+        <li>Approve the <b>not-contactable</b> flag.</li>
+        <li>Do stonemason sample requests skip the inbox and go straight to the rep?</li>
+        <li>Cabinet makers and builders — rep call, or nurture sequence?</li>
+        <li>Sample limits: 2 homeowner / 5 specifier / 10 per stone trade. Do A4 boards exist?</li>
+        <li><b>The voice recording on follow-up automations.</b> Fourth ask.</li>
+        <li>Olivia to Pipedrive Administrator.</li>
+      </ul></div>
+
+      <div class="ag-person"><h3>Pam</h3><ul>
+        <li><b>Datapel Breeze API credentials</b> — eight questions sent separately.</li>
+        <li>Territory definitions from each rep. Blocking trip planning since 24 August.</li>
+        <li>Test the trip planner.</li>
+      </ul></div>
+
+      <div class="ag-person"><h3>Olivia</h3><ul>
+        <li><b>NSW stonemason master list — done, ready to upload.</b> The revised workbook you
+          sent (Laura, Belinda, unallocated and your own tabs) has been processed into
+          <b>215 unique businesses</b>: duplicates removed, and the state filled in from the
+          postcode for the 86 rows where it was blank. They go into Pipedrive as organisations
+          with Business Category = Stonemason.</li>
+        <li><b>Two businesses appear on two reps' tabs.</b> <i>North Coast Marble &amp;
+          Granite</i> is on Laura's and Belinda's; <i>Site Stone Pty Ltd</i> is on Laura's and
+          yours. Each needs one owner before upload, or we create duplicates and the wrong rep
+          gets the account.</li>
+        <li><b>140 of the 215 have no contact name</b> — company record only. Pipedrive
+          Campaigns and Klaviyo can only email <i>people</i>, so those 140 are invisible to any
+          marketing until someone is named. Upload now and add contacts over time, or hold?</li>
+        <li><b>One address to eyeball:</b> Pacific Stone, Beard 2620. That postcode straddles
+          the ACT/NSW border so it can't be resolved automatically.</li>
+        <li><b>Sample stock-out form</b> — the digital replacement for the printed NSW and QLD
+          stock-out sheets. Four things only you can answer: <b>how many pieces in a carton</b>
+          for each size (100×100, 100×300, 150×300, 400×300) — the sheets record Pcs and Ctn
+          separately, so without this we can't turn a stock-out into a single number for
+          Datapel; <b>is 400×300 only Collection 05</b>, as both sheets show; <b>who may hand
+          out samples without recording it</b> — if the answer is anyone, stock counts will
+          never reconcile; and <b>is Oyster Grey discontinued?</b> Our notes say yes, the
+          website's stone data says it's active, and the new form takes its colour list from
+          the website.</li>
+        <li><b>CPD dates and materials.</b> Belinda wants to email our own architect and
+          designer database to drive attendance, and nothing can be scheduled or written until
+          the dates exist.</li>
+        <li><b>The five further relationship spreadsheets.</b> These map which cabinet makers
+          and builders work with which stonemasons. There are only <b>61 relationships in the
+          entire CRM</b> today, so this is most of Sprint J in one import.</li>
+      </ul></div>
+
+      <div class="ag-person"><h3>Jess</h3><ul>
+        <li><b>Which Australia Post account do you use — MyPost Business, or eParcel/Parcel
+          Send with an account number?</b> You currently re-key every sample address by hand,
+          12–15 a day. Australia Post only gives direct API access to eParcel and StarTrack
+          contract customers: on that account we can print labels and write tracking numbers
+          automatically. MyPost Business has no API at all, so instead we'd generate a
+          spreadsheet you upload in one go. Either way the re-keying stops — the answer just
+          decides which we build. If you're not sure, check whether there's an account number
+          on the Australia Post invoice.</li>
+        <li><b>Should showroom walk-in samples go through the new stock-out form too?</b> Right
+          now the showroom check-in records a person's name and phone but never the business
+          they're from — 67 walk-ins in six months that can't be linked to any account.
+          Recording them on the stock-out form would capture the samples and fix that gap at
+          the same time.</li>
+      </ul></div>
+
+    </div>
   </div>
-</div></section>
+</section>
 
-<footer><div class="wrap">
-  Prepared 2 September 2026 · all figures measured against the live Pipedrive account ·
-  internal preview, not indexed
-</div></footer>
+<section class="ag-band ag-band--cream" id="sprints">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>Sprints</h2>
+      <a class="ag-back" href="#ag-01">↑ Agenda</a></div>
+    <div class="ag-scroll"><table>
+      <thead><tr><th></th><th>Sprint</th><th>State</th><th>What remains</th></tr></thead>
+      <tbody>
+        <tr><td class="ag-key">A</td><td>Lead capture &amp; handling</td><td><span class="ag-pill ag-pill--stop">Blocked</span></td><td>Stages redesigned. Sequences wait on the voice recording</td></tr>
+        <tr><td class="ag-key">B</td><td>Forms by user type</td><td><span class="ag-pill ag-pill--wait">Building</span></td><td>Production audited, build brief written. No role branching live yet</td></tr>
+        <tr><td class="ag-key">C</td><td>Campaign landing pages</td><td><span class="ag-pill ag-pill--stop">Blocked</span></td><td>Kate's creatives, Meta pixel, Claire intro</td></tr>
+        <tr><td class="ag-key">D</td><td>Data completion</td><td><span class="ag-pill ag-pill--wait">Active</span></td><td>Owner sync approved, still not run. 1,051 with no postcode</td></tr>
+        <tr><td class="ag-key">E</td><td>Top 50 &amp; reporting</td><td><span class="ag-pill ag-pill--stop">Blocked</span></td><td>Built and tested. Needs Breeze credentials</td></tr>
+        <tr><td class="ag-key">F</td><td>Trip planning</td><td><span class="ag-pill ag-pill--stop">Blocked</span></td><td>Rep territories. Pam to test</td></tr>
+        <tr><td class="ag-key">G</td><td>Targeting research</td><td><span class="ag-pill ag-pill--go">Delivered</span></td><td>QMB list to hand to Olivia</td></tr>
+        <tr><td class="ag-key">H</td><td>Training &amp; handover</td><td><span class="ag-pill ag-pill--wait">Started</span></td><td>Program outlined. Dates not booked. <b>Biggest risk</b></td></tr>
+        <tr><td class="ag-key">I</td><td>Sample stock tracking</td><td><span class="ag-pill ag-pill--wait">Building</span></td><td>Mobile form live for review. Four answers from Olivia</td></tr>
+        <tr><td class="ag-key">J</td><td>Relationship mapping</td><td><span class="ag-pill ag-pill--stop">Blocked</span></td><td>61 links. Waiting on Belinda's cleaned sheet</td></tr>
+        <tr><td class="ag-key">K</td><td>Team self-service</td><td><span class="ag-pill ag-pill--stop">Not started</span></td><td>Add or remove a rep, retire a colour</td></tr>
+        <tr><td class="ag-key">L</td><td>NSW stonemason list</td><td><span class="ag-pill ag-pill--wait">Ready</span></td><td>215 unique organisations, upload-ready</td></tr>
+        <tr><td class="ag-key">M</td><td>Friction removal</td><td><span class="ag-pill ag-pill--wait">Active</span></td><td>Australia Post researched. Waiting on Jess</td></tr>
+        <tr><td class="ag-key">N</td><td>CPD &amp; specifier campaign</td><td><span class="ag-pill ag-pill--wait">Active</span></td><td>272 CPD firms classified, top 25 enriched</td></tr>
+        <tr><td class="ag-key">O</td><td>Platform hygiene</td><td><span class="ag-pill ag-pill--wait">Active</span></td><td>Three verification tests outstanding</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="ag-band ag-band--white" id="docs">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>Reference documents</h2>
+      <a class="ag-back" href="#agenda">↑ Agenda</a></div>
+    <div class="ag-docs">
+      <div>Activity audit — 2 Sep</div>
+      <div>Training program outline — 2 Sep</div>
+      <div>Lead stages design — 2 Sep</div>
+      <div>Sample form field spec — 2 Sep</div>
+      <div>Sprint B build brief — 2 Sep</div>
+      <div>Sample stock tracking, Sprint I — 2 Sep</div>
+      <div>Australia Post integration plan — 2 Sep</div>
+      <div>Datapel → RoadRunner integration design — 2 Sep</div>
+      <div>Datapel Breeze setup checklist — 2 Sep</div>
+      <div>Datapel runbook — 2 Sep</div>
+      <div>CPD Live target list — 2 Sep</div>
+      <div>Outstanding sprint list — 2 Sep</div>
+      <div>MBQld award winners vs CRM — 31 Aug</div>
+      <div>QLD postcode demand mapping — 26 Aug</div>
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <p class="footer-col-heading">Alpha Surfaces</p>
+      <p>Sales System Review — internal working document. Figures measured against the live
+      Pipedrive account on 2 September 2026.</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Locations</p>
+      <p>Kunda Park, Queensland<br>New South Wales</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Contact</p>
+      <p><a href="mailto:hello@alphasurfaces.com.au">hello@alphasurfaces.com.au</a></p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Site</p>
+      <p><a href="https://alphasurfaces.com.au">alphasurfaces.com.au</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom"><p>Internal preview · not indexed · prepared 2 September 2026</p></div>
+</div>
+
+<script src="/nav.js?v=23"></script>
 </body>
 </html>
