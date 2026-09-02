@@ -5,81 +5,80 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Sales System Review — 3 September | Alpha Surfaces</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Karla:wght@400;500;700&display=swap">
 <style>
+@font-face{font-family:'Concrette S';src:url('/fonts/Web/ConcretteS-Regular.woff2') format('woff2'),url('/fonts/Web/ConcretteS-Regular.woff') format('woff');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Concrette S';src:url('/fonts/Web/ConcretteS-Medium.woff2') format('woff2'),url('/fonts/Web/ConcretteS-Medium.woff') format('woff');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Concrette S';src:url('/fonts/Web/ConcretteS-Bold.woff2') format('woff2'),url('/fonts/Web/ConcretteS-Bold.woff') format('woff');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Degular';src:url('/fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'),url('/fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Degular';src:url('/fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'),url('/fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Degular';src:url('/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'),url('/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff');font-weight:600;font-style:normal;font-display:swap}
 :root{
-  --paper:#FAF9F6;--panel:#FFFFFF;--deep:#141310;--ink:#1C1A16;--muted:#6E6A61;
-  --faint:#9A968C;--rule:#E4E0D7;--brass:#8A6A3B;
-  --go:#2E6B45;--go-bg:#E7F0EA;--wait:#8A5D12;--wait-bg:#F7EEDC;--stop:#9C3125;--stop-bg:#F8E5E2;
-  --display:'Jost','Helvetica Neue',Arial,sans-serif;--body:'Karla','Helvetica Neue',Arial,sans-serif;
+  --cream:#f3f1e6;--white:#ffffff;--black:#000000;--olive:#564d22;--gray:#cccccc;
+  --red:#f56c6c;--border:rgba(0,0,0,0.1);
+  --paper:var(--cream);--panel:var(--white);--ink:var(--black);
+  --muted:#5a553f;--faint:#8b8672;--rule:var(--border);--rule-2:rgba(0,0,0,0.2);
+  --olive-soft:#e6e2d0;--red-soft:#fbe4e4;--gray-soft:#eceade;
+  --display:'Concrette S',Georgia,serif;--body:'Degular','Helvetica Neue',Arial,sans-serif;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#131210;--panel:#1A1815;--deep:#0C0B09;--ink:#F0EDE6;--muted:#A8A399;
-  --faint:#7C776E;--rule:#2C2925;--brass:#C49A5C;
-  --go:#6FBF8B;--go-bg:#16291D;--wait:#D3A44F;--wait-bg:#2B2314;--stop:#E08575;--stop-bg:#2E1614;
-}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);
   font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
 .wrap{max-width:900px;margin:0 auto;padding:0 24px}
-a{color:var(--brass)}
-.mast{border-bottom:1px solid var(--rule);padding:20px 0}
+a{color:var(--olive)}
+.mast{border-bottom:1px solid var(--rule-2);padding:20px 0;background:var(--white)}
 .mast .wrap{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-.logo{font-family:var(--display);font-weight:400;font-size:18px;letter-spacing:.26em;text-transform:uppercase}
-.tag{font-family:var(--display);font-weight:300;font-size:11.5px;letter-spacing:.18em;
+.logo{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:.16em;text-transform:uppercase}
+.tag{font-family:var(--body);font-weight:500;font-size:11.5px;letter-spacing:.18em;
   color:var(--faint);text-transform:uppercase;margin-left:auto}
-.hero{padding:56px 0 40px;border-bottom:1px solid var(--rule)}
-.eyebrow{font-weight:700;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--brass);margin:0 0 20px}
-h1{font-family:var(--display);font-weight:400;font-size:clamp(32px,6vw,54px);line-height:1.03;
-  letter-spacing:-.02em;margin:0 0 18px}
+.hero{padding:54px 0 38px;border-bottom:1px solid var(--rule-2)}
+.eyebrow{font-weight:600;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--olive);margin:0 0 18px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,6.5vw,58px);line-height:1;
+  letter-spacing:-.01em;margin:0 0 16px}
 .who{font-size:14.5px;color:var(--muted)}
-h2{font-family:var(--display);font-weight:400;font-size:13px;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--muted);margin:0 0 20px;padding-bottom:9px;
-  border-bottom:1px solid var(--rule)}
-section{padding:46px 0 0}
-.big{background:var(--panel);border:1px solid var(--rule);border-left:3px solid var(--brass);
-  padding:26px}
-.big .n{font-family:var(--display);font-weight:300;font-size:clamp(52px,11vw,88px);line-height:.85;
-  letter-spacing:-.04em;color:var(--brass)}
+h2{font-family:var(--display);font-weight:500;font-size:14px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--olive);margin:0 0 20px;padding-bottom:9px;
+  border-bottom:1px solid var(--rule-2)}
+section{padding:44px 0 0}
+.big{background:var(--white);border:1px solid var(--rule);border-left:4px solid var(--olive);padding:26px}
+.big .n{font-family:var(--display);font-weight:700;font-size:clamp(56px,12vw,92px);line-height:.85;
+  letter-spacing:-.03em;color:var(--olive)}
 .big p{margin:16px 0 0;max-width:60ch}
 .big p:first-of-type{font-size:18px}
 ol.ag{list-style:none;margin:0;padding:0}
-ol.ag li{display:grid;grid-template-columns:30px 1fr auto;gap:16px;align-items:baseline;
+ol.ag li{display:grid;grid-template-columns:32px 1fr auto;gap:16px;align-items:baseline;
   padding:14px 0;border-bottom:1px solid var(--rule)}
-.slot{font-family:var(--display);font-size:14px;color:var(--brass)}
-.t{font-family:var(--display);font-weight:500;font-size:17.5px}
-.n2{font-size:14px;color:var(--muted);margin-top:2px;max-width:60ch}
+.slot{font-family:var(--display);font-weight:700;font-size:15px;color:var(--olive)}
+.t{font-family:var(--display);font-weight:500;font-size:18px}
+.n2{font-size:14px;color:var(--muted);margin-top:3px;max-width:60ch}
 .min{font-size:12.5px;color:var(--faint);white-space:nowrap}
 .cards{display:grid;gap:12px}
-.card{background:var(--panel);border:1px solid var(--rule);padding:16px 18px}
-.card h3{font-family:var(--display);font-weight:500;font-size:12px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--brass);margin:0 0 10px}
+.card{background:var(--white);border:1px solid var(--rule);padding:16px 18px}
+.card h3{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--olive);margin:0 0 10px}
 .card ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:15px}
 .scroll{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:14.5px}
-th{text-align:left;font-weight:700;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--faint);padding:0 12px 8px 0;border-bottom:1px solid var(--rule);white-space:nowrap}
+th{text-align:left;font-weight:600;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint);padding:0 12px 8px 0;border-bottom:1px solid var(--rule-2);white-space:nowrap}
 td{padding:10px 12px 10px 0;border-bottom:1px solid var(--rule);vertical-align:top}
-.k{font-family:var(--display);color:var(--brass);width:24px}
-.pill{display:inline-block;font-weight:700;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
-  padding:3px 7px;border-radius:2px;white-space:nowrap}
-.go{background:var(--go-bg);color:var(--go)}
-.wt{background:var(--wait-bg);color:var(--wait)}
-.st{background:var(--stop-bg);color:var(--stop)}
+.k{font-family:var(--display);font-weight:700;color:var(--olive);width:24px}
+.pill{display:inline-block;font-weight:600;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 8px;border-radius:2px;white-space:nowrap}
+.go{background:var(--olive);color:var(--cream)}
+.wt{background:var(--olive-soft);color:var(--olive)}
+.st{background:var(--red-soft);color:#a33b3b}
 .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
-.links a{display:block;background:var(--panel);border:1px solid var(--rule);padding:13px 15px;
+.links a{display:block;background:var(--white);border:1px solid var(--rule);padding:13px 15px;
   text-decoration:none;color:var(--ink);font-weight:500;font-size:15px}
-.links a:hover{border-color:var(--brass)}
+.links a:hover{border-color:var(--olive)}
 .links a small{display:block;font-weight:400;font-size:12.5px;color:var(--faint);margin-top:2px}
-.links a.new{border-left:3px solid var(--brass)}
+.links a.new{border-left:4px solid var(--olive)}
 .docs{columns:2;column-gap:30px;font-size:14.5px;color:var(--muted)}
 .docs div{break-inside:avoid;padding:5px 0}
-footer{margin-top:56px;padding:22px 0 60px;border-top:1px solid var(--rule);
+footer{margin-top:52px;padding:22px 0 60px;border-top:1px solid var(--rule-2);
   font-size:12.5px;color:var(--faint)}
-@media (max-width:620px){.docs{columns:1}ol.ag li{grid-template-columns:26px 1fr}.min{grid-column:2}}
+@media (max-width:620px){.docs{columns:1}ol.ag li{grid-template-columns:28px 1fr}.min{grid-column:2}}
 </style>
 </head>
 <body>
@@ -118,7 +117,7 @@ footer{margin-top:56px;padding:22px 0 60px;border-top:1px solid var(--rule);
     <li><span class="slot">02</span><div><div class="t">The activity audit</div>
       <div class="n2">The 7% finding, and what it means for how we train.</div></div><span class="min">10 min</span></li>
     <li><span class="slot">03</span><div><div class="t">Training program — lock the dates</div>
-      <div class="n2">Three non-negotiables, four sessions over two weeks.</div></div><span class="min">15 min</span></li>
+      <div class="n2">Three non-negotiables, four sessions. Full plan below — we lock the four dates in this meeting.</div></div><span class="min">15 min</span></li>
     <li><span class="slot">04</span><div><div class="t">Lead stages — two routing decisions</div>
       <div class="n2">Five stages plus an outcome. Homeowner settled; trade routing needs the room.</div></div><span class="min">10 min</span></li>
     <li><span class="slot">05</span><div><div class="t">Sample form by user type</div>
@@ -135,17 +134,89 @@ footer{margin-top:56px;padding:22px 0 60px;border-top:1px solid var(--rule);
 </div></section>
 
 <section><div class="wrap">
+  <h2 id="training">Training program — week of 8 September</h2>
+
+  <div class="big" >
+    <p style="margin-top:0"><b>The three non-negotiables.</b> If the team does nothing else,
+    these fix most of what the audit found. Everything else is optional by comparison.</p>
+    <ol style="margin:14px 0 0;padding-left:20px;display:grid;gap:10px">
+      <li><b>Every activity carries a company AND a person.</b> No company, it didn't happen.
+        No person, we can never contact them again. Two taps — and it fixes the 7%.</li>
+      <li><b>Tick it done, and pick the right type</b> — and the type must say whether it was a
+        formal meeting or a sample drop. Fixes the 485 open activities and makes the
+        six-a-day KPI measurable.</li>
+      <li><b>Never leave a visit without booking the next one.</b> Turns the CRM into a call
+        cycle instead of a logbook.</li>
+    </ol>
+    <p style="color:var(--muted);font-size:15px">Start from the <b>contact</b> record, not the
+    organisation. That one change in where you begin is the whole fix — no extra field to
+    remember.</p>
+  </div>
+
+  <div class="scroll" style="margin-top:22px"><table>
+    <thead><tr><th></th><th>Session</th><th>Who</th><th>Length</th><th>Date &amp; time</th></tr></thead>
+    <tbody>
+      <tr><td class="k">1</td>
+        <td><b>The three non-negotiables</b><div class="n2">Live on a phone. Everyone logs one
+          real visit properly before they leave the room.</div></td>
+        <td>All reps — Pam, Caroline, Stacey, Laura, Jen, Belinda</td>
+        <td>45 min</td><td><span class="pill st">To lock</span></td></tr>
+      <tr><td class="k">2</td>
+        <td><b>Sample processing</b><div class="n2">Email → Pipedrive. Lead type, enquiry reason,
+          stones, samples sent. Plus the monthly summary she sends Belinda.</div></td>
+        <td>Jess — Belinda first, then Sean</td>
+        <td>60 min</td><td><span class="pill st">To lock</span></td></tr>
+      <tr><td class="k">3</td>
+        <td><b>Admin self-service</b><div class="n2">Batch uploads, users, field options,
+          RoadRunner + SSO. Worked example: create the Sample drop activity type.</div></td>
+        <td>Olivia</td>
+        <td>60 min</td><td><span class="pill st">To lock</span></td></tr>
+      <tr><td class="k">4</td>
+        <td><b>Trip planner + six-week cycles</b><div class="n2">Prove it with Pam before it
+          goes wider. Meeting vs sample drop in the run sheet.</div></td>
+        <td>Pam first, then reps</td>
+        <td>45 min</td><td><span class="pill st">To lock</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <p style="color:var(--muted);font-size:15px;max-width:62ch;margin-top:18px">
+  <b>Then, permanently:</b> the six-number scoreboard published every Monday. The program does
+  not end with the sessions — the scoreboard is what makes it stick, and it has not run since
+  17 August.</p>
+
+  <h2 style="margin-top:40px">How we know it worked — 30 days</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Measure</th><th>Now</th><th>Target</th></tr></thead>
+    <tbody>
+      <tr><td><b>Activities with a person</b></td><td>7%</td><td><b>60%</b></td></tr>
+      <tr><td>Activities with a company</td><td>61%</td><td>85%</td></tr>
+      <tr><td>Activities with both</td><td>5%</td><td>55%</td></tr>
+      <tr><td>Formal meetings vs sample drops</td><td>indistinguishable</td><td>split and reported</td></tr>
+      <tr><td>Open, never closed (excl. leave)</td><td>485</td><td>under 100</td></tr>
+      <tr><td>Showroom visits with a company</td><td>0%</td><td>90% — a code fix, not a habit</td></tr>
+      <tr><td>Relationships in the CRM</td><td>61</td><td>250</td></tr>
+      <tr><td>Leads with any activity</td><td>~0 of 80</td><td>all of them</td></tr>
+    </tbody>
+  </table></div>
+
+  <p style="color:var(--muted);font-size:15px;max-width:62ch;margin-top:18px">
+  <b>Not trained yet, deliberately:</b> deals and pipelines, custom reports, the Projects
+  add-on, manual relationship entry. Teaching everything is how nothing gets used.</p>
+</div></section>
+
+<section><div class="wrap">
   <h2>Live properties</h2>
   <div class="links">
-    <a class="new" href="/stockout-preview.html?v=2">Sample stock-out<small>New — open on a phone</small></a>
-    <a class="new" href="/congratulations/fergus-builders">Fergus Builders congratulations<small>New — awards campaign</small></a>
+    <a class="new" href="#training">Training program<small>Week of 8 September — four sessions to lock</small></a>
+    <a class="new" href="https://review.alphasurfaces.com.au/stockout-preview.html?v=2">Sample stock-out<small>New — open on a phone</small></a>
+    <a class="new" href="https://review.alphasurfaces.com.au/congratulations/fergus-builders">Fergus Builders congratulations<small>New — awards campaign</small></a>
     <a href="https://roadrunner.alphasurfaces.com.au/reports/coverage">Contact coverage by rep<small>RoadRunner</small></a>
     <a href="https://roadrunner.alphasurfaces.com.au/reports/stonemasons">Stonemason reach<small>RoadRunner</small></a>
     <a href="https://roadrunner.alphasurfaces.com.au/trips">Trip planner<small>RoadRunner</small></a>
     <a href="https://roadrunner.alphasurfaces.com.au/warranties">Warranty register<small>RoadRunner</small></a>
     <a href="https://roadrunner.alphasurfaces.com.au/forms">Forms dashboard<small>Sample requests, exportable</small></a>
-    <a href="/order-sample.html">Sample request form<small>Live site</small></a>
-    <a href="/utm">Campaign link builder<small>Live site</small></a>
+    <a href="https://review.alphasurfaces.com.au/order-sample.html">Sample request form<small>Live site</small></a>
+    <a href="https://review.alphasurfaces.com.au/utm">Campaign link builder<small>Live site</small></a>
   </div>
 </div></section>
 
