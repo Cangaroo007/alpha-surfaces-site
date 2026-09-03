@@ -27,9 +27,10 @@ html { scroll-behavior: smooth; }
 body { background: var(--white); color: var(--black); font-family: 'Degular', sans-serif; font-weight: 400; line-height: 1.2; }
 a { color: inherit; }
 img { display: block; max-width: 100%; }
-.prepared-for { background: var(--cream); padding: 18px 90px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 28px; }
-.prepared-for-label { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--olive); opacity: 0.6; flex-shrink: 0; }
-.prepared-for-logo { height: 28px; width: auto; max-width: 260px; object-fit: contain; flex-shrink: 0; }
+.prepared-for { background: var(--cream); padding: 26px 90px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 26px; }
+.prepared-for-label { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 1.6px; line-height: 1.5; text-transform: uppercase; color: var(--olive); opacity: 0.6; flex-shrink: 0; }
+.prepared-for-logo { height: 46px; width: auto; max-width: 200px; object-fit: contain; background: var(--white); padding: 12px 18px; border: 1px solid rgba(0,0,0,0.08); border-radius: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); flex-shrink: 0; }
+.prepared-for-x { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px; color: var(--olive); opacity: 0.4; flex-shrink: 0; }
 .prepared-for-name { font-family: 'Degular', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--olive); opacity: 0.55; margin-left: auto; }
 .hero { position: relative; width: 100%; height: calc(100vh - 155px); min-height: 600px; max-height: 880px; overflow: hidden; }
 .hero img { width: 100%; height: 100%; object-fit: cover; }
@@ -99,12 +100,13 @@ img { display: block; max-width: 100%; }
 .award-cat .ac-name { font-family: 'Concrette S', serif; font-weight: 700; font-size: 26px; color: var(--black); }
 .award-cat .ac-sub { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--olive); opacity: 0.75; margin-top: 6px; }
 /* --- SIGNATURE --- */
-.signoff { background: var(--cream); padding: 90px 90px 100px; }
-.signoff-inner { max-width: 780px; }
+.signoff { background: var(--cream); padding: 100px 90px 110px; }
+.signoff-card { background: var(--white); border-top: 4px solid var(--olive); padding: 60px 64px 56px; max-width: 860px; box-shadow: 0 2px 24px rgba(0,0,0,0.05); }
+.signoff-inner { max-width: 860px; }
 .signoff-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--olive); margin-bottom: 18px; }
-.signoff p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 22px; line-height: 1.45; color: var(--black); opacity: 0.85; margin-bottom: 18px; }
+.signoff-card p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 23px; line-height: 1.5; color: var(--black); opacity: 0.88; margin-bottom: 20px; max-width: 62ch; }
 .sign-mark { position: relative; display: inline-block; margin-top: 26px; padding: 0 12px 4px 4px; }
-.sign-name { font-family: 'Mrs Saint Delafield', cursive; font-size: 84px; line-height: 0.9; color: var(--olive); display: block; transform: rotate(-2.5deg); transform-origin: left bottom; }
+.sign-name { font-family: 'Mrs Saint Delafield', cursive; font-size: 92px; line-height: 0.9; color: var(--olive); display: block; transform: rotate(-2.5deg); transform-origin: left bottom; }
 .sign-rule { display: block; width: 230px; height: 22px; margin-top: -4px; overflow: visible; }
 .sign-rule path { fill: none; stroke: var(--olive); stroke-width: 1.6; stroke-linecap: round; opacity: 0.5; stroke-dasharray: 280; stroke-dashoffset: 280; animation: signDraw 1.1s ease-out 0.4s forwards; }
 @keyframes signDraw { to { stroke-dashoffset: 0; } }
@@ -139,8 +141,9 @@ img { display: block; max-width: 100%; }
   .showcase-sub { font-size: 16px; margin-bottom: 36px; }
   .showcase-grid { grid-template-columns: repeat(2, 1fr); gap: 20px 12px; }
   .showcase-block-title { font-size: 20px; }
-  .signoff { padding: 60px 24px; }
-  .signoff p { font-size: 18px; }
+  .signoff { padding: 50px 24px; }
+  .signoff-card { padding: 34px 26px 32px; }
+  .signoff-card p { font-size: 18px; }
   .sign-name { font-size: 62px; }
   .cta-bar { padding: 60px 24px; }
   .cta-bar-text h2 { font-size: 26px; }
@@ -179,7 +182,8 @@ img { display: block; max-width: 100%; }
 <nav class="nav" id="main-nav"></nav>
 
 <div class="prepared-for">
-  <span class="prepared-for-label">Congratulations to</span>
+  <span class="prepared-for-label">Alpha Surfaces<br>congratulates</span>
+  <span class="prepared-for-x">&times;</span>
   <img class="prepared-for-logo" src="assets/fergus-logo.jpg" alt="Fergus Builders">
   <span class="prepared-for-name">Mackay &amp; Whitsunday &middot; Building since 1983</span>
 </div>
@@ -322,7 +326,8 @@ img { display: block; max-width: 100%; }
 
 <section class="signoff">
   <div class="signoff-inner">
-    <p class="signoff-label">From your Alpha Surfaces contact</p>
+    <div class="signoff-card">
+    <p class="signoff-label">A personal note</p>
     <p>Congratulations again from all of us. Seven awards, two years running, across four categories — that is a genuinely rare thing in this industry, and it deserves to be said properly rather than in a comment on a post.</p>
     <p>If a sample set would be useful on your next job, just reply and I'll organise it.</p>
     <span class="sign-mark">
@@ -335,6 +340,7 @@ img { display: block; max-width: 100%; }
       <b>Pam Burchill</b>
       Alpha Surfaces &mdash; Queensland
     </p>
+    </div>
   </div>
 </section>
 
