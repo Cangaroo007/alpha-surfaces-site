@@ -267,6 +267,15 @@ app.use((req, res, next) => {
   const isAPI = p.startsWith('/api/') && !isPublicAPI;
   const isAdmin = p === '/admin' || p.startsWith('/admin/') || p.startsWith('/projects') || p === '/forms' || p === '/forms.html' || p.startsWith('/forms/');
   const isForm = ['/order-sample', '/enquiry', '/warranty', '/showroom-checkin'].some(f => p.startsWith(f));
+  // Partner ABM pages are low-traffic and edited repeatedly while a campaign is
+  // being prepared. A 4-hour edge cache meant a corrected page kept serving the
+  // old copy to anyone hitting the bare URL - incognito does not defeat the CDN.
+  const isPartner = p === '/partners' || p.startsWith('/partners/');
+
+  if (isPartner) {
+    res.set({ 'Cache-Control': 'public, max-age=0, s-maxage=60, must-revalidate', 'Vary': 'Accept-Encoding' });
+    return next();
+  }
 
   if (isAPI || isAdmin || isForm) {
     res.set({ 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' });
