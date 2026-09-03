@@ -99,20 +99,39 @@ img { display: block; max-width: 100%; }
 .award-cat { border-top: 2px solid var(--olive); padding-top: 18px; }
 .award-cat .ac-name { font-family: 'Concrette S', serif; font-weight: 700; font-size: 26px; color: var(--black); }
 .award-cat .ac-sub { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--olive); opacity: 0.75; margin-top: 6px; }
-/* --- SIGNATURE --- */
-.signoff { background: var(--cream); padding: 100px 90px 110px; }
-.signoff-card { background: var(--white); border-top: 4px solid var(--olive); padding: 60px 64px 56px; max-width: 860px; box-shadow: 0 2px 24px rgba(0,0,0,0.05); }
-.signoff-inner { max-width: 860px; }
-.signoff-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--olive); margin-bottom: 18px; }
-.signoff-card p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 23px; line-height: 1.5; color: var(--black); opacity: 0.88; margin-bottom: 20px; max-width: 62ch; }
-.sign-mark { position: relative; display: inline-block; margin-top: 26px; padding: 0 12px 4px 4px; }
-.sign-name { font-family: 'Mrs Saint Delafield', cursive; font-size: 92px; line-height: 0.9; color: var(--olive); display: block; transform: rotate(-2.5deg); transform-origin: left bottom; }
+/* --- PERSONAL NOTE (full bleed, white, client logo in-situ) --- */
+.note { background: var(--white); padding: 110px 90px 100px; }
+.note-grid { display: grid; grid-template-columns: 300px 1fr; gap: 80px; align-items: start;
+  max-width: 1400px; margin: 0 auto; }
+.note-aside { position: sticky; top: 120px; }
+.note-logo { width: 100%; max-width: 240px; height: auto; }
+.note-meta { margin-top: 22px; padding-top: 20px; border-top: 2px solid var(--olive);
+  font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px; line-height: 1.7;
+  letter-spacing: 1.2px; text-transform: uppercase; color: var(--black); opacity: 0.55; }
+.note-label { font-family: 'Degular', sans-serif; font-weight: 400; font-size: 13px;
+  text-transform: uppercase; letter-spacing: 1.4px; color: var(--olive); margin-bottom: 26px; }
+.note-lead { font-family: 'Concrette S', serif; font-weight: 700; font-size: 34px;
+  line-height: 1.2; color: var(--black); margin-bottom: 30px; max-width: 22ch; }
+.note-body p { font-family: 'Concrette S', serif; font-weight: 400; font-size: 20px;
+  line-height: 1.5; color: var(--black); opacity: 0.82; margin-bottom: 20px; max-width: 60ch; }
+.note-body p.note-lead { opacity: 1; max-width: 22ch; }
+.note-sign { margin-top: 42px; padding-top: 34px; border-top: 1px solid var(--border); }
+.sign-mark { position: relative; display: inline-block; padding: 0 12px 4px 4px; }
+.sign-name { font-family: 'Mrs Saint Delafield', cursive; font-size: 92px; line-height: 0.9;
+  color: var(--olive); display: block; transform: rotate(-2.5deg); transform-origin: left bottom; }
 .sign-rule { display: block; width: 230px; height: 22px; margin-top: -4px; overflow: visible; }
-.sign-rule path { fill: none; stroke: var(--olive); stroke-width: 1.6; stroke-linecap: round; opacity: 0.5; stroke-dasharray: 280; stroke-dashoffset: 280; animation: signDraw 1.1s ease-out 0.4s forwards; }
+.sign-rule path { fill: none; stroke: var(--olive); stroke-width: 1.6; stroke-linecap: round;
+  opacity: 0.5; stroke-dasharray: 280; stroke-dashoffset: 280;
+  animation: signDraw 1.1s ease-out 0.4s forwards; }
 @keyframes signDraw { to { stroke-dashoffset: 0; } }
 @media (prefers-reduced-motion: reduce) { .sign-rule path { animation: none; stroke-dashoffset: 0; } }
-.sign-who { margin-top: 18px; font-family: 'Degular', sans-serif; font-size: 15px; line-height: 1.6; color: var(--black); opacity: 0.7; }
-.sign-who b { display: block; font-family: 'Concrette S', serif; font-weight: 700; font-size: 20px; opacity: 1; margin-bottom: 2px; }
+.sign-who { margin-top: 16px; font-family: 'Degular', sans-serif; font-size: 15px;
+  line-height: 1.6; color: var(--black); opacity: 0.7; }
+.sign-who b { display: block; font-family: 'Concrette S', serif; font-weight: 700;
+  font-size: 20px; opacity: 1; margin-bottom: 2px; }
+.awards--cream { background: var(--cream); }
+.diff--cream { background: var(--cream); }
+.diff--cream .diff-card { background: var(--white); }
 @media (max-width: 1024px) {
   .prepared-for { padding: 10px 24px; gap: 14px; flex-wrap: wrap; }
   .prepared-for p { font-size: 11px; letter-spacing: 1.2px; }
@@ -141,9 +160,13 @@ img { display: block; max-width: 100%; }
   .showcase-sub { font-size: 16px; margin-bottom: 36px; }
   .showcase-grid { grid-template-columns: repeat(2, 1fr); gap: 20px 12px; }
   .showcase-block-title { font-size: 20px; }
-  .signoff { padding: 50px 24px; }
-  .signoff-card { padding: 34px 26px 32px; }
-  .signoff-card p { font-size: 18px; }
+  .note { padding: 44px 24px 50px; }
+  .note-grid { grid-template-columns: 1fr; gap: 34px; }
+  .note-aside { position: static; }
+  .note-logo { max-width: 180px; }
+  .note-lead { font-size: 24px; max-width: 100%; }
+  .note-body p { font-size: 17px; }
+  .sign-name { font-size: 66px; }
   .sign-name { font-size: 62px; }
   .cta-bar { padding: 60px 24px; }
   .cta-bar-text h2 { font-size: 26px; }
@@ -181,13 +204,6 @@ img { display: block; max-width: 100%; }
 <body>
 <nav class="nav" id="main-nav"></nav>
 
-<div class="prepared-for">
-  <span class="prepared-for-label">Alpha Surfaces<br>congratulates</span>
-  <span class="prepared-for-x">&times;</span>
-  <img class="prepared-for-logo" src="assets/fergus-logo.jpg" alt="Fergus Builders">
-  <span class="prepared-for-name">Mackay &amp; Whitsunday &middot; Building since 1983</span>
-</div>
-
 <section class="hero">
   <img src="../images/gallery-kitchen.webp" alt="Alpha Surfaces kitchen benchtop">
   <div class="hero-overlay"></div>
@@ -198,12 +214,44 @@ img { display: block; max-width: 100%; }
   </div>
 </section>
 
+<section class="note">
+  <div class="note-grid">
+    <div class="note-aside">
+      <img class="note-logo" src="assets/fergus-logo.jpg" alt="Fergus Builders">
+      <div class="note-meta">Mackay &amp; Whitsunday<br>Building since 1983</div>
+    </div>
+    <div class="note-body">
+      <p class="note-label">A personal note</p>
+      <p class="note-lead">Seven awards in one night is a good year. Seven awards two years
+      running is a standard &mdash; and everyone in the Mackay and Whitsunday building
+      community knows the difference.</p>
+      <p>Congratulations again from all of us. Across four categories in the same night is a
+      genuinely rare thing in this industry, and it deserves to be said properly rather than
+      in a comment on a post. What it says about the people on your team is the part worth
+      being proud of.</p>
+      <p>We're not writing to ask you for anything. We just wanted you to know that if there's
+      ever a way we can help &mdash; a hard question about a surface, a tight programme, or
+      something on site that needs sorting &mdash; you can pick up the phone and we'll do
+      what we can.</p>
+      <div class="note-sign">
+        <span class="sign-mark">
+          <span class="sign-name">Pam</span>
+          <svg class="sign-rule" viewBox="0 0 230 22" aria-hidden="true">
+            <path d="M3 15 C 42 5, 82 19, 120 11 S 190 3, 226 13"/>
+          </svg>
+        </span>
+        <p class="sign-who"><b>Pam Burchill</b>Alpha Surfaces &mdash; Queensland</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="statement">
   <span class="statement-label">A note from Alpha Surfaces</span>
   <p>Seven awards in one night is a good year. Seven awards two years running is a standard — and everyone in the Mackay and Whitsunday building community knows the difference.</p>
 </section>
 
-<section class="awards">
+<section class="awards awards--cream">
   <p class="awards-label">2026 Mackay &amp; Whitsunday</p>
   <h2>Excellence across four categories in a single night.</h2>
   <div class="awards-grid">
@@ -214,7 +262,7 @@ img { display: block; max-width: 100%; }
   </div>
 </section>
 
-<section class="split cream" id="why">
+<section class="split" id="why">
   <div class="split-image">
     <img src="../images/gallery-bathroom.webp" alt="Alpha Surfaces bathroom vanity">
   </div>
@@ -231,7 +279,7 @@ img { display: block; max-width: 100%; }
   </div>
 </section>
 
-<section class="differentiators">
+<section class="differentiators diff--cream">
   <p class="differentiators-label">Why Alpha, specifically</p>
   <h2>Four reasons we are worth a conversation.</h2>
   <div class="diff-grid">
@@ -324,25 +372,6 @@ img { display: block; max-width: 100%; }
   </div>
 </section>
 
-<section class="signoff">
-  <div class="signoff-inner">
-    <div class="signoff-card">
-    <p class="signoff-label">A personal note</p>
-    <p>Congratulations again from all of us. Seven awards, two years running, across four categories — that is a genuinely rare thing in this industry, and it deserves to be said properly rather than in a comment on a post.</p>
-    <p>If a sample set would be useful on your next job, just reply and I'll organise it.</p>
-    <span class="sign-mark">
-      <span class="sign-name">Pam</span>
-      <svg class="sign-rule" viewBox="0 0 230 22" aria-hidden="true">
-        <path d="M3 15 C 42 5, 82 19, 120 11 S 190 3, 226 13"/>
-      </svg>
-    </span>
-    <p class="sign-who">
-      <b>Pam Burchill</b>
-      Alpha Surfaces &mdash; Queensland
-    </p>
-    </div>
-  </div>
-</section>
 
 <section class="cta-bar" id="contact">
   <div class="cta-bar-text">
