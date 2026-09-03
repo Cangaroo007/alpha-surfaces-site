@@ -2729,7 +2729,20 @@ app.get('/partners/:slug', (req, res) => {
   const slug = req.params.slug.replace(/[^a-z0-9-]/gi, '');
   const filePath = path.join(__dirname, 'public', 'partners', slug + '.html');
   if (fs.existsSync(filePath)) return sendHtml(res, filePath);
-  res.redirect('/');
+  // A miss must NEVER be a cacheable redirect. The global cache middleware
+  // stamps max-age=14400 on extensionless paths, so the old `res.redirect('/')`
+  // poisoned the URL in Chrome and at the Cloudflare edge for 4 hours - a page
+  // deployed minutes later still bounced everyone to the home page.
+  res.set({ 'Cache-Control': 'no-store, no-cache, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' });
+  res.status(404).send(`<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page Not Found | Alpha Surfaces</title>
+<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f3f1e6;color:#564d22;font-family:'Degular',system-ui,-apple-system,sans-serif;text-align:center;padding:40px}
+h1{font-size:28px;font-weight:500;margin:0 0 12px}p{margin:0 0 24px;opacity:.75}
+a{color:#564d22;font-weight:600}</style></head>
+<body><div><h1>This page isn't available</h1>
+<p>The link may be mistyped, or the page may not be published yet.</p>
+<a href="/">Return to Alpha Surfaces</a></div></body></html>`);
 });
 
 // ─── Stone detail page ───
