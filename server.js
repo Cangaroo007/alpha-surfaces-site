@@ -2667,9 +2667,6 @@ app.get(['/agenda/3-september', '/agenda/3-september.html'], (req, res) => {
 app.get(['/stockout-preview', '/stockout-preview.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'stockout-preview.html'));
 });
-app.get(['/congratulations/fergus-builders', '/congratulations/fergus-builders.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'congratulations-fergus-builders.html'));
-});
 
 app.get('/order-sample', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'order-sample.html'));
