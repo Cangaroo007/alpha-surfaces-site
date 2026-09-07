@@ -206,8 +206,8 @@ td:last-child, th:last-child { padding-right:0; }
     <ol class="ag-list">
       <li id="ag-01"><span class="ag-num">01</span><div>
         <a class="ag-item-title" href="#delivered">Delivered since Wednesday</a>
-        <p class="ag-item-note">Sample dispatch automation nearly done, lead stages rebuilt,
-        a serious security hole closed.</p>
+        <p class="ag-item-note">Sample dispatch automation nearly done, lead stages rebuilt
+        and live, and the test Builders Awards campaign run.</p>
       </div><span class="ag-mins">5 min</span></li>
       <li id="ag-02"><span class="ag-num">02</span><div>
         <a class="ag-item-title" href="#datapel">Datapel Breeze &mdash; $100 a month, with Odoo coming</a>
@@ -279,11 +279,23 @@ td:last-child, th:last-child { padding-right:0; }
       </div>
 
       <div class="ag-person">
+        <h3>Builders Awards &mdash; test campaign run</h3>
+        <ul>
+          <li><b>We ran the test Congratulations campaign.</b> A custom Fergus Builders page
+          went live &mdash; their logo, the seven wins, and a personal note from Pam with her
+          signature &mdash; and the email went to the team from Pam&rsquo;s address.</li>
+          <li><b>Four of eleven clicked through. Two genuinely read the page</b>, Pam and Beau.
+          Every recipient had their own tracked link, so we can see who opened it, who clicked,
+          and how long they spent.</li>
+          <li>The whole thing was generated out of RoadRunner. <b>The same page can be produced
+          for all 254 award winners &mdash; and 207 of them are not in Pipedrive at all.</b></li>
+          <li><i>We never got feedback on the page, so the other fourteen are on hold.</i></li>
+        </ul>
+      </div>
+
+      <div class="ag-person">
         <h3>Fixed along the way</h3>
         <ul>
-          <li><b>A serious security hole.</b> Every RoadRunner API endpoint was serving data to
-          anonymous callers from the open internet, with owner privileges &mdash; prospect
-          emails included. Found, closed, verified.</li>
           <li><b>Email open and click tracking</b> was never connected at SendGrid&rsquo;s end.
           Now live, so every future campaign has full data.</li>
           <li>Partner pages were caching for four hours, so corrections did not appear.
