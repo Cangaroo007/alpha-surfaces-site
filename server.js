@@ -2664,6 +2664,9 @@ app.get('/warranty-terms', (req, res) => {
 app.get(['/review/3-september', '/review/3-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'review-3-september.html'));
 });
+app.get(['/agenda/7-september', '/agenda/7-september.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-7sep.html'));
+});
 app.get(['/agenda/3-september', '/agenda/3-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-3sep.html'));
 });
