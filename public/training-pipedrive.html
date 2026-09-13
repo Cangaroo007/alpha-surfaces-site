@@ -226,7 +226,7 @@ td:last-child, th:last-child { padding-right:0; }
     <ol class="ag-list">
       <li><span class="ag-num">1</span>
         <a class="ag-item-title" href="#questions">Questions we need to answer</a>
-        <span class="ag-item-note">Eleven decisions. Nothing below can be taught until these are settled.</span>
+        <span class="ag-item-note">Nine decisions. Nothing below can be taught until these are settled.</span>
         <span class="ag-mins">Monday</span></li>
       <li><span class="ag-num">2</span>
         <a class="ag-item-title" href="#why">Why we&rsquo;re doing this</a>
@@ -268,8 +268,8 @@ td:last-child, th:last-child { padding-right:0; }
 
 <section class="ag-statement" id="questions">
   <div class="ag-statement-inner">
-    <div class="ag-stat-figure">11</div>
-    <p>Eleven questions, and the training can&rsquo;t start without them.</p>
+    <div class="ag-stat-figure">9</div>
+    <p>Nine questions, and the training can&rsquo;t start without them.</p>
     <p class="ag-sub">None of these is a big piece of work. Every one of them decides
     something a rep will be told to do for the next twelve months, so they are worth
     ten minutes each in a room rather than a guess from me.</p>
@@ -293,17 +293,12 @@ td:last-child, th:last-child { padding-right:0; }
           <li><b>What does <i>Showroom Visit</i> actually mean?</b> Someone walking into our
           showroom, or a rep visiting theirs? All 67 records are the first. One name
           can&rsquo;t carry both.</li>
-          <li><b>Is session 1 mandatory, and when?</b> A 45&ndash;minute all&ndash;rep slot
-          needs you to call it.</li>
           <li><b>Olivia to Administrator.</b> Owed since 8 September, and it blocks her
           session entirely. <span class="tr-flag">Blocking</span></li>
           <li><b>Do you run the scoreboard in the weekly meeting?</b> Without that the
           programme decays inside a fortnight. It has not run since 17 August.</li>
           <li><b>Approve the <i>not&ndash;contactable</i> flag</b>, so a blank record stops
           meaning three different things.</li>
-          <li><b>The pool business.</b> Asked five times now. Roughly 264 pool and tile
-          organisations sit alongside Alpha&rsquo;s, so every unfiltered count mixes two
-          businesses &mdash; and reps will see it on day one of training.</li>
         </ul>
       </div>
 
@@ -400,15 +395,19 @@ td:last-child, th:last-child { padding-right:0; }
     <div class="tr-two">
       <div class="tr-card tr-card--do">
         <h4>Do</h4>
-        <p>Search for the company first. Link the person to it. If the company genuinely
-        isn&rsquo;t in Pipedrive, flag it to Pam or Jess so it gets created properly &mdash;
-        once, with a category and an owner.</p>
+        <p><b>Search before you create &mdash; then create it yourself.</b> Try the obvious
+        variants first: <i>Coast Stone</i>, <i>Coast Stone Pty Ltd</i>, <i>Coastal Stone</i>.
+        Search the suburb too. If it genuinely isn&rsquo;t there, add it &mdash; with a
+        <b>Business Category</b> and an <b>owner</b> set at the same time. You don&rsquo;t
+        need to wait for anyone.</p>
       </div>
       <div class="tr-card tr-card--dont">
         <h4>Don&rsquo;t</h4>
-        <p>Create an organisation from the lead or person screen. The old auto&ndash;create
-        path made <b>152 junk organisations between May and August</b> before it was
-        removed. Two spellings of the same stonemason is worse than none.</p>
+        <p>Create one without searching first. The old auto&ndash;create path made
+        <b>152 junk organisations between May and August</b> by doing exactly that. Two
+        spellings of the same stonemason is worse than none &mdash; the activity splits
+        across both and neither record tells the truth. <b>If you find a duplicate, merge
+        it rather than picking one.</b></p>
       </div>
     </div>
 
@@ -430,22 +429,39 @@ td:last-child, th:last-child { padding-right:0; }
     <p class="ag-lead">Even a guessed one. A contact with no title is a name we can&rsquo;t
     route, can&rsquo;t segment, and can&rsquo;t brief a rep on before a visit.</p>
 
+    <p class="ag-note"><b>Where does a title go today? Nowhere.</b> This is every field
+    that exists on a contact:</p>
+
     <div class="tr-shot">
-      <img src="/training-img/people-list.jpg" alt="Pipedrive People list showing an empty Labels column and contacts named Sales- and Admin-">
-      <p class="tr-cap"><b>The live People list.</b> The <b>Labels</b> column is empty
-      all the way down. And look at the names &mdash; <i>Sales&ndash; Keys &amp; Co
-      Kitchens</i>, <i>Sales&ndash; Pool Systems</i>, <i>Admin&ndash; Airlie Tiles</i>.
-      People have been typing the job into the <b>name</b> field, because there has never
-      been anywhere else to put it. That is the whole argument for this habit, and the team
-      made it themselves.</p>
+      <img src="/training-img/person-fields.jpg" alt="Pipedrive Settings, Data fields, Person tab: all eleven custom fields listed, none of which is a job title or role">
+      <p class="tr-cap"><b>Settings &rarr; Data fields &rarr; Person.</b> All
+      <b>eleven</b> custom fields on a contact: Product Category, Business Category, State,
+      Region, Stonemason (installer), Retailer&nbsp;/&nbsp;stockist, Stone colour,
+      Installation date, Warranty reference, Stonemason (company), Delivery address.
+      <b>Not one of them is a job title or a role.</b> The built&ndash;in fields below add
+      only Name, Email, Phone, Organisation, Owner and Label &mdash; so there is genuinely
+      nowhere to record what somebody does.</p>
     </div>
 
-    <p class="ag-note" style="margin-top:34px"><b>Where it goes today: nowhere.</b> Checked
-    live against the account &mdash; the Person record has eleven custom fields and not one
-    of them is a job title or a role. The only place a title exists is inside
-    <i>Label</i>, mixed in with business types. Of the 23 Label options, exactly five are
-    job titles: <b>CEO</b>, <b>Director</b>, <b>Sales Rep</b>, <b>Estimator</b> and
-    <b>Client Liason</b> (spelled like that). The rest are trades and pool tags.</p>
+    <p class="ag-note" style="margin-top:34px">So people have improvised, and you can see
+    it in the contact list:</p>
+
+    <div class="tr-shot">
+      <img src="/training-img/people-list.jpg" alt="Pipedrive People list showing an empty Labels column and contacts named Sales- and Admin-">
+      <p class="tr-cap"><b>The live People list.</b> The <b>Labels</b> column &mdash; the
+      only field that could hold a title today &mdash; is empty all the way down. And look
+      at the names: <i>Sales&ndash; Keys &amp; Co Kitchens</i>, <i>Sales&ndash; Pool
+      Systems</i>, <i>Admin&ndash; Airlie Tiles and Design Studio</i>. <b>People have been
+      typing the job into the name field</b>, because that was the only box available. The
+      team made the argument for this field themselves.</p>
+    </div>
+
+    <p class="ag-note" style="margin-top:34px">The nearest thing we have is <i>Label</i>,
+    and it is doing two jobs at once. Of its 23 options, exactly five are job titles &mdash;
+    <b>CEO</b>, <b>Director</b>, <b>Sales Rep</b>, <b>Estimator</b> and <b>Client Liason</b>
+    (spelled like that). The other eighteen are trades and pool tags. That mixture is why
+    it can&rsquo;t be filtered on, and why the answer is a new field rather than tidying
+    this one.</p>
 
     <p class="ag-note">So this needs one new field &mdash; <b>Role</b>, single&ndash;select,
     six values. Single&ndash;select rather than free text because <i>&ldquo;National
