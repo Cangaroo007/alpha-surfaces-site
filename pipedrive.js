@@ -65,6 +65,15 @@ const FIELD_PRODUCT_CATEGORY  = '6c3a7edb24cde1d21864dcb96693e76fc7bcd116';
 // has no native address field on a person, so the state given on the form was
 // previously dropped on the floor.
 const FIELD_STATE = 'b53442866baff353ea710225b82f3519ece695cd';
+
+const { normalise, pipedrivePayload } = require('./address.js');
+
+// Person > Delivery address (type: address). Its subfields ARE writable via
+// the API - proved 13 Sep 2026 by writing one and reading it back - so we send
+// each component explicitly instead of hoping Google geocodes the string.
+// dispatch.ts reads the subfields, not the string, so this matters.
+// _formatted_address is the exception: Pipedrive derives it and ignores input.
+const FIELD_DELIVERY_ADDRESS = '0e47c33c80d07e2bdb502223c7bb770acca3da13';
 const STATE_OPTION = {
   QLD: 233, NSW: 234, VIC: 235, SA: 236,
   WA: 237, TAS: 238, NT: 239, ACT: 240,
@@ -323,12 +332,33 @@ async function pdPatch(endpoint, body) {
   }
 }
 
+// Delivery address for the sample box. The form's Unit / House No. field is
+// required, so people fill it whether or not they live in a unit: they repeat
+// the house number, or put the house number in it, or type the whole pair.
+// address.js sorts that out and REFUSES TO GUESS - a wrong address buys a
+// label and posts a box to a stranger, which is worse than no address at all.
+function deliveryFor(fields) {
+  if (!fields) return null;
+  const raw = {
+    unit: fields.unit, street: fields.street, suburb: fields.suburb,
+    state: fields.state, postcode: fields.postcode
+  };
+  const n = normalise(raw);
+  if (!n.line) return null;
+  if (!n.ok) {
+    console.warn('[pipedrive] delivery address NOT written:', n.problems.join('; '), JSON.stringify(raw));
+    return null;
+  }
+  return { payload: pipedrivePayload(FIELD_DELIVERY_ADDRESS, n), formatted: n.formatted };
+}
+
 // Email-first dedup: same email → same person. Falls back to creating a
 // new person, optionally attaching to a matching/created organization.
-async function findOrCreatePerson({ name, email, phone, company, role, interestedIn, state, consent }) {
+async function findOrCreatePerson({ name, email, phone, company, role, interestedIn, state, consent, address }) {
   const bcId = businessCategoryIdFor(role);
   const pcIds = productCategoryIdsFor(interestedIn);
   const stateId = stateOptionId(state);
+  const delivery = deliveryFor(address);
   if (email) {
     const search = await pdGet('persons/search', { term: email, fields: 'email', limit: 1 });
     const item = search?.data?.items?.[0]?.item;
@@ -337,7 +367,7 @@ async function findOrCreatePerson({ name, email, phone, company, role, intereste
       // Existing people used to be returned untouched, so a repeat visitor
       // never picked up a category. Enrich in place, merging rather than
       // overwriting. Best-effort — a failure here must not block the form.
-      await enrichPerson(item.id, bcId, pcIds, stateId, !!consent).catch(err =>
+      await enrichPerson(item.id, bcId, pcIds, stateId, !!consent, delivery).catch(err =>
         console.error('[pipedrive] person enrich failed:', err.message));
       return item;
     }
@@ -366,6 +396,7 @@ async function findOrCreatePerson({ name, email, phone, company, role, intereste
   if (bcId) personData[FIELD_BUSINESS_CATEGORY] = String(bcId);
   if (pcIds.length) personData[FIELD_PRODUCT_CATEGORY] = pcIds.join(',');
   if (stateId) personData[FIELD_STATE] = stateId;
+  if (delivery) Object.assign(personData, delivery.payload);
   // Marketing consent. Pipedrive's built-in marketing_status is what its own
   // Campaigns feature reads, so it goes there rather than a custom field.
   // Only ever set to subscribed on an explicit tick — never inferred.
@@ -384,8 +415,8 @@ async function findOrCreatePerson({ name, email, phone, company, role, intereste
 // the current values first so multi-select entries aren't flattened — one
 // contact in the workspace already carries "191,195" (Cabinet Maker + Tile
 // Outlet) and a bare assignment would drop one of them.
-async function enrichPerson(personId, bcId, pcIds, stateId, consentGiven) {
-  if (!personId || (!bcId && !(pcIds && pcIds.length) && !stateId)) return;
+async function enrichPerson(personId, bcId, pcIds, stateId, consentGiven, delivery) {
+  if (!personId || (!bcId && !(pcIds && pcIds.length) && !stateId && !delivery)) return;
   const current = await pdGet(`persons/${personId}`);
   const p = current?.data;
   if (!p) return;
@@ -408,9 +439,16 @@ async function enrichPerson(personId, bcId, pcIds, stateId, consentGiven) {
       && p.marketing_status !== 'unsubscribed') {
     patch.marketing_status = 'subscribed';
   }
+  // Delivery address behaves like State: fill it when blank, never overwrite
+  // one somebody has already given. A customer who has moved is a job for
+  // Jess, not for a form submission.
+  if (delivery && !p[FIELD_DELIVERY_ADDRESS]) Object.assign(patch, delivery.payload);
   if (!Object.keys(patch).length) return;
   await pdPatch(`persons/${personId}`, patch);
-  console.log(`[pipedrive] enriched person ${personId}:`, Object.keys(patch).join(', '));
+  const changed = Object.keys(patch)
+    .filter(k => !k.startsWith(FIELD_DELIVERY_ADDRESS + '_'))
+    .map(k => k === FIELD_DELIVERY_ADDRESS ? 'delivery address' : k);
+  console.log(`[pipedrive] enriched person ${personId}:`, changed.join(', '));
 }
 
 // Creates a LEAD (Leads Inbox), not a Deal. Always tags HOT — every web
@@ -610,6 +648,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
     role,
     interestedIn,
     state: fields.state,
+    address: fields,
     consent: marketingConsentFor(formType, fields),
   });
   if (!person?.id) return;
