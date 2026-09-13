@@ -2664,8 +2664,14 @@ app.get('/warranty-terms', (req, res) => {
 app.get(['/review/3-september', '/review/3-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'review-3-september.html'));
 });
+app.get(['/training/pipedrive', '/training/pipedrive.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'training-pipedrive.html'));
+});
 app.get(['/agenda/7-september', '/agenda/7-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-7sep.html'));
+});
+app.get(['/agenda/10-september', '/agenda/10-september.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-10sep.html'));
 });
 app.get(['/agenda/8-september', '/agenda/8-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-8sep.html'));
