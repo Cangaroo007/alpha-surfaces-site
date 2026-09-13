@@ -2689,6 +2689,10 @@ app.get(['/stockout-preview', '/stockout-preview.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'stockout-preview.html'));
 });
 
+app.get(['/agenda/14-september', '/agenda/14-september.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-14sep.html'));
+});
+
 app.get('/order-sample', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'order-sample.html'));
 });
