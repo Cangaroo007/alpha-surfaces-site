@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Sales System Review — 8 September | Alpha Surfaces</title>
+<title>Sales System Review — 14 September | Alpha Surfaces</title>
 <link rel="stylesheet" href="/nav.css?v=23">
 <style>
 /* --- FONTS (absolute paths - this page is not at the site root) --- */
@@ -171,212 +171,492 @@ td:last-child, th:last-child { padding-right:0; }
   .footer { padding:44px 24px 20px; }
   .footer-inner { grid-template-columns:1fr; gap:32px; }
 }
+
+/* --- TRAINING PAGE ADDITIONS (scoped, additive) --- */
+.tr-shot { margin:34px 0 0; }
+.tr-shot img { width:100%; border:1px solid var(--border); background:var(--white); }
+.ag-band--cream .tr-shot img { background:var(--cream); }
+.tr-cap { font-family:'Degular',sans-serif; font-size:13px; line-height:1.5;
+  color:var(--olive); margin-top:12px; letter-spacing:.01em; max-width:80ch; }
+.tr-cap b { font-weight:600; }
+.tr-shot--tight img { max-width:620px; }
+.tr-two { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:34px; align-items:start; }
+.tr-card { padding:26px 26px 28px; border:1px solid var(--border); background:var(--white); }
+.ag-band--white .tr-card { background:var(--cream); }
+.tr-card h4 { font-family:'Concrette S',serif; font-weight:700; font-size:19px;
+  margin-bottom:12px; line-height:1.2; }
+.tr-card p { font-family:'Degular',sans-serif; font-size:15px; line-height:1.5; opacity:.78; }
+.tr-card--do { border-left:3px solid var(--olive); }
+.tr-card--do h4 { color:var(--olive); }
+.tr-card--dont { border-left:3px solid var(--red); }
+.tr-card--dont h4 { color:#9c3125; }
+.tr-rule { background:var(--olive); color:var(--cream); padding:34px 38px; margin:34px 0 0; }
+.tr-rule p { font-family:'Concrette S',serif; font-weight:500; font-size:27px;
+  line-height:1.25; max-width:40ch; }
+.tr-rule span { display:block; font-family:'Degular',sans-serif; font-weight:400;
+  font-size:16px; line-height:1.5; color:rgba(243,241,230,.78); margin-top:16px; max-width:62ch; }
+.tr-habit-no { font-family:'Degular',sans-serif; font-weight:600; font-size:12px;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--olive); margin-bottom:14px; }
+.tr-qnum { font-family:'Concrette S',serif; font-weight:700; font-size:15px;
+  color:var(--olive); width:26px; }
+.tr-flag { display:inline-block; font-family:'Degular',sans-serif; font-weight:600;
+  font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--red);
+  border:1px solid rgba(245,108,108,.5); padding:3px 7px; border-radius:6px;
+  vertical-align:middle; margin-left:8px; }
+@media (max-width:1024px){
+  .tr-two { grid-template-columns:1fr; gap:16px; }
+  .tr-rule { padding:24px 22px; }
+  .tr-rule p { font-size:21px; }
+}
 </style>
 </head>
 <body>
-<div class="ag-head">
-  <p class="ag-eyebrow">Sales Systems Review</p>
-  <h1>Monday 14 September 2026</h1>
-  <p class="ag-meta">Belinda &middot; Pam &middot; Olivia &middot; Sean &nbsp;&middot;&nbsp; 45 minutes</p>
-</div>
 
-<section class="ag-statement">
-  <div class="ag-wrap">
-    <p class="ag-stat-figure">73 of 73</p>
-    <p class="ag-stat-body">Until Sunday, <strong>not one sample request in Pipedrive carried a delivery address</strong>. The form collected it, the website database stored it, and the code that writes to the CRM never sent it. Every address is now restored and structured, and new submissions carry theirs from today.</p>
-    <p class="ag-stat-body">That was the last thing standing between Jess and never typing an address into Australia Post again.</p>
+<nav class="nav" id="main-nav"></nav>
+
+<header class="ag-head">
+  <p class="ag-eyebrow">Sales System &mdash; review</p>
+  <h1>Monday 14 September</h1>
+  <p class="ag-meta">Belinda &middot; Pam &middot; Olivia &middot; Sean &nbsp;—&nbsp; 45 minutes</p>
+</header>
+
+<section class="ag-statement" id="number">
+  <div class="ag-statement-inner">
+    <div class="ag-stat-figure">102</div>
+    <p>Every lead in the CRM shows &ldquo;no activity&rdquo;. Not most &mdash; all of them.</p>
+    <p class="ag-sub">All 102 still owned by Jess, never passed to a rep, every one tagged
+    <b>HOT</b>. The oldest has been sitting since <b>31 May</b>. These are people who filled
+    in a form on our own website asking for our product. Measured live this morning, not
+    from a report.</p>
   </div>
 </section>
 
 <section class="ag-band ag-band--cream" id="agenda">
-  <div class="ag-wrap">
-    <h2>Agenda</h2>
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>Agenda</h2></div>
     <ol class="ag-list">
-      <li><a href="#dispatch">Sample dispatch &mdash; closing the loop</a><span>8 min</span></li>
-      <li><a href="#forms">The form rebuild</a><span>7 min</span></li>
-      <li><a href="#awards">Builder awards &mdash; 12 or 53</a><span>8 min</span></li>
-      <li><a href="#training">Training &mdash; Sprint H at 0%</a><span>8 min</span></li>
-      <li><a href="#datapel">Datapel</a><span>4 min</span></li>
-      <li><a href="#sprints">Sprints &mdash; the two-week order</a><span>5 min</span></li>
-      <li><a href="#blocked">What I need from the room</a><span>5 min</span></li>
+      <li><span class="ag-num">1</span>
+        <a class="ag-item-title" href="#training">Training &mdash; the page is built</a>
+        <span class="ag-item-note">Nine questions have to be answered before anyone is trained. <b>Pam &middot; Belinda</b></span>
+        <span class="ag-mins">12 min</span></li>
+      <li><span class="ag-num">2</span>
+        <a class="ag-item-title" href="#dispatch">Sample dispatch &mdash; closing the loop</a>
+        <span class="ag-item-note">Two changes from finished. Confirm what &ldquo;sent&rdquo; means, and eParcel.</span>
+        <span class="ag-mins">6 min</span></li>
+      <li><span class="ag-num">3</span>
+        <a class="ag-item-title" href="#form">The form rebuild</a>
+        <span class="ag-item-note">One day. Stops the address problem recurring.</span>
+        <span class="ag-mins">4 min</span></li>
+      <li><span class="ag-num">4</span>
+        <a class="ag-item-title" href="#awards">Builder awards &mdash; 12 or 53</a>
+        <span class="ag-item-note">Four weeks old. One true blocker. <b>Pam</b></span>
+        <span class="ag-mins">6 min</span></li>
+      <li><span class="ag-num">5</span>
+        <a class="ag-item-title" href="#datapel">Datapel</a>
+        <span class="ag-item-note">Approved 8 September. Still waiting on the login. <b>Pam</b></span>
+        <span class="ag-mins">3 min</span></li>
+      <li><span class="ag-num">6</span>
+        <a class="ag-item-title" href="#crm">What we found in the CRM today</a>
+        <span class="ag-item-note">Mostly FYI, two decisions.</span>
+        <span class="ag-mins">8 min</span></li>
+      <li><span class="ag-num">7</span>
+        <a class="ag-item-title" href="#backups">Backups &mdash; one real gap, now closed</a>
+        <span class="ag-item-note">One question I can&rsquo;t answer.</span>
+        <span class="ag-mins">3 min</span></li>
+      <li><span class="ag-num">8</span>
+        <a class="ag-item-title" href="#sprints">Sprints &mdash; the two-week order</a>
+        <span class="ag-item-note">Only two of seven involve new code.</span>
+        <span class="ag-mins">3 min</span></li>
     </ol>
   </div>
 </section>
 
-<section class="ag-band" id="dispatch">
-  <div class="ag-wrap">
-    <a class="ag-back" href="#agenda">&larr; Agenda</a>
-    <h2>1 &middot; Sample dispatch &mdash; closing the loop</h2>
-    <p class="ag-lead">The bridge is deployed, the signed webhook is verified end to end, 73 of 73 delivery addresses are restored, and the website now writes the address on every new submission.</p>
-    <p><strong>The bug, plainly.</strong> <code>pipedrive.js</code> contained zero references to <code>street</code> or <code>postcode</code>. Someone previously hit the same problem for <strong>State</strong>, fixed that one field, and stopped. Pipedrive hides it by returning <code>success: true</code> while discarding values that have nowhere to land.</p>
-    <h3>Two things left, both small</h3>
-    <ol>
-      <li>Verify one live submission end to end.</li>
-      <li><code>dispatch.ts</code> must read the <strong>Person&rsquo;s</strong> address first &mdash; 68 of 86 sample leads have no organisation, because they are homeowners.</li>
+<section class="ag-band ag-band--white" id="training">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>1 &middot; Training &mdash; built and live</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+
+    <p class="ag-lead">The whole programme is now a page, in Alpha branding, with live
+    screenshots from our own CRM. It opens with the decisions, not the content.</p>
+
+    <div class="ag-panels" style="margin-bottom:40px">
+      <a class="ag-panel ag-panel--new" href="https://review.alphasurfaces.com.au/training/pipedrive">
+        <div class="ag-panel-name">Pipedrive &mdash; The Five Habits</div>
+        <div class="ag-panel-desc">The training page. Nine questions, then the habits, each
+        shown on a real Pipedrive screen.</div>
+        <span class="ag-panel-cta">Open the page</span></a>
+    </div>
+
+    <p class="ag-note">The three non-negotiables became <b>the Five Habits</b> &mdash;
+    habits to build rather than rules to break.</p>
+
+    <ol class="ag-habits">
+      <li><b>Company is the parent. Person is the child.</b></li>
+      <li><b>Every person carries a title.</b></li>
+      <li><b>Every activity carries a company and a person</b> &mdash; start from the
+      contact record, not the company record.</li>
+      <li><b>Tick it done, and pick the right type.</b></li>
+      <li><b>Never leave a visit without booking the next one.</b></li>
     </ol>
-    <p>Then the carrier comes off test mode and Jess stops re-typing. <strong>12&ndash;15 addresses a day, roughly an hour.</strong></p>
-    <h3>Decisions</h3>
-    <table class="ag-table">
-      <tr><th>Confirm what &ldquo;sent&rdquo; means</th><td>The Australia Post scan, not the label printing. A printed label sitting on a shelf never shows as sent. That is what is built.</td></tr>
-      <tr><th>eParcel</th><td>Alpha qualifies at ~3,000&ndash;3,750 parcels a year against a 2,000 threshold. Free, removes the $126/month fee, gives true lodgement confirmation and better rates. Open since 8 September; Jess is the named contact.</td></tr>
-    </table>
+
+    <div class="tr-rule">
+      <p>Habit 3 is the one that matters, and it isn&rsquo;t about effort.</p>
+      <span>Open the person and log the activity from there, and Pipedrive fills the
+      company in for you. Start from the company and it never asks you for a person &mdash;
+      which is exactly how we got to 7%.</span>
+    </div>
+
+    <p class="ag-note" style="margin-top:34px"><b>The nine questions are on the page</b>,
+    grouped by who owns them. In short: Belinda has five, Pam has three, and I have one
+    &mdash; run the scripts before session 1 so nobody is asked to hand-fix what a script
+    can.</p>
   </div>
 </section>
 
-<section class="ag-band ag-band--cream" id="forms">
-  <div class="ag-wrap">
-    <a class="ag-back" href="#agenda">&larr; Agenda</a>
-    <h2>2 &middot; The form rebuild</h2>
-    <p class="ag-lead">Cleaning 74 addresses showed what people type when a form asks a question with no right answer.</p>
-    <table class="ag-table">
-      <tr><th>Unit box</th><th>Street box</th><th>What they meant</th></tr>
-      <tr><td><code>9</code></td><td><code>9 Sunnymede Lane</code></td><td>9 Sunnymede Lane</td></tr>
-      <tr><td><code>94</code></td><td><code>Ring Street</code></td><td>94 Ring Street</td></tr>
-      <tr><td><code>2</code></td><td><code>11 Sundew St</code></td><td>2/11 Sundew St</td></tr>
-      <tr><td><code>1-9, 8</code></td><td><code>Mulligan St</code></td><td>nobody knows</td></tr>
-    </table>
-    <p>Plus <code>VIC</code> typed into the postcode box, and one person whose fields all shifted one across, so their suburb reads &ldquo;Street&rdquo;.</p>
-    <p class="ag-callout">None of this is user error. <strong>Unit / House No. is required, and most people do not have one.</strong></p>
-    <h3>The fix &mdash; one day</h3>
-    <ul>
-      <li>One address line instead of two.</li>
-      <li>Postcode first, which auto-fills suburb and state from the free Australia Post dataset.</li>
-      <li>A &ldquo;Sending to:&rdquo; confirmation line before submit.</li>
-    </ul>
-    <p>That removes four of the five defect classes at source, and the parser stops being the only defence. <strong>The 2 September spec already specified one address line</strong> &mdash; the build diverged. This finishes something already decided.</p>
-    <p>It also unblocks three other sprints: Australia Post needs clean addresses, cabinet makers naming their stonemasons grows the relationship data on its own, and architects self-identify for CPD.</p>
+<section class="ag-band ag-band--cream" id="dispatch">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>2 &middot; Sample dispatch &mdash; closing the loop</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+
+    <p class="ag-lead"><b>73 of 73.</b> Until Sunday, not one sample request in Pipedrive
+    carried a delivery address.</p>
+
+    <p class="ag-note">The form collected it, the website database stored it, and the code
+    that writes to the CRM never sent it. <b>The bug, plainly:</b> <i>pipedrive.js</i>
+    contained zero references to <i>street</i> or <i>postcode</i>. Someone previously hit the
+    same problem for <b>State</b>, fixed that one field, and stopped. Pipedrive hides it by
+    returning <i>success: true</i> while discarding values with nowhere to land.</p>
+
+    <p class="ag-note"><b>Two things left, both small:</b> verify one live submission end to
+    end, and make <i>dispatch.ts</i> read the <b>Person&rsquo;s</b> address first &mdash; 68
+    of 86 sample leads have no organisation, because they&rsquo;re homeowners. Then the
+    carrier flips off test mode and <b>Jess stops re-typing 12&ndash;15 addresses a day.</b></p>
+
+    <div class="ag-person" style="margin-top:34px">
+      <h3>Decisions</h3>
+      <ul>
+        <li>Confirm <b>&ldquo;sent&rdquo; means the Australia Post scan</b>, not the label
+        printing. A printed label on a shelf never shows as sent. That&rsquo;s what&rsquo;s
+        built.</li>
+        <li><b>eParcel</b> &mdash; Alpha qualifies at ~3,000&ndash;3,750 parcels a year
+        against a 2,000 threshold. Free, removes the $126/month Starshipit fee, gives true
+        lodgement confirmation and better rates. Open since 8 September; Jess is the named
+        contact.</li>
+      </ul>
+    </div>
   </div>
 </section>
 
-<section class="ag-band" id="awards">
-  <div class="ag-wrap">
-    <a class="ag-back" href="#agenda">&larr; Agenda</a>
-    <h2>3 &middot; Builder awards &mdash; 12 or 53</h2>
-    <p class="ag-lead">The awards are now four weeks old.</p>
-    <p>The 8 September meeting agreed 12 generic plus 8 personalised. Pam&rsquo;s spreadsheet came back with <strong>53</strong> builders she has not contacted. <strong>Her 53 held up</strong> &mdash; re-checked against the live CRM on 9 September, only one changed status.</p>
-    <h3>They are 100% regional</h3>
-    <table class="ag-table">
-      <tr><th>Far North Queensland</th><td>13</td><th>Wide Bay Burnett</th><td>9</td></tr>
-      <tr><th>Downs &amp; Western</th><td>13</td><th>Mackay &amp; Whitsunday</th><td>5</td></tr>
-      <tr><th>North Queensland</th><td>9</td><th>Central Queensland</th><td>4</td></tr>
-    </table>
-    <p><strong>Zero from Brisbane, Gold Coast or Sunshine Coast.</strong> That has consequences for stock, delivery and which rep follows up.</p>
-    <p><strong>Three of the 53 are already Pam&rsquo;s accounts</strong> &mdash; Taylor Builders, Neater Constructions and Ellis Developments. A cold &ldquo;we may not have met yet&rdquo; to an account she owns reads badly.</p>
-    <p class="ag-callout">The one true blocker: <strong>the 53 email addresses.</strong> The award pages publish company names only. The sheet has 53 blanks. Nothing can send without them.</p>
-    <p>Everything else is built and guarded &mdash; the send script physically refuses to send any message still carrying a placeholder, so the open copy decisions cannot leak out half-finished.</p>
-    <p><strong>Worth saying plainly:</strong> Queensland state winners are announced in October, drawn from these same regional winners. If the 53 do not go before then, they should probably wait and go as part of the state run rather than arriving two months late.</p>
+<section class="ag-band ag-band--white" id="form">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>3 &middot; The form rebuild</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+
+    <p class="ag-lead">Cleaning 74 addresses showed what people actually type when a form
+    asks a question with no right answer.</p>
+
+    <div class="ag-scroll" style="margin-top:30px">
+      <table>
+        <thead><tr><th>Unit box</th><th>Street box</th><th>What they meant</th></tr></thead>
+        <tbody>
+          <tr><td>9</td><td>9 Sunnymede Lane</td><td>9 Sunnymede Lane</td></tr>
+          <tr><td>94</td><td>Ring Street</td><td>94 Ring Street</td></tr>
+          <tr><td>2</td><td>11 Sundew St</td><td>2/11 Sundew St</td></tr>
+          <tr><td>1-9, 8</td><td>Mulligan St</td><td>nobody knows</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="ag-note"><b>None of this is user error.</b> <i>Unit / House No.</i> is
+    required, and most people don&rsquo;t have one.</p>
+
+    <p class="ag-note"><b>The fix &mdash; one day.</b> One address line instead of two.
+    Postcode first, which auto-fills suburb and state from the free Australia Post dataset.
+    A &ldquo;Sending to:&rdquo; confirmation before submit. <b>The 2 September spec already
+    specified one address line</b> &mdash; the build diverged. This is finishing something
+    already decided.</p>
   </div>
 </section>
 
-<section class="ag-band ag-band--cream" id="training">
-  <div class="ag-wrap">
-    <a class="ag-back" href="#agenda">&larr; Agenda</a>
-    <h2>4 &middot; Training &mdash; Sprint H is at 0%</h2>
-    <p class="ag-lead">The build is 85% ahead of adoption.</p>
-    <table class="ag-table">
-      <tr><th>Completed activities, six months</th><td>3,973</td></tr>
-      <tr><th>&hellip;carrying a company</th><td>61%</td></tr>
-      <tr><th>&hellip;carrying a person</th><td><strong>7%</strong></td></tr>
-      <tr><th>&hellip;carrying both</th><td><strong>5%</strong></td></tr>
-      <tr><th>Open, never closed</th><td><strong>485</strong> &mdash; 386 are meetings, oldest due 484 days</td></tr>
-      <tr><th>Showroom visits carrying a company</th><td><strong>0%</strong></td></tr>
-      <tr><th>Leads still sitting on &ldquo;New&rdquo;</th><td><strong>93 of 101</strong></td></tr>
-    </table>
-    <p class="ag-callout">This is not an effort problem and should not be presented as one. 3,973 activities in six months is a team that is working. 6% person-attachment is too uniform across meetings <em>and</em> calls to be individual habit &mdash; it is what happens when activity is logged from the organisation record or straight off the calendar.</p>
-    <h3>Three things, trainable in twenty minutes</h3>
-    <ol>
-      <li>Every activity carries a <strong>company and a person</strong>.</li>
-      <li><strong>Tick it done, and pick the right type</strong> &mdash; formal meeting or sample drop.</li>
-      <li><strong>Never leave a visit without booking the next one.</strong></li>
-    </ol>
-    <p>Do the machine&rsquo;s share first &mdash; backfill the person where a company has exactly one contact, and fix the showroom check-in in code. Nobody should be asked to hand-fix what a script can.</p>
-    <p><strong>Another week of building changes none of these numbers. One week of logging three things properly changes all of them.</strong></p>
+<section class="ag-band ag-band--cream" id="awards">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>4 &middot; Builder awards &mdash; 12 or 53</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+
+    <p class="ag-lead">The awards are now <b>four weeks old</b>.</p>
+
+    <p class="ag-note">8 September agreed 12 generic plus 8 personalised. Pam&rsquo;s
+    spreadsheet came back with <b>53</b> builders she hasn&rsquo;t contacted &mdash; and her
+    53 held up, re-checked live on 9 September with only one changed.</p>
+
+    <p class="ag-note"><b>They are 100% regional.</b> Far North Queensland 13 &middot; Downs
+    &amp; Western 13 &middot; North Queensland 9 &middot; Wide Bay Burnett 9 &middot; Mackay
+    &amp; Whitsunday 5 &middot; Central Queensland 4. <b>Zero from Brisbane, Gold Coast or
+    Sunshine Coast</b> &mdash; which has consequences for stock, delivery and which rep
+    follows up.</p>
+
+    <p class="ag-note"><b>Three of the 53 are already Pam&rsquo;s accounts</b> &mdash; Taylor
+    Builders, Neater Constructions, Ellis Developments. A cold &ldquo;we may not have met
+    yet&rdquo; to an account she owns reads badly.</p>
+
+    <div class="tr-rule">
+      <p>The one true blocker is the 53 email addresses.</p>
+      <span>The award pages publish company names only, and the sheet has 53 blanks.
+      Everything else is built and guarded &mdash; the send script physically refuses to
+      send any message still containing a placeholder.</span>
+    </div>
+
+    <p class="ag-note" style="margin-top:34px"><b>Worth saying plainly:</b> Queensland
+    <b>state</b> winners are announced in October, drawn from these same regional winners. If
+    the 53 don&rsquo;t go before then, they should probably wait and go with the state run
+    rather than arriving two months late.</p>
   </div>
 </section>
 
-<section class="ag-band" id="datapel">
-  <div class="ag-wrap">
-    <a class="ag-back" href="#agenda">&larr; Agenda</a>
-    <h2>5 &middot; Datapel</h2>
-    <p class="ag-lead">Approved on 8 September at $100/month. Still not signed up, because the login has not come through.</p>
-    <p>The integration is fully designed and the discovery scripts are written &mdash; they run the day credentials land. It is the biggest single dependency in the engagement: the Top 50, sales by customer, the buying-versus-visited quadrant and Olivia&rsquo;s price level field all sit behind it.</p>
-    <p>Odoo has moved to January, so this is six-plus months of visibility for $600.</p>
+<section class="ag-band ag-band--white" id="datapel">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>5 &middot; Datapel</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+    <p class="ag-lead">Approved on 8 September at $100/month. <b>Still not signed up, because
+    the login hasn&rsquo;t come through.</b></p>
+    <p class="ag-note">The integration is designed and the discovery scripts are written
+    &mdash; they run the day credentials land. It is the biggest single dependency in the
+    engagement: the Top 50, sales by customer, the buying-versus-visited quadrant and
+    Olivia&rsquo;s price level field all sit behind it. Odoo has moved to January, so this is
+    six-plus months of visibility for $600.</p>
+  </div>
+</section>
+
+<section class="ag-band ag-band--cream" id="crm">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>6 &middot; What we found in the CRM today</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+
+    <p class="ag-lead">Pulled live from the account this morning. Mostly FYI, two decisions.</p>
+
+    <div class="ag-scroll" style="margin-top:30px">
+      <table>
+        <thead><tr><th>Finding</th><th>So what</th></tr></thead>
+        <tbody>
+          <tr><td><b>Eight activity types. No <i>Sample drop</i></b></td>
+              <td>A two-minute pop-in and a booked hour are the same record.
+              <b>The six-a-day KPI cannot be measured</b> until this exists</td></tr>
+          <tr><td><b><i>Showroom Visit</i> is inbound only</b></td>
+              <td>67 records, 100% carry a person, <b>0% carry a company</b> &mdash; every one
+              written by the website check-in form. No rep has ever created one by hand</td></tr>
+          <tr><td><b>No title or role field exists on a contact</b></td>
+              <td>Eleven custom fields, not one a job title. There is genuinely nowhere to
+              record what somebody does</td></tr>
+          <tr><td><b><i>Labels</i> holds 23 options doing three jobs</b></td>
+              <td>13 trades &middot; 5 pool tags &middot; <b>5 job titles</b>. It is
+              multi-select and <b>cannot be renamed</b> &mdash; a Pipedrive built-in</td></tr>
+          <tr><td><b>People type the job into the <i>name</i> field</b></td>
+              <td><i>Sales&ndash; Keys &amp; Co Kitchens</i>, <i>Admin&ndash; Airlie Tiles</i>.
+              The team made the argument for a Role field themselves</td></tr>
+          <tr><td><b>102 leads, none with a next activity</b></td>
+              <td>All owned by Jess, never passed to a rep. Oldest 31 May</td></tr>
+          <tr><td><b>2,018 contacts &middot; 56 of 100 custom fields used</b></td>
+              <td>44 spare, so adding <i>Role</i> costs nothing</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ag-people" style="margin-top:40px">
+      <div class="ag-person">
+        <h3>Decision one &mdash; create <i>Sample drop</i></h3>
+        <ul>
+          <li>Two-minute settings change. Two custom types already exist, so there is no plan
+          limit in the way.</li>
+          <li>⚠️ <b>The trap.</b> The coverage report counts contact as type in
+          <i>call, meeting, lunch, showroom&nbsp;visit</i>. Add the type without adding it to
+          that list and <b>every sample drop silently stops counting</b> &mdash; coverage gets
+          worse overnight for a reason nobody connects back to a settings change made a
+          fortnight earlier. <b>Both change in the same sitting.</b></li>
+        </ul>
+      </div>
+      <div class="ag-person">
+        <h3>Decision two &mdash; the six roles</h3>
+        <ul>
+          <li>Owner&nbsp;/&nbsp;Director &middot; Manager &middot; Estimator &middot;
+          Designer&nbsp;/&nbsp;Specifier &middot; Sales&nbsp;/&nbsp;Showroom &middot;
+          Admin&nbsp;/&nbsp;Accounts.</li>
+          <li>A <b>new single-select field</b>, so it can be filtered. <i>Labels</i> can&rsquo;t
+          be, because a person can be <i>Estimator</i> and <i>Cabinetmaker</i> at the same
+          time. Homeowners don&rsquo;t need one.</li>
+          <li><b>Already solved, worth knowing:</b> business type has a proper home &mdash;
+          <i>Business Category</i>, populated on ~82% of people. The script that fills it from
+          the company record already exists and ran on 24 August, stamping 1,337 contacts.
+          Worth re-running for the ~117 contacts added since.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ag-band ag-band--white" id="backups">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>7 &middot; Backups &mdash; one real gap, now closed</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+
+    <p class="ag-lead">Both repositories were checked end to end after a push failure.
+    <b>No corruption in either.</b></p>
+
+    <p class="ag-note">But RoadRunner had <b>24 untracked files</b> &mdash; present on one
+    laptop and nowhere else. Not junk: <i>lead-stages.js</i> (the 6 September stage rebuild),
+    the Starshipit bridge and its installers, the address parser and its 31 tests, and
+    Saturday&rsquo;s address backfill. <b>The three most recent pieces of work on this
+    engagement were held on a single machine.</b> Now committed and pushed &mdash; 26 files,
+    2,644 lines.</p>
+
+    <p class="ag-note">Also found: a <b>stale git lock dated 9 September</b> on the site repo.
+    Anything scripted against it had been failing silently for four days.</p>
+
+    <div class="tr-rule">
+      <p>Still open, and I can&rsquo;t answer it: GitHub backs up code, not data.</p>
+      <span>The website and RoadRunner both run Postgres on Railway, and whether either
+      database is backed up has never been established. Worth answering before it matters.</span>
+    </div>
   </div>
 </section>
 
 <section class="ag-band ag-band--cream" id="sprints">
-  <div class="ag-wrap">
-    <a class="ag-back" href="#agenda">&larr; Agenda</a>
-    <h2>6 &middot; Sprints &mdash; the two-week order</h2>
-    <table class="ag-table">
-      <tr><th>1</th><td><strong>M &mdash; Sample dispatch</strong></td><td>Two changes from finished. Saves Jess an hour a day</td><td><span class="ag-pill ag-pill--go">Finishing</span></td></tr>
-      <tr><th>2</th><td><strong>B &mdash; Form rebuild</strong></td><td>One day. Stops the address problem recurring</td><td><span class="ag-pill ag-pill--go">Next</span></td></tr>
-      <tr><th>3</th><td><strong>H &mdash; Training</strong></td><td>0%, and nothing else matters if nobody uses it</td><td><span class="ag-pill ag-pill--stop">Blocked</span></td></tr>
-      <tr><th>4</th><td><strong>C &mdash; Awards</strong></td><td>Staler every week</td><td><span class="ag-pill ag-pill--stop">Blocked</span></td></tr>
-      <tr><th>5</th><td><strong>D &mdash; Data completion</strong></td><td>One approved command, never run</td><td><span class="ag-pill ag-pill--wait">Open</span></td></tr>
-      <tr><th>6</th><td><strong>A &mdash; Automations</strong></td><td>The day Belinda&rsquo;s recording lands</td><td><span class="ag-pill ag-pill--stop">Blocked</span></td></tr>
-      <tr><th>7</th><td><strong>E &mdash; Datapel</strong></td><td>The day the login lands</td><td><span class="ag-pill ag-pill--stop">Blocked</span></td></tr>
-    </table>
-    <p><strong>Only two of those involve new code.</strong></p>
-  </div>
-</section>
-
-<section class="ag-band" id="live">
-  <div class="ag-wrap">
-    <h2>Live</h2>
-    <div class="ag-panels">
-      <a class="ag-panel" href="https://roadrunner.alphasurfaces.com.au/reports/campaigns"><strong>Campaign engagement</strong><span>Opens, clicks and on-page behaviour, one row per person</span></a>
-      <a class="ag-panel" href="https://alphasurfaces.com.au/partners/fergus-builders"><strong>Fergus Builders page</strong><span>The awards template &mdash; 14 more waiting on sign-off</span></a>
-      <a class="ag-panel" href="https://roadrunner.alphasurfaces.com.au/reports/coverage"><strong>Contact coverage</strong><span>Who has never been contacted</span></a>
-      <a class="ag-panel" href="https://alphasurfaces.com.au/order-sample"><strong>Sample request form</strong><span>The one being rebuilt</span></a>
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>8 &middot; Sprints &mdash; the two-week order</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+    <div class="ag-scroll">
+      <table>
+        <thead><tr><th></th><th>Sprint</th><th>Why now</th></tr></thead>
+        <tbody>
+          <tr><td class="ag-key">1</td><td class="ag-sess">M &mdash; Sample dispatch</td><td>Two changes from finished. Saves Jess an hour a day</td></tr>
+          <tr><td class="ag-key">2</td><td class="ag-sess">B &mdash; Form rebuild</td><td>One day. Stops the address problem recurring</td></tr>
+          <tr><td class="ag-key">3</td><td class="ag-sess">H &mdash; Training</td><td>The page is built; it now needs the nine answers</td></tr>
+          <tr><td class="ag-key">4</td><td class="ag-sess">C &mdash; Awards</td><td>Getting staler every week</td></tr>
+          <tr><td class="ag-key">5</td><td class="ag-sess">D &mdash; Data completion</td><td><i>sync --apply</i> is one approved command, never run</td></tr>
+          <tr><td class="ag-key">6</td><td class="ag-sess">A &mdash; Automations</td><td>The day Belinda&rsquo;s recording lands</td></tr>
+          <tr><td class="ag-key">7</td><td class="ag-sess">E &mdash; Datapel</td><td>The day the login lands</td></tr>
+        </tbody>
+      </table>
     </div>
+    <p class="ag-note"><b>Only two of those involve new code.</b></p>
   </div>
 </section>
 
-<section class="ag-band ag-band--cream" id="blocked">
-  <div class="ag-wrap">
-    <a class="ag-back" href="#agenda">&larr; Agenda</a>
-    <h2>7 &middot; What I need from the room</h2>
+<section class="ag-band ag-band--white" id="blocked">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>What I need from the room</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
     <div class="ag-people">
+
       <div class="ag-person">
         <h3>Belinda</h3>
-        <p><strong>The voice recording. Week five.</strong> Every follow-up sequence waits on it.</p>
-        <p>Which areas to train first &middot; training dates &middot; Olivia to Administrator &middot; the zero-silica wording &middot; the warranty term.</p>
+        <ul>
+          <li><b>The voice recording. Week five.</b> Every follow-up sequence waits on it</li>
+          <li><b>Approve <i>Sample drop</i></b> &mdash; and confirm it counts as coverage but
+          not toward the six a day</li>
+          <li><b>What does <i>Showroom Visit</i> mean</b> &mdash; them visiting us, or a rep
+          visiting their showroom? One name can&rsquo;t carry both</li>
+          <li><b>Training dates</b>, and which areas first</li>
+          <li><b>Olivia to Administrator</b> &mdash; owed since 8 September, blocks her session</li>
+          <li>The <b>not-contactable</b> flag, the <b>zero-silica wording</b> and the
+          <b>warranty term</b></li>
+        </ul>
       </div>
+
       <div class="ag-person">
         <h3>Pam</h3>
-        <p><strong>The 53 email addresses.</strong> Nothing sends without them.</p>
-        <p>12 or 53 &middot; the three accounts already yours &middot; the five non-benchtop winners &middot; approve the copy &middot; the 8 recordings &middot; the Datapel login.</p>
+        <ul>
+          <li><b>The 53 email addresses</b> &mdash; the only true blocker on the campaign</li>
+          <li><b>12 or 53</b>, and the three accounts already yours</li>
+          <li>The five non-benchtop winners, the copy, and the 8 recordings</li>
+          <li><b>The Datapel login</b></li>
+          <li><b>The six roles</b> &mdash; your language wins over mine, particularly whether
+          it&rsquo;s <i>Estimator</i> or <i>Quoting</i></li>
+        </ul>
       </div>
+
       <div class="ag-person">
         <h3>Olivia</h3>
-        <p><strong>The master brand document</strong> &mdash; long and short descriptors for every collection and colour.</p>
-        <p>The relationship spreadsheets &middot; the CPD dates and materials.</p>
+        <ul>
+          <li>The <b>master brand document</b>, with long and short descriptors for every
+          collection and colour</li>
+          <li>The relationship spreadsheets, and the CPD dates</li>
+        </ul>
       </div>
+
       <div class="ag-person">
         <h3>The room</h3>
-        <p><strong>The pool business. Asked five times.</strong></p>
-        <p>Around 264 pool and tile organisations share this CRM, so every unfiltered count mixes two businesses. Every report is wrong until it is settled.</p>
+        <ul>
+          <li><b>The pool business. Asked five times.</b> Around 264 pool and tile
+          organisations share this CRM, so every unfiltered count mixes two businesses.
+          <b>Every report is wrong until it&rsquo;s settled</b> &mdash; and reps will see it on
+          day one of training</li>
+        </ul>
       </div>
+
     </div>
   </div>
 </section>
 
-<section class="ag-band ag-docs">
-  <div class="ag-wrap">
-    <h2>Reference</h2>
-    <ul>
-      <li>Comprehensive handover &mdash; 14 September</li>
-      <li>Sprint plan &mdash; every sprint, one scheme</li>
-      <li>Sample dispatch &mdash; closing the loop</li>
-      <li>Form redesign &mdash; why the address data is bad</li>
-      <li>Builder awards &mdash; full campaign record</li>
-      <li>Data flow map &mdash; where data lives and moves</li>
-    </ul>
+<section class="ag-band ag-band--cream" id="docs">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>Reference documents</h2></div>
+    <div class="ag-docs">
+      <div>Pipedrive training plan &mdash; 14 Sep</div>
+      <div>Repo backup and git findings &mdash; 14 Sep</div>
+      <div>Comprehensive handover &mdash; 14 Sep</div>
+      <div>Sprint plan, all sprints in one scheme &mdash; 14 Sep</div>
+      <div>Sample dispatch, closing the loop &mdash; 14 Sep</div>
+      <div>Form redesign &mdash; 14 Sep</div>
+      <div>Builder awards campaign, full record &mdash; 14 Sep</div>
+      <div>Data flow map &mdash; where data lives and moves</div>
+    </div>
   </div>
 </section>
 
+<div class="footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <p class="footer-col-heading">Alpha Surfaces</p>
+      <p>Sales System Review &mdash; internal working document. CRM figures pulled live from
+      the Pipedrive account on 14 September 2026; activity percentages measured 2 September.</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Locations</p>
+      <p>Kunda Park, Queensland<br>New South Wales</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Contact</p>
+      <p><a href="mailto:hello@alphasurfaces.com.au">hello@alphasurfaces.com.au</a></p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Site</p>
+      <p><a href="https://alphasurfaces.com.au">alphasurfaces.com.au</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom"><p>Internal preview &middot; not indexed &middot; prepared 14 September 2026 &middot; Brisbane</p></div>
+</div>
 
 <script src="/nav.js?v=23"></script>
+<script>
+(function () {
+  function fixLogo() {
+    var img = document.querySelector('#main-nav img');
+    if (!img) return false;
+    var src = img.getAttribute('src') || '';
+    if (src && src.charAt(0) !== '/' && src.indexOf('http') !== 0) {
+      img.setAttribute('src', '/' + src.replace(/^(\.\.\/)+/, ''));
+    }
+    return true;
+  }
+  if (!fixLogo()) {
+    var nav = document.getElementById('main-nav');
+    if (nav && window.MutationObserver) {
+      var mo = new MutationObserver(function () { if (fixLogo()) mo.disconnect(); });
+      mo.observe(nav, { childList: true, subtree: true });
+      setTimeout(function () { mo.disconnect(); }, 8000);
+    }
+  }
+})();
+</script>
 </body>
 </html>
