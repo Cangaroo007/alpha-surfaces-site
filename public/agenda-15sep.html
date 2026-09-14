@@ -208,6 +208,10 @@ td:last-child, th:last-child { padding-right:0; }
   .tr-rule { padding:24px 22px; }
   .tr-rule p { font-size:21px; }
 }
+
+/* --- DOC LINKS (scoped, additive) --- */
+.ag-docs a { color:var(--olive); text-decoration:underline; text-underline-offset:3px; }
+.ag-docs .ag-doc-link { opacity:1; }
 </style>
 </head>
 <body>
@@ -566,6 +570,14 @@ td:last-child, th:last-child { padding-right:0; }
       </table>
     </div>
     <p class="ag-note"><b>Only two of those involve new code.</b></p>
+
+    <div class="ag-panels" style="margin-top:34px">
+      <a class="ag-panel ag-panel--new" href="https://review.alphasurfaces.com.au/sprint-plan/15-september">
+        <div class="ag-panel-name">The full sprint plan</div>
+        <div class="ag-panel-desc">All fifteen sprints in one scheme, what changed since
+        Monday, the standing blockers and who owes what.</div>
+        <span class="ag-panel-cta">Open the sprint plan</span></a>
+    </div>
   </div>
 </section>
 
@@ -636,14 +648,14 @@ td:last-child, th:last-child { padding-right:0; }
   <div class="ag-inner">
     <div class="ag-bandhead"><h2>Reference documents</h2></div>
     <div class="ag-docs">
-      <div>Pipedrive training plan &mdash; 14 Sep</div>
+      <div class="ag-doc-link"><a href="https://review.alphasurfaces.com.au/training/pipedrive">Pipedrive training page</a> &mdash; live</div>
       <div>Repo backup and git findings &mdash; 14 Sep</div>
       <div>Comprehensive handover &mdash; 14 Sep</div>
-      <div>Sprint plan, all sprints in one scheme &mdash; 15 Sep</div>
+      <div class="ag-doc-link"><a href="https://review.alphasurfaces.com.au/sprint-plan/15-september">Sprint plan, all sprints in one scheme</a> &mdash; 15 Sep</div>
       <div>Awards campaign, the 48 addresses sourced &mdash; 14 Sep</div>
       <div>Sample dispatch, closing the loop &mdash; 14 Sep</div>
       <div>Form redesign &mdash; 14 Sep</div>
-      <div>Builder awards campaign, full record &mdash; 14 Sep</div>
+      <div class="ag-doc-link"><a href="https://review.alphasurfaces.com.au/awards-review">Builder awards campaign review</a> &mdash; live</div>
       <div>Data flow map &mdash; where data lives and moves</div>
     </div>
   </div>
