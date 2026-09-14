@@ -237,21 +237,21 @@ td:last-child, th:last-child { padding-right:0; }
         <span class="ag-item-note">48 pages live and the addresses sourced. Four small asks, and a timing choice. <b>Pam</b></span>
         <span class="ag-mins">8 min</span></li>
       <li><span class="ag-num">3</span>
+        <a class="ag-item-title" href="#crm">What we found in the CRM</a>
+        <span class="ag-item-note">Mostly FYI, two decisions.</span>
+        <span class="ag-mins">8 min</span></li>
+      <li><span class="ag-num">4</span>
         <a class="ag-item-title" href="#dispatch">Sample dispatch &mdash; closing the loop</a>
         <span class="ag-item-note">Two changes from finished. Confirm what &ldquo;sent&rdquo; means, and eParcel.</span>
         <span class="ag-mins">6 min</span></li>
-      <li><span class="ag-num">4</span>
+      <li><span class="ag-num">5</span>
         <a class="ag-item-title" href="#form">The form rebuild</a>
         <span class="ag-item-note">One day. Stops the address problem recurring.</span>
         <span class="ag-mins">4 min</span></li>
-      <li><span class="ag-num">5</span>
+      <li><span class="ag-num">6</span>
         <a class="ag-item-title" href="#datapel">Datapel</a>
         <span class="ag-item-note">Approved. Waiting on the login. <b>Pam</b></span>
         <span class="ag-mins">3 min</span></li>
-      <li><span class="ag-num">6</span>
-        <a class="ag-item-title" href="#crm">What we found in the CRM today</a>
-        <span class="ag-item-note">Mostly FYI, two decisions.</span>
-        <span class="ag-mins">8 min</span></li>
       <li><span class="ag-num">7</span>
         <a class="ag-item-title" href="#backups">Backups &mdash; one real gap, now closed</a>
         <span class="ag-item-note">One question I can&rsquo;t answer.</span>
@@ -381,90 +381,12 @@ td:last-child, th:last-child { padding-right:0; }
   </div>
 </section>
 
-<section class="ag-band ag-band--white" id="dispatch">
+<section class="ag-band ag-band--white" id="crm">
   <div class="ag-inner">
-    <div class="ag-bandhead"><h2>3 &middot; Sample dispatch &mdash; closing the loop</h2>
+    <div class="ag-bandhead"><h2>3 &middot; What we found in the CRM</h2>
       <a class="ag-back" href="#agenda">Back to agenda</a></div>
 
-    <p class="ag-lead"><b>73 of 73.</b> Until Sunday, not one sample request in Pipedrive
-    carried a delivery address.</p>
-
-    <p class="ag-note">The form collected it, the website database stored it, and the code
-    that writes to the CRM never sent it. <b>The bug, plainly:</b> <i>pipedrive.js</i>
-    contained zero references to <i>street</i> or <i>postcode</i>. Someone previously hit the
-    same problem for <b>State</b>, fixed that one field, and stopped. Pipedrive hides it by
-    returning <i>success: true</i> while discarding values with nowhere to land.</p>
-
-    <p class="ag-note"><b>Two things left, both small:</b> verify one live submission end to
-    end, and make <i>dispatch.ts</i> read the <b>Person&rsquo;s</b> address first &mdash; 68
-    of 86 sample leads have no organisation, because they&rsquo;re homeowners. Then the
-    carrier flips off test mode and <b>Jess stops re-typing 12&ndash;15 addresses a day.</b></p>
-
-    <div class="ag-person" style="margin-top:34px">
-      <h3>Decisions</h3>
-      <ul>
-        <li>Confirm <b>&ldquo;sent&rdquo; means the Australia Post scan</b>, not the label
-        printing. A printed label on a shelf never shows as sent. That&rsquo;s what&rsquo;s
-        built.</li>
-        <li><b>eParcel</b> &mdash; Alpha qualifies at ~3,000&ndash;3,750 parcels a year
-        against a 2,000 threshold. Free, removes the $126/month Starshipit fee, gives true
-        lodgement confirmation and better rates. Open since 8 September; Jess is the named
-        contact.</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<section class="ag-band ag-band--cream" id="form">
-  <div class="ag-inner">
-    <div class="ag-bandhead"><h2>4 &middot; The form rebuild</h2>
-      <a class="ag-back" href="#agenda">Back to agenda</a></div>
-
-    <p class="ag-lead">Cleaning 74 addresses showed what people actually type when a form
-    asks a question with no right answer.</p>
-
-    <div class="ag-scroll" style="margin-top:30px">
-      <table>
-        <thead><tr><th>Unit box</th><th>Street box</th><th>What they meant</th></tr></thead>
-        <tbody>
-          <tr><td>9</td><td>9 Sunnymede Lane</td><td>9 Sunnymede Lane</td></tr>
-          <tr><td>94</td><td>Ring Street</td><td>94 Ring Street</td></tr>
-          <tr><td>2</td><td>11 Sundew St</td><td>2/11 Sundew St</td></tr>
-          <tr><td>1-9, 8</td><td>Mulligan St</td><td>nobody knows</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <p class="ag-note"><b>None of this is user error.</b> <i>Unit / House No.</i> is
-    required, and most people don&rsquo;t have one.</p>
-
-    <p class="ag-note"><b>The fix &mdash; one day.</b> One address line instead of two.
-    Postcode first, which auto-fills suburb and state from the free Australia Post dataset.
-    A &ldquo;Sending to:&rdquo; confirmation before submit. <b>The 2 September spec already
-    specified one address line</b> &mdash; the build diverged. This is finishing something
-    already decided.</p>
-  </div>
-</section>
-
-<section class="ag-band ag-band--white" id="datapel">
-  <div class="ag-inner">
-    <div class="ag-bandhead"><h2>5 &middot; Datapel</h2>
-      <a class="ag-back" href="#agenda">Back to agenda</a></div>
-    <p class="ag-lead">Approved at $100/month. <b>Waiting on the login to sign up.</b></p>
-    <p class="ag-note">The integration is designed and the discovery scripts are written
-    &mdash; they run the day credentials land. It is the biggest single dependency in the
-    engagement: the Top 50, sales by customer, the buying-versus-visited quadrant and
-    Olivia&rsquo;s price level field all sit behind it. Odoo has moved to January, so this is
-    six-plus months of visibility for $600.</p>
-  </div>
-</section>
-
-<section class="ag-band ag-band--cream" id="crm">
-  <div class="ag-inner">
-    <div class="ag-bandhead"><h2>6 &middot; What we found in the CRM today</h2>
-      <a class="ag-back" href="#agenda">Back to agenda</a></div>
-
-    <p class="ag-lead">Pulled live from the account this morning. Mostly FYI, two decisions.</p>
+    <p class="ag-lead">Pulled live from the account on Monday. Mostly FYI, two decisions.</p>
 
     <div class="ag-scroll" style="margin-top:30px">
       <table>
@@ -522,6 +444,88 @@ td:last-child, th:last-child { padding-right:0; }
         </ul>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="ag-band ag-band--cream" id="dispatch">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>4 &middot; Sample dispatch &mdash; closing the loop</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+
+    <p class="ag-lead"><b>73 of 73.</b> Every sample request in Pipedrive now carries a
+    complete, structured delivery address &mdash; and every new one has since Monday.</p>
+
+    <p class="ag-note"><b>Nobody did anything wrong here.</b> The addresses were never
+    missing. The form collected them and the website database stored them &mdash; they simply
+    never reached the CRM, because the code that writes to Pipedrive had no reference to
+    <i>street</i> or <i>postcode</i>. Pipedrive returns <i>success: true</i> while discarding
+    values with nowhere to land, so <b>every layer reported that it had worked.</b></p>
+
+    <p class="ag-note"><b>And we had never shown Jess how to run dispatch through
+    Pipedrive</b>, so there was no reason for anyone to go looking. That part is training, and
+    it is session 2.</p>
+
+    <p class="ag-note"><b>Two things left, both small:</b> verify one live submission end to
+    end, and make <i>dispatch.ts</i> read the <b>Person&rsquo;s</b> address first &mdash; 68
+    of 86 sample leads have no organisation, because they&rsquo;re homeowners. Then the
+    carrier flips off test mode and <b>Jess stops re-typing 12&ndash;15 addresses a day.</b></p>
+
+    <div class="ag-person" style="margin-top:34px">
+      <h3>Decisions</h3>
+      <ul>
+        <li>Confirm <b>&ldquo;sent&rdquo; means the Australia Post scan</b>, not the label
+        printing. A printed label on a shelf never shows as sent. That&rsquo;s what&rsquo;s
+        built.</li>
+        <li><b>eParcel</b> &mdash; Alpha qualifies at ~3,000&ndash;3,750 parcels a year
+        against a 2,000 threshold. Free, removes the $126/month Starshipit fee, gives true
+        lodgement confirmation and better rates. Open since 8 September; Jess is the named
+        contact.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="ag-band ag-band--white" id="form">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>5 &middot; The form rebuild</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+
+    <p class="ag-lead">Cleaning 74 addresses showed what people actually type when a form
+    asks a question with no right answer.</p>
+
+    <div class="ag-scroll" style="margin-top:30px">
+      <table>
+        <thead><tr><th>Unit box</th><th>Street box</th><th>What they meant</th></tr></thead>
+        <tbody>
+          <tr><td>9</td><td>9 Sunnymede Lane</td><td>9 Sunnymede Lane</td></tr>
+          <tr><td>94</td><td>Ring Street</td><td>94 Ring Street</td></tr>
+          <tr><td>2</td><td>11 Sundew St</td><td>2/11 Sundew St</td></tr>
+          <tr><td>1-9, 8</td><td>Mulligan St</td><td>nobody knows</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="ag-note"><b>None of this is user error.</b> <i>Unit / House No.</i> is
+    required, and most people don&rsquo;t have one.</p>
+
+    <p class="ag-note"><b>The fix &mdash; one day.</b> One address line instead of two.
+    Postcode first, which auto-fills suburb and state from the free Australia Post dataset.
+    A &ldquo;Sending to:&rdquo; confirmation before submit. <b>The 2 September spec already
+    specified one address line</b> &mdash; the build diverged. This is finishing something
+    already decided.</p>
+  </div>
+</section>
+
+<section class="ag-band ag-band--cream" id="datapel">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>6 &middot; Datapel</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+    <p class="ag-lead">Approved at $100/month. <b>Waiting on the login to sign up.</b></p>
+    <p class="ag-note">The integration is designed and the discovery scripts are written
+    &mdash; they run the day credentials land. It is the biggest single dependency in the
+    engagement: the Top 50, sales by customer, the buying-versus-visited quadrant and
+    Olivia&rsquo;s price level field all sit behind it. Odoo has moved to January, so this is
+    six-plus months of visibility for $600.</p>
   </div>
 </section>
 
