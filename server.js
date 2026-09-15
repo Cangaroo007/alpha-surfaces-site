@@ -2667,6 +2667,9 @@ app.get(['/review/3-september', '/review/3-september.html'], (req, res) => {
 app.get(['/training/pipedrive', '/training/pipedrive.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'training-pipedrive.html'));
 });
+app.get(['/training/samples', '/training/samples.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'training-samples.html'));
+});
 app.get(['/agenda/7-september', '/agenda/7-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-7sep.html'));
 });
