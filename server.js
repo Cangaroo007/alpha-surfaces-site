@@ -2694,6 +2694,12 @@ app.get(['/training/pipedrive', '/training/pipedrive.html'], (req, res) => {
 app.get(['/training/samples', '/training/samples.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'training-samples.html'));
 });
+app.get(['/training/sending-samples', '/training/sending-samples.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'training-sending-samples.html'));
+});
+app.get(['/training/samples-system', '/training/samples-system.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'training-samples-system.html'));
+});
 app.get(['/agenda/7-september', '/agenda/7-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-7sep.html'));
 });
