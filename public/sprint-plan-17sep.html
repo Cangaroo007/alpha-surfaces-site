@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sprint plan — 17 September | Alpha Surfaces</title>
+<link rel="stylesheet" href="/nav.css?v=23">
+<style>
+/* --- FONTS (absolute paths - this page is not at the site root) --- */
+@font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('/fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('/fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('/fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('/fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('/fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --olive:#564d22; --cream:#f3f1e6; --white:#ffffff; --black:#000000;
+        --red:#f56c6c; --gray:#cccccc; --border:rgba(0,0,0,0.1); }
+html { scroll-behavior: smooth; overflow-x: clip; }
+body { background:#f5f5f5; color:var(--black); font-family:'Degular',sans-serif;
+       font-weight:400; line-height:1.2; overflow-x:clip; max-width:100vw; }
+a { color: inherit; }
+img { display:block; max-width:100%; }
+
+/* --- PAGE HEADER, on the .hero-tagline pattern --- */
+.ag-head { background: var(--cream); text-align: center; padding: 72px 24px 56px; }
+.ag-eyebrow { font-family:'Degular',sans-serif; font-weight:600; font-size:13px;
+  letter-spacing:0.16em; text-transform:uppercase; color:var(--olive); margin-bottom:22px; }
+.ag-head h1 { font-family:'Concrette S',serif; font-weight:600; font-size:62px;
+  color:#564D22; letter-spacing:0; line-height:1.05; }
+.ag-head .ag-meta { font-family:'Degular',sans-serif; font-size:16px; color:var(--black);
+  margin-top:20px; opacity:.7; }
+
+/* --- OLIVE STATEMENT BAND --- */
+.ag-statement { background: var(--olive); padding: 100px 171px; }
+.ag-statement-inner { max-width:1100px; margin:0 auto; }
+.ag-stat-figure { font-family:'Concrette S',serif; font-weight:700; font-size:120px;
+  line-height:1; color:var(--white); margin-bottom:24px; }
+.ag-statement p { font-family:'Concrette S',serif; font-weight:500; font-size:42px;
+  line-height:1.2; color:var(--white); max-width:1100px; }
+.ag-statement p.ag-sub { font-weight:400; font-size:22px; line-height:1.35;
+  color:rgba(255,255,255,0.82); margin-top:28px; max-width:820px; }
+
+/* --- CONTENT BANDS, on the .about / .gallery pattern --- */
+.ag-band { padding: 80px 161px; }
+.ag-band--cream { background: var(--cream); }
+.ag-band--white { background: var(--white); }
+.ag-inner { max-width: 1100px; margin: 0 auto; }
+.ag-bandhead { display:flex; align-items:baseline; justify-content:space-between;
+  gap:24px; margin-bottom:44px; border-bottom:1px solid var(--border); padding-bottom:18px; }
+.ag-bandhead h2 { font-family:'Concrette S',serif; font-weight:400; font-size:42px;
+  color:var(--black); line-height:1.1; }
+.ag-back { font-family:'Degular',sans-serif; font-weight:500; font-size:13px;
+  letter-spacing:0.08em; text-transform:uppercase; color:var(--olive);
+  text-decoration:underline; text-underline-offset:3px; white-space:nowrap; }
+
+/* --- AGENDA LIST --- */
+.ag-list { list-style:none; }
+.ag-list li { display:grid; grid-template-columns:64px 1fr auto; gap:24px;
+  align-items:baseline; padding:22px 0; border-bottom:1px solid var(--border);
+  scroll-margin-top:120px; }
+.ag-list li:last-child { border-bottom:0; }
+.ag-num { font-family:'Concrette S',serif; font-weight:700; font-size:20px; color:var(--olive); }
+.ag-item-title { font-family:'Concrette S',serif; font-weight:500; font-size:24px;
+  color:var(--black); text-decoration:none; display:block; line-height:1.2; }
+.ag-item-title:hover { color:var(--olive); text-decoration:underline; text-underline-offset:4px; }
+.ag-item-note { font-family:'Degular',sans-serif; font-size:16px; line-height:1.45;
+  color:var(--black); opacity:.68; margin-top:8px; max-width:62ch; }
+.ag-mins { font-family:'Degular',sans-serif; font-size:13px; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--olive); white-space:nowrap; }
+
+/* --- PROSE --- */
+.ag-lead { font-family:'Concrette S',serif; font-weight:400; font-size:20px;
+  line-height:1.35; max-width:60ch; margin-bottom:16px; }
+.ag-note { font-family:'Degular',sans-serif; font-size:16px; line-height:1.5;
+  max-width:66ch; opacity:.72; margin-top:18px; }
+
+/* --- NUMBERED HABITS --- */
+.ag-habits { list-style:none; counter-reset:h; display:grid; gap:22px; margin-top:8px; }
+.ag-habits li { counter-increment:h; padding-left:56px; position:relative;
+  font-family:'Degular',sans-serif; font-size:17px; line-height:1.5; max-width:70ch; }
+.ag-habits li::before { content:counter(h); position:absolute; left:0; top:-2px;
+  font-family:'Concrette S',serif; font-weight:700; font-size:26px; color:var(--olive); }
+
+/* --- LINK PANELS, on the .feature-panel pattern --- */
+.ag-panels { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.ag-panel { display:block; text-decoration:none; background:var(--white);
+  border:1px solid var(--border); padding:24px 22px 26px; transition:border-color .2s ease; }
+.ag-band--white .ag-panel { background:var(--cream); }
+.ag-panel:hover { border-color:var(--olive); }
+.ag-panel-name { font-family:'Concrette S',serif; font-weight:500; font-size:20px;
+  color:var(--black); line-height:1.2; }
+.ag-panel-desc { font-family:'Degular',sans-serif; font-size:14px; line-height:1.4;
+  color:var(--black); opacity:.65; margin-top:8px; }
+.ag-panel-cta { font-family:'Degular',sans-serif; font-weight:500; font-size:13px;
+  letter-spacing:0.08em; color:var(--olive); text-decoration:underline;
+  text-underline-offset:3px; margin-top:14px; display:inline-block; }
+.ag-panel--new { border-left:3px solid var(--olive); }
+
+/* --- PERSON CARDS --- */
+.ag-people { display:grid; gap:24px; }
+.ag-person { background:var(--cream); padding:30px 32px; }
+.ag-band--cream .ag-person { background:var(--white); }
+.ag-person h3 { font-family:'Concrette S',serif; font-weight:700; font-size:28px;
+  color:var(--olive); margin-bottom:18px; }
+.ag-person ul { list-style:none; display:grid; gap:14px; }
+.ag-person li { font-family:'Degular',sans-serif; font-size:16px; line-height:1.5;
+  padding-left:20px; position:relative; max-width:78ch; }
+.ag-person li::before { content:''; position:absolute; left:0; top:10px;
+  width:8px; height:1px; background:var(--olive); }
+.ag-person li b { font-weight:600; }
+.ag-person li i { font-style:italic; }
+
+/* --- TABLES --- */
+.ag-scroll { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-family:'Degular',sans-serif; font-size:15px; }
+th { text-align:left; font-weight:600; font-size:11px; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--olive); padding:0 16px 12px 0;
+  border-bottom:1px solid var(--border); white-space:nowrap; }
+td { padding:14px 16px 14px 0; border-bottom:1px solid var(--border);
+  vertical-align:top; line-height:1.45; }
+td:last-child, th:last-child { padding-right:0; }
+.ag-key { font-family:'Concrette S',serif; font-weight:700; font-size:17px;
+  color:var(--olive); width:28px; }
+.ag-sess { font-family:'Concrette S',serif; font-weight:500; font-size:18px; }
+.ag-pill { display:inline-block; font-family:'Degular',sans-serif; font-weight:600;
+  font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:5px 10px;
+  border-radius:8px; white-space:nowrap; }
+.ag-pill--go { background:var(--olive); color:var(--cream); }
+.ag-pill--wait { background:rgba(86,77,34,0.12); color:var(--olive); }
+.ag-pill--stop { background:rgba(245,108,108,0.16); color:#9c3125; }
+
+/* --- DOC LIST --- */
+.ag-docs { columns:2; column-gap:48px; font-family:'Degular',sans-serif;
+  font-size:15px; line-height:1.6; }
+.ag-docs div { break-inside:avoid; padding:6px 0; opacity:.75; }
+
+/* --- FOOTER (site pattern) --- */
+.footer { background:var(--white); border-top:1px solid var(--border); padding:50px 60px 40px; }
+.footer-inner { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:40px; }
+.footer-col-heading { font-family:'Concrette S',serif; font-weight:700; font-size:14px;
+  color:var(--black); margin-bottom:10px; }
+.footer-col p, .footer-col a { font-family:'Degular',sans-serif; font-weight:400;
+  font-size:13px; color:var(--black); line-height:1.6; }
+.footer-col a { text-decoration:underline; text-underline-offset:2px; }
+.footer-col a:hover { color:var(--olive); }
+.footer-bottom { border-top:1px solid var(--border); margin-top:30px; padding-top:20px; }
+.footer-bottom p { font-family:'Degular',sans-serif; font-weight:400; font-size:11px;
+  letter-spacing:0.46px; text-transform:uppercase; color:var(--black); }
+
+/* --- MOBILE, matching the site breakpoint --- */
+@media (max-width: 1024px) {
+  .ag-head { padding:44px 24px 36px; }
+  .ag-head h1 { font-size:32px; }
+  .ag-statement { padding:44px 24px; }
+  .ag-stat-figure { font-size:72px; }
+  .ag-statement p { font-size:24px; line-height:1.15; font-weight:400; }
+  .ag-statement p.ag-sub { font-size:17px; }
+  .ag-band { padding:44px 24px; }
+  .ag-bandhead { flex-direction:column; gap:10px; margin-bottom:28px; }
+  .ag-bandhead h2 { font-size:28px; }
+  .ag-list li { grid-template-columns:40px 1fr; gap:14px; padding:18px 0; }
+  .ag-item-title { font-size:20px; }
+  .ag-mins { grid-column:2; }
+  .ag-panels { grid-template-columns:1fr; }
+  .ag-person { padding:22px 20px; }
+  .ag-person h3 { font-size:22px; }
+  .ag-docs { columns:1; }
+  .footer { padding:44px 24px 20px; }
+  .footer-inner { grid-template-columns:1fr; gap:32px; }
+}
+
+/* --- TRAINING PAGE ADDITIONS (scoped, additive) --- */
+.tr-shot { margin:34px 0 0; }
+.tr-shot img { width:100%; border:1px solid var(--border); background:var(--white); }
+.ag-band--cream .tr-shot img { background:var(--cream); }
+.tr-cap { font-family:'Degular',sans-serif; font-size:13px; line-height:1.5;
+  color:var(--olive); margin-top:12px; letter-spacing:.01em; max-width:80ch; }
+.tr-cap b { font-weight:600; }
+.tr-shot--tight img { max-width:620px; }
+.tr-two { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:34px; align-items:start; }
+.tr-card { padding:26px 26px 28px; border:1px solid var(--border); background:var(--white); }
+.ag-band--white .tr-card { background:var(--cream); }
+.tr-card h4 { font-family:'Concrette S',serif; font-weight:700; font-size:19px;
+  margin-bottom:12px; line-height:1.2; }
+.tr-card p { font-family:'Degular',sans-serif; font-size:15px; line-height:1.5; opacity:.78; }
+.tr-card--do { border-left:3px solid var(--olive); }
+.tr-card--do h4 { color:var(--olive); }
+.tr-card--dont { border-left:3px solid var(--red); }
+.tr-card--dont h4 { color:#9c3125; }
+.tr-rule { background:var(--olive); color:var(--cream); padding:34px 38px; margin:34px 0 0; }
+.tr-rule p { font-family:'Concrette S',serif; font-weight:500; font-size:27px;
+  line-height:1.25; max-width:40ch; }
+.tr-rule span { display:block; font-family:'Degular',sans-serif; font-weight:400;
+  font-size:16px; line-height:1.5; color:rgba(243,241,230,.78); margin-top:16px; max-width:62ch; }
+.tr-habit-no { font-family:'Degular',sans-serif; font-weight:600; font-size:12px;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--olive); margin-bottom:14px; }
+.tr-qnum { font-family:'Concrette S',serif; font-weight:700; font-size:15px;
+  color:var(--olive); width:26px; }
+.tr-flag { display:inline-block; font-family:'Degular',sans-serif; font-weight:600;
+  font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--red);
+  border:1px solid rgba(245,108,108,.5); padding:3px 7px; border-radius:6px;
+  vertical-align:middle; margin-left:8px; }
+@media (max-width:1024px){
+  .tr-two { grid-template-columns:1fr; gap:16px; }
+  .tr-rule { padding:24px 22px; }
+  .tr-rule p { font-size:21px; }
+}
+
+/* --- DOC LINKS (scoped, additive) --- */
+.ag-docs a { color:var(--olive); text-decoration:underline; text-underline-offset:3px; }
+.ag-docs .ag-doc-link { opacity:1; }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="main-nav"></nav>
+
+<header class="ag-head">
+  <p class="ag-eyebrow">Sales System &mdash; sprint plan</p>
+  <h1>Thursday 17 September</h1>
+  <p class="ag-meta">All sprints in one scheme &nbsp;—&nbsp; supersedes every earlier list</p>
+</header>
+
+<section class="ag-statement" id="number">
+  <div class="ag-statement-inner">
+    <div class="ag-stat-figure">2</div>
+    <p>Sprints in this plan need new code. Everything else needs a person.</p>
+    <p class="ag-sub">Sample dispatch is built and waiting on Jess&rsquo;s hour. Training is
+    three pages waiting on a read. The master list is loaded. The most valuable week
+    available is almost entirely people using what is already there.</p>
+  </div>
+</section>
+
+<section class="ag-band ag-band--cream" id="plan">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>The plan</h2></div>
+
+    <p class="ag-lead">Priority order, and the single thing that moves each one.</p>
+
+    <ol class="ag-list">
+      <li><span class="ag-num">1</span>
+        <a class="ag-item-title" href="#m">M &mdash; Sample dispatch</a>
+        <span class="ag-item-note">Built. Jess&rsquo;s hour in plain-label mode, then one variable.</span>
+        <span class="ag-mins">built</span></li>
+      <li><span class="ag-num">2</span>
+        <a class="ag-item-title" href="#h">H &mdash; Training</a>
+        <span class="ag-item-note">Three pages. Pam&rsquo;s read, then dates.</span>
+        <span class="ag-mins">built</span></li>
+      <li><span class="ag-num">3</span>
+        <a class="ag-item-title" href="#l">L &mdash; NSW master list</a>
+        <span class="ag-item-note">Loaded. Two small calls to finish it.</span>
+        <span class="ag-mins">90%</span></li>
+      <li><span class="ag-num">4</span>
+        <a class="ag-item-title" href="#c">C &mdash; Builder awards</a>
+        <span class="ag-item-note">48 pages live. Pam&rsquo;s four.</span>
+        <span class="ag-mins">95%</span></li>
+      <li><span class="ag-num">5</span>
+        <a class="ag-item-title" href="#b">B &mdash; Form rebuild</a>
+        <span class="ag-item-note">One day of build. Next in the queue.</span>
+        <span class="ag-mins">75%</span></li>
+      <li><span class="ag-num">6</span>
+        <a class="ag-item-title" href="#d">D &mdash; Data completion</a>
+        <span class="ag-item-note">One approved command, ready to run.</span>
+        <span class="ag-mins">70%</span></li>
+      <li><span class="ag-num">7</span>
+        <a class="ag-item-title" href="#a">A &mdash; Follow-up process</a>
+        <span class="ag-item-note">Belinda&rsquo;s voice notes.</span>
+        <span class="ag-mins">90%</span></li>
+      <li><span class="ag-num">8</span>
+        <a class="ag-item-title" href="#e">E &mdash; Datapel reporting</a>
+        <span class="ag-item-note">Breeze requested. Paperwork coming to Pam.</span>
+        <span class="ag-mins">blocked</span></li>
+      <li><span class="ag-num">9</span>
+        <a class="ag-item-title" href="#f">F &mdash; Trip planning + road-trip view</a>
+        <span class="ag-item-note">Planner live. The view needs territories.</span>
+        <span class="ag-mins">85% / 0%</span></li>
+      <li><span class="ag-num">10</span>
+        <a class="ag-item-title" href="#rest">The rest &mdash; G, I, J, N, K, O</a>
+        <span class="ag-item-note">Where each one sits.</span>
+        <span class="ag-mins">&mdash;</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="ag-band ag-band--white" id="changed">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>What changed since Tuesday</h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <div class="ag-scroll">
+      <table>
+        <thead><tr><th>Sprint</th><th>Now</th></tr></thead>
+        <tbody>
+          <tr><td class="ag-sess">L &mdash; NSW master list</td><td><b>Loaded.</b> 103 organisations, 64 contacts, 54 records updated. Stonemasons in the CRM 229 &rarr; <b>336</b></td></tr>
+          <tr><td class="ag-sess">M &mdash; Sample dispatch</td><td><b>There is a working tool.</b> Queue, detail page, Express as a tier, three Pipedrive controls, automatic Belinda email, and a dispatch link on every new lead</td></tr>
+          <tr><td class="ag-sess">H &mdash; Training</td><td><b>Three pages</b>, one of them a walkthrough built from screen recordings</td></tr>
+          <tr><td class="ag-sess">F2 &mdash; Road-trip view</td><td><b>Back on the list</b> with its own definition, after losing its letter in the August re-lettering</td></tr>
+          <tr><td class="ag-sess">E &mdash; Datapel</td><td>Breeze module requested; Datapel is issuing the paperwork <b>to Pam</b>. Report specification signed off and in progress</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="ag-note" style="margin-top:34px">⚠️ <b>Sean&rsquo;s Pipedrive login is not
+    working.</b> This week&rsquo;s CRM work and every figure on this page was done through
+    the API. Worth restoring, because the interface is where the eyeball checks happen.</p>
+  </div>
+</section>
+
+<section class="ag-band ag-band--cream" id="m">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>M &middot; Sample dispatch <span class="ag-pill ag-pill--go">built</span></h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <p class="ag-lead">Jess has one page listing every request waiting, and one button that
+    prints the label with the address already on it.</p>
+
+    <p class="ag-note"><b>Done:</b> the queue with a 14-day window &middot; the detail page
+    with stones, address and where the address was read from &middot; Express as a tier
+    (<i>B20</i> / <i>B30</i>) &middot; stage, referral and note controls &middot; automatic
+    Belinda email &middot; Close &middot; a dispatch link in the note of every new sample
+    lead, live on production.</p>
+
+    <div class="ag-scroll">
+      <table>
+        <thead><tr><th>Remaining</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="ag-sess">Jess uses it in plain-label mode</td><td>Her hour. Nothing else blocks it</td></tr>
+          <tr><td class="ag-sess">Set <i>STARSHIPIT_CARRIER</i></td><td>The variable is unset, which is why test mode is on. Setting it is the go-live</td></tr>
+          <tr><td class="ag-sess">eParcel application</td><td>Free, removes the $126/month fee, gives real lodgement confirmation</td></tr>
+          <tr><td class="ag-sess">The satchel question</td><td>$8.57 against $9.83 &mdash; roughly $3,800&ndash;4,700 a year. Needs Jess on packaging</td></tr>
+          <tr><td class="ag-sess">Lead outcome on close</td><td>No option id recorded; closing sets the stage only</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="ag-band ag-band--white" id="h">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>H &middot; Training <span class="ag-pill ag-pill--go">built</span></h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <p class="ag-lead">Three pages, each aimed at one person&rsquo;s actual job.</p>
+
+    <div class="ag-panels" style="margin-bottom:40px">
+      <a class="ag-panel" href="https://review.alphasurfaces.com.au/training/pipedrive" target="_blank" rel="noopener">
+        <div class="ag-panel-name">Pipedrive &mdash; the Five Habits</div>
+        <div class="ag-panel-desc">All reps.</div>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel ag-panel--new" href="https://review.alphasurfaces.com.au/training/sending-samples" target="_blank" rel="noopener">
+        <div class="ag-panel-name">Sending samples</div>
+        <div class="ag-panel-desc">Jess. Seven steps, six clips.</div>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel ag-panel--new" href="https://review.alphasurfaces.com.au/training/samples-system" target="_blank" rel="noopener">
+        <div class="ag-panel-name">How the system works</div>
+        <div class="ag-panel-desc">The path, and what to check.</div>
+        <span class="ag-panel-cta">Open</span></a>
+    </div>
+
+    <p class="ag-note">⚠️ All three are on the review site only. A page Jess opens daily
+    probably belongs on the production site.</p>
+
+    <p class="ag-note"><b>The measures that justify the programme:</b> 3,973 completed
+    activities in six months, 7% carrying a person, 485 open and never closed, 93 of 101
+    leads still on &ldquo;New&rdquo;. <b>Committed: Friday 2 October.</b></p>
+  </div>
+</section>
+
+<section class="ag-band ag-band--cream" id="l">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>L &middot; NSW master list <span class="ag-pill ag-pill--go">loaded</span></h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <p class="ag-lead">223 rows became 212 unique records. 103 organisations and 64 contacts
+    created, 54 existing records updated, 42 of those gaining a grade.</p>
+
+    <p class="ag-note">Grades filled only where blank &mdash; nothing already in Pipedrive
+    was overwritten. Owners as Olivia set them: Laura 81, Belinda 15, Olivia 7. One category
+    change, <b>Mudgee Kitchens</b>, exactly as she specified. Full rollback list kept.</p>
+
+    <p class="ag-note"><b>To finish:</b> an owner for the 45 unallocated accounts, and thirty
+    seconds on 10 close name matches. Then the <b>QLD retail reallocation list</b> runs the
+    same way.</p>
+
+    <p class="ag-note">⚠️ Smartstone data pre-dates the July 2024 engineered stone ban &mdash;
+    the pre-ban top-50 names still need a trading check.</p>
+  </div>
+</section>
+
+<section class="ag-band ag-band--white" id="c">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>C &middot; Builder awards <span class="ag-pill ag-pill--wait">with Pam</span></h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <p class="ag-lead">48 personalised pages, the email, the send script and an engagement
+    dashboard, all built and live. Addresses sourced.</p>
+
+    <div class="ag-panels" style="margin-bottom:40px">
+      <a class="ag-panel" href="https://review.alphasurfaces.com.au/awards-review" target="_blank" rel="noopener">
+        <div class="ag-panel-name">Awards campaign review</div>
+        <div class="ag-panel-desc">Every page and address in one place.</div>
+        <span class="ag-panel-cta">Open</span></a>
+    </div>
+
+    <p class="ag-note"><b>Pam:</b> tick <i>Send?</i> &middot; confirm or drop the six inferred
+    addresses &middot; one read of the copy with her direct number &middot; the eight
+    recordings. <b>Belinda:</b> zero-silica wording and warranty term.</p>
+
+    <p class="ag-note"><b>October:</b> Queensland state winners are announced then, from these
+    same regional winners. Folding into the state run is the stronger play if this wave
+    doesn&rsquo;t go now.</p>
+  </div>
+</section>
+
+<section class="ag-band ag-band--cream" id="b">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>B &middot; Form rebuild <span class="ag-pill ag-pill--wait">next build</span></h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <p class="ag-lead">One address line instead of two, postcode first auto-filling suburb
+    and state, and a &ldquo;Sending to:&rdquo; confirmation before submit.</p>
+
+    <p class="ag-note">The root cause of the address work: <i>Unit / House No.</i> is required
+    and most people do not have one. <b>One form change moves four sprints</b> &mdash; M, J, N
+    and A.</p>
+  </div>
+</section>
+
+<section class="ag-band ag-band--white" id="d">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>D &middot; Data completion <span class="ag-pill ag-pill--wait">one command</span></h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <p class="ag-note">Owner sync <i>--apply</i>, 1,062 contacts, approved in August and ready
+    to run &middot; the showroom check-in carries no company &middot; <b>1,051 organisations
+    with no postcode</b>, which is also what the road-trip view needs.</p>
+  </div>
+</section>
+
+<section class="ag-band ag-band--cream" id="a">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>A &middot; Follow-up process <span class="ag-pill ag-pill--wait">Belinda</span></h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <p class="ag-lead">Every sequence is designed. What it needs is Belinda talking through
+    what good follow-up looks like for each category of business.</p>
+
+    <p class="ag-note">Two routing decisions still open: do stonemason sample requests go to
+    the owning rep or through Jess first, and do cabinet makers and builders get a rep call or
+    a nurture sequence.</p>
+  </div>
+</section>
+
+<section class="ag-band ag-band--white" id="e">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>E &middot; Datapel reporting <span class="ag-pill ag-pill--wait">paperwork</span></h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <p class="ag-lead">Approved at $100 a month. Breeze module requested; Datapel is issuing
+    the paperwork to Pam. The report specification is signed off and in progress.</p>
+
+    <p class="ag-note">⚠️ Two traps recorded in the design: RoadRunner runs in Railway&rsquo;s
+    Virginia region and Datapel is Australian-hosted and may be IP-restricted; and changing
+    Railway region changes the egress IPs. <b>Move region first, allowlist after.</b></p>
+  </div>
+</section>
+
+<section class="ag-band ag-band--cream" id="f">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>F &middot; Trip planning and the road-trip view</h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <p class="ag-lead"><b>F1 &mdash; the planner.</b> Live since 31 August; booking a stop
+    writes a real CRM activity.</p>
+
+    <p class="ag-lead" style="margin-top:22px"><b>F2 &mdash; the road-trip view.</b> Back on
+    the list. A read-only forward look at who is visiting whom, where, next week, with enough
+    beside each row to judge whether the day is worth joining.</p>
+
+    <p class="ag-note">Pipedrive cannot do it: the schedule lives on the activity and the
+    account context lives on the organisation, and no Pipedrive view joins the two. That join
+    is the build &mdash; about half a day.</p>
+
+    <p class="ag-note"><b>What both need is the same thing:</b> rep territory definitions and
+    postcodes. That is the ask, not the code.</p>
+  </div>
+</section>
+
+<section class="ag-band ag-band--white" id="rest">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>The rest</h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <div class="ag-scroll">
+      <table>
+        <thead><tr><th></th><th>Sprint</th><th>Where it sits</th></tr></thead>
+        <tbody>
+          <tr><td class="ag-key">G</td><td class="ag-sess">Targeting research</td><td>Delivered. <i>cpd-crosscheck.js</i> written but never run. Use house price as the affluence signal, weight settled dwelling stock above income</td></tr>
+          <tr><td class="ag-key">I</td><td class="ag-sess">Sample stock tracking</td><td>Designed and built. Waits on the Oyster Grey inventory question and on <i>Sample drop</i></td></tr>
+          <tr><td class="ag-key">J</td><td class="ag-sess">Relationship mapping</td><td>20 of 229 stonemason organisations have a relationship recorded. The form rebuild grows this without data entry</td></tr>
+          <tr><td class="ag-key">N</td><td class="ag-sess">CPD + architects</td><td>Tier A, 96 direct specifiers. Do not mass-mail Tier C. Season 13 had no benchtop session &mdash; that is the opening</td></tr>
+          <tr><td class="ag-key">K</td><td class="ag-sess">Team self-service</td><td>Not started. Last. Nobody is waiting on it</td></tr>
+          <tr><td class="ag-key">O</td><td class="ag-sess">Website hygiene</td><td>Newsletter welcome test &middot; delete the two test records &middot; AS-008 and AS-012</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="ag-band ag-band--cream" id="chase">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>The chase list</h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <div class="ag-scroll">
+      <table>
+        <thead><tr><th>Who</th><th>What</th><th>Blocks</th></tr></thead>
+        <tbody>
+          <tr><td class="ag-key">Belinda</td><td class="ag-sess">The follow-up voice notes</td><td>A &mdash; every sequence</td></tr>
+          <tr><td class="ag-key">Belinda</td><td class="ag-sess">Pool business decision</td><td>E, and every report</td></tr>
+          <tr><td class="ag-key">Belinda</td><td class="ag-sess">Yes on <i>Sample drop</i> &middot; training dates and areas</td><td>H, I</td></tr>
+          <tr><td class="ag-key">Pam</td><td class="ag-sess">The awards four</td><td>C</td></tr>
+          <tr><td class="ag-key">Pam</td><td class="ag-sess">Datapel paperwork &middot; territory definitions</td><td>E, I, F</td></tr>
+          <tr><td class="ag-key">Pam</td><td class="ag-sess">A read of the training pages</td><td>H</td></tr>
+          <tr><td class="ag-key">Olivia</td><td class="ag-sess">The 45 unallocated &middot; the 10 near-matches</td><td>L</td></tr>
+          <tr><td class="ag-key">Olivia</td><td class="ag-sess">Administrator access &mdash; unblocks three items at once</td><td>H, I</td></tr>
+          <tr><td class="ag-key">Jess</td><td class="ag-sess">Use the dispatch tool in plain-label mode &middot; the satchel question</td><td>M</td></tr>
+          <tr><td class="ag-key">Sean</td><td class="ag-sess">Pipedrive access &middot; the QLD retail list &middot; the form rebuild</td><td>L, B</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="ag-band ag-band--white" id="risk">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>Worth not losing</h2>
+      <a class="ag-back" href="#plan">Back to the plan</a></div>
+
+    <ol class="ag-list">
+      <li><span class="ag-num">1</span><span class="ag-item-title">The weekly six-number scoreboard</span><span class="ag-item-note">Built, and worth restarting &mdash; it is what keeps the training programme alive after the sessions.</span></li>
+      <li><span class="ag-num">2</span><span class="ag-item-title">The owner-mismatch fix</span><span class="ag-item-note">1,062 contacts, one approved command.</span></li>
+      <li><span class="ag-num">3</span><span class="ag-item-title">Two businesses in one Pipedrive</span><span class="ag-item-note">Every unfiltered count mixes both &mdash; reps will notice on day one of training.</span></li>
+      <li><span class="ag-num">4</span><span class="ag-item-title">Postgres backups on Railway</span><span class="ag-item-note">Never verified. GitHub backs up code, not data.</span></li>
+      <li><span class="ag-num">5</span><span class="ag-item-title">The address parser lives in two repos</span><span class="ag-item-note">Identical today, and they will drift.</span></li>
+      <li><span class="ag-num">6</span><span class="ag-item-title">Roughly 36 commits never merged to production</span><span class="ag-item-note">Including all three training pages.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="ag-band ag-band--cream" id="live">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>Everything live</h2></div>
+    <div class="ag-panels">
+      <a class="ag-panel" href="https://review.alphasurfaces.com.au/agenda/17-september" target="_blank" rel="noopener">
+        <div class="ag-panel-name">Today&rsquo;s agenda</div>
+        <div class="ag-panel-desc">Thursday 17 September.</div>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel" href="https://roadrunner.alphasurfaces.com.au/samples" target="_blank" rel="noopener">
+        <div class="ag-panel-name">The samples queue</div>
+        <div class="ag-panel-desc">Everything waiting to be packed.</div>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel" href="https://review.alphasurfaces.com.au/training/sending-samples" target="_blank" rel="noopener">
+        <div class="ag-panel-name">Sending samples</div>
+        <div class="ag-panel-desc">The walkthrough, for Jess.</div>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel" href="https://review.alphasurfaces.com.au/training/samples-system" target="_blank" rel="noopener">
+        <div class="ag-panel-name">How the system works</div>
+        <div class="ag-panel-desc">The path end to end.</div>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel" href="https://review.alphasurfaces.com.au/training/pipedrive" target="_blank" rel="noopener">
+        <div class="ag-panel-name">Pipedrive training</div>
+        <div class="ag-panel-desc">The Five Habits.</div>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel" href="https://review.alphasurfaces.com.au/awards-review" target="_blank" rel="noopener">
+        <div class="ag-panel-name">Awards campaign review</div>
+        <div class="ag-panel-desc">48 pages and their addresses.</div>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel" href="https://roadrunner.alphasurfaces.com.au/reports/campaigns" target="_blank" rel="noopener">
+        <div class="ag-panel-name">Campaign engagement</div>
+        <div class="ag-panel-desc">Delivery, opens and on-page behaviour.</div>
+        <span class="ag-panel-cta">Open</span></a>
+      <a class="ag-panel" href="https://review.alphasurfaces.com.au/training/samples" target="_blank" rel="noopener">
+        <div class="ag-panel-name">Sample requests in Pipedrive</div>
+        <div class="ag-panel-desc">The 15 September step-by-step.</div>
+        <span class="ag-panel-cta">Open</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <p class="footer-col-heading">Alpha Surfaces</p>
+      <p>Sprint plan &mdash; internal working document. Supersedes every earlier sprint list.
+      CRM figures pulled live from the Pipedrive account on 14 September 2026; activity
+      percentages measured 2 September.</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Locations</p>
+      <p>Kunda Park, Queensland<br>New South Wales</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Contact</p>
+      <p><a href="mailto:hello@alphasurfaces.com.au">hello@alphasurfaces.com.au</a></p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Site</p>
+      <p><a href="https://alphasurfaces.com.au" target="_blank" rel="noopener">alphasurfaces.com.au</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom"><p>Internal preview &middot; not indexed &middot; prepared 17 September 2026 &middot; Brisbane</p></div>
+</div>
+
+<script src="/nav.js?v=23"></script>
+<script>
+(function () {
+  function fixLogo() {
+    var img = document.querySelector('#main-nav img');
+    if (!img) return false;
+    var src = img.getAttribute('src') || '';
+    if (src && src.charAt(0) !== '/' && src.indexOf('http') !== 0) {
+      img.setAttribute('src', '/' + src.replace(/^(\.\.\/)+/, ''));
+    }
+    return true;
+  }
+  if (!fixLogo()) {
+    var nav = document.getElementById('main-nav');
+    if (nav && window.MutationObserver) {
+      var mo = new MutationObserver(function () { if (fixLogo()) mo.disconnect(); });
+      mo.observe(nav, { childList: true, subtree: true });
+      setTimeout(function () { mo.disconnect(); }, 8000);
+    }
+  }
+})();
+</script>
+</body>
+</html>

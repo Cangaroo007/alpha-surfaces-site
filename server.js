@@ -2731,12 +2731,15 @@ app.get(['/agenda/17-september', '/agenda/17-september.html'], (req, res) => {
 app.get(['/agenda/15-september', '/agenda/15-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-15sep.html'));
 });
+app.get(['/sprint-plan/17-september', '/sprint-plan/17-september.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'sprint-plan-17sep.html'));
+});
 app.get(['/sprint-plan/15-september', '/sprint-plan/15-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'sprint-plan-15sep.html'));
 });
 // Stable alias -> whichever sprint plan is current. Update this one line when a new plan lands.
 app.get(['/sprint-plan', '/sprint-plan.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'sprint-plan-15sep.html'));
+  res.sendFile(path.join(__dirname, 'public', 'sprint-plan-17sep.html'));
 });
 app.get(['/awards-review', '/awards-review.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'awards-review.html'));
