@@ -273,6 +273,12 @@ const WARRANTY_PERSON_FIELDS = [
 // other rep meeting in the account.
 const SHOWROOM_ACTIVITY_TYPE = process.env.PIPEDRIVE_SHOWROOM_ACTIVITY_TYPE || 'showroom_visit';
 
+// Where Jess dispatches a sample from. Pipedrive has no way to run this, so
+// the lead note carries the link and the note is the way in. Overridable so a
+// staging site can point at a staging RoadRunner.
+const ROADRUNNER_BASE = (process.env.ROADRUNNER_PUBLIC_URL || 'https://roadrunner.alphasurfaces.com.au')
+  .replace(/\/+$/, '');
+
 // Forms whose product line is implied by the form itself.
 const PRODUCT_INTEREST_BY_FORM = {
   'Sample Request':      'engineered stone',
@@ -453,7 +459,7 @@ async function enrichPerson(personId, bcId, pcIds, stateId, consentGiven, delive
 
 // Creates a LEAD (Leads Inbox), not a Deal. Always tags HOT — every web
 // form is an active outreach. Optional follow-up note attached to the lead.
-async function createLead({ title, personId, orgId, notes, labelIds, leadFields }) {
+async function createLead({ title, personId, orgId, notes, labelIds, leadFields, dispatchLink }) {
   if (!personId) return null;
   const leadData = {
     title,
@@ -476,7 +482,15 @@ async function createLead({ title, personId, orgId, notes, labelIds, leadFields 
   const result = await pdPost('leads', leadData);
   const leadId = result?.data?.id;
   if (leadId && notes) {
-    await pdPost('notes', { lead_id: leadId, content: notes });
+    // The link can only be built once Pipedrive has given us the lead id, so
+    // it is appended here rather than by the caller.
+    const body = dispatchLink
+      ? notes +
+        `<br><br><b>Send the samples:</b> ` +
+        `<a href="${ROADRUNNER_BASE}/samples/${leadId}">` +
+        `${ROADRUNNER_BASE}/samples/${leadId}</a>`
+      : notes;
+    await pdPost('notes', { lead_id: leadId, content: body });
   }
   if (leadId) console.log(`[pipedrive] created HOT lead: ${title} (ID: ${leadId})`);
   return result?.data || null;
@@ -681,6 +695,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
         title: `Sample Request — ${name}${stoneInterest ? ' (' + stoneInterest + ')' : ''}`,
         personId: person.id,
         orgId,
+        dispatchLink: true,
         leadFields: buildLeadFields({
           // Sprint B. A matched org id becomes a real link on the lead and
           // fires the referral automation. "Connect me with one" is handled
