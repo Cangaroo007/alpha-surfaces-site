@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Sending samples — the new way | Alpha Surfaces</title>
+<title>Sending samples — watch it once | Alpha Surfaces</title>
 <link rel="stylesheet" href="/nav.css?v=23">
 <style>
 /* --- FONTS (absolute paths - this page is not at the site root) --- */
@@ -215,7 +215,61 @@ td:last-child, th:last-child { padding-right:0; }
 .ag-list li > div { min-width: 0; }
 .ag-list p, .ag-list .ag-item-title, .tr-card p, .ag-note { overflow-wrap: anywhere; }
 
+/* --- WALKTHROUGH (scoped, additive) --- */
+.wk-rail { position:sticky; top:0; z-index:40; background:var(--cream);
+  border-bottom:1px solid var(--border); }
+.wk-rail-in { max-width:1180px; margin:0 auto; padding:12px 40px;
+  display:flex; gap:8px; align-items:center; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.wk-chip { flex:0 0 auto; font-family:'Degular',sans-serif; font-size:13px; font-weight:500;
+  color:var(--olive); text-decoration:none; padding:7px 14px; border:1px solid var(--border);
+  border-radius:999px; white-space:nowrap; background:var(--white); }
+.wk-chip.is-on { background:var(--olive); color:var(--cream); border-color:var(--olive); }
+.wk-chip b { font-weight:700; margin-right:6px; opacity:.6; }
+.wk-chip.is-on b { opacity:.7; }
+
+.wk-step { max-width:1180px; margin:0 auto; padding:64px 40px 0; scroll-margin-top:72px; }
+.wk-step:last-of-type { padding-bottom:64px; }
+.wk-num { font-family:'Degular',sans-serif; font-weight:600; font-size:12px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--olive); margin-bottom:10px; }
+.wk-step h2 { font-family:'Concrette S',serif; font-weight:700; font-size:34px; line-height:1.1;
+  margin-bottom:12px; }
+.wk-say { font-family:'Degular',sans-serif; font-size:19px; line-height:1.5; max-width:60ch;
+  margin-bottom:26px; }
+.wk-say b { font-weight:600; }
+.wk-media { position:relative; background:var(--white); border:1px solid var(--border); }
+.wk-media video, .wk-media img { display:block; width:100%; height:auto; }
+.wk-tag { font-family:'Degular',sans-serif; font-size:12px; font-weight:600; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--olive); opacity:.7; margin-top:10px; }
+.wk-points { list-style:none; margin:22px 0 0; padding:0; display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+.wk-points li { font-family:'Degular',sans-serif; font-size:15px; line-height:1.5;
+  padding:14px 16px; background:var(--white); border-left:3px solid var(--olive); }
+.ag-band--white .wk-points li, .wk-step--alt .wk-points li { background:var(--cream); }
+.wk-points li b { font-weight:600; }
+.wk-step--alt { background:var(--white); max-width:none; padding-left:0; padding-right:0; }
+.wk-step--alt > .wk-inner { max-width:1180px; margin:0 auto; padding:0 40px 64px; }
+.wk-next { display:inline-block; margin-top:30px; font-family:'Degular',sans-serif;
+  font-size:15px; font-weight:500; color:var(--olive); text-decoration:none;
+  border-bottom:1px solid var(--olive); padding-bottom:2px; }
+.wk-two { display:grid; grid-template-columns:1fr 1fr; gap:26px; align-items:start; }
+.wk-phone { max-width:360px; }
+@media (max-width:1024px) {
+  /* The clips are desktop-width recordings, so on a phone they shrink to about
+     a third and the text in them stops being readable. Say so, rather than
+     pretending it is fine. */
+  .wk-media::after { content:"Tap the clip, then the full-screen button, to read it."; display:block;
+    font-family:'Degular',sans-serif; font-size:12.5px; line-height:1.4; color:var(--olive);
+    padding:8px 10px; border-top:1px solid var(--border); background:var(--cream); }
+  .wk-rail-in { padding:10px 20px; }
+  .wk-step { padding:44px 20px 0; }
+  .wk-step--alt > .wk-inner { padding:0 20px 44px; }
+  .wk-step h2 { font-size:26px; }
+  .wk-say { font-size:17px; }
+  .wk-two { grid-template-columns:1fr; }
+}
+
 /* --- DOC LINKS (scoped, additive) --- */
+
 .ag-docs a { color:var(--olive); text-decoration:underline; text-underline-offset:3px; }
 .ag-docs .ag-doc-link { opacity:1; }
 </style>
@@ -225,286 +279,188 @@ td:last-child, th:last-child { padding-right:0; }
 <nav class="nav" id="main-nav"></nav>
 
 <header class="ag-head">
-  <p class="ag-eyebrow">Sending samples &mdash; the new way</p>
-  <h1>One page, one button</h1>
-  <p class="ag-meta">For Jess &nbsp;&mdash;&nbsp; 16 September 2026</p>
+  <p class="ag-eyebrow">Sending samples</p>
+  <h1>Watch it once, then do it</h1>
+  <p class="ag-meta">For Jess &nbsp;&mdash;&nbsp; six short clips, about a minute all up</p>
 </header>
 
-<section class="ag-band ag-band--cream" id="short">
-  <div class="ag-inner">
-    <div class="ag-bandhead"><h2>The short version</h2></div>
+<div class="wk-rail">
+  <div class="wk-rail-in" id="rail">
+    <a class="wk-chip" href="#s1"><b>1</b>Open the list</a>
+    <a class="wk-chip" href="#s2"><b>2</b>Read it</a>
+    <a class="wk-chip" href="#s3"><b>3</b>Send it</a>
+    <a class="wk-chip" href="#s4"><b>4</b>Express</a>
+    <a class="wk-chip" href="#s5"><b>5</b>Pipedrive</a>
+    <a class="wk-chip" href="#s6"><b>6</b>Won't send</a>
+    <a class="wk-chip" href="#s7"><b>7</b>On your phone</a>
+  </div>
+</div>
 
-    <p class="ag-lead">There is now one page that lists every sample request waiting to go
-    out. You open a request, check the address, press <b>Dispatch</b>, and the label prints
-    with the address already on it.</p>
+<section class="wk-step" id="s1">
+  <p class="wk-num">Step 1</p>
+  <h2>Open the list</h2>
+  <p class="wk-say">Go to <b>roadrunner.alphasurfaces.com.au/samples</b> and bookmark it.
+  Everything waiting to be packed is there. Click a name.</p>
+  <div class="wk-media">
+    <video poster="/training-media/step-find.jpg"
+           autoplay muted loop playsinline controls preload="metadata"
+           aria-label="The samples list, then clicking the first name to open that request">
+      <source src="/training-media/step-find.webm" type="video/webm">
+      <source src="/training-media/step-find.mp4" type="video/mp4">
+      Your browser cannot play this clip.</video>
+  </div>
+  <p class="wk-tag">Names and addresses in every clip are made up</p>
+  <ul class="wk-points">
+    <li>Asked to sign in? Sign in at <b>/forms</b> first, then come back.</li>
+    <li>Newest at the top. The last column is how long it has been waiting.</li>
+  </ul>
+  <a class="wk-next" href="#s2">Next &mdash; read the request &rarr;</a>
+</section>
 
-    <div class="tr-two">
-      <div class="tr-card tr-card--dont">
-        <h4>Three things you can stop doing</h4>
-        <p><b>Typing addresses into MyPost Business.</b> The address comes off the person
-        record in Pipedrive.<br><br>
-        <b>Emailing Belinda</b> when someone names their stonemason. That email now sends
-        itself.<br><br>
-        <b>Setting the lead stage</b> and filling in <b>Samples sent</b>. Both happen on
-        their own.</p>
+<section class="wk-step wk-step--alt" id="s2">
+  <div class="wk-inner" style="padding-top:64px">
+  <p class="wk-num">Step 2</p>
+  <h2>Read it</h2>
+  <p class="wk-say">Three cards, in the order you need them: what to pack, where it goes,
+  and who it is for.</p>
+  <div class="wk-media">
+    <video poster="/training-media/step-read.jpg"
+           autoplay muted loop playsinline controls preload="metadata"
+           aria-label="The three cards highlighted in turn: in the box, sending to, who this is">
+      <source src="/training-media/step-read.webm" type="video/webm">
+      <source src="/training-media/step-read.mp4" type="video/mp4">
+      Your browser cannot play this clip.</video>
+  </div>
+  <ul class="wk-points">
+    <li><b>In the box</b> &mdash; the stones to pack.</li>
+    <li><b>Sending to</b> &mdash; the address. Wrong? Fix it on the person in Pipedrive, then reload.</li>
+    <li><b>Who this is</b> &mdash; if you see the grey line, Belinda is emailed automatically. Don't write to her.</li>
+  </ul>
+  <a class="wk-next" href="#s3">Next &mdash; send it &rarr;</a>
+  </div>
+</section>
+
+<section class="wk-step" id="s3">
+  <p class="wk-num">Step 3</p>
+  <h2>Send it</h2>
+  <p class="wk-say">Leave it on <b>Standard</b> and press <b>Dispatch</b>. The label comes
+  back with the address already on it.</p>
+  <div class="wk-media">
+    <video poster="/training-media/step-send.jpg"
+           autoplay muted loop playsinline controls preload="metadata"
+           aria-label="Pressing Dispatch, and the tracking number coming back">
+      <source src="/training-media/step-send.webm" type="video/webm">
+      <source src="/training-media/step-send.mp4" type="video/mp4">
+      Your browser cannot play this clip.</video>
+  </div>
+  <ul class="wk-points">
+    <li><b>Right now nothing can charge anything.</b> Test mode prints a label and books nothing. Press everything.</li>
+    <li>The lead moves to <b>Following up</b> by itself. You don't set it.</li>
+    <li><b>Samples sent</b> fills in when Australia Post scans the parcel &mdash; not when you press the button.</li>
+  </ul>
+  <a class="wk-next" href="#s4">Next &mdash; when to use Express &rarr;</a>
+</section>
+
+<section class="wk-step wk-step--alt" id="s4">
+  <div class="wk-inner" style="padding-top:64px">
+  <p class="wk-num">Step 4</p>
+  <h2>Express, only when asked</h2>
+  <p class="wk-say"><b>Standard is the answer almost every time.</b> Pick Express when someone
+  has actually asked for it &mdash; usually a rep who needs it on a bench tomorrow.</p>
+  <div class="wk-media">
+    <video poster="/training-media/step-express.jpg"
+           autoplay muted loop playsinline controls preload="metadata"
+           aria-label="Selecting Express, and the line under the Dispatch button changing">
+      <source src="/training-media/step-express.webm" type="video/webm">
+      <source src="/training-media/step-express.mp4" type="video/mp4">
+      Your browser cannot play this clip.</video>
+  </div>
+  <ul class="wk-points">
+    <li>The line beside <b>Dispatch</b> always tells you what it is about to send as.</li>
+    <li>Express costs Alpha more. It is a decision, not a default.</li>
+  </ul>
+  <a class="wk-next" href="#s5">Next &mdash; the Pipedrive box &rarr;</a>
+  </div>
+</section>
+
+<section class="wk-step" id="s5">
+  <p class="wk-num">Step 5</p>
+  <h2>The Pipedrive box</h2>
+  <p class="wk-say">At the bottom of every request. For the things dispatching doesn't
+  already do &mdash; each with its own button, each telling you what it did.</p>
+  <div class="wk-media">
+    <video poster="/training-media/step-pipedrive.jpg"
+           autoplay muted loop playsinline controls preload="metadata"
+           aria-label="Setting the lead stage, then recording a stonemason referral">
+      <source src="/training-media/step-pipedrive.webm" type="video/webm">
+      <source src="/training-media/step-pipedrive.mp4" type="video/mp4">
+      Your browser cannot play this clip.</video>
+  </div>
+  <ul class="wk-points">
+    <li><b>Lead stage</b> &mdash; all five. You rarely need it; dispatching sets Following up for you.</li>
+    <li><b>Referred them to a stonemason</b> &mdash; goes into the lead history with today's date. It does <b>not</b> link the company; that's still a job in Pipedrive.</li>
+    <li><b>Add a note</b> &mdash; free text. Notes only ever get added, never replaced.</li>
+  </ul>
+  <a class="wk-next" href="#s6">Next &mdash; when it won't send &rarr;</a>
+</section>
+
+<section class="wk-step wk-step--alt" id="s6">
+  <div class="wk-inner" style="padding-top:64px">
+  <p class="wk-num">Step 6</p>
+  <h2>When it won't send</h2>
+  <p class="wk-say">A red box means something is missing from the address. It lists exactly
+  what, and <b>Dispatch stays switched off</b> until it is fixed.</p>
+  <div class="wk-media">
+    <video poster="/training-media/step-blocked.jpg"
+           autoplay muted loop playsinline controls preload="metadata"
+           aria-label="A request that cannot be sent, showing what is missing and a disabled Dispatch button">
+      <source src="/training-media/step-blocked.webm" type="video/webm">
+      <source src="/training-media/step-blocked.mp4" type="video/mp4">
+      Your browser cannot play this clip.</video>
+  </div>
+  <ul class="wk-points">
+    <li><b>Fix it on the person in Pipedrive</b>, reload the page, and the red box goes.</li>
+    <li><b>&ldquo;Already sent&rdquo;</b> with a tracking number &mdash; it has gone. Nothing to do.</li>
+    <li><b>&ldquo;Could not reach the server&rdquo;</b> &mdash; reload. Twice in a row, message Sean.</li>
+    <li><b>Not a real request?</b> Use <b>Close this request</b> at the bottom.</li>
+  </ul>
+  <div class="tr-rule" style="margin-top:34px">
+    <p>Don't fall back to typing it into MyPost Business.</p>
+    <span>If the page won't send it, tell Sean rather than working around it &mdash; otherwise
+    nobody can tell which parcels the system sent and which it didn't. And if the page and
+    this guide disagree, the guide is wrong: send a screenshot and it gets fixed.</span>
+  </div>
+  <a class="wk-next" href="#s7">Next &mdash; on your phone &rarr;</a>
+  </div>
+</section>
+
+<section class="wk-step" id="s7">
+  <p class="wk-num">Step 7</p>
+  <h2>On your phone</h2>
+  <p class="wk-say">Same address, same login. Built for the bench, not just the desk.</p>
+  <div class="wk-two">
+    <div>
+      <div class="wk-media wk-phone">
+        <img src="/training-img/dispatch-lead-phone.png" alt="The same request on a phone, cards stacked and everything readable">
       </div>
-      <div class="tr-card tr-card--do">
-        <h4>Two things that are still yours</h4>
-        <p><b>Packing the box.</b> The page tells you which stones go in it &mdash; nothing
-        can do that part for you.<br><br>
-        <b>Looking at the address before you send.</b> You are the last check between a
-        wrong address and a box arriving at a stranger's house.</p>
-      </div>
     </div>
-
-    <div class="tr-rule">
-      <p>Right now nothing you press here can charge anything.</p>
-      <span>The system is in test mode. Dispatch produces a label, but it does not book
-      anything with Australia Post and does not touch the card. Press everything. Break it
-      if you can &mdash; that is the most useful thing you can do this week.</span>
+    <div>
+      <ul class="wk-points" style="grid-template-columns:1fr; margin-top:0">
+        <li>Nothing is cut off and nothing scrolls sideways.</li>
+        <li>The list shows the <b>last 14 days</b>. Around ninety older requests are hidden so they don't bury the live ones &mdash; nothing has been closed or deleted.</li>
+        <li><b>Show everything</b> under the list brings them back if you ever need to look.</li>
+      </ul>
     </div>
   </div>
 </section>
 
-<section class="ag-band ag-band--white" id="open">
-  <div class="ag-inner">
-    <div class="ag-bandhead"><h2>1 &middot; Open the list</h2>
-      <a class="ag-back" href="#short">Back to the top</a></div>
-
-    <p class="ag-lead">Go to <b>roadrunner.alphasurfaces.com.au/samples</b> and bookmark it.
-    That is the whole address &mdash; there is nothing to install.</p>
-
-    <p class="ag-note" style="margin-top:22px">If it asks you to sign in, sign in at
-    <b>roadrunner.alphasurfaces.com.au/forms</b> first, then come back. It is the same
-    login you already use for the forms dashboard.</p>
-
-    <div class="tr-shot">
-      <img src="/training-img/dispatch-queue.png" alt="The samples queue listing three requests, each showing who it is for, which stones they asked for, the kind of lead, and how long it has been waiting">
-      <p class="tr-cap">Everything waiting to be packed. <b>Who</b> it is for, <b>which
-      stones</b> they asked for, what kind of enquiry it was, and <b>how long it has sat
-      there</b> &mdash; newest at the top. Click a name to open it.</p>
-    </div>
-
-    <p class="ag-note" style="margin-top:34px">The names, stones and dates in every
-    screenshot on this page are made up. The real list will show real customers.</p>
-  </div>
-</section>
-
-<section class="ag-band ag-band--cream" id="request">
-  <div class="ag-inner">
-    <div class="ag-bandhead"><h2>2 &middot; Read the request</h2>
-      <a class="ag-back" href="#short">Back to the top</a></div>
-
-    <p class="ag-lead">One request, top to bottom, in the order you need it.</p>
-
-    <div class="tr-shot">
-      <img src="/training-img/dispatch-lead.png" alt="A single sample request showing the test mode banner, the stones in the box, the delivery address with its source, who the person is, a standard or express choice, the dispatch button, and a close option">
-      <p class="tr-cap"><b>In the box</b> &mdash; the stones to pack.
-      <b>Sending to</b> &mdash; the address, and a line saying where it was read from
-      (&ldquo;name from person, address from person&rdquo;).
-      <b>Who this is</b> &mdash; the kind of customer, and their stonemason if they named one.
-      <b>How fast</b> &mdash; Standard unless someone has asked otherwise.
-      Then <b>Dispatch</b>.</p>
-    </div>
-
-    <div class="tr-two">
-      <div class="tr-card">
-        <h4>&ldquo;Read from Pipedrive: the person record&rdquo;</h4>
-        <p>This line tells you where the address came from, so you know what to fix if it is
-        wrong. Fix it <b>on the person in Pipedrive</b>, then reload this page &mdash; editing
-        it here would only be undone the next time anything reads the record.</p>
-      </div>
-      <div class="tr-card">
-        <h4>The grey note about Belinda</h4>
-        <p>When you see it, Belinda gets an email about this request automatically the moment
-        you dispatch it. You do not need to write to her, and you do not need to check that
-        it sent.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="ag-band ag-band--white" id="speed">
-  <div class="ag-inner">
-    <div class="ag-bandhead"><h2>3 &middot; Standard or Express</h2>
-      <a class="ag-back" href="#short">Back to the top</a></div>
-
-    <p class="ag-lead"><b>Standard is the answer almost every time.</b> It is Parcel Post,
-    and it is what every sample has always gone as.</p>
-
-    <p class="ag-note" style="margin-top:22px">Choose <b>Express</b> only when someone has
-    actually asked for it &mdash; usually a rep who needs it on a customer's bench tomorrow.
-    It costs Alpha more, so it is a decision rather than a default. You never have to know a
-    service code; the page works that out.</p>
-  </div>
-</section>
-
-<section class="ag-band ag-band--cream" id="send">
-  <div class="ag-inner">
-    <div class="ag-bandhead"><h2>4 &middot; Dispatch</h2>
-      <a class="ag-back" href="#short">Back to the top</a></div>
-
-    <p class="ag-lead">Press it once. The label comes back, and you stick it on the box.</p>
-
-    <p class="ag-note" style="margin-top:22px">While the system is in test mode you get a
-    plain label and nothing is booked. Once it goes live, pressing Dispatch <b>buys a real
-    label and charges the MyPost Business card</b> &mdash; so from that day the page will ask
-    you to confirm first, showing the name and suburb. Read that line before you confirm.</p>
-
-    <div class="tr-two">
-      <div class="tr-card tr-card--do">
-        <h4>What happens on its own</h4>
-        <p>The lead moves to <b>Following up</b>.<br>
-        The <b>tracking number</b> and <b>tracking link</b> land on the lead.<br>
-        <b>Samples sent</b> fills in &mdash; but only when Australia Post actually scans the
-        parcel, not when you press the button.<br>
-        Belinda's email goes, if this was one of those.</p>
-      </div>
-      <div class="tr-card">
-        <h4>What you do next</h4>
-        <p>Nothing. Go back to the list and open the next one. If a request you have already
-        sent still shows in the list, say so &mdash; that is worth knowing about.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="ag-band ag-band--white" id="pipedrive">
-  <div class="ag-inner">
-    <div class="ag-bandhead"><h2>5 &middot; The rest of Pipedrive</h2>
-      <a class="ag-back" href="#short">Back to the top</a></div>
-
-    <p class="ag-lead">At the bottom of the request there is an <b>Update Pipedrive</b> box.
-    It is for the things dispatching does not already do for you.</p>
-
-    <ul class="ag-list">
-      <li><span class="tr-qnum">1</span><div>
-        <p class="ag-item-title">Lead stage</p>
-        <p>All five stages, set from here. You will not normally need it &mdash; dispatching
-        moves the lead to <b>Following up</b> by itself &mdash; but if you have spoken to
-        someone and it should say <b>Working</b> or <b>Qualified</b>, set it here rather than
-        going looking for the lead.</p>
-      </div></li>
-      <li><span class="tr-qnum">2</span><div>
-        <p class="ag-item-title">Referred them to a stonemason</p>
-        <p>Type who you sent them to and press <b>Record it</b>. It goes into the lead history
-        with today's date, so the next person can see the referral happened and to whom.
-        <b>It does not link the company.</b> If that fabricator is already an organisation in
-        Pipedrive and should be linked to this lead, that is still a job in Pipedrive &mdash;
-        the page will not guess which one you meant, because guessing is how the CRM ended up
-        with a pile of duplicate companies.</p>
-      </div></li>
-      <li><span class="tr-qnum">3</span><div>
-        <p class="ag-item-title">Add a note</p>
-        <p>Free text onto the lead. &ldquo;Called her, wants it next week&rdquo;. Notes only
-        ever get added, never replaced, so you cannot wipe out something that was already
-        there.</p>
-      </div></li>
-    </ul>
-
-    <p class="ag-note" style="margin-top:34px">Each one has its own button and tells you what
-    it did. If it says something went wrong, nothing was written &mdash; try again, and if it
-    fails twice, message Sean.</p>
-  </div>
-</section>
-
-<section class="ag-band ag-band--cream" id="wrong">
-  <div class="ag-inner">
-    <div class="ag-bandhead"><h2>When something looks wrong</h2>
-      <a class="ag-back" href="#short">Back to the top</a></div>
-
-    <p class="ag-lead">Four things you might see, and what each one means.</p>
-
-    <ul class="ag-list">
-      <li>
-        <span class="tr-qnum">1</span>
-        <div>
-          <p class="ag-item-title">&ldquo;This one cannot be sent yet&rdquo;</p>
-          <p>Something is missing from the address &mdash; no street, no postcode, no
-          suburb. The box lists exactly what. Fix it on the person in Pipedrive, reload, and
-          the message goes away. The Dispatch button stays switched off until it does, so you
-          cannot accidentally post a box into nowhere.</p>
-        </div>
-      </li>
-      <li>
-        <span class="tr-qnum">2</span>
-        <div>
-          <p class="ag-item-title">&ldquo;Already sent&rdquo; with a tracking number</p>
-          <p>This one has gone out. Nothing to do &mdash; and pressing anything will not send
-          a second box.</p>
-        </div>
-      </li>
-      <li>
-        <span class="tr-qnum">3</span>
-        <div>
-          <p class="ag-item-title">&ldquo;Could not reach the server&rdquo;</p>
-          <p>Reload the page. If it says it twice, stop and message Sean. Do not fall back to
-          typing the address into MyPost Business by hand to get it out the door, because then
-          nobody can tell which parcels the system sent and which it did not.</p>
-        </div>
-      </li>
-      <li>
-        <span class="tr-qnum">4</span>
-        <div>
-          <p class="ag-item-title">It is not a real request</p>
-          <p>A test, a duplicate, or somebody who clearly is not after samples. Use <b>Close
-          this request</b> at the bottom. It asks you to confirm, and then the request stops
-          appearing in the list.</p>
-        </div>
-      </li>
-    </ul>
-
-    <div class="tr-rule">
-      <p>If the page and the screen disagree, the page is wrong.</p>
-      <span>These notes were written before you used it in anger. If something does not match
-      what is in front of you, send Sean a screenshot &mdash; that is faster than working
-      around it, and it stops the next person hitting the same thing.</span>
-    </div>
-  </div>
-</section>
-
-<section class="ag-band ag-band--white" id="phone">
-  <div class="ag-inner">
-    <div class="ag-bandhead"><h2>On your phone</h2>
-      <a class="ag-back" href="#short">Back to the top</a></div>
-
-    <p class="ag-lead">Same address, same login. It is built to work at the bench, not just
-    at a desk.</p>
-
-    <div class="tr-shot tr-shot--tight">
-      <img src="/training-img/dispatch-lead-phone.png" alt="The same sample request on a phone-width screen, with the cards stacked and everything still readable">
-      <p class="tr-cap">The cards stack; nothing is cut off and nothing scrolls sideways.</p>
-    </div>
-  </div>
-</section>
-
-<section class="ag-band ag-band--cream" id="older">
-  <div class="ag-inner">
-    <div class="ag-bandhead"><h2>The older requests</h2>
-      <a class="ag-back" href="#short">Back to the top</a></div>
-
-    <p class="ag-lead">The list shows the <b>last 14 days</b>. There are around ninety older
-    requests in Pipedrive, nearly all of them posted by hand months ago, and putting them in
-    the list would bury the ones that actually need you.</p>
-
-    <p class="ag-note" style="margin-top:22px">They are not gone, and nothing has been closed
-    or deleted. The line under the list says how many are hidden, and
-    <b>Show everything</b> brings them back if you ever need to look.</p>
-
-    <div class="tr-shot">
-      <img src="/training-img/dispatch-queue-all.png" alt="The same queue with the recency window lifted, showing every open request including a much older one, and a link back to the last 14 days">
-      <p class="tr-cap">With the window lifted. The link takes you back to the last 14 days.</p>
-    </div>
-  </div>
-</section>
-
-<section class="ag-band ag-band--white" id="other">
+<section class="ag-band ag-band--cream" id="other">
   <div class="ag-inner">
     <div class="ag-bandhead"><h2>The other pages</h2></div>
     <div class="ag-docs">
-      <p><a class="ag-doc-link" href="/training/samples" target="_blank" rel="noopener">Sample requests in Pipedrive</a> &mdash; the step-by-step from our call on 15 September. Still right about reading a request; the address typing and the Belinda email are now handled for you.</p>
+      <p><a class="ag-doc-link" href="/training/samples" target="_blank" rel="noopener">Sample requests in Pipedrive</a> &mdash; from our call on 15 September. Still right about reading a request; the address typing and the Belinda email are now handled for you.</p>
       <p><a class="ag-doc-link" href="/training/pipedrive" target="_blank" rel="noopener">Pipedrive, the habits</a> &mdash; the wider CRM training.</p>
-      <p><a class="ag-doc-link" href="/training/samples-system" target="_blank" rel="noopener">How the system works</a> &mdash; for Sean. What happens behind the button, and what to check.</p>
+      <p><a class="ag-doc-link" href="/training/samples-system" target="_blank" rel="noopener">How the system works</a> &mdash; for Sean.</p>
     </div>
   </div>
 </section>
@@ -513,7 +469,7 @@ td:last-child, th:last-child { padding-right:0; }
   <div class="footer-inner">
     <div class="footer-col">
       <p class="footer-col-heading">Alpha Surfaces</p>
-      <p>Internal training note for sending samples. The screenshots are of the real page, filled with invented names and addresses &mdash; no customer details appear on this page.</p>
+      <p>Internal walkthrough for sending samples. The clips are recordings of the real page driven against invented data &mdash; no customer name or address appears anywhere on this page.</p>
     </div>
     <div class="footer-col">
       <p class="footer-col-heading">Locations</p>
@@ -551,6 +507,28 @@ td:last-child, th:last-child { padding-right:0; }
       setTimeout(function () { mo.disconnect(); }, 8000);
     }
   }
+})();
+</script>
+<script>
+(function () {
+  // Light up the chip for whichever step is on screen. Falls back to doing
+  // nothing at all on a browser without IntersectionObserver.
+  if (!window.IntersectionObserver) return;
+  var chips = {};
+  var links = document.querySelectorAll('.wk-chip');
+  for (var i = 0; i < links.length; i++) chips[links[i].getAttribute('href').slice(1)] = links[i];
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      var c = chips[e.target.id];
+      if (!c) return;
+      if (e.isIntersecting) {
+        for (var k in chips) chips[k].classList.remove('is-on');
+        c.classList.add('is-on');
+      }
+    });
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  var steps = document.querySelectorAll('.wk-step');
+  for (var j = 0; j < steps.length; j++) io.observe(steps[j]);
 })();
 </script>
 </body>

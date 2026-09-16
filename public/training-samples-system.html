@@ -215,6 +215,35 @@ td:last-child, th:last-child { padding-right:0; }
 .ag-list li > div { min-width: 0; }
 .ag-list p, .ag-list .ag-item-title, .tr-card p, .ag-note { overflow-wrap: anywhere; }
 
+/* --- FLOW (scoped, additive) --- */
+.fl { display:grid; grid-template-columns:repeat(5,1fr); gap:0; margin:34px 0 0; }
+.fl-step { position:relative; padding:20px 18px 22px; background:var(--white);
+  border:1px solid var(--border); border-right:0; }
+.fl-step:last-child { border-right:1px solid var(--border); }
+/* Only the step number, not a <b> inside the copy. */
+.fl-step > b:first-child { display:block; font-family:'Degular',sans-serif; font-weight:600;
+  font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--olive);
+  margin-bottom:10px; }
+.fl-step p b { font-weight:600; }
+.fl-step h4 { font-family:'Concrette S',serif; font-weight:700; font-size:17px; line-height:1.2;
+  margin-bottom:8px; }
+.fl-step p { font-family:'Degular',sans-serif; font-size:13.5px; line-height:1.45; opacity:.78; }
+.fl-step::after { content:""; position:absolute; right:-7px; top:50%; width:12px; height:12px;
+  margin-top:-6px; border-top:2px solid var(--olive); border-right:2px solid var(--olive);
+  transform:rotate(45deg); background:var(--cream); z-index:2; }
+.fl-step:last-child::after { display:none; }
+.fl-who { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+.fl-tag { font-family:'Degular',sans-serif; font-size:10px; font-weight:600; letter-spacing:.09em;
+  text-transform:uppercase; padding:3px 8px; border-radius:999px; border:1px solid var(--border); }
+.fl-tag--auto { background:var(--olive); color:var(--cream); border-color:var(--olive); }
+@media (max-width:1024px) {
+  .fl { grid-template-columns:1fr; }
+  .fl-step { border-right:1px solid var(--border); border-bottom:0; }
+  .fl-step:last-child { border-bottom:1px solid var(--border); }
+  .fl-step::after { right:auto; left:50%; top:auto; bottom:-7px; margin:0 0 0 -6px;
+    transform:rotate(135deg); }
+}
+
 /* --- DOC LINKS (scoped, additive) --- */
 .ag-docs a { color:var(--olive); text-decoration:underline; text-underline-offset:3px; }
 .ag-docs .ag-doc-link { opacity:1; }
@@ -234,43 +263,54 @@ td:last-child, th:last-child { padding-right:0; }
   <div class="ag-inner">
     <div class="ag-bandhead"><h2>The path, end to end</h2></div>
 
-    <p class="ag-lead">Five systems, one direction. Every arrow below has been run against
-    the live stack.</p>
+    <p class="ag-lead">Five systems, one direction. The dark tags are the steps nobody
+    touches &mdash; they are why the page has so few buttons on it.</p>
 
-    <ul class="ag-list">
-      <li><span class="tr-qnum">1</span><div>
-        <p class="ag-item-title">The website takes the request</p>
-        <p><b>alphasurfaces.com.au/order-sample</b> writes the submission to its own database
-        and creates a Person and a Lead in Pipedrive. The person record carries the delivery
-        address in structured subfields &mdash; that is the piece that was silently missing
-        until 13 September.</p>
-      </div></li>
-      <li><span class="tr-qnum">2</span><div>
-        <p class="ag-item-title">The lead note carries the way in</p>
-        <p>Every new sample-request note ends with a link to
-        <b>roadrunner.alphasurfaces.com.au/samples/&lt;lead id&gt;</b>. That is how someone
-        working in Pipedrive gets to the dispatch page without knowing a URL. Leads created
-        before 16 September do not have it; they are reachable from the queue instead.</p>
-      </div></li>
-      <li><span class="tr-qnum">3</span><div>
-        <p class="ag-item-title">Jess works the queue</p>
-        <p><b>/samples</b> lists what is waiting, last 14 days. <b>/samples/&lt;id&gt;</b> is
-        one request: the stones, the address and where it was read from, standard or express,
-        and Dispatch.</p>
-      </div></li>
-      <li><span class="tr-qnum">4</span><div>
-        <p class="ag-item-title">Starshipit buys the label</p>
-        <p>Two calls, not one: <b>POST /api/orders</b> then <b>POST /api/orders/shipment</b>.
-        The second is the one that charges. The order is recorded before the print, so a
-        retry re-fetches the existing label rather than buying a second one.</p>
-      </div></li>
-      <li><span class="tr-qnum">5</span><div>
-        <p class="ag-item-title">Australia Post closes the loop</p>
-        <p>A signed webhook writes the tracking number, link, status and delivered date back
-        onto the lead. <b>Samples sent</b> is set by the carrier scan, never by the button
-        press &mdash; a printed label sitting on a shelf will never read as sent.</p>
-      </div></li>
-    </ul>
+    <div class="fl">
+      <div class="fl-step">
+        <b>1</b>
+        <h4>The website</h4>
+        <p>A sample request writes a Person and a Lead, with the delivery address in
+        structured subfields.</p>
+        <div class="fl-who"><span class="fl-tag fl-tag--auto">Automatic</span></div>
+      </div>
+      <div class="fl-step">
+        <b>2</b>
+        <h4>The lead note</h4>
+        <p>Ends with a link to <span style="white-space:nowrap">/samples/&lt;lead id&gt;</span>
+        &mdash; the way in from Pipedrive.</p>
+        <div class="fl-who"><span class="fl-tag fl-tag--auto">Automatic</span></div>
+      </div>
+      <div class="fl-step">
+        <b>3</b>
+        <h4>The queue</h4>
+        <p>Jess opens the request, checks the address, picks a speed, presses Dispatch.</p>
+        <div class="fl-who"><span class="fl-tag">Jess</span></div>
+      </div>
+      <div class="fl-step">
+        <b>4</b>
+        <h4>Starshipit</h4>
+        <p>Order, then shipment. The second call is the one that charges. Order recorded
+        before the print, so a retry re-fetches.</p>
+        <div class="fl-who"><span class="fl-tag fl-tag--auto">Automatic</span></div>
+      </div>
+      <div class="fl-step">
+        <b>5</b>
+        <h4>Australia Post</h4>
+        <p>A signed webhook writes tracking and the delivered date back onto the lead.
+        <b>Samples sent</b> is set by the carrier scan, never the button.</p>
+        <div class="fl-who"><span class="fl-tag fl-tag--auto">Automatic</span></div>
+      </div>
+    </div>
+
+    <p class="ag-note" style="margin-top:34px">Leads created before 16 September have no
+    link in their note. They are reachable from the queue instead, which is why no backfill
+    was run.</p>
+
+    <p class="ag-note" style="margin-top:18px"><b>To see exactly what Jess sees</b>, the
+    <a href="/training/sending-samples" target="_blank" rel="noopener">walkthrough</a> is six
+    short clips of the real page &mdash; about a minute all up. Worth watching before you
+    hand it to her.</p>
   </div>
 </section>
 
