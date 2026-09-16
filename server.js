@@ -226,7 +226,31 @@ app.post('/api/tracking/landing-page',
 );
 
 // ─── Middleware ───
-app.use(express.json({ limit: '25mb' }));
+// verify keeps the first 200 bytes of every JSON body. body-parser's own
+// error says only "not valid JSON" — it names neither the caller nor the
+// route — so without this a malformed POST is untraceable.
+app.use(express.json({
+  limit: '25mb',
+  verify: (req, _res, buf) => {
+    if (buf && buf.length) req.rawBodyHead = buf.slice(0, 200).toString('utf8');
+  }
+}));
+
+// A malformed body is the client's mistake, not ours. Log who sent it and
+// what they sent, answer 400, and keep it out of the default handler, which
+// dumps a stack with no request on it. Anything else is passed straight on.
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error('[bad-json] %s %s ct=%s ip=%s head=%j',
+      req.method,
+      req.originalUrl,
+      req.headers['content-type'] || '-',
+      req.headers['x-forwarded-for'] || req.ip || '-',
+      req.rawBodyHead || '');
+    return res.status(400).json({ error: 'Invalid JSON body' });
+  }
+  return next(err);
+});
 app.use(cookieParser());
 app.use(helmet());
 app.use(
