@@ -2700,8 +2700,26 @@ app.get(['/training/sending-samples', '/training/sending-samples.html'], (req, r
 app.get(['/training/samples-system', '/training/samples-system.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'training-samples-system.html'));
 });
-app.get(['/agenda/7-september', '/agenda/7-september.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'agenda-7sep.html'));
+app.get(['/stockout-preview', '/stockout-preview.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'stockout-preview.html'));
+});
+
+// --- AGENDA ARCHIVE ---------------------------------------------------------
+// Every agenda stays at its own dated URL forever; the list at the bottom of
+// the current page links to all of them. Newest first. /agenda is the stable
+// alias - move that one line when a new agenda lands, and add the new dated
+// route above it.
+app.get(['/agenda/24-september', '/agenda/24-september.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-24sep.html'));
+});
+app.get(['/agenda/17-september', '/agenda/17-september.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-17sep.html'));
+});
+app.get(['/agenda/15-september', '/agenda/15-september.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-15sep.html'));
+});
+app.get(['/agenda/14-september', '/agenda/14-september.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-14sep.html'));
 });
 app.get(['/agenda/10-september', '/agenda/10-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-10sep.html'));
@@ -2709,35 +2727,16 @@ app.get(['/agenda/10-september', '/agenda/10-september.html'], (req, res) => {
 app.get(['/agenda/8-september', '/agenda/8-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-8sep.html'));
 });
-app.get(['/agenda/3-september', '/agenda/3-september.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'agenda-3sep.html'));
+app.get(['/agenda/7-september', '/agenda/7-september.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-7sep.html'));
 });
 app.get(['/agenda/3-september', '/agenda/3-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-3sep.html'));
 });
-app.get(['/agenda/3-september', '/agenda/3-september.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'agenda-3sep.html'));
-});
-app.get(['/stockout-preview', '/stockout-preview.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'stockout-preview.html'));
-});
-
-app.get(['/agenda/14-september', '/agenda/14-september.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'agenda-14sep.html'));
-});
-app.get(['/agenda/17-september', '/agenda/17-september.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'agenda-17sep.html'));
-});
-app.get(['/agenda/24-september', '/agenda/24-september.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'agenda-24sep.html'));
-});
-// Stable alias -> whichever agenda is current. Update this one line when a new agenda lands.
 app.get(['/agenda', '/agenda.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-24sep.html'));
 });
-app.get(['/agenda/15-september', '/agenda/15-september.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'agenda-15sep.html'));
-});
+// --- end agenda archive -----------------------------------------------------
 app.get(['/sprint-plan/17-september', '/sprint-plan/17-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'sprint-plan-17sep.html'));
 });
