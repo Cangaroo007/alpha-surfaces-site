@@ -2728,6 +2728,13 @@ app.get(['/agenda/14-september', '/agenda/14-september.html'], (req, res) => {
 app.get(['/agenda/17-september', '/agenda/17-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-17sep.html'));
 });
+app.get(['/agenda/24-september', '/agenda/24-september.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-24sep.html'));
+});
+// Stable alias -> whichever agenda is current. Update this one line when a new agenda lands.
+app.get(['/agenda', '/agenda.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-24sep.html'));
+});
 app.get(['/agenda/15-september', '/agenda/15-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-15sep.html'));
 });
