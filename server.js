@@ -3003,10 +3003,44 @@ async function replayFallbackQueue(limit = 25) {
         console.error(`[form-fallback] replay failed for ${item.id}:`, err.message);
       }
     }
+    await alertIfFallbackQueueStuck().catch(err =>
+      console.error('[form-fallback] stuck alert error:', err.message));
     return stats;
   } finally {
     fallbackReplayRunning = false;
   }
+}
+
+// 21-30 Sep 2026 the database was unreachable for nine days and nobody knew:
+// customers saw "thanks", the SMS/email still went out, and the queue quietly
+// filled. Anything still unsaved after 30 minutes now pages a person, at most
+// every 6 hours while it stays stuck.
+const FALLBACK_STUCK_AFTER_MS = 30 * 60 * 1000;
+const FALLBACK_ALERT_EVERY_MS = 6 * 60 * 60 * 1000;
+let lastFallbackAlertAt = 0;
+async function alertIfFallbackQueueStuck() {
+  const now = Date.now();
+  const stuck = formFallbackQueue.list('pending')
+    .concat(formFallbackQueue.list('failed'))
+    .filter(item => now - new Date(item.created_at).getTime() > FALLBACK_STUCK_AFTER_MS);
+  if (!stuck.length || now - lastFallbackAlertAt < FALLBACK_ALERT_EVERY_MS) return;
+  lastFallbackAlertAt = now;
+  const byType = {};
+  for (const item of stuck) byType[item.formType || item.kind] = (byType[item.formType || item.kind] || 0) + 1;
+  const oldest = stuck[0];
+  const subject = `Alpha website: ${stuck.length} form(s) not saving — check the fallback queue`;
+  const text = [
+    subject,
+    '',
+    'Waiting: ' + Object.entries(byType).map(([t, n]) => n + ' ' + t).join(', '),
+    'Oldest: ' + fallbackReference(oldest.id) + ' from ' + oldest.created_at,
+    'Last error: ' + (oldest.last_error || 'unknown'),
+    '',
+    'These are safe on disk and retry every 5 minutes, but they are NOT in the',
+    'database or Pipedrive until this clears. Railway logs: filter "form-fallback".'
+  ].join('\n');
+  console.error('[form-fallback] STUCK:', text.replace(/\n+/g, ' | '));
+  await notifications.sendOpsAlert(subject, text);
 }
 
 app.get('/api/admin/form-fallback-queue', authMiddleware, (req, res) => {

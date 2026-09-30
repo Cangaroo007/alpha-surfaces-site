@@ -707,6 +707,29 @@ async function sendSubmissionEmail(submission) {
   }
 }
 
+// Operational alert — something is broken and a person needs to know.
+// Email via SendGrid (SMTP is not configured on Railway) and SMS via Twilio.
+// Recipients: OPS_ALERT_EMAIL_TO / OPS_ALERT_SMS_TO, comma-separated.
+async function sendOpsAlert(subject, text) {
+  const emails = (process.env.OPS_ALERT_EMAIL_TO || 'sean@cangaroo.ai,hello@alphasurfaces.com.au')
+    .split(',').map(s => s.trim()).filter(Boolean);
+  const phones = (process.env.OPS_ALERT_SMS_TO || '+61423802120')
+    .split(',').map(s => s.trim()).filter(Boolean);
+  if (configureSendgrid()) {
+    try {
+      await sgMail.send({
+        to: emails, from: NOTIFY_EMAIL_FROM(), subject,
+        text, html: '<pre style="font-family:inherit;white-space:pre-wrap">' +
+          String(text).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])) + '</pre>'
+      });
+      console.log('[ops-alert] email sent to', emails.join(', '));
+    } catch (err) {
+      console.error('[ops-alert] email error:', err.message);
+    }
+  }
+  for (const phone of phones) await sendSMSTo(phone, subject);
+}
+
 // Forms-portal password reset email. `to` should match NOTIFY_EMAIL_TO so a
 // stolen forgot-password attempt by anyone else just bounces silently.
 async function sendFormsResetEmail(to, resetUrl) {
@@ -1684,6 +1707,7 @@ module.exports = {
   sendWarrantyConfirmationEmail,
   sendEnquiryConfirmationEmail,
   sendFormsResetEmail,
+  sendOpsAlert,
   // Retired 2 Sep 2026 at client request. Stubbed at the export boundary so
   // no trigger path can reach a sender, whatever calls it. Hour logging from
   // commits is unaffected — only the alert email is suppressed.
