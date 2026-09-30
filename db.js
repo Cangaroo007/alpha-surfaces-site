@@ -256,7 +256,10 @@ async function saveSubmission(formType, fields, sampleItems = []) {
         fields.company        || null,
         fields.stone_interest || null,
         fields.message        || fields.special_instructions || null,
-        fields.postcode       || null,
+        // Column is VARCHAR(20); people type suburb + state in here. The full
+        // text is kept in raw_data, so clipping loses nothing and a long entry
+        // no longer fails the whole save (3 queue items stuck on this, Sep 2026).
+        fields.postcode ? String(fields.postcode).trim().slice(0, 20) : null,
         fields.state          || null,
         fields.store_location || null,
         fields.source         || null,
