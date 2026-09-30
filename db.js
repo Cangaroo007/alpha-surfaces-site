@@ -304,6 +304,12 @@ async function saveSubmission(formType, fields, sampleItems = []) {
       if (existing.rows.length) return { ...existing.rows[0], duplicate: true };
     }
     throw err;
+  } finally {
+    // Without this every form submission kept one of the pool's 10
+    // connections forever. After ten submissions since the last deploy the
+    // pool was empty and every database call timed out "trying to connect"
+    // (outage 21-30 Sep 2026: all website forms fell back to the queue).
+    client.release();
   }
 }
 
