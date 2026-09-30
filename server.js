@@ -2954,7 +2954,13 @@ async function replayFallbackQueue(limit = 25) {
   fallbackReplayRunning = true;
   const stats = { ok: true, checked: 0, replayed: 0, failed: 0 };
   try {
-    const pending = formFallbackQueue.list('pending').slice(0, limit);
+    // 'failed' items are retried too. The queue gives up after 288 attempts
+    // (24h), so a database outage longer than a day stranded every submission
+    // in it (20-30 Sep 2026: 12 sample requests). Nothing in the queue is
+    // disposable, so keep trying until the database takes it.
+    const pending = formFallbackQueue.list('pending')
+      .concat(formFallbackQueue.list('failed'))
+      .slice(0, limit);
     stats.checked = pending.length;
     for (const item of pending) {
       try {
