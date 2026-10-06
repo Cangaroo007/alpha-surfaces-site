@@ -188,6 +188,14 @@ function stonemasonNote(f) {
   return '';
 }
 
+// Which page the form was on. The Meta campaign pages (/free-samples/order,
+// /discover/order, /discover/enquire) send it; everything else keeps its
+// old fixed label. Only a plain site path is accepted.
+function landingPath(f, fallback) {
+  const p = String((f && f.landing_page) || '').trim();
+  return /^\/[a-z0-9\/-]{1,80}$/i.test(p) ? p : fallback;
+}
+
 function buildCampaignString(f) {
   const parts = [f.utm_source, f.utm_medium, f.utm_campaign]
     .map(v => String(v || '').trim()).filter(Boolean);
@@ -716,7 +724,7 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
           attribution +
           `<b>Sample Request ${escape(ref)}</b><br>` +
           `Stones: ${escape(stoneInterest || 'Not specified')}<br>` +
-          `Source: alphasurfaces.com.au/order-sample<br>` +
+          `Source: alphasurfaces.com.au${escape(landingPath(fields, '/order-sample'))}<br>` +
           `Role: ${escape(role || '—')}<br>` +
           `State: ${escape(fields.state || '—')}<br>` +
           // Spam Act: record that consent was given, when, and via which form.
@@ -765,8 +773,10 @@ async function syncFormToPipedrive(formType, fields, sampleItems, typed) {
           attribution +
           `<b>${isPartner ? 'Partner Enquiry' : 'Contact Form'} ${escape(ref)}</b><br>` +
           `Company: ${escape(fields.company || '—')}<br>` +
+          (fields.postcode ? `Postcode: ${escape(fields.postcode)}<br>` : '') +
+          (fields.landing_page ? `Marketing consent: ${fields.marketing_consent ? 'YES — ' + new Date().toISOString().slice(0, 10) + ' via ' + escape(landingPath(fields, '/contact')) : 'no'}<br>` : '') +
           `Message: ${escape(fields.message || '—')}<br>` +
-          `Source: alphasurfaces.com.au/contact`,
+          `Source: alphasurfaces.com.au${escape(landingPath(fields, '/contact'))}`,
       });
       break;
     }

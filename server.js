@@ -261,14 +261,16 @@ app.use(
         "'self'", "'unsafe-inline'", "'unsafe-eval'",
         "https://cdn.jsdelivr.net", "https://online.flippingbook.com", "https://d33i2vgywgme2s.cloudfront.net",
         "https://www.googletagmanager.com", "https://www.google-analytics.com",
-        "https://www.clarity.ms", "https://*.clarity.ms"
+        "https://www.clarity.ms", "https://*.clarity.ms",
+        "https://connect.facebook.net"
       ],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://online.flippingbook.com", "https://*.flippingbook.com"],
       imgSrc: [
         "'self'", "https://res.cloudinary.com", "https://behold.pictures", "https://*.behold.pictures", "data:",
         "https://online.flippingbook.com", "https://*.flippingbook.com",
         "https://www.google-analytics.com", "https://www.googletagmanager.com",
-        "https://c.clarity.ms", "https://*.clarity.ms"
+        "https://c.clarity.ms", "https://*.clarity.ms",
+        "https://www.facebook.com"
       ],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       connectSrc: [
@@ -277,7 +279,8 @@ app.use(
         "https://analytics.google.com",
         "https://www.clarity.ms", "https://c.clarity.ms", "https://d.clarity.ms",
         "https://*.clarity.ms",
-        "https://roadrunner-api-staging.up.railway.app"
+        "https://roadrunner-api-staging.up.railway.app",
+        "https://www.facebook.com", "https://connect.facebook.net"
       ],
       frameSrc: ["'self'", "https://online.flippingbook.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
@@ -290,7 +293,7 @@ app.use((req, res, next) => {
   const isPublicAPI = p === '/api/public/stones' || p === '/api/public/collections' || p === '/api/public/instagram';
   const isAPI = p.startsWith('/api/') && !isPublicAPI;
   const isAdmin = p === '/admin' || p.startsWith('/admin/') || p.startsWith('/projects') || p === '/forms' || p === '/forms.html' || p.startsWith('/forms/');
-  const isForm = ['/order-sample', '/enquiry', '/warranty', '/showroom-checkin'].some(f => p.startsWith(f));
+  const isForm = ['/order-sample', '/enquiry', '/warranty', '/showroom-checkin', '/free-samples/order', '/discover/order', '/discover/enquire'].some(f => p.startsWith(f));
   // Partner ABM pages are low-traffic and edited repeatedly while a campaign is
   // being prepared. A 4-hour edge cache meant a corrected page kept serving the
   // old copy to anyone hitting the bare URL - incognito does not defeat the CDN.
@@ -2759,6 +2762,51 @@ app.get(['/awards-review', '/awards-review.html'], (req, res) => {
 
 app.get('/order-sample', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'order-sample.html'));
+});
+
+// ─── Meta campaign landing pages (Claire Joachim / This Is Ikon pilot) ───
+// Every step is its own URL so Meta and GA4 can measure each one; no pop-ups.
+//   /free-samples        → /free-samples/order?stones=a,b,c
+//   /discover            → /discover/order   and   /discover/enquire
+// The two /order pages are the existing order-sample form. A <base href="/">
+// keeps its relative asset paths working one folder down.
+function sendHtmlAtDepth(res, filePath) {
+  res.set('Content-Type', 'text/html; charset=utf-8');
+  res.send(renderHtml(filePath).replace(/<head>/i, '<head>\n<base href="/">'));
+}
+app.get(['/free-samples', '/free-samples/'], (req, res) => sendHtml(res, path.join(__dirname, 'public', 'free-samples.html')));
+app.get(['/discover', '/discover/'], (req, res) => sendHtml(res, path.join(__dirname, 'public', 'discover.html')));
+app.get(['/free-samples/order', '/discover/order'], (req, res) => sendHtmlAtDepth(res, path.join(__dirname, 'public', 'order-sample.html')));
+app.get('/discover/enquire', (req, res) => sendHtml(res, path.join(__dirname, 'public', 'discover-enquire.html')));
+
+// Meta pixel loader. The pixel ID is not a secret (it is visible in every
+// page that loads it) but lives in the META_PIXEL_ID Railway variable so it
+// can be set or changed without a code change. With no ID this still defines
+// window.alphaTrack(), which then sends GA4 events only.
+const META_STANDARD_EVENTS = ['PageView', 'ViewContent', 'Lead', 'Contact', 'InitiateCheckout', 'CompleteRegistration', 'Search', 'SubmitApplication'];
+app.get('/meta-pixel.js', (req, res) => {
+  const id = String(process.env.META_PIXEL_ID || '').replace(/[^0-9]/g, '');
+  res.set({ 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'public, max-age=300' });
+  res.send(`/* Alpha Surfaces - Meta pixel + GA4 event helper */
+(function () {
+  var PIXEL = ${JSON.stringify(id)};
+  var STANDARD = ${JSON.stringify(META_STANDARD_EVENTS)};
+  if (PIXEL) {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', PIXEL);
+    fbq('track', 'PageView');
+  }
+  window.alphaTrack = function (name, params) {
+    params = params || {};
+    try { if (PIXEL && window.fbq) fbq(STANDARD.indexOf(name) >= 0 ? 'track' : 'trackCustom', name, params); } catch (e) {}
+    try { if (window.gtag) gtag('event', name === 'Lead' ? 'generate_lead' : name.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase(), params); } catch (e) {}
+  };
+})();
+`);
 });
 app.get('/enquiry', (req, res) => {
   sendHtml(res, path.join(__dirname, 'public', 'enquiry.html'));

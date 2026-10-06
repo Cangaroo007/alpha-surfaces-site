@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enquire | Alpha Surfaces</title>
+<meta name="description" content="Ask Alpha Surfaces anything about our benchtops. We will be in touch within 24 hours.">
+<meta name="robots" content="noindex">
+<base href="/">
+<link rel="stylesheet" href="/animation.css?v=19">
+<link rel="stylesheet" href="/nav.css?v=19">
+<link rel="stylesheet" href="/mobile.css?v=19">
+<link rel="stylesheet" href="/campaign.css?v=1">
+<!-- ALPHA_ANALYTICS_V1 -->
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W0841557EV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-W0841557EV');
+</script>
+<!-- Microsoft Clarity -->
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "wsphsnhr52");
+</script>
+<!-- Meta pixel: the ID comes from the META_PIXEL_ID variable on Railway. Until it is set this defines alphaTrack() and sends GA4 events only. -->
+<script src="/meta-pixel.js"></script>
+</head>
+<body data-campaign-page="discover-enquire">
+<nav class="nav" id="main-nav"></nav>
+
+<section class="cp-section">
+  <div class="cp-wrap cp-split" style="align-items:start">
+    <div>
+      <p class="cp-eyebrow">Enquire</p>
+      <h1 class="cp-h2" style="font-size:clamp(30px,4vw,46px)">Ask us anything.</h1>
+      <p class="cp-sub" style="margin-bottom:34px">Designs, pricing, where to buy, or what will work in your kitchen &mdash; send us a note and the right person will come back to you.</p>
+
+      <form id="enquire" class="cp-form" novalidate>
+        <input type="hidden" name="utm_source"><input type="hidden" name="utm_medium"><input type="hidden" name="utm_campaign"><input type="hidden" name="utm_content">
+        <input type="hidden" name="landing_page">
+        <div class="cp-row2">
+          <div class="cp-field"><label for="first_name">First name <span class="req">*</span></label><input id="first_name" name="first_name" autocomplete="given-name" required></div>
+          <div class="cp-field"><label for="last_name">Last name <span class="req">*</span></label><input id="last_name" name="last_name" autocomplete="family-name" required></div>
+        </div>
+        <div class="cp-row2">
+          <div class="cp-field"><label for="email">Email <span class="req">*</span></label><input id="email" name="email" type="email" autocomplete="email" required></div>
+          <div class="cp-field"><label for="phone">Phone <span class="opt">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
+        </div>
+        <div class="cp-row2">
+          <div class="cp-field"><label for="role">I am a <span class="req">*</span></label>
+            <select id="role" name="role" required>
+              <option value="" selected disabled>Select</option>
+              <option value="Homeowner">Homeowner</option>
+              <option value="Interior designer">Interior designer</option>
+              <option value="Architect">Architect</option>
+              <option value="Builder/developer">Builder / developer</option>
+              <option value="Cabinet maker">Cabinet maker / kitchen company</option>
+              <option value="Stonemason">Stonemason</option>
+              <option value="Other">Other</option>
+            </select></div>
+          <div class="cp-field"><label for="postcode">Postcode <span class="opt">(optional)</span></label><input id="postcode" name="postcode" inputmode="numeric" maxlength="4" autocomplete="postal-code"></div>
+        </div>
+        <div class="cp-field"><label for="message">Your message <span class="req">*</span></label><textarea id="message" name="message" required placeholder="Tell us a bit about your project"></textarea></div>
+        <label class="cp-check"><input type="checkbox" name="marketing_consent"> Keep me updated with new designs and news from Alpha Surfaces.</label>
+        <p class="cp-err" id="err"></p>
+        <div><button class="cp-btn" type="submit">Send enquiry</button></div>
+      </form>
+    </div>
+
+    <aside class="cp-aside">
+      <h2 class="cp-h2" style="font-size:24px">Would a sample help?</h2>
+      <p class="cp-sub" style="margin-bottom:20px">Up to three free samples, delivered. Seeing the stone in your own light is the fastest way to decide.</p>
+      <a class="cp-btn" href="/discover/order" data-keep>Click here to order a sample</a>
+      <p class="cp-sub" style="margin-top:26px;font-size:14px">Prefer to talk? Call <a href="tel:1300257420">1300 257 420</a>.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<script src="/animation.js?v=19"></script>
+<script src="/nav.js?v=23"></script>
+<script src="/campaign.js?v=1"></script>
+<script>
+(function () {
+  var C = window.AlphaCampaign, form = document.getElementById('enquire'), err = document.getElementById('err');
+  var q = new URLSearchParams(location.search);
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) { if (q.get(k)) form.elements[k].value = q.get(k); });
+  form.elements.landing_page.value = location.pathname;
+  C.track('ViewContent', { content_name: 'discover_enquire' });
+  function fail(m) { err.textContent = m; err.style.display = 'block'; err.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault(); err.style.display = 'none';
+    var f = {}; new FormData(form).forEach(function (v, k) { f[k] = typeof v === 'string' ? v.trim() : v; });
+    if (!f.first_name || !f.last_name) return fail('Please tell us your name.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email || '')) return fail('Please enter a valid email address.');
+    if (!f.role) return fail('Please tell us which one you are.');
+    if (f.postcode && !/^\d{4}$/.test(f.postcode)) return fail('Postcode should be four digits.');
+    if (!f.message) return fail('Please include a message.');
+    f.name = f.first_name + ' ' + f.last_name;
+    f.reason = 'General enquiry';
+    var btn = form.querySelector('button'); btn.disabled = true; btn.textContent = 'Sending\u2026';
+    fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(f) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j.ok) throw new Error(j.error || 'Something went wrong.');
+        C.track('Lead', { content_name: 'enquiry', content_category: 'discover', value: 0, currency: 'AUD' });
+        C.track('Contact', { content_name: 'discover_enquire' });
+        form.outerHTML = '<div class="cp-done"><div style="font-size:44px;color:#564d22">&#10003;</div>' +
+          '<h2 class="cp-h2" style="font-size:26px;margin-top:10px">Thanks &mdash; we have your enquiry.</h2>' +
+          '<p class="cp-sub" style="margin:0 auto">Someone from Alpha Surfaces will be in touch within 24 hours.</p>' +
+          '<div class="cp-btns" style="justify-content:center"><a class="cp-btn" href="' + C.withParams('/discover/order') + '">Order a free sample</a></div></div>';
+      })
+      .catch(function (x) { btn.disabled = false; btn.textContent = 'Send enquiry'; fail(x.message + ' You can also call us on 1300 257 420.'); });
+  });
+})();
+</script>
+<script src="/newsletter-form.js"></script>
+</body>
+</html>

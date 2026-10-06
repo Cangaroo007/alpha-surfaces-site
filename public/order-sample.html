@@ -109,6 +109,8 @@ input[name="samples"]:disabled + label { opacity:0.4; cursor:not-allowed; }
   gtag('js', new Date());
   gtag('config', 'G-W0841557EV');
 </script>
+<!-- Meta pixel: ID from META_PIXEL_ID on Railway; a no-op until it is set -->
+<script src="/meta-pixel.js"></script>
 <!-- Microsoft Clarity -->
 <script type="text/javascript">
   (function(c,l,a,r,i,t,y){
@@ -135,6 +137,8 @@ input[name="samples"]:disabled + label { opacity:0.4; cursor:not-allowed; }
     <form id="order-form" class="order-form" action="#" method="POST">
       <!-- Outreach attribution — hidden fields populated from URL params -->
       <input type="hidden" name="utm_source"   id="utm_source">
+      <input type="hidden" name="utm_medium"   id="utm_medium">
+      <input type="hidden" name="landing_page" id="landing_page">
       <input type="hidden" name="utm_campaign" id="utm_campaign">
       <input type="hidden" name="utm_content"  id="utm_content">
       <input type="hidden" name="pid"          id="pid">
@@ -253,6 +257,16 @@ input[name="samples"]:disabled + label { opacity:0.4; cursor:not-allowed; }
 (function() {
   var params = new URLSearchParams(window.location.search);
   var preselectedSlug = params.get('stone') || '';
+  // Campaign pages (/free-samples/order, /discover/order) arrive with up to
+  // three stones already chosen in ?stones=a,b,c, and show the current range
+  // only - discontinued stones stay on the plain /order-sample form for now.
+  var campaignPage = /^\/(free-samples|discover)\//.test(window.location.pathname);
+  var preselectedList = (params.get('stones') || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 3);
+  if (preselectedSlug && preselectedList.indexOf(preselectedSlug) < 0) preselectedList.unshift(preselectedSlug);
+  preselectedList = preselectedList.slice(0, 3);
+  if (campaignPage) {
+    var h = document.querySelector('.order-heading'); if (h) h.textContent = 'Order your free samples';
+  }
 
   fetch('/data/stones.json')
     .then(function(r) { return r.json(); })
@@ -260,15 +274,30 @@ input[name="samples"]:disabled + label { opacity:0.4; cursor:not-allowed; }
       var allStones = [];
       var preselected = null;
 
+      var chosen = [];
       data.collections.forEach(function(c) {
         c.stones.forEach(function(s) {
+          if (campaignPage && s.discontinued) return;
+          if (preselectedList.indexOf(s.slug) >= 0) chosen.push({ name: s.name, slug: s.slug, thumbnail: s.thumbnail || '', collection: c.name });
           allStones.push({ name: s.name, slug: s.slug, image: s.image || '', thumbnail: s.thumbnail || '', collection: c.name });
           if (s.slug === preselectedSlug) preselected = { name: s.name, slug: s.slug, image: s.image || '', thumbnail: s.thumbnail || '', collection: c.name };
         });
       });
 
-      // Show pre-selected stone
-      if (preselected) {
+      // Show pre-selected stones (one from ?stone=, up to three from ?stones=)
+      if (chosen.length > 1) {
+        var elM = document.getElementById('selected-stone');
+        var cardM = document.getElementById('selected-stone-card');
+        elM.querySelector('.selected-stone-label').textContent = 'Your selected surfaces';
+        cardM.style.flexDirection = 'column'; cardM.style.alignItems = 'stretch';
+        cardM.innerHTML = chosen.map(function (c) {
+          return '<div style="display:flex;gap:16px;align-items:center">' +
+            (c.thumbnail ? '<img src="' + c.thumbnail + '" alt="' + c.name + '">' : '<div class="ssc-placeholder"></div>') +
+            '<div><div class="selected-stone-name">' + c.name + '</div><div class="selected-stone-collection">' + c.collection + '</div></div></div>';
+        }).join('');
+        elM.classList.add('active');
+      } else if (preselected || chosen.length === 1) {
+        preselected = preselected || chosen[0];
         var el = document.getElementById('selected-stone');
         var card = document.getElementById('selected-stone-card');
         var imgHtml = preselected.thumbnail
@@ -285,7 +314,7 @@ input[name="samples"]:disabled + label { opacity:0.4; cursor:not-allowed; }
       allStones.forEach(function(s) {
         var opt = document.createElement('label');
         opt.className = 'stone-option';
-        var checked = s.slug === preselectedSlug ? ' checked' : '';
+        var checked = preselectedList.indexOf(s.slug) >= 0 ? ' checked' : '';
         var imgHtml = s.thumbnail
           ? '<img src="' + s.thumbnail + '" alt="' + s.name + '">'
           : '<div class="so-placeholder"></div>';
@@ -295,6 +324,11 @@ input[name="samples"]:disabled + label { opacity:0.4; cursor:not-allowed; }
           '<span>' + s.name + '</span>';
         picker.appendChild(opt);
       });
+      // Let the counter and the three-sample limit see the pre-ticked stones.
+      var formEl = document.getElementById('order-form');
+      var first = formEl && formEl.querySelector('input[name="samples"]');
+      if (first) first.dispatchEvent(new Event('change', { bubbles: true }));
+      if (window.alphaTrack) window.alphaTrack('ViewContent', { content_name: 'sample_order_form', content_ids: preselectedList, page: window.location.pathname });
     })
     .catch(function(err) { console.error('Failed to load stones:', err); });
 })();
@@ -421,7 +455,9 @@ input[name="samples"]:disabled + label { opacity:0.4; cursor:not-allowed; }
 // submission carries the outreach attribution through to the server.
 (function () {
   var params = new URLSearchParams(window.location.search);
-  ['utm_source', 'utm_campaign', 'utm_content', 'pid'].forEach(function (key) {
+  var lp = document.getElementById('landing_page');
+  if (lp) lp.value = window.location.pathname;
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'pid'].forEach(function (key) {
     var el = document.getElementById(key);
     var val = params.get(key);
     if (el && val) el.value = val;
@@ -540,6 +576,11 @@ input[name="samples"]:disabled + label { opacity:0.4; cursor:not-allowed; }
         var res=await fetch('/api/order-sample',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(fields)});
         var json=await res.json();
         if(json.ok){
+          if(window.alphaTrack){
+            var ids=(fields.samples||[]);
+            window.alphaTrack('Lead',{content_name:'sample_order',content_category:window.location.pathname,content_ids:ids,num_items:ids.length,value:0,currency:'AUD'});
+            window.alphaTrack('SampleOrder',{content_ids:ids,page:window.location.pathname});
+          }
           form.innerHTML='<div style="padding:48px 24px;text-align:center"><div style="font-size:48px;margin-bottom:16px">✓</div><h2 style="color:#564D22;margin:0 0 12px;font-size:22px">Request received.</h2><p style="color:#666;font-size:16px;line-height:1.7;margin:0 auto;max-width:400px">Thank you, '+fields.first_name+'. Your sample request has been sent. We will be in touch within 2–3 business days.</p></div>';
         }else{throw new Error(json.error||'Submission failed');}
       }catch(err){
