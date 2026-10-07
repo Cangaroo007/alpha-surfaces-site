@@ -188,3 +188,14 @@ a { color: inherit; }
   .footer-bottom { margin-top: 32px; }
   .footer-bottom p { font-size: 11px; }
 }
+
+/* --- COLOURS: match the live site (measured on alphasurfaces.com.au, 7 Oct).
+   Display headings in olive like "Stone. Life. Style."; body text black at
+   the site's 0.75 for secondary copy; white/cream on olive bands. --- */
+:root { --black: #000; --muted: rgba(0,0,0,0.75); }
+body { color: var(--black); }
+.cp-h1, .cp-h2, .cp-group-h, .cp-point b, .cp-room b, .cp-dir b, .cp-reasons li, .cp-faq summary, .cp-tile .name, .cp-aside .cp-h2 { color: var(--olive); }
+.cp-lede, .cp-faq .a { color: var(--black); }
+.cp-sub, .cp-point span, .cp-room p, .cp-dir span, .cp-group-p, .cp-howto, .cp-tile .coll, .cp-empty { color: var(--muted); }
+.cp-close .cp-h2 { color: var(--cream); }
+.cp-field label { color: var(--black); }
