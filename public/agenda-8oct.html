@@ -216,6 +216,41 @@ td:last-child, th:last-child { padding-right:0; }
 /* --- DOC LINKS (scoped, additive) --- */
 .ag-docs a { color:var(--olive); text-decoration:underline; text-underline-offset:3px; }
 .ag-docs .ag-doc-link { opacity:1; }
+
+/* item 2: stonemason tagging (interactive) */
+.tg-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:34px 0 26px; }
+.tg-tab { font-family:'Degular',sans-serif; font-weight:600; font-size:15px; padding:10px 16px; border:1px solid var(--olive); background:transparent; color:var(--olive); cursor:pointer; }
+.tg-tab.is-on, .tg-tab:hover { background:var(--olive); color:var(--cream); }
+.tg-panel[hidden] { display:none; }
+.tg-two { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px; }
+.tg-card { background:var(--white); border:1px solid var(--border); padding:22px 24px; font-family:'Degular',sans-serif; font-size:16px; line-height:1.5; }
+.tg-card-head { font-size:18px; margin-bottom:10px; } .tg-catch { color:var(--olive); margin-top:10px; }
+.tg-shots { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:18px; }
+.tg-shots--one { grid-template-columns:minmax(0,420px); }
+.tg-shots figure { margin:0; } .tg-zoom { padding:0; border:1px solid var(--border); background:var(--white); cursor:zoom-in; display:block; width:100%; }
+.tg-shots figcaption { font-family:'Degular',sans-serif; font-size:14px; color:var(--olive); margin-top:8px; }
+.tg-toggle { display:inline-flex; border:1px solid var(--olive); margin-bottom:16px; }
+.tg-tbtn { font-family:'Degular',sans-serif; font-weight:600; font-size:15px; padding:8px 16px; background:transparent; border:0; color:var(--olive); cursor:pointer; }
+.tg-tbtn.is-on { background:var(--olive); color:var(--cream); }
+.tg-count { font-family:'Concrette S',serif; font-size:22px; margin-bottom:14px; } .tg-count #tg-n { font-weight:700; font-size:34px; color:var(--olive); }
+.tg-sub { display:block; font-family:'Degular',sans-serif; font-size:15px; color:var(--olive); }
+.tg-list { list-style:none; padding:0; margin:0; columns:2; column-gap:28px; font-family:'Degular',sans-serif; font-size:15px; }
+.tg-list li { break-inside:avoid; padding:6px 10px; border-bottom:1px solid var(--border); }
+.tg-list li.tg-new { background:rgba(86,77,34,0.10); } .tg-list.is-before li.tg-new { display:none; }
+.tg-name { font-weight:600; } .tg-cat { color:var(--olive); font-size:13px; } .tg-typed { color:#7a7363; font-size:13px; }
+.tg-steps { list-style:none; padding:0; margin:18px 0 0; counter-reset:none; }
+.tg-steps li { border:1px solid var(--border); background:var(--white); margin-bottom:10px; }
+.tg-step { width:100%; text-align:left; background:transparent; border:0; padding:16px 18px; font-family:'Degular',sans-serif; font-size:17px; line-height:1.4; cursor:pointer; display:block; padding-left:62px; position:relative; }
+.tg-step span { font-family:'Concrette S',serif; font-weight:700; color:var(--cream); background:var(--olive); width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; position:absolute; left:18px; top:12px; }
+.tg-body { display:none; padding:0 18px 18px 62px; font-family:'Degular',sans-serif; font-size:16px; line-height:1.5; }
+.tg-steps li.is-on .tg-body { display:block; } .tg-inline { max-width:min(420px,100%); border:1px solid var(--border); margin:6px 0 12px; }
+.tg-quiz { background:var(--white); border:1px solid var(--border); padding:20px 22px; margin-bottom:16px; }
+.tg-opt { display:block; width:100%; text-align:left; margin-top:8px; padding:12px 14px; border:1px solid var(--border); background:var(--cream); font-family:'Degular',sans-serif; font-size:16px; cursor:pointer; }
+.tg-opt.is-right { border-color:var(--olive); background:rgba(86,77,34,0.14); } .tg-opt.is-wrong { border-color:#9c3125; background:rgba(245,108,108,0.12); }
+.tg-fb { font-family:'Degular',sans-serif; font-size:15px; margin-top:10px; color:var(--olive); }
+.tg-lightbox { position:fixed; inset:0; background:rgba(20,18,10,0.82); display:flex; align-items:center; justify-content:center; z-index:9999; cursor:zoom-out; padding:20px; }
+.tg-lightbox img { max-height:92vh; max-width:92vw; width:auto; background:#fff; }
+@media (max-width:760px) { .tg-two, .tg-shots { grid-template-columns:1fr; } .tg-list { columns:1; } .tg-body { padding-left:18px; } }
 </style>
 </head>
 <body>
@@ -225,7 +260,7 @@ td:last-child, th:last-child { padding-right:0; }
 <header class="ag-head">
   <p class="ag-eyebrow">Sales System &mdash; review</p>
   <h1>Thursday 8 October</h1>
-  <p class="ag-meta">Belinda &middot; Pam &middot; Olivia &middot; Sean &nbsp;—&nbsp; 60 minutes</p>
+  <p class="ag-meta">Belinda &middot; Pam &middot; Olivia &middot; Sean &nbsp;—&nbsp; 70 minutes</p>
 </header>
 
 <section class="ag-statement" id="number">
@@ -253,34 +288,38 @@ td:last-child, th:last-child { padding-right:0; }
         <span class="ag-item-note">Ten items from the 6 October meeting, and where each landed. <b>Belinda</b></span>
         <span class="ag-mins">5 min</span></li>
 <li><span class="ag-num">2</span>
+        <a class="ag-item-title" href="#tagging">Which stonemason does a client use? &mdash; tagging it once, properly</a>
+        <span class="ag-item-note">Why Townsville Stone showed 9 related companies instead of 27, what changed this morning, and one way of recording it from now on. <b>Pam &middot; Belinda &middot; Olivia</b></span>
+        <span class="ag-mins">10 min</span></li>
+<li><span class="ag-num">3</span>
         <a class="ag-item-title" href="#forecast">Monthly forecast &mdash; a tour</a>
         <span class="ag-item-note">Entering it, the reminders, and actual vs forecast. November is the first month. <b>Belinda</b></span>
         <span class="ag-mins">12 min</span></li>
-<li><span class="ag-num">3</span>
+<li><span class="ag-num">4</span>
         <a class="ag-item-title" href="#team">Reports for the whole team</a>
         <span class="ag-item-note">Who can see what, signing in, and what committed and back orders mean. <b>Belinda</b></span>
         <span class="ag-mins">5 min</span></li>
-<li><span class="ag-num">4</span>
+<li><span class="ag-num">5</span>
         <a class="ag-item-title" href="#suburbs">Suburbs &mdash; the last 340</a>
         <span class="ag-item-note">An approval list per owner. <b>Pam &middot; Belinda</b></span>
         <span class="ag-mins">4 min</span></li>
-<li><span class="ag-num">5</span>
+<li><span class="ag-num">6</span>
         <a class="ag-item-title" href="#dupes">Duplicate companies &mdash; the plan</a>
         <span class="ag-item-note">146 groups: merge, keep separate, or check. Nothing merged yet. <b>Belinda &middot; Olivia</b></span>
         <span class="ag-mins">8 min</span></li>
-<li><span class="ag-num">6</span>
+<li><span class="ag-num">7</span>
         <a class="ag-item-title" href="#meta">Meta campaign pages &mdash; drafts on the review site</a>
         <span class="ag-item-note">What Claire and Kate have, and what they&rsquo;re waiting on. <b>Olivia &middot; Belinda</b></span>
         <span class="ag-mins">6 min</span></li>
-<li><span class="ag-num">7</span>
+<li><span class="ag-num">8</span>
         <a class="ag-item-title" href="#builder">A campaign builder in RoadRunner</a>
         <span class="ag-item-note">Built; Sean is testing it. How the team would use it, and four questions. <b>Belinda</b></span>
         <span class="ag-mins">8 min</span></li>
-<li><span class="ag-num">8</span>
+<li><span class="ag-num">9</span>
         <a class="ag-item-title" href="#sms">Text alerts &mdash; what Twilio needs from us</a>
         <span class="ag-item-note">Two documents, one domain record and the mobile numbers. <b>Belinda &middot; Sean</b></span>
         <span class="ag-mins">5 min</span></li>
-<li><span class="ag-num">9</span>
+<li><span class="ag-num">10</span>
         <a class="ag-item-title" href="#blocked">Outstanding, by person</a>
         <span class="ag-item-note">Named, including Sean&rsquo;s own list.</span>
         <span class="ag-mins">7 min</span></li>
@@ -300,7 +339,7 @@ td:last-child, th:last-child { padding-right:0; }
       <table>
         <thead><tr><th>From Monday</th><th>State</th><th>What happened</th></tr></thead>
         <tbody>
-          <tr><td class="ag-sess">Pipedrive suburbs</td><td><span class="ag-pill ag-pill--go">Back</span></td><td>670 filled; the rest are item 4</td></tr>
+          <tr><td class="ag-sess">Pipedrive suburbs</td><td><span class="ag-pill ag-pill--go">Back</span></td><td>670 filled; the rest are item 5</td></tr>
           <tr><td class="ag-sess">Ace Stone Warehouse &rarr; Peff Cabinets link</td><td><span class="ag-pill ag-pill--go">Undone</span></td><td>Every hand-made link now has an <i>undo</i>, and linking asks to confirm first</td></tr>
           <tr><td class="ag-sess">Accent Benchtops as one QLD account</td><td><span class="ag-pill ag-pill--go">Done</span></td><td>Counts under Queensland in every report, although it ships to Tweed Heads</td></tr>
           <tr><td class="ag-sess">North Coast Stone to Jess</td><td><span class="ag-pill ag-pill--go">Done</span></td><td>Shows under Jess; it no longer sits in Stacey&rsquo;s figures</td></tr>
@@ -308,10 +347,10 @@ td:last-child, th:last-child { padding-right:0; }
           <tr><td class="ag-sess">Search on Top 50, Business development, forecast</td><td><span class="ag-pill ag-pill--go">Done</span></td><td>Search is now the first box. On Top 50 it also finds customers <i>outside</i> the top 50, with a button to add them to the Spotlight</td></tr>
           <tr><td class="ag-sess">Nightly refresh instead of the button</td><td><span class="ag-pill ag-pill--go">Done</span></td><td>Pipedrive owners, regions and related companies refresh every night; the button is gone</td></tr>
           <tr><td class="ag-sess">Accent Mackay&rsquo;s related companies</td><td><span class="ag-pill ag-pill--go">Showing</span></td><td>All 16 of Pam&rsquo;s related companies now appear</td></tr>
-          <tr><td class="ag-sess">Townsville Stone&rsquo;s related companies</td><td><span class="ag-pill ag-pill--go">Fixed 8 Oct</span></td><td>9 showed; 27 now. Pam had mostly recorded the stonemason in the <i>Stonemason Used</i> field (&ldquo;Townsville Stone&rdquo;, &ldquo;TS&rdquo;), which RoadRunner didn&rsquo;t read. Across Pipedrive, 240 companies use that field against 101 related links. 116 related links have been added from it (Pam&rsquo;s text kept), RoadRunner now reads the field every night, and names it can&rsquo;t match (&ldquo;Accent&rdquo;, &ldquo;Banks&rdquo;) wait on a short list for Belinda</td></tr>
+          <tr><td class="ag-sess">Townsville Stone&rsquo;s related companies</td><td><span class="ag-pill ag-pill--go">Fixed 8 Oct</span></td><td>9 showed; 27 now. Pam had mostly recorded the stonemason in the <i>Stonemason Used</i> field (&ldquo;Townsville Stone&rdquo;, &ldquo;TS&rdquo;), which RoadRunner didn&rsquo;t read. Across Pipedrive, 240 companies use that field against 101 related links. 116 related links have been added from it (Pam&rsquo;s text kept), RoadRunner now reads the field every night, and names it can&rsquo;t match (&ldquo;Accent&rdquo;, &ldquo;Banks&rdquo;) wait on a short list for Belinda. <a href="#tagging">Item 2</a></td></tr>
           <tr><td class="ag-sess">Nightly refresh skipping a night</td><td><span class="ag-pill ag-pill--go">Fixed 8 Oct</span></td><td>A refresh made in the afternoon caused the next night&rsquo;s to skip (Pipedrive on 7&ndash;8 Oct, Datapel on 2&ndash;3 Oct). Now it never skips, catches up if late, and emails Sean at 7am if anything is out of date. The new <i>Data freshness</i> page shows when each source last refreshed</td></tr>
           <tr><td class="ag-sess">Belinda on the click alerts</td><td><span class="ag-pill ag-pill--go">Done</span></td><td>Added on the Alerts page</td></tr>
-          <tr><td class="ag-sess">Committed vs back order</td><td><span class="ag-pill ag-pill--go">Note sent</span></td><td>Item 3</td></tr>
+          <tr><td class="ag-sess">Committed vs back order</td><td><span class="ag-pill ag-pill--go">Note sent</span></td><td>Item 4</td></tr>
         </tbody>
       </table>
     </div>
@@ -322,9 +361,121 @@ td:last-child, th:last-child { padding-right:0; }
   </div>
 </section>
 
+<section class="ag-band ag-band--cream" id="tagging">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>2 &middot; Which stonemason does a client use?</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+
+    <p class="ag-lead">On Tuesday Pam said Townsville Stone&rsquo;s related companies in
+    RoadRunner didn&rsquo;t match what she had put into Pipedrive. She was right. RoadRunner
+    showed <b>9</b>; Pipedrive actually said <b>27</b>. Nothing was lost: the same fact was
+    being recorded in two different places, and RoadRunner only read one of them.</p>
+
+    <div class="tg-tabs" role="tablist">
+      <button class="tg-tab is-on" role="tab" data-tab="t1">1 &middot; What was happening</button>
+      <button class="tg-tab" role="tab" data-tab="t2">2 &middot; Townsville Stone, before and now</button>
+      <button class="tg-tab" role="tab" data-tab="t3">3 &middot; How to tag it from now on</button>
+      <button class="tg-tab" role="tab" data-tab="t4">4 &middot; Quick check</button>
+    </div>
+
+    <div class="tg-panel is-on" id="t1">
+      <p class="ag-note">There are two ways to say &ldquo;this builder uses Townsville Stone&rdquo; in Pipedrive:</p>
+      <div class="tg-two">
+        <div class="tg-card">
+          <div class="tg-card-head"><span class="ag-pill ag-pill--wait">Text field</span> <b>Stonemason Used</b></div>
+          <p>Type the stonemason&rsquo;s name into the client&rsquo;s <i>Stonemason Used</i> (or <i>Stonemason</i>) field. Quick, and it&rsquo;s what most of us have been doing: <b>240 companies</b> have it filled in.</p>
+          <p class="tg-catch"><b>The catch:</b> it&rsquo;s free text. &ldquo;Townsville Stone&rdquo;, &ldquo;TS&rdquo;, &ldquo;TS &amp; TC&rdquo;, &ldquo;Accent&rdquo; (which Accent?) all mean something to a person, but a report can&rsquo;t be sure. Until today RoadRunner didn&rsquo;t read this field at all.</p>
+        </div>
+        <div class="tg-card">
+          <div class="tg-card-head"><span class="ag-pill ag-pill--go">Link</span> <b>Related organizations</b></div>
+          <p>Link the two companies with the <b>+</b> on <i>Related organizations</i>. It points at the actual stonemason record, so it can&rsquo;t be misspelt and it shows on both companies. Only <b>101</b> links existed until this morning.</p>
+          <p class="tg-catch"><b>Why it matters:</b> this is what the Business development and Stonemason reach reports count, and what a rep sees on the stonemason&rsquo;s own page.</p>
+        </div>
+      </div>
+      <p class="ag-note" style="margin-top:28px">Two of Pam&rsquo;s clients, as they look in Pipedrive now. The field she typed is kept; the link under <i>Related organizations</i> was added this morning from it. Click a picture to enlarge it.</p>
+      <div class="tg-shots">
+        <figure><button class="tg-zoom" data-src="/images/agenda/8oct/pd-gj-gardner-stonemason-used.jpg"><img src="/images/agenda/8oct/pd-gj-gardner-stonemason-used.jpg" alt="GJ Gardner Townsville in Pipedrive: Stonemason Used reads Townsville Stone, and Townsville Stone is listed under Related organizations" loading="lazy"></button>
+          <figcaption><b>GJ Gardner Townsville.</b> Pam typed &ldquo;Townsville Stone&rdquo; on 7 Oct. Now also linked.</figcaption></figure>
+        <figure><button class="tg-zoom" data-src="/images/agenda/8oct/pd-lancini-ts.jpg"><img src="/images/agenda/8oct/pd-lancini-ts.jpg" alt="Lancini Homes in Pipedrive: Stonemason Used reads TS, and Townsville Stone is listed under Related organizations" loading="lazy"></button>
+          <figcaption><b>Lancini Homes.</b> &ldquo;TS&rdquo; &mdash; 11 companies use this shorthand. Sean confirmed it means Townsville Stone.</figcaption></figure>
+      </div>
+      <p class="ag-note" style="margin-top:22px"><b>Tip:</b> on any company in Pipedrive, type <i>stonemason</i> into <b>Filter fields</b> (top of the left column) to see just these fields.</p>
+    </div>
+
+    <div class="tg-panel" id="t2" hidden>
+      <div class="tg-toggle" role="group" aria-label="Before or now">
+        <button class="tg-tbtn" data-view="before">Before (Tuesday)</button>
+        <button class="tg-tbtn is-on" data-view="now">Now</button>
+      </div>
+      <div class="tg-count"><span id="tg-n">27</span> related companies <span class="tg-sub" id="tg-sub">9 that were linked + 18 added this morning from what Pam typed</span></div>
+      <ul class="tg-list" id="tg-list"><li class="tg-new"><span class="tg-name">Andrew&#x27;s Custom Cabinets</span> <span class="tg-cat">Cabinet Maker</span> <span class="tg-typed">&ldquo;TS&rdquo;</span></li><li class="tg-new"><span class="tg-name">AP Williams &amp; Co</span> <span class="tg-cat">Builder/Developer</span> <span class="tg-typed">&ldquo;Townsville Stone&rdquo;</span></li><li class="tg-new"><span class="tg-name">Bob Gould Fabrications</span> <span class="tg-cat">Cabinet Maker</span> <span class="tg-typed">&ldquo;TS&rdquo;</span></li><li class="tg-old"><span class="tg-name">David Moore Cabinet Making</span> <span class="tg-cat">Cabinet Maker</span></li><li class="tg-old"><span class="tg-name">Fresh Homes</span> <span class="tg-cat">Builder/Developer</span> <span class="tg-typed">&ldquo;Townsville Stone&rdquo;</span></li><li class="tg-new"><span class="tg-name">Galbraith Cabinets</span> <span class="tg-cat">Cabinet Maker</span> <span class="tg-typed">&ldquo;TS&rdquo;</span></li><li class="tg-old"><span class="tg-name">Garutti D P &amp; J M Cabinetmakers</span> <span class="tg-cat">Cabinet Maker</span></li><li class="tg-old"><span class="tg-name">Garuttis Cabinets</span> <span class="tg-cat">Cabinet Maker</span> <span class="tg-typed">&ldquo;Townsville Stone&rdquo;</span></li><li class="tg-new"><span class="tg-name">Gedoun Property Group</span> <span class="tg-cat">Cabinet Maker</span> <span class="tg-typed">&ldquo;Townsville Stone - Moduline&rdquo;</span></li><li class="tg-new"><span class="tg-name">GJ Gardner Townsville</span> <span class="tg-cat">Builder/Developer</span> <span class="tg-typed">&ldquo;Townsville Stone&rdquo;</span></li><li class="tg-new"><span class="tg-name">HKB Cabinetmaking</span> <span class="tg-cat">Cabinet Maker</span> <span class="tg-typed">&ldquo;Townsville Stone&rdquo;</span></li><li class="tg-old"><span class="tg-name">Homes by D.J. Jones</span> <span class="tg-cat">Builder/Developer</span></li><li class="tg-new"><span class="tg-name">Ian Pengelly Cabinets</span> <span class="tg-cat">Cabinet Maker</span> <span class="tg-typed">&ldquo;TS&rdquo;</span></li><li class="tg-old"><span class="tg-name">Intrinsic Building Group</span> <span class="tg-cat">Builder/Developer</span> <span class="tg-typed">&ldquo;Townsville Stone&rdquo;</span></li><li class="tg-new"><span class="tg-name">Jones Easy Cut</span> <span class="tg-cat">Cabinet Maker</span> <span class="tg-typed">&ldquo;TS&rdquo;</span></li><li class="tg-new"><span class="tg-name">JP Cabinets and Maintenance</span> <span class="tg-cat">Cabinet Maker</span> <span class="tg-typed">&ldquo;Townsville Stone&rdquo;</span></li><li class="tg-old"><span class="tg-name">JWB Joinery</span> <span class="tg-cat">Cabinet Maker</span> <span class="tg-typed">&ldquo;TS&rdquo;</span></li><li class="tg-new"><span class="tg-name">Lancini Homes</span> <span class="tg-cat">Builder/Developer</span> <span class="tg-typed">&ldquo;TS&rdquo;</span></li><li class="tg-old"><span class="tg-name">M Homes</span> <span class="tg-cat">Builder/Developer</span> <span class="tg-typed">&ldquo;Townsville Stone&rdquo;</span></li><li class="tg-old"><span class="tg-name">Michael Case Homes</span> <span class="tg-cat">Builder/Developer</span> <span class="tg-typed">&ldquo;Townsville Stone&rdquo;</span></li><li class="tg-new"><span class="tg-name">NCL Homes</span> <span class="tg-cat">Builder/Developer</span> <span class="tg-typed">&ldquo;TS&rdquo;</span></li><li class="tg-new"><span class="tg-name">NEW HOME SOLUTIONS</span> <span class="tg-cat">Builder/Developer</span> <span class="tg-typed">&ldquo;TS&rdquo;</span></li><li class="tg-new"><span class="tg-name">Parkside Group / Tropical Homes</span> <span class="tg-cat">Builder/Developer</span> <span class="tg-typed">&ldquo;Townsville Stone.  Moduline&rdquo;</span></li><li class="tg-new"><span class="tg-name">The Coloured House</span> <span class="tg-cat">Designer</span> <span class="tg-typed">&ldquo;TS&rdquo;</span></li><li class="tg-new"><span class="tg-name">Towers Custom Cabinets Townsville Office</span> <span class="tg-cat">Cabinet Maker</span> <span class="tg-typed">&ldquo;Townsville Stone&rdquo;</span></li><li class="tg-new"><span class="tg-name">Townsville Cabinetmaking &amp; Joinery</span> <span class="tg-cat">Cabinet Maker</span> <span class="tg-typed">&ldquo;TS&rdquo;</span></li><li class="tg-new"><span class="tg-name">Youngbuild</span> <span class="tg-cat">Builder/Developer</span> <span class="tg-typed">&ldquo;TS &amp; TC&rdquo;</span></li></ul>
+      <p class="ag-note" style="margin-top:22px">Highlighted = added this morning. The quote is what was typed in <i>Stonemason Used</i>.</p>
+      <div class="tg-shots tg-shots--one">
+        <figure><button class="tg-zoom" data-src="/images/agenda/8oct/pd-townsville-stone-related.jpg"><img src="/images/agenda/8oct/pd-townsville-stone-related.jpg" alt="Townsville Stone in Pipedrive: Related organizations lists 10 companies and +17 more" loading="lazy"></button>
+          <figcaption><b>Townsville Stone in Pipedrive now:</b> 10 shown, &ldquo;+17 more&rdquo;.</figcaption></figure>
+      </div>
+      <div class="ag-scroll" style="margin-top:30px">
+        <table>
+          <thead><tr><th>Across all of Pipedrive</th><th>Count</th></tr></thead>
+          <tbody>
+            <tr><td class="ag-sess">Related-organization links before</td><td>101</td></tr>
+            <tr><td class="ag-sess">Links added this morning from the text field (Pam&rsquo;s text kept)</td><td>116</td></tr>
+            <tr><td class="ag-sess">Links now</td><td>217</td></tr>
+            <tr><td class="ag-sess">Names typed that can&rsquo;t be matched to one stonemason yet</td><td>91 &mdash; e.g. &ldquo;Accent&rdquo; (Mackay, Tweed or Toowoomba?), &ldquo;Banks&rdquo; (which branch?), &ldquo;CMG&rdquo;, &ldquo;Moduline&rdquo;</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="ag-note" style="margin-top:22px">RoadRunner also now reads the text field every night, so a name typed tomorrow still reaches the reports the next morning. A new <b>Data freshness</b> page shows when each source last refreshed, and Sean gets an email at 7am if anything is late.</p>
+    </div>
+
+    <div class="tg-panel" id="t3" hidden>
+      <p class="ag-note">Proposed: <b>link it</b> whenever you learn which stonemason a client uses. Keep typing in the text field too if it helps you, but the link is what counts.</p>
+      <ol class="tg-steps">
+        <li class="is-on"><button class="tg-step"><span>1</span>Open the client in Pipedrive</button>
+          <div class="tg-body">The builder, cabinet maker or designer &mdash; e.g. GJ Gardner Townsville. (Doing it from the stonemason&rsquo;s page works just as well; the link shows on both.)</div></li>
+        <li><button class="tg-step"><span>2</span>Scroll to <i>Related organizations</i> and press <b>+</b></button>
+          <div class="tg-body">It&rsquo;s in the left column, under Deals.</div></li>
+        <li><button class="tg-step"><span>3</span>Leave Type as <b>Related</b>, type the stonemason&rsquo;s name, pick it</button>
+          <div class="tg-body"><img src="/images/agenda/8oct/pd-link-related-dialog.jpg" alt="Pipedrive dialog: Link related organizations, Type Related, Organization name box, Link organization button" loading="lazy" class="tg-inline">
+          Choose the <b>exact</b> record: there are three Accents and three Banks. If the stonemason isn&rsquo;t in Pipedrive, add it first (Business Category: Stonemason).</div></li>
+        <li><button class="tg-step"><span>4</span>Press <b>Link organization</b></button>
+          <div class="tg-body">Done. It appears in RoadRunner&rsquo;s reports the next morning (nightly refresh at 1am).</div></li>
+      </ol>
+    </div>
+
+    <div class="tg-panel" id="t4" hidden>
+      <div class="tg-quiz" data-answer="b">
+        <p class="ag-note"><b>A rep types &ldquo;Accent&rdquo; in a client&rsquo;s Stonemason Used field. What does RoadRunner do?</b></p>
+        <button class="tg-opt" data-k="a">Links the client to Accent Benchtops Mackay</button>
+        <button class="tg-opt" data-k="b">Nothing yet: there are three Accents, so it waits for someone to say which</button>
+        <button class="tg-opt" data-k="c">Links it to all three Accents</button>
+        <p class="tg-fb" hidden></p>
+      </div>
+      <div class="tg-quiz" data-answer="a">
+        <p class="ag-note"><b>Which of these shows up on the stonemason&rsquo;s own Pipedrive page?</b></p>
+        <button class="tg-opt" data-k="a">A Related organizations link</button>
+        <button class="tg-opt" data-k="b">The Stonemason Used text on the client</button>
+        <p class="tg-fb" hidden></p>
+      </div>
+    </div>
+
+    <div class="ag-scroll" style="margin-top:40px">
+      <table>
+        <thead><tr><th>To decide in the room</th><th>Options</th></tr></thead>
+        <tbody>
+          <tr><td class="ag-sess">One way of recording it</td><td>Link with Related organizations from now on (proposed), or keep the text field as the main place</td></tr>
+          <tr><td class="ag-sess">The 91 names that don&rsquo;t match yet</td><td>Who goes through them? Each takes one click in RoadRunner (<i>Stonemason Used</i> page): pick the stonemason, or ignore</td></tr>
+          <tr><td class="ag-sess">Text typed in future</td><td>Should RoadRunner turn it into a Pipedrive link automatically once the name is known, or should it stay a report-only link?</td></tr>
+          <tr><td class="ag-sess">Training on 30 Oct</td><td>Add this as a two-minute step in the Pipedrive session</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
 <section class="ag-band ag-band--cream" id="forecast">
   <div class="ag-inner">
-    <div class="ag-bandhead"><h2>2 &middot; Monthly forecast &mdash; a tour</h2>
+    <div class="ag-bandhead"><h2>3 &middot; Monthly forecast &mdash; a tour</h2>
       <a class="ag-back" href="#agenda">Back to agenda</a></div>
 
     <p class="ag-lead">Each salesperson forecasts the slabs they expect each key account to
@@ -382,7 +533,7 @@ td:last-child, th:last-child { padding-right:0; }
 
 <section class="ag-band ag-band--white" id="team">
   <div class="ag-inner">
-    <div class="ag-bandhead"><h2>3 &middot; Reports for the whole team</h2>
+    <div class="ag-bandhead"><h2>4 &middot; Reports for the whole team</h2>
       <a class="ag-back" href="#agenda">Back to agenda</a></div>
 
     <p class="ag-lead">Belinda approved sharing the reports with everyone on Monday, and the
@@ -419,7 +570,7 @@ td:last-child, th:last-child { padding-right:0; }
 
 <section class="ag-band ag-band--cream" id="suburbs">
   <div class="ag-inner">
-    <div class="ag-bandhead"><h2>4 &middot; Suburbs &mdash; the last 340</h2>
+    <div class="ag-bandhead"><h2>5 &middot; Suburbs &mdash; the last 340</h2>
       <a class="ag-back" href="#agenda">Back to agenda</a></div>
 
     <p class="ag-lead">The 340 companies still without a suburb have a street but no
@@ -445,7 +596,7 @@ td:last-child, th:last-child { padding-right:0; }
 
 <section class="ag-band ag-band--white" id="dupes">
   <div class="ag-inner">
-    <div class="ag-bandhead"><h2>5 &middot; Duplicate companies &mdash; the plan</h2>
+    <div class="ag-bandhead"><h2>6 &middot; Duplicate companies &mdash; the plan</h2>
       <a class="ag-back" href="#agenda">Back to agenda</a></div>
 
     <p class="ag-lead">146 groups of companies in Pipedrive look like the same business.
@@ -478,7 +629,7 @@ td:last-child, th:last-child { padding-right:0; }
 
 <section class="ag-band ag-band--cream" id="meta">
   <div class="ag-inner">
-    <div class="ag-bandhead"><h2>6 &middot; Meta campaign pages &mdash; drafts on the review site</h2>
+    <div class="ag-bandhead"><h2>7 &middot; Meta campaign pages &mdash; drafts on the review site</h2>
       <a class="ag-back" href="#agenda">Back to agenda</a></div>
 
     <p class="ag-lead">Both landing pages Claire asked for are built on the review site, in
@@ -517,7 +668,7 @@ td:last-child, th:last-child { padding-right:0; }
 
 <section class="ag-band ag-band--white" id="builder">
   <div class="ag-inner">
-    <div class="ag-bandhead"><h2>7 &middot; A campaign builder in RoadRunner</h2>
+    <div class="ag-bandhead"><h2>8 &middot; A campaign builder in RoadRunner</h2>
       <a class="ag-back" href="#agenda">Back to agenda</a></div>
 
     <p class="ag-lead">Every campaign so far has been built by Sean. Stacey asked on Monday
@@ -554,7 +705,7 @@ td:last-child, th:last-child { padding-right:0; }
 
 <section class="ag-band ag-band--white" id="sms">
   <div class="ag-inner">
-    <div class="ag-bandhead"><h2>8 &middot; Text alerts &mdash; what Twilio needs from us</h2>
+    <div class="ag-bandhead"><h2>9 &middot; Text alerts &mdash; what Twilio needs from us</h2>
       <a class="ag-back" href="#agenda">Back to agenda</a></div>
 
     <p class="ag-lead">The Twilio account is paid and already sending texts, but from an
@@ -585,7 +736,7 @@ td:last-child, th:last-child { padding-right:0; }
 
 <section class="ag-band ag-band--cream" id="blocked">
   <div class="ag-inner">
-    <div class="ag-bandhead"><h2>9 &middot; Outstanding, by person</h2>
+    <div class="ag-bandhead"><h2>10 &middot; Outstanding, by person</h2>
       <a class="ag-back" href="#agenda">Back to agenda</a></div>
 
     <p class="ag-lead">Everything on this page, sorted by who it sits with.</p>
@@ -729,7 +880,7 @@ td:last-child, th:last-child { padding-right:0; }
       <p><a href="https://alphasurfaces.com.au" target="_blank" rel="noopener">alphasurfaces.com.au</a></p>
     </div>
   </div>
-  <div class="footer-bottom"><p>Internal preview &middot; not indexed &middot; prepared 7 October 2026, updated 6am 8 October &middot; Brisbane</p></div>
+  <div class="footer-bottom"><p>Internal preview &middot; not indexed &middot; prepared 7 October 2026, updated 7am 8 October &middot; Brisbane</p></div>
 </div>
 
 <script src="/nav.js?v=23"></script>
@@ -752,6 +903,49 @@ td:last-child, th:last-child { padding-right:0; }
       setTimeout(function () { mo.disconnect(); }, 8000);
     }
   }
+})();
+</script>
+
+<script>
+(function () {
+  var root = document.getElementById('tagging'); if (!root) return;
+  var tabs = root.querySelectorAll('.tg-tab');
+  for (var i = 0; i < tabs.length; i++) tabs[i].addEventListener('click', function () {
+    for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove('is-on');
+    this.classList.add('is-on');
+    var ps = root.querySelectorAll('.tg-panel'); for (var k = 0; k < ps.length; k++) ps[k].hidden = true;
+    document.getElementById(this.getAttribute('data-tab')).hidden = false;
+  });
+  var tb = root.querySelectorAll('.tg-tbtn'), list = document.getElementById('tg-list');
+  for (var a = 0; a < tb.length; a++) tb[a].addEventListener('click', function () {
+    for (var b = 0; b < tb.length; b++) tb[b].classList.remove('is-on'); this.classList.add('is-on');
+    var before = this.getAttribute('data-view') === 'before';
+    list.classList.toggle('is-before', before);
+    document.getElementById('tg-n').textContent = before ? '9' : '27';
+    document.getElementById('tg-sub').textContent = before ? 'Only the Related-organization links. RoadRunner did not read the Stonemason Used field' : '9 that were linked + 18 added this morning from what Pam typed';
+  });
+  var steps = root.querySelectorAll('.tg-steps li');
+  for (var c = 0; c < steps.length; c++) steps[c].querySelector('.tg-step').addEventListener('click', function () {
+    this.parentNode.classList.toggle('is-on');
+  });
+  var quizzes = root.querySelectorAll('.tg-quiz');
+  var why = { b: 'Right. A name only links on its own when it matches exactly one stonemason; otherwise it waits on the Stonemason Used page for someone to choose.', a: 'Right. Only a link shows on both companies. The text sits on the client alone.' };
+  for (var q = 0; q < quizzes.length; q++) (function (quiz) {
+    var opts = quiz.querySelectorAll('.tg-opt'), ans = quiz.getAttribute('data-answer'), fb = quiz.querySelector('.tg-fb');
+    for (var o = 0; o < opts.length; o++) opts[o].addEventListener('click', function () {
+      for (var p = 0; p < opts.length; p++) opts[p].classList.remove('is-right', 'is-wrong');
+      var ok = this.getAttribute('data-k') === ans; this.classList.add(ok ? 'is-right' : 'is-wrong');
+      fb.hidden = false; fb.textContent = ok ? why[ans] : 'Not quite. Try another.';
+    });
+  })(quizzes[q]);
+  var zooms = root.querySelectorAll('.tg-zoom');
+  for (var z = 0; z < zooms.length; z++) zooms[z].addEventListener('click', function () {
+    var box = document.createElement('div'); box.className = 'tg-lightbox';
+    var im = document.createElement('img'); im.src = this.getAttribute('data-src'); im.alt = '';
+    box.appendChild(im); box.addEventListener('click', function () { box.remove(); });
+    document.body.appendChild(box);
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var lb = document.querySelector('.tg-lightbox'); if (lb) lb.remove(); } });
 })();
 </script>
 </body>
