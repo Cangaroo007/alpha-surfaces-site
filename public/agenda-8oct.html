@@ -238,8 +238,9 @@ td:last-child, th:last-child { padding-right:0; }
     from the map and 140 a short list to choose from, all on one list for each owner to
     approve. 61 need someone who knows the business: a PO box, a region, or a street the map
     can&rsquo;t find.</p>
-    <p class="ag-sub" style="font-size:16px;opacity:.85;margin-top:18px">Also since Tuesday: every item from Monday&rsquo;s list is built, and the monthly
-    forecast now has its own page, reminders and an actual-vs-forecast review.</p>
+    <p class="ag-sub" style="font-size:16px;opacity:.85;margin-top:18px">Also since Tuesday: every item from Monday&rsquo;s list is built and live, the
+    monthly forecast has its own page, reminders and an actual-vs-forecast review, the reports
+    are open to the whole sales team, and RoadRunner now records which of its pages get used.</p>
   </div>
 </section>
 
@@ -254,7 +255,7 @@ td:last-child, th:last-child { padding-right:0; }
 <li><span class="ag-num">2</span>
         <a class="ag-item-title" href="#forecast">Monthly forecast &mdash; a tour</a>
         <span class="ag-item-note">Entering it, the reminders, and actual vs forecast. November is the first month. <b>Belinda</b></span>
-        <span class="ag-mins">14 min</span></li>
+        <span class="ag-mins">12 min</span></li>
 <li><span class="ag-num">3</span>
         <a class="ag-item-title" href="#team">Reports for the whole team</a>
         <span class="ag-item-note">Who can see what, signing in, and what committed and back orders mean. <b>Belinda</b></span>
@@ -274,11 +275,15 @@ td:last-child, th:last-child { padding-right:0; }
 <li><span class="ag-num">7</span>
         <a class="ag-item-title" href="#builder">A campaign builder in RoadRunner</a>
         <span class="ag-item-note">Built; Sean is testing it. How the team would use it, and four questions. <b>Belinda</b></span>
-        <span class="ag-mins">10 min</span></li>
+        <span class="ag-mins">8 min</span></li>
 <li><span class="ag-num">8</span>
+        <a class="ag-item-title" href="#sms">Text alerts &mdash; what Twilio needs from us</a>
+        <span class="ag-item-note">Two documents, one domain record and the mobile numbers. <b>Belinda &middot; Sean</b></span>
+        <span class="ag-mins">5 min</span></li>
+<li><span class="ag-num">9</span>
         <a class="ag-item-title" href="#blocked">Outstanding, by person</a>
         <span class="ag-item-note">Named, including Sean&rsquo;s own list.</span>
-        <span class="ag-mins">8 min</span></li>
+        <span class="ag-mins">7 min</span></li>
     </ol>
   </div>
 </section>
@@ -399,9 +404,14 @@ td:last-child, th:last-child { padding-right:0; }
     January. Either the stock is being held for the customer or the orders were never closed
     off. Closing them off makes committed mean stock that is really waiting to go out.</p>
 
-    <p class="ag-note"><b>Signing in:</b> anyone without a RoadRunner password presses
-    <i>Forgot password</i> on the sign-in page and gets a link by email to set one. It goes
-    live with the next RoadRunner deploy.</p>
+    <p class="ag-note"><b>Signing in (live now):</b> Belinda, Pam, Jana and Jess already have
+    a RoadRunner password. Olivia, Caroline, Stacey, Danielle, Jennifer and Laura go to
+    <b>roadrunner.alphasurfaces.com.au/forms</b>, press <i>Forgot password</i>, and set one from
+    the link in the email. None of the six has done it yet.</p>
+
+    <p class="ag-note"><b>New: which pages get used.</b> Since yesterday afternoon every
+    RoadRunner page records who opened it and for how long, on a Usage page for Belinda and
+    Sean. After a few weeks it shows which reports earn their place and who might need a hand.</p>
   </div>
 </section>
 
@@ -540,9 +550,40 @@ td:last-child, th:last-child { padding-right:0; }
   </div>
 </section>
 
+<section class="ag-band ag-band--white" id="sms">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>8 &middot; Text alerts &mdash; what Twilio needs from us</h2>
+      <a class="ag-back" href="#agenda">Back to agenda</a></div>
+
+    <p class="ag-lead">The Twilio account is paid and already sending texts, but from an
+    American number. To text Belinda, Pam and the reps from an Australian number (and to let
+    Belinda reply to assign a sample request), Twilio has to approve the business first. These
+    are the pieces it asks for.</p>
+
+    <div class="ag-scroll">
+      <table>
+        <thead><tr><th>What</th><th>Details</th><th>From</th></tr></thead>
+        <tbody>
+          <tr><td class="ag-sess">Proof of the business name and ABN</td><td>The free printout from ABN Lookup (abr.business.gov.au) or an ASIC company extract. One document covers both</td><td>Belinda or accounts</td></tr>
+          <tr><td class="ag-sess">Proof of the business address</td><td>A recent utility bill, rates or tax notice, or the lease for Kunda Park, in the business&rsquo;s name. A PDF or photo is fine</td><td>Belinda or accounts</td></tr>
+          <tr><td class="ag-sess">The exact registered name</td><td>Twilio has the address on file as &ldquo;Alpha Surfaces Inc, Kunda Park&rdquo;. It has to match the ABN record exactly, so we need the name as registered (for example &ldquo;&hellip; Pty Ltd&rdquo;)</td><td>Belinda</td></tr>
+          <tr><td class="ag-sess">A record on the website&rsquo;s domain</td><td>One line in Cloudflare that proves alphasurfaces.com.au is ours</td><td>Sean</td></tr>
+          <tr><td class="ag-sess">Mobile numbers</td><td>For everyone who should get texts: Belinda, Pam, and any rep who wants them</td><td>Each person</td></tr>
+          <tr><td class="ag-sess">Which alerts go by text</td><td>Suggested: builder and architect sample requests to Belinda; campaign clicks to Pam. Everything stays on email too</td><td>Belinda</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="ag-note" style="margin-top:34px"><b>Then:</b> Sean submits the approval the same
+    day the documents arrive. Twilio usually reviews it in one to three business days. Once
+    approved, the Australian number is bought (about US$8 a month; texts about 5 US cents
+    each), switched on, and tested the same day.</p>
+  </div>
+</section>
+
 <section class="ag-band ag-band--cream" id="blocked">
   <div class="ag-inner">
-    <div class="ag-bandhead"><h2>8 &middot; Outstanding, by person</h2>
+    <div class="ag-bandhead"><h2>9 &middot; Outstanding, by person</h2>
       <a class="ag-back" href="#agenda">Back to agenda</a></div>
 
     <p class="ag-lead">Everything on this page, sorted by who it sits with.</p>
@@ -552,12 +593,12 @@ td:last-child, th:last-child { padding-right:0; }
       <div class="ag-person">
         <h3>Sean</h3>
         <ul>
-          <li><b>Deploy RoadRunner</b>, so Monday&rsquo;s fixes and the forecast pages go live</li>
           <li><b>Test the campaign builder</b> before it goes to the team</li>
+          <li><b>Twilio:</b> the domain record in Cloudflare; submit the business approval when the documents arrive; buy and switch on the Australian number</li>
           <li>Put the approved suburbs into Pipedrive</li>
           <li>Run the duplicate merges once the list is approved</li>
           <li>Training ready by 14 October, now including the forecast</li>
-          <li>The Meta pixel switched on when Claire sends the ID</li>
+          <li>The Meta pixel switched on when Claire sends the ID; a Google Analytics stream for RoadRunner</li>
           <li>Real labels and the eParcel application, carried from Monday</li>
         </ul>
       </div>
@@ -567,6 +608,7 @@ td:last-child, th:last-child { padding-right:0; }
         <ul>
           <li><b>Accent Benchtops: Tweed or Mackay</b> for the Datapel link</li>
           <li><b>Forecast: top 50, or every recent account?</b></li>
+          <li><b>Twilio:</b> the ABN printout, proof of the Kunda Park address, the exact registered name, and which alerts go by text</li>
           <li>Approve the suburbs on her 284 companies</li>
           <li>The duplicates sitting with Olivia</li>
           <li>NSW in or out of the Meta pilot; the zero-silica wording</li>
@@ -579,6 +621,7 @@ td:last-child, th:last-child { padding-right:0; }
         <h3>Pam</h3>
         <ul>
           <li>Approve the one suburb on her list</li>
+          <li>Her mobile number for the campaign click texts</li>
           <li>Call the builders who clicked, carried from Monday</li>
           <li>Training content signed off before her leave</li>
         </ul>
@@ -599,7 +642,8 @@ td:last-child, th:last-child { padding-right:0; }
         <ul>
           <li><b>Caroline, Stacey, Danielle, Laura, Jennifer:</b> approve the suburbs on their own lists</li>
           <li><b>Everyone:</b> enter November&rsquo;s forecast by Sunday 1 November</li>
-          <li><b>Everyone without a RoadRunner password:</b> <i>Forgot password</i> on the sign-in page</li>
+          <li><b>Olivia, Caroline, Stacey, Danielle, Jennifer, Laura:</b> set a RoadRunner password (<i>Forgot password</i> at roadrunner.alphasurfaces.com.au/forms)</li>
+          <li><b>Anyone who wants text alerts:</b> their mobile number</li>
         </ul>
       </div>
 
@@ -683,7 +727,7 @@ td:last-child, th:last-child { padding-right:0; }
       <p><a href="https://alphasurfaces.com.au" target="_blank" rel="noopener">alphasurfaces.com.au</a></p>
     </div>
   </div>
-  <div class="footer-bottom"><p>Internal preview &middot; not indexed &middot; prepared 7 October 2026 &middot; Brisbane</p></div>
+  <div class="footer-bottom"><p>Internal preview &middot; not indexed &middot; prepared 7 October 2026, updated 6am 8 October &middot; Brisbane</p></div>
 </div>
 
 <script src="/nav.js?v=23"></script>
