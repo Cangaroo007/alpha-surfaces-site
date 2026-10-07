@@ -2777,7 +2777,7 @@ function sendHtmlAtDepth(res, filePath) {
 app.get(['/free-samples', '/free-samples/'], (req, res) => sendHtml(res, path.join(__dirname, 'public', 'free-samples.html')));
 app.get(['/discover', '/discover/'], (req, res) => sendHtml(res, path.join(__dirname, 'public', 'discover.html')));
 app.get(['/free-samples/order', '/discover/order'], (req, res) => sendHtmlAtDepth(res, path.join(__dirname, 'public', 'order-sample.html')));
-app.get('/discover/enquire', (req, res) => sendHtml(res, path.join(__dirname, 'public', 'discover-enquire.html')));
+app.get('/discover/enquire', (req, res) => sendHtmlAtDepth(res, path.join(__dirname, 'public', 'discover-enquire.html')));
 
 // Meta pixel loader. The pixel ID is not a secret (it is visible in every
 // page that loads it) but lives in the META_PIXEL_ID Railway variable so it

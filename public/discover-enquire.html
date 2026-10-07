@@ -6,11 +6,10 @@
 <title>Enquire | Alpha Surfaces</title>
 <meta name="description" content="Ask Alpha Surfaces anything about our benchtops. We will be in touch within 24 hours.">
 <meta name="robots" content="noindex">
-<base href="/">
 <link rel="stylesheet" href="/animation.css?v=19">
 <link rel="stylesheet" href="/nav.css?v=19">
 <link rel="stylesheet" href="/mobile.css?v=19">
-<link rel="stylesheet" href="/campaign.css?v=1">
+<link rel="stylesheet" href="/campaign.css?v=2">
 <!-- ALPHA_ANALYTICS_V1 -->
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-W0841557EV"></script>
@@ -76,7 +75,7 @@
     <aside class="cp-aside">
       <h2 class="cp-h2" style="font-size:24px">Would a sample help?</h2>
       <p class="cp-sub" style="margin-bottom:20px">Up to three free samples, delivered. Seeing the stone in your own light is the fastest way to decide.</p>
-      <a class="cp-btn" href="/discover/order" data-keep>Click here to order a sample</a>
+      <a class="cp-btn" href="/discover#collection" data-keep>Click here to order a sample</a>
       <p class="cp-sub" style="margin-top:26px;font-size:14px">Prefer to talk? Call <a href="tel:1300257420">1300 257 420</a>.</p>
     </aside>
   </div>
@@ -114,7 +113,7 @@
         form.outerHTML = '<div class="cp-done"><div style="font-size:44px;color:#564d22">&#10003;</div>' +
           '<h2 class="cp-h2" style="font-size:26px;margin-top:10px">Thanks &mdash; we have your enquiry.</h2>' +
           '<p class="cp-sub" style="margin:0 auto">Someone from Alpha Surfaces will be in touch within 24 hours.</p>' +
-          '<div class="cp-btns" style="justify-content:center"><a class="cp-btn" href="' + C.withParams('/discover/order') + '">Order a free sample</a></div></div>';
+          '<div class="cp-btns" style="justify-content:center"><a class="cp-btn" href="' + C.withParams('/discover#collection') + '">Order a free sample</a></div></div>';
       })
       .catch(function (x) { btn.disabled = false; btn.textContent = 'Send enquiry'; fail(x.message + ' You can also call us on 1300 257 420.'); });
   });
