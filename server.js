@@ -849,6 +849,10 @@ async function handleShowroomCheckin(req, res) {
     if (!name)  return res.status(400).json({ ok: false, error: 'Name is required.' });
     if (!phone) return res.status(400).json({ ok: false, error: 'Phone is required.' });
     const role = String(f.i_am_a || f.role || '').trim();
+    // Required (Belinda/Sean, 8 Oct 2026): 80 walk-ins from September have no visitor type,
+    // so the reports can't say who came in. The iPad page already requires it; this stops
+    // any other caller (an old cached page, a script) saving one without it.
+    if (!role) return res.status(400).json({ ok: false, error: 'Please select one option for "I am a".' });
     fields = {
       _client_submission_id: f._client_submission_id || f.client_submission_id || f.submission_uuid || null,
       name,
