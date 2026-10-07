@@ -194,6 +194,8 @@
       el.innerHTML = d.showrooms.map(function (r) {
         return '<div class="cp-room"><b>' + esc(r.name) + '</b><p>' + esc(r.address) + '</p>' +
           (r.phone ? '<p><a href="tel:' + esc(r.phone.replace(/\s/g, '')) + '">' + esc(r.phone) + '</a></p>' : '') +
+          (r.hours ? '<p>' + esc(r.hours) + '</p>' : '') +
+          (r.contacts ? '<p>' + esc(r.contacts) + '</p>' : '') +
           (r.maps ? '<p><a href="' + esc(r.maps) + '" target="_blank" rel="noopener">Get directions</a></p>' : '') + '</div>';
       }).join('') +
       '<div class="cp-room"><b>Near you</b><p>Our stonemason partners across Queensland can show you samples and full slabs.</p>' +
