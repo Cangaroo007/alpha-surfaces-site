@@ -67,6 +67,9 @@
     var state = { tone: '', pattern: '', dir: '', picked: [] };
     loadStones().then(function (d) {
       var stones = d.stones;
+      // Campaign builder: a campaign can show only some stones, or leave some out.
+      if (opts.include && opts.include.length) stones = stones.filter(function (s) { return opts.include.indexOf(s.slug) >= 0; });
+      if (opts.exclude && opts.exclude.length) stones = stones.filter(function (s) { return opts.exclude.indexOf(s.slug) < 0; });
       var filters = opts.filters === false ? '' :
         '<div class="cp-filters">' +
           row('Colour', 'tone', [['', 'All'], ['light', 'Light'], ['warm', 'Warm'], ['dark', 'Dark']]) +
@@ -189,9 +192,10 @@
     });
   }
 
-  function mountShowrooms(el) {
+  function mountShowrooms(el, only) {
     loadStones().then(function (d) {
-      el.innerHTML = d.showrooms.map(function (r) {
+      var rooms = only && only.length ? d.showrooms.filter(function (r) { return only.indexOf(r.name) >= 0; }) : d.showrooms;
+      el.innerHTML = rooms.map(function (r) {
         return '<div class="cp-room"><b>' + esc(r.name) + '</b><p>' + esc(r.address) + '</p>' +
           (r.phone ? '<p><a href="tel:' + esc(r.phone.replace(/\s/g, '')) + '">' + esc(r.phone) + '</a></p>' : '') +
           (r.hours ? '<p>' + esc(r.hours) + '</p>' : '') +

@@ -298,6 +298,13 @@ app.use((req, res, next) => {
   // being prepared. A 4-hour edge cache meant a corrected page kept serving the
   // old copy to anyone hitting the bare URL - incognito does not defeat the CDN.
   const isPartner = p === '/partners' || p.startsWith('/partners/');
+  // Campaign builder pages (/c/<slug>): a minute at the edge so an approval
+  // shows quickly; previews and the form steps are never cached.
+  if (p.startsWith('/c/')) {
+    if (req.query.preview || /\/(order|enquire)\/?$/.test(p)) res.set({ 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' });
+    else res.set({ 'Cache-Control': 'public, max-age=0, s-maxage=60, must-revalidate', 'Vary': 'Accept-Encoding' });
+    return next();
+  }
 
   if (isPartner) {
     res.set({ 'Cache-Control': 'public, max-age=0, s-maxage=60, must-revalidate', 'Vary': 'Accept-Encoding' });
@@ -2778,6 +2785,86 @@ app.get(['/free-samples', '/free-samples/'], (req, res) => sendHtml(res, path.jo
 app.get(['/discover', '/discover/'], (req, res) => sendHtml(res, path.join(__dirname, 'public', 'discover.html')));
 app.get(['/free-samples/order', '/discover/order'], (req, res) => sendHtmlAtDepth(res, path.join(__dirname, 'public', 'order-sample.html')));
 app.get('/discover/enquire', (req, res) => sendHtmlAtDepth(res, path.join(__dirname, 'public', 'discover-enquire.html')));
+
+// ─── Campaign builder pages: /c/<slug>, /c/<slug>/order, /c/<slug>/enquire ───
+// The campaign is a spec made in RoadRunner (/campaigns) and fetched from
+// RoadRunner's public API. Same outage rule as the stone pages (AGENTS.md):
+// a short timeout, then the last good copy (memory, then disk), so a live
+// campaign page keeps working if RoadRunner is down. Previews (?preview=<token>)
+// are never cached, carry no pixel or analytics, and can be shown inside the
+// RoadRunner builder.
+const CAMPAIGN_API = (process.env.ROADRUNNER_PUBLIC_URL || 'https://roadrunner.alphasurfaces.com.au').replace(/\/+$/, '') + '/api/public/campaigns/';
+const CAMPAIGN_CACHE_DIR = path.join(DATA_DIR, 'campaign-cache');
+const campaignCache = new Map();
+async function fetchCampaign(slug, preview) {
+  if (!/^[a-z0-9-]{3,50}$/.test(slug)) return null;
+  const key = slug;
+  const hit = campaignCache.get(key);
+  if (!preview && hit && Date.now() - hit.at < 30000) return hit.data;
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 2500);
+  try {
+    const r = await fetch(CAMPAIGN_API + slug + (preview ? '?preview=' + encodeURIComponent(preview) : ''), { signal: ctl.signal });
+    if (r.status === 404) { if (!preview) campaignCache.delete(key); return null; }
+    if (!r.ok) throw new Error('status ' + r.status);
+    const data = await r.json();
+    if (!preview) {
+      campaignCache.set(key, { at: Date.now(), data });
+      try { fs.mkdirSync(CAMPAIGN_CACHE_DIR, { recursive: true }); fs.writeFileSync(path.join(CAMPAIGN_CACHE_DIR, slug + '.json'), JSON.stringify(data)); } catch (_) {}
+    }
+    return data;
+  } catch (err) {
+    console.warn('[campaign] RoadRunner unreachable for', slug, err.message);
+    if (preview) return null;
+    if (hit) return hit.data;
+    try { return JSON.parse(fs.readFileSync(path.join(CAMPAIGN_CACHE_DIR, slug + '.json'), 'utf8')); } catch (_) { return null; }
+  } finally { clearTimeout(timer); }
+}
+function campaignFrameHeaders(res) {
+  // Let the RoadRunner builder show the page in its preview pane.
+  res.removeHeader('X-Frame-Options');
+  const csp = res.getHeader('Content-Security-Policy');
+  if (csp) res.setHeader('Content-Security-Policy', String(csp).replace(/frame-ancestors[^;]*/, "frame-ancestors 'self' https://roadrunner.alphasurfaces.com.au"));
+}
+function escAttr(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+app.get(['/c/:slug', '/c/:slug/'], async (req, res) => {
+  const preview = typeof req.query.preview === 'string' ? req.query.preview : '';
+  const c = await fetchCampaign(req.params.slug, preview);
+  if (!c || !c.spec) return res.redirect(302, '/');
+  const spec = c.spec;
+  let html = renderHtml(path.join(__dirname, 'public', 'campaign-page.html'))
+    .replace(/CP_TITLE/g, escAttr(spec.title))
+    .replace(/CP_DESCRIPTION/g, escAttr(spec.description || 'Premium benchtops by Alpha Surfaces. Order up to three free samples.'))
+    .replace(/CP_IMAGE/g, escAttr(spec.shareImage || spec.hero && spec.hero.image || '/images/gallery-kitchen.webp'))
+    .replace('<!-- CP_SPEC -->', '<script id="cp-spec" type="application/json">' +
+      JSON.stringify({ slug: c.slug, status: c.status, preview: !!c.preview, spec }).replace(/</g, '\\u003c') + '</script>');
+  if (c.preview) {
+    html = html.replace('<!-- CP_ROBOTS -->', '<meta name="robots" content="noindex,nofollow">')
+      .replace(/<!-- CP_ANALYTICS_START -->[\s\S]*?<!-- CP_ANALYTICS_END -->/, '');
+  }
+  campaignFrameHeaders(res);
+  res.set('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
+});
+app.get(['/c/:slug/order', '/c/:slug/order/'], (req, res) => {
+  // The order step is the standard sample form for every campaign (it reads
+  // ?stones= and records the page in landing_page), so it needs no spec - which
+  // also lets it work from a preview.
+  if (!/^[a-z0-9-]{3,50}$/.test(req.params.slug)) return res.redirect(302, '/order-sample');
+  campaignFrameHeaders(res);
+  sendHtmlAtDepth(res, path.join(__dirname, 'public', 'order-sample.html'));
+});
+app.get(['/c/:slug/enquire', '/c/:slug/enquire/'], async (req, res) => {
+  const c = await fetchCampaign(req.params.slug, typeof req.query.preview === 'string' ? req.query.preview : '');
+  if (!c || !c.spec || !(c.spec.enquiry && c.spec.enquiry.enabled)) return res.redirect(302, '/c/' + encodeURIComponent(req.params.slug));
+  const stonesSec = (c.spec.sections || []).find((x) => x.type === 'stones');
+  const back = '/c/' + c.slug + '#' + (stonesSec && stonesSec.id ? stonesSec.id : 'stones-' + (c.spec.sections || []).indexOf(stonesSec));
+  campaignFrameHeaders(res);
+  res.set('Content-Type', 'text/html; charset=utf-8');
+  let html = renderHtml(path.join(__dirname, 'public', 'discover-enquire.html')).replace(/<head>/i, '<head>\n<base href="/">').split('/discover#collection').join(back);
+  if (c.spec.enquiry.heading) html = html.replace(/(<h1[^>]*>)[\s\S]*?(<\/h1>)/, '$1' + escAttr(c.spec.enquiry.heading) + '$2');
+  res.send(html);
+});
 
 // Meta pixel loader. The pixel ID is not a secret (it is visible in every
 // page that loads it) but lives in the META_PIXEL_ID Railway variable so it
