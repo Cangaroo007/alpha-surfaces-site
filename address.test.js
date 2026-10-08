@@ -18,6 +18,12 @@ const cases = [
   ['1',    '7 Hale St,',        '1/7 Hale St',        'trailing comma stripped'],
   ['Unit 547', '547/61 Noosa Springs Drive', '547/61 Noosa Springs Drive', 'no triple'],
   ['8 Toorumbee drive', '8 Toorumbee drive', '8 Toorumbee drive', 'identical'],
+  // Real sample requests from 30 Sep, refused before 8 Oct.
+  ['13-15 ', 'enterprise street ', '13-15 enterprise street', 'unit is a house-number range'],
+  ['14-18', 'duell road', '14-18 duell road', 'range, lowercase'],
+  ['Unit 12, 45-53', 'Ocean Ave', '12/45-53 Ocean Ave', 'unit, comma, number range'],
+  ['Office 2 / 5', 'Madsen Rd', '2/5 Madsen Rd', 'office and number'],
+  ['13-15', '13-15 Enterprise St', '13-15 Enterprise St', 'range repeated in street'],
 ];
 
 for (const [unit, street, expected, note] of cases) {
@@ -140,4 +146,12 @@ test('lot address still survives', () => {
   const n = normalise({ unit: '', street: 'Lot 442 (6) Worona Lane', suburb: 'Bohle Plains', state: 'QLD', postcode: '4817' });
   assert.strictEqual(n.line, 'Lot 442 (6) Worona Lane');
   assert.ok(n.ok);
+});
+
+test('a range in the unit box beside a numbered street is still refused', () => {
+  assert.strictEqual(addressLine('13-15', '7 Enterprise St').confident, false);
+});
+test('range subfields', () => {
+  const sf = subfields('12/45-53 Ocean Ave');
+  assert.deepStrictEqual(sf, { subpremise: '12', street_number: '45-53', route: 'Ocean Ave' });
 });

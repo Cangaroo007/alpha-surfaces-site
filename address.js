@@ -51,7 +51,7 @@ function titleCase(s) {
 /** "Unit 5" / "U5" / "#5" / "Apt 5" -> "5". Returns '' if nothing useful. */
 function cleanUnit(raw) {
   let u = squash(raw).replace(/[.,]+$/, '');
-  u = u.replace(/^(unit|apt|apartment|suite|flat|u|no\.?|#)\s*/i, '').trim();
+  u = u.replace(/^(unit|apt|apartment|suite|flat|office|shop|villa|townhouse|u|no\.?|#)\s*/i, '').trim();
   return u;
 }
 
@@ -78,7 +78,8 @@ function addressLine(rawUnit, rawStreet) {
   if (unit.toLowerCase() === street.toLowerCase()) {
     return { line: street, confident: true, why: 'unit duplicated street' };
   }
-  const leading = street.match(/^(\d+[a-z]?)\b/i);
+  // A house number can be a range - "13-15 Enterprise Street" is one building.
+  const leading = street.match(/^(\d+[a-z]?(?:-\d+[a-z]?)?)\b/i);
   if (leading && leading[1].toLowerCase() === unit.toLowerCase()) {
     return { line: street, confident: true, why: 'unit repeated the house number' };
   }
@@ -92,6 +93,20 @@ function addressLine(rawUnit, rawStreet) {
   // Unit already holds the whole pair - "4/13" + "Commerce Ave".
   if (/^\d+[a-z]?\s*\/\s*\d+[a-z]?$/i.test(unit) && !leading) {
     return { line: `${unit.replace(/\s*\/\s*/, '/')} ${street}`, confident: true, why: 'unit held the unit/number pair' };
+  }
+
+  // Unit holds a unit and a house number separated by a comma or space -
+  // "12, 45-53" + "Ocean Ave" is 12/45-53 Ocean Ave. Only when the street has
+  // no number of its own, so nothing is being chosen between.
+  const pair = unit.match(/^(\d+[a-z]?)\s*(?:,|\/)\s*(\d+[a-z]?(?:-\d+[a-z]?)?)$/i);
+  if (pair && !leading) {
+    return { line: `${pair[1]}/${pair[2]} ${street}`, confident: true, why: 'unit held unit and house number' };
+  }
+
+  // Unit is a house-number range and the street has no number: "13-15" +
+  // "Enterprise Street". A range is never a unit number.
+  if (!leading && /^\d+[a-z]?-\d+[a-z]?$/i.test(unit)) {
+    return { line: `${unit} ${street}`, confident: true, why: 'unit is a house-number range' };
   }
 
   // Street starts with a house number and unit is a plain number: genuine unit.
