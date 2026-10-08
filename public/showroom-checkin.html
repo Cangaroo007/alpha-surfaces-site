@@ -296,8 +296,8 @@
       </div>
 
       <div class="field">
-        <label for="state">State <span class="opt">optional</span></label>
-        <select id="state" name="state">
+        <label for="state">State</label>
+        <select id="state" name="state" required>
           <option value="">Select one</option>
           <option>QLD</option>
           <option>NSW</option>
@@ -416,6 +416,7 @@
         }
         if (!role) return showError('Please select one option for "I am a".');
         if (!interestedIn) return showError('Please select what they are interested in.');
+        if (!state) return showError('Please select the state they live in.');
         if (!source) return showError('Please select how you heard about us.');
         var payload = {
           _client_submission_id: makeSubmissionId(),

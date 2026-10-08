@@ -853,6 +853,7 @@ async function handleShowroomCheckin(req, res) {
     // so the reports can't say who came in. The iPad page already requires it; this stops
     // any other caller (an old cached page, a script) saving one without it.
     if (!role) return res.status(400).json({ ok: false, error: 'Please select one option for "I am a".' });
+    if (!String(f.state || '').trim()) return res.status(400).json({ ok: false, error: 'Please select the state they live in.' });
     fields = {
       _client_submission_id: f._client_submission_id || f.client_submission_id || f.submission_uuid || null,
       name,
