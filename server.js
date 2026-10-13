@@ -2724,6 +2724,9 @@ app.get(['/stockout-preview', '/stockout-preview.html'], (req, res) => {
 // the current page links to all of them. Newest first. /agenda is the stable
 // alias - move that one line when a new agenda lands, and add the new dated
 // route above it.
+app.get(['/agenda/14-october', '/agenda/14-october.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-14oct.html'));
+});
 app.get(['/agenda/8-october', '/agenda/8-october.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-8oct.html'));
 });
@@ -2758,7 +2761,7 @@ app.get(['/agenda/3-september', '/agenda/3-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-3sep.html'));
 });
 app.get(['/agenda', '/agenda.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'agenda-8oct.html'));
+  res.sendFile(path.join(__dirname, 'public', 'agenda-14oct.html'));
 });
 // --- end agenda archive -----------------------------------------------------
 app.get(['/sprint-plan/17-september', '/sprint-plan/17-september.html'], (req, res) => {
