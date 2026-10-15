@@ -380,9 +380,15 @@
         hideError();
         btn.disabled = false;
         btn.textContent = 'Check in';
+        // Back to the top of the form for the next visitor (iPad kiosk).
+        if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+        window.scrollTo(0, 0);
+        if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
         // Refocus name for the next visitor.
         var n = document.getElementById('name');
         if (n) n.focus({ preventScroll: true });
+        // iOS can restore the old position after the keyboard closes; reset once more.
+        setTimeout(function () { window.scrollTo(0, 0); }, 300);
       }
 
       function makeSubmissionId() {
@@ -393,6 +399,7 @@
       function showThankYou(name) {
         thanksNm.textContent = 'Thank you, ' + (name || 'friend') + '!';
         thanksEl.classList.add('show');
+        window.scrollTo(0, 0);
         setTimeout(function () {
           thanksEl.classList.remove('show');
           resetForm();
