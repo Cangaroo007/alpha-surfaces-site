@@ -2724,6 +2724,9 @@ app.get(['/stockout-preview', '/stockout-preview.html'], (req, res) => {
 // the current page links to all of them. Newest first. /agenda is the stable
 // alias - move that one line when a new agenda lands, and add the new dated
 // route above it.
+app.get(['/agenda/20-october/kpi-dashboard'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-20oct-kpi.html'));
+});
 app.get(['/agenda/20-october', '/agenda/20-october.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-20oct.html'));
 });

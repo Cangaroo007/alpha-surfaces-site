@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>KPI dashboard mock-up — 20 October | Alpha Surfaces</title>
+<link rel="stylesheet" href="/nav.css?v=23">
+<style>
+/* --- FONTS (absolute paths - this page is not at the site root) --- */
+@font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Regular.woff2') format('woff2'), url('/fonts/Web/ConcretteS-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Medium.woff2') format('woff2'), url('/fonts/Web/ConcretteS-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Concrette S'; src: url('/fonts/Web/ConcretteS-Bold.woff2') format('woff2'), url('/fonts/Web/ConcretteS-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Regular.woff2') format('woff2'), url('/fonts/Degular Normal/Degular/Web/Degular-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Medium.woff2') format('woff2'), url('/fonts/Degular Normal/Degular/Web/Degular-Medium.woff') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Degular'; src: url('/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff2') format('woff2'), url('/fonts/Degular Normal/Degular/Web/Degular-Semibold.woff') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --olive:#564d22; --cream:#f3f1e6; --white:#ffffff; --black:#000000;
+        --red:#f56c6c; --gray:#cccccc; --border:rgba(0,0,0,0.1); }
+html { scroll-behavior: smooth; overflow-x: clip; }
+body { background:#f5f5f5; color:var(--black); font-family:'Degular',sans-serif;
+       font-weight:400; line-height:1.2; overflow-x:clip; max-width:100vw; }
+a { color: inherit; }
+img { display:block; max-width:100%; }
+
+/* --- PAGE HEADER, on the .hero-tagline pattern --- */
+.ag-head { background: var(--cream); text-align: center; padding: 72px 24px 56px; }
+.ag-eyebrow { font-family:'Degular',sans-serif; font-weight:600; font-size:13px;
+  letter-spacing:0.16em; text-transform:uppercase; color:var(--olive); margin-bottom:22px; }
+.ag-head h1 { font-family:'Concrette S',serif; font-weight:600; font-size:62px;
+  color:#564D22; letter-spacing:0; line-height:1.05; }
+.ag-head .ag-meta { font-family:'Degular',sans-serif; font-size:16px; color:var(--black);
+  margin-top:20px; opacity:.7; }
+
+/* --- OLIVE STATEMENT BAND --- */
+.ag-statement { background: var(--olive); padding: 100px 171px; }
+.ag-statement-inner { max-width:1100px; margin:0 auto; }
+.ag-stat-figure { font-family:'Concrette S',serif; font-weight:700; font-size:120px;
+  line-height:1; color:var(--white); margin-bottom:24px; }
+.ag-statement p { font-family:'Concrette S',serif; font-weight:500; font-size:42px;
+  line-height:1.2; color:var(--white); max-width:1100px; }
+.ag-statement p.ag-sub { font-weight:400; font-size:22px; line-height:1.35;
+  color:rgba(255,255,255,0.82); margin-top:28px; max-width:820px; }
+
+/* --- CONTENT BANDS, on the .about / .gallery pattern --- */
+.ag-band { padding: 80px 161px; }
+.ag-band--cream { background: var(--cream); }
+.ag-band--white { background: var(--white); }
+.ag-inner { max-width: 1100px; margin: 0 auto; }
+.ag-bandhead { display:flex; align-items:baseline; justify-content:space-between;
+  gap:24px; margin-bottom:44px; border-bottom:1px solid var(--border); padding-bottom:18px; }
+.ag-bandhead h2 { font-family:'Concrette S',serif; font-weight:400; font-size:42px;
+  color:var(--black); line-height:1.1; }
+.ag-back { font-family:'Degular',sans-serif; font-weight:500; font-size:13px;
+  letter-spacing:0.08em; text-transform:uppercase; color:var(--olive);
+  text-decoration:underline; text-underline-offset:3px; white-space:nowrap; }
+
+/* --- AGENDA LIST --- */
+.ag-list { list-style:none; }
+.ag-list li { display:grid; grid-template-columns:64px 1fr auto; gap:24px;
+  align-items:baseline; padding:22px 0; border-bottom:1px solid var(--border);
+  scroll-margin-top:120px; }
+.ag-list li:last-child { border-bottom:0; }
+.ag-num { font-family:'Concrette S',serif; font-weight:700; font-size:20px; color:var(--olive); }
+.ag-item-title { font-family:'Concrette S',serif; font-weight:500; font-size:24px;
+  color:var(--black); text-decoration:none; display:block; line-height:1.2; }
+.ag-item-title:hover { color:var(--olive); text-decoration:underline; text-underline-offset:4px; }
+.ag-item-note { font-family:'Degular',sans-serif; font-size:16px; line-height:1.45;
+  color:var(--black); opacity:.68; margin-top:8px; max-width:62ch; }
+.ag-mins { font-family:'Degular',sans-serif; font-size:13px; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--olive); white-space:nowrap; }
+
+/* --- PROSE --- */
+.ag-lead { font-family:'Concrette S',serif; font-weight:400; font-size:20px;
+  line-height:1.35; max-width:60ch; margin-bottom:16px; }
+.ag-note { font-family:'Degular',sans-serif; font-size:16px; line-height:1.5;
+  max-width:66ch; opacity:.72; margin-top:18px; }
+
+/* --- NUMBERED HABITS --- */
+.ag-habits { list-style:none; counter-reset:h; display:grid; gap:22px; margin-top:8px; }
+.ag-habits li { counter-increment:h; padding-left:56px; position:relative;
+  font-family:'Degular',sans-serif; font-size:17px; line-height:1.5; max-width:70ch; }
+.ag-habits li::before { content:counter(h); position:absolute; left:0; top:-2px;
+  font-family:'Concrette S',serif; font-weight:700; font-size:26px; color:var(--olive); }
+
+/* --- LINK PANELS, on the .feature-panel pattern --- */
+.ag-panels { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.ag-panel { display:block; text-decoration:none; background:var(--white);
+  border:1px solid var(--border); padding:24px 22px 26px; transition:border-color .2s ease; }
+.ag-band--white .ag-panel { background:var(--cream); }
+.ag-panel:hover { border-color:var(--olive); }
+.ag-panel-name { font-family:'Concrette S',serif; font-weight:500; font-size:20px;
+  color:var(--black); line-height:1.2; }
+.ag-panel-desc { font-family:'Degular',sans-serif; font-size:14px; line-height:1.4;
+  color:var(--black); opacity:.65; margin-top:8px; }
+.ag-panel-cta { font-family:'Degular',sans-serif; font-weight:500; font-size:13px;
+  letter-spacing:0.08em; color:var(--olive); text-decoration:underline;
+  text-underline-offset:3px; margin-top:14px; display:inline-block; }
+.ag-panel--new { border-left:3px solid var(--olive); }
+
+/* --- PERSON CARDS --- */
+.ag-people { display:grid; gap:24px; }
+.ag-person { background:var(--cream); padding:30px 32px; }
+.ag-band--cream .ag-person { background:var(--white); }
+.ag-person h3 { font-family:'Concrette S',serif; font-weight:700; font-size:28px;
+  color:var(--olive); margin-bottom:18px; }
+.ag-person ul { list-style:none; display:grid; gap:14px; }
+.ag-person li { font-family:'Degular',sans-serif; font-size:16px; line-height:1.5;
+  padding-left:20px; position:relative; max-width:78ch; }
+.ag-person li::before { content:''; position:absolute; left:0; top:10px;
+  width:8px; height:1px; background:var(--olive); }
+.ag-person li b { font-weight:600; }
+.ag-person li i { font-style:italic; }
+
+/* --- TABLES --- */
+.ag-scroll { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-family:'Degular',sans-serif; font-size:15px; }
+th { text-align:left; font-weight:600; font-size:11px; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--olive); padding:0 16px 12px 0;
+  border-bottom:1px solid var(--border); white-space:nowrap; }
+td { padding:14px 16px 14px 0; border-bottom:1px solid var(--border);
+  vertical-align:top; line-height:1.45; }
+td:last-child, th:last-child { padding-right:0; }
+.ag-key { font-family:'Concrette S',serif; font-weight:700; font-size:17px;
+  color:var(--olive); width:28px; }
+.ag-sess { font-family:'Concrette S',serif; font-weight:500; font-size:18px; }
+.ag-pill { display:inline-block; font-family:'Degular',sans-serif; font-weight:600;
+  font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:5px 10px;
+  border-radius:8px; white-space:nowrap; }
+.ag-pill--go { background:var(--olive); color:var(--cream); }
+.ag-pill--wait { background:rgba(86,77,34,0.12); color:var(--olive); }
+.ag-pill--stop { background:rgba(245,108,108,0.16); color:#9c3125; }
+
+/* --- DOC LIST --- */
+.ag-docs { columns:2; column-gap:48px; font-family:'Degular',sans-serif;
+  font-size:15px; line-height:1.6; }
+.ag-docs div { break-inside:avoid; padding:6px 0; opacity:.75; }
+
+/* --- FOOTER (site pattern) --- */
+.footer { background:var(--white); border-top:1px solid var(--border); padding:50px 60px 40px; }
+.footer-inner { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:40px; }
+.footer-col-heading { font-family:'Concrette S',serif; font-weight:700; font-size:14px;
+  color:var(--black); margin-bottom:10px; }
+.footer-col p, .footer-col a { font-family:'Degular',sans-serif; font-weight:400;
+  font-size:13px; color:var(--black); line-height:1.6; }
+.footer-col a { text-decoration:underline; text-underline-offset:2px; }
+.footer-col a:hover { color:var(--olive); }
+.footer-bottom { border-top:1px solid var(--border); margin-top:30px; padding-top:20px; }
+.footer-bottom p { font-family:'Degular',sans-serif; font-weight:400; font-size:11px;
+  letter-spacing:0.46px; text-transform:uppercase; color:var(--black); }
+
+/* --- MOBILE, matching the site breakpoint --- */
+@media (max-width: 1024px) {
+  .ag-head { padding:44px 24px 36px; }
+  .ag-head h1 { font-size:32px; }
+  .ag-statement { padding:44px 24px; }
+  .ag-stat-figure { font-size:72px; }
+  .ag-statement p { font-size:24px; line-height:1.15; font-weight:400; }
+  .ag-statement p.ag-sub { font-size:17px; }
+  .ag-band { padding:44px 24px; }
+  .ag-bandhead { flex-direction:column; gap:10px; margin-bottom:28px; }
+  .ag-bandhead h2 { font-size:28px; }
+  .ag-list li { grid-template-columns:40px 1fr; gap:14px; padding:18px 0; }
+  .ag-item-title { font-size:20px; }
+  /* Four children into two columns: the note wrapped into the 40px number
+     column and came out one word per line. Both text spans belong under the
+     title. */
+  .ag-item-note { grid-column:2; }
+  .ag-mins { grid-column:2; }
+  .ag-panels { grid-template-columns:1fr; }
+  .ag-person { padding:22px 20px; }
+  .ag-person h3 { font-size:22px; }
+  .ag-docs { columns:1; }
+  .footer { padding:44px 24px 20px; }
+  .footer-inner { grid-template-columns:1fr; gap:32px; }
+}
+
+/* --- TRAINING PAGE ADDITIONS (scoped, additive) --- */
+.tr-shot { margin:34px 0 0; }
+.tr-shot img { width:100%; border:1px solid var(--border); background:var(--white); }
+.ag-band--cream .tr-shot img { background:var(--cream); }
+.tr-cap { font-family:'Degular',sans-serif; font-size:13px; line-height:1.5;
+  color:var(--olive); margin-top:12px; letter-spacing:.01em; max-width:80ch; }
+.tr-cap b { font-weight:600; }
+.tr-shot--tight img { max-width:620px; }
+.tr-two { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:34px; align-items:start; }
+.tr-card { padding:26px 26px 28px; border:1px solid var(--border); background:var(--white); }
+.ag-band--white .tr-card { background:var(--cream); }
+.tr-card h4 { font-family:'Concrette S',serif; font-weight:700; font-size:19px;
+  margin-bottom:12px; line-height:1.2; }
+.tr-card p { font-family:'Degular',sans-serif; font-size:15px; line-height:1.5; opacity:.78; }
+.tr-card--do { border-left:3px solid var(--olive); }
+.tr-card--do h4 { color:var(--olive); }
+.tr-card--dont { border-left:3px solid var(--red); }
+.tr-card--dont h4 { color:#9c3125; }
+.tr-rule { background:var(--olive); color:var(--cream); padding:34px 38px; margin:34px 0 0; }
+.tr-rule p { font-family:'Concrette S',serif; font-weight:500; font-size:27px;
+  line-height:1.25; max-width:40ch; }
+.tr-rule span { display:block; font-family:'Degular',sans-serif; font-weight:400;
+  font-size:16px; line-height:1.5; color:rgba(243,241,230,.78); margin-top:16px; max-width:62ch; }
+.tr-habit-no { font-family:'Degular',sans-serif; font-weight:600; font-size:12px;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--olive); margin-bottom:14px; }
+.tr-qnum { font-family:'Concrette S',serif; font-weight:700; font-size:15px;
+  color:var(--olive); width:26px; }
+.tr-flag { display:inline-block; font-family:'Degular',sans-serif; font-weight:600;
+  font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--red);
+  border:1px solid rgba(245,108,108,.5); padding:3px 7px; border-radius:6px;
+  vertical-align:middle; margin-left:8px; }
+@media (max-width:1024px){
+  .tr-two { grid-template-columns:1fr; gap:16px; }
+  .tr-rule { padding:24px 22px; }
+  .tr-rule p { font-size:21px; }
+}
+
+/* --- DOC LINKS (scoped, additive) --- */
+.ag-docs a { color:var(--olive); text-decoration:underline; text-underline-offset:3px; }
+.ag-docs .ag-doc-link { opacity:1; }
+
+/* item 2: stonemason tagging (interactive) */
+.tg-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:34px 0 26px; }
+.tg-tab { font-family:'Degular',sans-serif; font-weight:600; font-size:15px; padding:10px 16px; border:1px solid var(--olive); background:transparent; color:var(--olive); cursor:pointer; }
+.tg-tab.is-on, .tg-tab:hover { background:var(--olive); color:var(--cream); }
+.tg-panel[hidden] { display:none; }
+.tg-two { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px; }
+.tg-card { background:var(--white); border:1px solid var(--border); padding:22px 24px; font-family:'Degular',sans-serif; font-size:16px; line-height:1.5; }
+.tg-card-head { font-size:18px; margin-bottom:10px; } .tg-catch { color:var(--olive); margin-top:10px; }
+.tg-shots { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:18px; }
+.tg-shots--one { grid-template-columns:minmax(0,420px); }
+.tg-shots figure { margin:0; } .tg-zoom { padding:0; border:1px solid var(--border); background:var(--white); cursor:zoom-in; display:block; width:100%; }
+.tg-shots figcaption { font-family:'Degular',sans-serif; font-size:14px; color:var(--olive); margin-top:8px; }
+.tg-toggle { display:inline-flex; border:1px solid var(--olive); margin-bottom:16px; }
+.tg-tbtn { font-family:'Degular',sans-serif; font-weight:600; font-size:15px; padding:8px 16px; background:transparent; border:0; color:var(--olive); cursor:pointer; }
+.tg-tbtn.is-on { background:var(--olive); color:var(--cream); }
+.tg-count { font-family:'Concrette S',serif; font-size:22px; margin-bottom:14px; } .tg-count #tg-n { font-weight:700; font-size:34px; color:var(--olive); }
+.tg-sub { display:block; font-family:'Degular',sans-serif; font-size:15px; color:var(--olive); }
+.tg-list { list-style:none; padding:0; margin:0; columns:2; column-gap:28px; font-family:'Degular',sans-serif; font-size:15px; }
+.tg-list li { break-inside:avoid; padding:6px 10px; border-bottom:1px solid var(--border); }
+.tg-list li.tg-new { background:rgba(86,77,34,0.10); } .tg-list.is-before li.tg-new { display:none; }
+.tg-name { font-weight:600; } .tg-cat { color:var(--olive); font-size:13px; } .tg-typed { color:#7a7363; font-size:13px; }
+.tg-steps { list-style:none; padding:0; margin:18px 0 0; counter-reset:none; }
+.tg-steps li { border:1px solid var(--border); background:var(--white); margin-bottom:10px; }
+.tg-step { width:100%; text-align:left; background:transparent; border:0; padding:16px 18px; font-family:'Degular',sans-serif; font-size:17px; line-height:1.4; cursor:pointer; display:block; padding-left:62px; position:relative; }
+.tg-step span { font-family:'Concrette S',serif; font-weight:700; color:var(--cream); background:var(--olive); width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; position:absolute; left:18px; top:12px; }
+.tg-body { display:none; padding:0 18px 18px 62px; font-family:'Degular',sans-serif; font-size:16px; line-height:1.5; }
+.tg-steps li.is-on .tg-body { display:block; } .tg-inline { max-width:min(420px,100%); border:1px solid var(--border); margin:6px 0 12px; }
+.tg-quiz { background:var(--white); border:1px solid var(--border); padding:20px 22px; margin-bottom:16px; }
+.tg-opt { display:block; width:100%; text-align:left; margin-top:8px; padding:12px 14px; border:1px solid var(--border); background:var(--cream); font-family:'Degular',sans-serif; font-size:16px; cursor:pointer; }
+.tg-opt.is-right { border-color:var(--olive); background:rgba(86,77,34,0.14); } .tg-opt.is-wrong { border-color:#9c3125; background:rgba(245,108,108,0.12); }
+.tg-fb { font-family:'Degular',sans-serif; font-size:15px; margin-top:10px; color:var(--olive); }
+.tg-lightbox { position:fixed; inset:0; background:rgba(20,18,10,0.82); display:flex; align-items:center; justify-content:center; z-index:9999; cursor:zoom-out; padding:20px; }
+.tg-lightbox img { max-height:92vh; max-width:92vw; width:auto; background:#fff; }
+@media (max-width:760px) { .tg-two, .tg-shots { grid-template-columns:1fr; } .tg-list { columns:1; } .tg-body { padding-left:18px; } }
+</style>
+
+<style>
+.kd { max-width:1180px; margin:0 auto; padding:0 24px; }
+.kd-banner { background:#fff8e8; border:1px solid #e3cf9a; color:#5a4512; padding:12px 16px; border-radius:10px; font-family:'Degular',sans-serif; font-size:16px; margin:0 0 24px; }
+.kd-ctrl { background:var(--white); border-radius:16px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; margin-bottom:24px; }
+.kd-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.kd-row .lab { font-family:'Degular',sans-serif; font-weight:600; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:#6b6555; min-width:84px; }
+.kd-chip { font-family:'Degular',sans-serif; font-weight:600; font-size:15px; min-height:38px; padding:0 15px; border-radius:999px; border:1px solid #d6d0b8; background:#fff; color:#2b2a25; cursor:pointer; }
+.kd-chip.on { background:var(--olive); border-color:var(--olive); color:var(--cream); }
+.kd-dates { font-family:'Degular',sans-serif; font-size:15px; color:#5c5747; border-top:1px solid #f0ede0; padding-top:10px; }
+.kd-dates b { color:#1f1d16; }
+.kd-tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:24px; }
+.kd-tile { background:var(--white); border-radius:16px; padding:20px; font-family:'Degular',sans-serif; }
+.kd-tile .k { font-size:14px; font-weight:600; color:#5c5747; }
+.kd-tile .n { font-family:'Concrette S',serif; font-size:46px; line-height:1.05; color:#1f1d16; margin:6px 0; }
+.kd-tile .n small { font-size:20px; color:#6b6555; }
+.kd-tile .s { font-size:14px; color:#5c5747; }
+.kd-d { font-family:'Degular',sans-serif; font-size:14px; font-weight:600; margin-top:4px; }
+.kd-d.up { color:#3b6d11; } .kd-d.down { color:#9c3125; } .kd-d.flat { color:#5c5747; }
+.kd-card { background:var(--white); border-radius:16px; padding:20px; margin-bottom:24px; }
+.kd-card h3 { font-family:'Concrette S',serif; font-weight:400; font-size:26px; margin:0 0 12px; }
+.kd-card table { width:100%; min-width:760px; border-collapse:collapse; font-family:'Degular',sans-serif; font-size:15px; }
+.kd-card th { text-align:left; font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:#5c5747; padding:8px 10px; border-bottom:1px solid #e6e2cf; }
+.kd-card td { padding:10px; border-bottom:1px solid #f0ede0; vertical-align:middle; }
+.kd-card tr.pick { cursor:pointer; } .kd-card tr.pick:hover td { background:#faf9f3; }
+.kd-bar { height:8px; background:#ece8d8; border-radius:4px; min-width:80px; } .kd-bar i { display:block; height:8px; border-radius:4px; background:var(--olive); }
+.kd-grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:16px; }
+.kd-mix { display:grid; grid-template-columns:150px 1fr 44px; gap:8px; align-items:center; font-family:'Degular',sans-serif; font-size:15px; margin:6px 0; }
+.kd-track { position:relative; height:16px; background:#f3f1e6; border-radius:4px; }
+.kd-track i { position:absolute; left:0; top:2px; bottom:2px; border-radius:3px; background:#a59c76; }
+.kd-track i.k { background:var(--olive); }
+.kd-band { position:absolute; left:50%; width:10%; top:0; bottom:0; background:#dfe3c4; border-left:1px dashed var(--olive); border-right:1px dashed var(--olive); }
+.kd-hero { background:var(--olive); color:var(--cream); border-radius:16px; padding:24px; margin-bottom:24px; font-family:'Degular',sans-serif; }
+.kd-hero .n { font-family:'Concrette S',serif; font-size:72px; line-height:1; }
+.kd-hero .t { font-size:20px; }
+.kd-hero .br { display:flex; flex-wrap:wrap; gap:20px; font-size:16px; margin-top:12px; }
+.kd-hero .kd-bar { background:rgba(243,241,230,.25); height:12px; margin-top:12px; } .kd-hero .kd-bar i { background:var(--cream); height:12px; }
+.kd-list { list-style:none; padding:0; margin:0; font-family:'Degular',sans-serif; font-size:15px; }
+.kd-list li { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid #f0ede0; }
+.kd-list li span:last-child { color:#5c5747; white-space:nowrap; }
+.kd-hidden { display:none; }
+@media (max-width:760px) { .kd { padding:0 16px; } .kd-mix { grid-template-columns:110px 1fr 40px; } .kd-hero .n { font-size:56px; } }
+</style>
+</head>
+<body>
+<nav class="nav" id="main-nav"></nav>
+<header class="ag-head">
+  <p class="ag-eyebrow">Appendix &mdash; Sales System Review, 20 October</p>
+  <h1>KPI dashboard mock-up</h1>
+  <p class="ag-meta"><a href="/agenda/20-october#dashboard">&larr; Back to the agenda</a></p>
+</header>
+
+<section class="ag-band ag-band--cream" style="padding-top:40px">
+<div class="kd">
+  <div class="kd-banner"><b>Illustrative numbers, to show the layout.</b> The live version will read Pipedrive activities (Meeting, Sample drop, Showroom display), Datapel sales and RoadRunner sample records. Click the buttons: everything on this page responds.</div>
+
+  <div class="kd-ctrl">
+    <div class="kd-row"><span class="lab">Who</span><span id="reps" class="kd-row"></span></div>
+    <div class="kd-row"><span class="lab">Dates</span><span id="ranges" class="kd-row"></span></div>
+    <div class="kd-row"><span class="lab">Compare</span><span id="cmps" class="kd-row"></span></div>
+    <div class="kd-dates" id="dates"></div>
+  </div>
+
+  <div id="team">
+    <div class="kd-tiles" id="teamTiles"></div>
+    <div class="kd-card"><h3>Everyone at a glance</h3><p class="ag-lead" style="font-size:15px;margin:0 0 10px">Click a row to open that rep.</p>
+      <div class="ag-scroll"><table><thead><tr><th>Rep</th><th>In person</th><th></th><th>Meetings</th><th>Sample drops</th><th>Displays</th><th>Different companies</th><th>Net new</th><th>Kitchen retail</th><th>Top 50 seen</th></tr></thead><tbody id="teamRows"></tbody></table></div></div>
+  </div>
+
+  <div id="rep" class="kd-hidden">
+    <div class="kd-hero" id="hero"></div>
+    <div class="kd-grid2">
+      <div class="kd-card"><h3>Meeting mix</h3><p style="font-family:'Degular',sans-serif;color:#5c5747;margin:0 0 8px">By the company&rsquo;s Business Category. Shaded band = Belinda&rsquo;s 50&ndash;60% for kitchen retail.</p><div id="mix"></div></div>
+      <div class="kd-card"><h3>New vs repeat</h3><div id="newrep"></div></div>
+      <div class="kd-card"><h3>Top 50 not seen lately</h3><ul class="kd-list" id="gap"></ul></div>
+      <div class="kd-card"><h3>Past due on call cycle</h3><ul class="kd-list" id="overdue"></ul></div>
+      <div class="kd-card"><h3>Showroom displays</h3><ul class="kd-list" id="displays"></ul></div>
+      <div class="kd-card"><h3>Samples dropped</h3><div id="samples"></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="ag-band ag-band--white" id="how">
+  <div class="ag-inner">
+    <div class="ag-bandhead"><h2>How each number is counted</h2><a class="ag-back" href="/agenda/20-october#dashboard">Back to the agenda</a></div>
+    <div class="ag-scroll"><table>
+      <thead><tr><th>Number</th><th>Counted from</th></tr></thead>
+      <tbody>
+        <tr><td class="ag-key">In person</td><td>Completed Meetings, Sample drops and Showroom displays linked to a company. Target 24 a week.</td></tr>
+        <tr><td class="ag-key">Different companies / net new</td><td>Distinct companies among those visits. Net new = first-ever visit, never bought in Datapel.</td></tr>
+        <tr><td class="ag-key">Meeting mix</td><td>The company&rsquo;s Business Category (Kitchen Retailer is the new option).</td></tr>
+        <tr><td class="ag-key">Top 50 / call cycle</td><td>Datapel 12-month ranking by state, and days since the last visit against the company&rsquo;s Call Cycle.</td></tr>
+        <tr><td class="ag-key">Displays</td><td>Showroom display activities: planned = confirmed, done = installed.</td></tr>
+        <tr><td class="ag-key">Samples</td><td>The items ticked on each Sample drop, scanned by QR at pick-up and at the drop.</td></tr>
+        <tr><td class="ag-key">Comparison</td><td>Previous period, or the same period last year, for every number.</td></tr>
+      </tbody></table></div>
+  </div>
+</section>
+
+<script>
+(function () {
+  var REPS = [
+    { id:'stacey', name:'Stacey', st:'QLD', m:9, d:11, i:2, u:17, nn:3, mix:[48,18,14,10,6,4], t50:[9,12], conf:7,
+      gap:[['#7 Pomie Granite',41],['#12 Sunny Coast Stone',38]], od:[['Edge Designer Homes',44],['KBL Building Solutions',39]],
+      disp:[['Kitchen Connection Maroochydore','installed'],['Coast Kitchens','confirmed']], s:[6,4,1,3] },
+    { id:'caroline', name:'Caroline', st:'QLD', m:10, d:8, i:1, u:12, nn:1, mix:[55,20,12,8,3,2], t50:[10,14], conf:3,
+      gap:[['#4 Stone Corp',47],['#15 Our Stone',36]], od:[['Stone Top Solid Surfaces',52],['Auko Constructions',40]],
+      disp:[['Tuscany Stone Co.','installed'],['Bespoke Stone','confirmed']], s:[5,2,0,2] },
+    { id:'pam', name:'Pam', st:'QLD', m:6, d:10, i:0, u:11, nn:2, mix:[38,26,20,6,4,6], t50:[8,13], conf:2,
+      gap:[['#3 Whitsunday Stone Group',58],['#9 Harmony Stone Gallery',44]], od:[['Marlin Tiles',61],['Peff Cabinets',47]],
+      disp:[['Accent Benchtops Mackay','confirmed']], s:[8,6,2,1] },
+    { id:'laura', name:'Laura', st:'NSW', m:12, d:6, i:1, u:16, nn:4, mix:[44,12,30,8,4,2], t50:[14,22], conf:2,
+      gap:[['#2 Hunter Valley Granite & Marble',37],['#11 Central Coast Granite',35]], od:[['OJ Marble',49],['Stone Work Pro',42]],
+      disp:[['Made In Stone','installed'],['Galaxy Marble Group','confirmed']], s:[4,3,1,2] },
+    { id:'jennifer', name:'Jennifer', st:'QLD', m:7, d:5, i:0, u:10, nn:5, mix:[58,16,6,12,6,2], t50:[3,6], conf:0,
+      gap:[['#18 GX Stone',40]], od:[['Tile Studio',33]], disp:[], s:[3,2,0,1] },
+    { id:'olivia', name:'Olivia', st:'NSW', m:5, d:4, i:0, u:9, nn:1, mix:[40,10,10,30,6,4], t50:[4,8], conf:1,
+      gap:[['#25 Kell & Denson',46]], od:[['All Set Solutions',55]], disp:[['Allambie Marble Crafts','confirmed']], s:[2,1,0,1] }
+  ];
+  var RANGES = [
+    ['tw','This week',1,'19 – 25 Oct 2026','12 – 18 Oct','19 – 25 Oct 2025'],
+    ['lw','Last week',1,'12 – 18 Oct 2026','5 – 11 Oct','12 – 18 Oct 2025'],
+    ['tm','This month',3,'1 – 20 Oct 2026','1 – 20 Sep','1 – 20 Oct 2025'],
+    ['lm','Last month',4.3,'September 2026','August','September 2025'],
+    ['lq','Last quarter',13,'Jul – Sep 2026','Apr – Jun','Jul – Sep 2025'],
+    ['fy','Financial year to date',16,'1 Jul – 20 Oct 2026','12 Mar – 30 Jun','1 Jul – 20 Oct 2025']
+  ];
+  var CMPS = [['none','No comparison'],['prev','Previous period'],['yoy','Same period last year']];
+  var PREV = { stacey:.82, caroline:1.08, pam:.9, laura:.76, jennifer:.95, olivia:1.12 };
+  var YOY = { stacey:.64, caroline:.7, pam:.88, laura:.5, jennifer:.6, olivia:.8 };
+  var MIX = ['Kitchen retail','Cabinet maker','Stonemason','Architect / designer','Builder','No category'];
+  var SAMPLES = ['Benchtop boxes','Designer boxes','Floor stands','Folders'];
+  var st = { rep:'team', range:'tw', cmp:'prev' };
+  function $(id) { return document.getElementById(id); }
+  function esc(v) { return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function rng() { for (var i = 0; i < RANGES.length; i++) if (RANGES[i][0] === st.range) return RANGES[i]; }
+  function f(id) { return (st.cmp === 'yoy' ? YOY : PREV)[id]; }
+  function delta(cur, prev, unit) {
+    if (st.cmp === 'none') return '';
+    var d = cur - prev, p = prev ? Math.round(d / prev * 100) : 0, s = d > 0 ? '+' : d < 0 ? '−' : '±';
+    return '<div class="kd-d ' + (d > 0 ? 'up' : d < 0 ? 'down' : 'flat') + '">' + s + Math.abs(d) + (unit || ' (' + s + Math.abs(p) + '%)') + ' vs ' + (st.cmp === 'yoy' ? 'last year' : 'previous period') + '</div>';
+  }
+  function calc(r, k) {
+    var ip = Math.round((r.m + r.d + r.i) * k);
+    return { ip: ip, prev: Math.round(ip * f(r.id)), m: Math.round(r.m * k), d: Math.round(r.d * k), i: Math.round(r.i * k),
+      u: Math.round(r.u * (k === 1 ? 1 : k * .65)), nn: Math.round(r.nn * k), target: Math.round(24 * k) };
+  }
+  function chips(host, list, key) {
+    $(host).innerHTML = list.map(function (x) { return '<button type="button" class="kd-chip' + (st[key] === x[0] ? ' on' : '') + '" data-' + key + '="' + x[0] + '">' + esc(x[1]) + '</button>'; }).join('');
+  }
+  function render() {
+    var R = rng(), k = R[2];
+    chips('reps', [['team','Whole team']].concat(REPS.map(function (r) { return [r.id, r.name]; })), 'rep');
+    chips('ranges', RANGES, 'range'); chips('cmps', CMPS, 'cmp');
+    $('dates').innerHTML = '<b>' + R[3] + '</b>' + (st.cmp === 'none' ? '' : ' compared with ' + (st.cmp === 'yoy' ? R[5] : R[4])) + ' &middot; target ' + Math.round(24 * k) + ' in person per rep (24 a week)';
+    var team = st.rep === 'team';
+    $('team').classList.toggle('kd-hidden', !team); $('rep').classList.toggle('kd-hidden', team);
+    if (team) {
+      var all = REPS.map(function (r) { return [r, calc(r, k)]; });
+      var sum = function (fn) { return all.reduce(function (a, x) { return a + fn(x); }, 0); };
+      var ip = sum(function (x) { return x[1].ip; }), prev = sum(function (x) { return x[1].prev; }), tf = prev / ip;
+      var nn = sum(function (x) { return x[1].nn; }), inst = sum(function (x) { return x[1].i; });
+      var kit = Math.round(sum(function (x) { return x[1].ip * x[0].mix[0]; }) / ip);
+      $('teamTiles').innerHTML =
+        '<div class="kd-tile"><div class="k">Team in-person activities</div><div class="n">' + ip + '<small> / ' + Math.round(24 * k) * REPS.length + '</small></div>' + delta(ip, prev) + '</div>' +
+        '<div class="kd-tile"><div class="k">Net new companies</div><div class="n">' + nn + '</div><div class="s">first-ever visit, never bought</div>' + delta(nn, Math.round(nn * tf)) + '</div>' +
+        '<div class="kd-tile"><div class="k">Kitchen retail share of visits</div><div class="n">' + kit + '%</div><div class="s">Belinda&rsquo;s band: 50&ndash;60%</div>' + delta(kit, kit - (st.cmp === 'yoy' ? 9 : 3), ' pts') + '</div>' +
+        '<div class="kd-tile"><div class="k">Showroom displays</div><div class="n">' + inst + '<small> installed</small></div><div class="s">' + sum(function (x) { return x[0].conf; }) + ' confirmed and waiting</div>' + delta(inst, Math.round(inst * tf)) + '</div>';
+      $('teamRows').innerHTML = all.map(function (x) {
+        var r = x[0], c = x[1], pct = Math.min(100, Math.round(c.ip / c.target * 100));
+        var dd = st.cmp === 'none' ? '' : ' <span class="kd-d ' + (c.ip >= c.prev ? 'up' : 'down') + '" style="display:inline">' + (c.ip >= c.prev ? '+' : '−') + Math.abs(c.ip - c.prev) + '</span>';
+        return '<tr class="pick" data-rep="' + r.id + '"><td><b>' + r.name + '</b> <span style="color:#6b6555">' + r.st + '</span></td><td>' + c.ip + ' / ' + c.target + dd + '</td><td style="width:120px"><div class="kd-bar"><i style="width:' + pct + '%"></i></div></td>' +
+          '<td>' + c.m + '</td><td>' + c.d + '</td><td>' + c.i + '</td><td>' + c.u + '</td><td>' + c.nn + '</td><td>' + r.mix[0] + '%</td><td>' + r.t50[0] + ' / ' + r.t50[1] + '</td></tr>';
+      }).join('');
+      return;
+    }
+    var r = REPS.filter(function (x) { return x.id === st.rep; })[0], c = calc(r, k), pct = Math.min(100, Math.round(c.ip / c.target * 100));
+    $('hero').innerHTML = '<div style="font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">' + r.name + ' &middot; in-person activities</div>' +
+      '<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span class="n">' + c.ip + '</span><span class="t">of ' + c.target + ' target</span></div>' +
+      (st.cmp === 'none' ? '' : '<div style="font-weight:600;opacity:.9">' + (c.ip >= c.prev ? '+' : '−') + Math.abs(c.ip - c.prev) + ' vs ' + (st.cmp === 'yoy' ? 'last year' : 'previous period') + ' (' + c.prev + ')</div>') +
+      '<div class="kd-bar"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="br"><span><b>' + c.m + '</b> meetings</span><span><b>' + c.d + '</b> sample drops</span><span><b>' + c.i + '</b> showroom displays</span></div>';
+    $('mix').innerHTML = r.mix.map(function (p, i) { return '<div class="kd-mix"><span>' + MIX[i] + '</span><span class="kd-track">' + (i === 0 ? '<span class="kd-band"></span>' : '') + '<i class="' + (i === 0 ? 'k' : '') + '" style="width:' + p + '%"></i></span><span>' + p + '%</span></div>'; }).join('');
+    $('newrep').innerHTML = '<div class="kd-tiles" style="margin:0"><div class="kd-tile" style="background:#f3f1e6"><div class="k">Different companies</div><div class="n">' + c.u + '</div><div class="s">' + Math.max(0, c.ip - c.u) + ' repeat visits</div></div>' +
+      '<div class="kd-tile" style="background:#f3f1e6"><div class="k">Net new</div><div class="n">' + c.nn + '</div><div class="s">first-ever visit, never bought</div></div></div>';
+    $('gap').innerHTML = r.gap.map(function (g) { return '<li><span>' + esc(g[0]) + '</span><span>' + g[1] + ' days ago</span></li>'; }).join('') + '<li><span>Top 50 seen in this period</span><span>' + r.t50[0] + ' of ' + r.t50[1] + '</span></li>';
+    $('overdue').innerHTML = r.od.map(function (g) { return '<li><span>' + esc(g[0]) + '</span><span>' + g[1] + ' days since a visit</span></li>'; }).join('');
+    $('displays').innerHTML = r.disp.length ? r.disp.map(function (g) { return '<li><span>' + esc(g[0]) + '</span><span>' + g[1] + '</span></li>'; }).join('') : '<li><span>None in this period</span><span></span></li>';
+    $('samples').innerHTML = '<ul class="kd-list">' + r.s.map(function (n, i) { return '<li><span>' + SAMPLES[i] + '</span><span>' + Math.round(n * k) + ' dropped</span></li>'; }).join('') + '<li><span>Logged by QR scan</span><span>' + (r.id === 'pam' ? '7 of 10' : 'all') + '</span></li></ul>';
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-rep],[data-range],[data-cmp]'); if (!b) return;
+    if (b.hasAttribute('data-rep')) st.rep = b.getAttribute('data-rep');
+    if (b.hasAttribute('data-range')) st.range = b.getAttribute('data-range');
+    if (b.hasAttribute('data-cmp')) st.cmp = b.getAttribute('data-cmp');
+    render();
+    if (b.tagName === 'TR') window.scrollTo({ top: $('rep').getBoundingClientRect().top + window.scrollY - 220, behavior: 'smooth' });
+  });
+  render();
+})();
+</script>
+<div class="footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <p class="footer-col-heading">Alpha Surfaces</p>
+      <p>Sales System Review &mdash; internal working document. Mock-up with illustrative figures, prepared for the 20 October review.</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Locations</p>
+      <p>Kunda Park, Queensland<br>New South Wales</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Contact</p>
+      <p><a href="mailto:hello@alphasurfaces.com.au">hello@alphasurfaces.com.au</a></p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-heading">Site</p>
+      <p><a href="https://alphasurfaces.com.au" target="_blank" rel="noopener">alphasurfaces.com.au</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom"><p>Internal preview &middot; not indexed &middot; prepared 20 October 2026 &middot; Brisbane</p></div>
+</div>
+
+<script src="/nav.js?v=23"></script>
+<script>
+(function () {
+  function fixLogo() {
+    var img = document.querySelector('#main-nav img');
+    if (!img) return false;
+    var src = img.getAttribute('src') || '';
+    if (src && src.charAt(0) !== '/' && src.indexOf('http') !== 0) {
+      img.setAttribute('src', '/' + src.replace(/^(\.\.\/)+/, ''));
+    }
+    return true;
+  }
+  if (!fixLogo()) {
+    var nav = document.getElementById('main-nav');
+    if (nav && window.MutationObserver) {
+      var mo = new MutationObserver(function () { if (fixLogo()) mo.disconnect(); });
+      mo.observe(nav, { childList: true, subtree: true });
+      setTimeout(function () { mo.disconnect(); }, 8000);
+    }
+  }
+})();
+</script>
+</body>
+</html>
