@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="/animation.css?v=19">
 <link rel="stylesheet" href="/nav.css?v=19">
 <link rel="stylesheet" href="/mobile.css?v=19">
-<link rel="stylesheet" href="/campaign.css?v=3">
+<link rel="stylesheet" href="/campaign.css?v=4">
 <!-- ALPHA_ANALYTICS_V1 -->
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-W0841557EV"></script>
@@ -37,6 +37,7 @@
 
 <!-- 1 · Hero -->
 <header class="cp-hero">
+  <!-- Hero image: swap for a wider kitchen lifestyle shot from the October shoot when it arrives (Claire, 19 Oct). -->
   <div class="cp-hero-media"><img src="/images/gallery-kitchen.webp" alt="Kitchen with an Alpha Surfaces benchtop"></div>
   <div class="cp-hero-copy">
     <p class="cp-eyebrow">Alpha Surfaces</p>
@@ -48,21 +49,27 @@
   </div>
 </header>
 
-<!-- 2 · Benefits strip -->
+<!-- 2 · Why Alpha: short intro, an optional video, then the four pillars with a photo each (Claire, 19 Oct).
+     Video: drop a muted MP4 at /images/campaign/discover-intro.mp4 and it appears here (autoplay, muted, looping).
+     Pillar photos are stand-ins from the site until the shoot images arrive. Intro copy is a draft for Claire's sweep. -->
 <section class="cp-section" style="padding-bottom:40px">
+  <div class="cp-wrap cp-centre">
+    <p class="cp-intro">Alpha Surfaces makes premium mineral benchtops for Australian homes: <span data-count>30+</span> contemporary designs, a zero silica formulation that&rsquo;s safer for the people who make them, and AlphaShield&trade; protection that stops everyday spills from staining. Beautiful to look at and easy to live with.</p>
+    <div class="cp-video" id="intro-video" hidden style="margin-top:36px"></div>
+  </div>
   <div class="cp-wrap">
     <div class="cp-points">
-      <div class="cp-point"><b>Beautiful</b><span><span data-count>30+</span> contemporary designs</span></div>
-      <div class="cp-point"><b>Durable</b><span>Designed for everyday use</span></div>
-      <div class="cp-point"><b>Protected</b><span>AlphaShield&trade; surface protection</span></div>
-      <div class="cp-point" data-claim="silica"><b>Zero Silica</b><span>Next-generation mineral surfaces</span></div>
+      <div class="cp-point"><b>Beautiful</b><span class="cp-point-img"><img src="/images/quality-carrara-20260607.webp" alt="Kitchen with an Alpha Surfaces benchtop" loading="lazy"></span><span><span data-count>30+</span> contemporary designs</span></div>
+      <div class="cp-point"><b>Durable</b><span class="cp-point-img"><img src="/images/gallery-kitchen.webp" alt="Alpha Surfaces benchtop in everyday use" loading="lazy"></span><span>Designed for everyday use</span></div>
+      <div class="cp-point"><b>Protected</b><span class="cp-point-img" id="pillar-shield"><img src="/images/alphashield-hero.webp" alt="AlphaShield surface protection" loading="lazy"></span><span>AlphaShield&trade; surface protection</span></div>
+      <div class="cp-point" data-claim="silica"><b>Zero Silica</b><span class="cp-point-img"><img src="/images/stones/statuario-gold-slab.webp" alt="Close-up of a veined Alpha Surfaces slab" loading="lazy"></span><span>Next-generation mineral surfaces</span></div>
     </div>
   </div>
 </section>
 
 <!-- 3 · Certifications -->
 <section class="cp-section" style="padding-top:20px">
-  <div class="cp-wrap">
+  <div class="cp-wrap cp-certs-wrap">
     <p class="cp-sub">Independently tested and certified to the highest international standards.</p>
     <div class="cp-certs">
       <img src="/images/certifications/nsf.webp" alt="NSF International Certified" loading="lazy">
@@ -85,6 +92,18 @@
       <p class="cp-eyebrow">AlphaShield&trade;</p>
       <h2 class="cp-h2">Stains happen. AlphaShield&trade; stops them sticking.</h2>
       <p class="cp-sub">Our exclusive surface treatment repels everyday stains &mdash; wine, coffee, oil, acidic foods &mdash; and comes backed by a Lifetime Stain Resistance Guarantee.</p>
+      <!-- "Learn more" opens in place: no pop-up, nobody leaves the page (Claire, 19 Oct) -->
+      <details class="cp-more" id="shield-more"><summary>Learn more about AlphaShield&trade;</summary>
+        <div class="body">
+          <p>AlphaShield&trade; is applied in the final stage of manufacture and embedded in the top layer of the surface, filling its microscopic pores. It is invisible and permanent, so there is nothing to reapply or reseal.</p>
+          <ul>
+            <li>Resists everyday kitchen stains: red wine, coffee, oil and acidic foods.</li>
+            <li>Stands up to most household chemicals.</li>
+            <li>Built-in microbial protection.</li>
+            <li>Backed by a Lifetime Stain Resistance Guarantee.</li>
+          </ul>
+        </div>
+      </details>
     </div>
   </div>
 </section>
@@ -94,6 +113,7 @@
   <div class="cp-wrap">
     <p class="cp-eyebrow">Explore our collections</p>
     <h2 class="cp-h2">Every design, from warm and natural to bold and dramatic.</h2>
+    <p class="cp-sub" style="max-width:760px">Every space is unique, and the right surface makes all the difference. Discover our range of benchtop surfaces, with colours and finishes to suit every style, from understated elegance to bold contemporary design. Explore the collection below and order up to three free samples to find your perfect match.</p>
     <div id="grid" style="margin-top:26px"></div>
   </div>
 </section>
@@ -131,8 +151,8 @@
 <!-- 8 · Showrooms -->
 <section class="cp-section cream" id="showrooms">
   <div class="cp-wrap">
-    <h2 class="cp-h2">See it in person.</h2>
-    <p class="cp-sub">Find your nearest showroom or fabricator.</p>
+    <h2 class="cp-h2">Visit a showroom</h2>
+    <p class="cp-sub">See full slabs in person at one of our showrooms, or through a stonemason partner near you.</p>
     <div class="cp-rooms" id="rooms"></div>
   </div>
 </section>
@@ -152,7 +172,7 @@
 <!-- FOOTER -->
 <script src="/animation.js?v=19"></script>
 <script src="/nav.js?v=23"></script>
-<script src="/campaign.js?v=2"></script>
+<script src="/campaign.js?v=3"></script>
 <script>
 (function () {
   var C = window.AlphaCampaign;
@@ -170,10 +190,19 @@
   });
   // Autoplay the wipe-clean demo once the file exists (muted, inline, looping).
   fetch('/images/campaign/alphashield-wipe.mp4', { method: 'HEAD' }).then(function (r) {
-    if (!r.ok) return;
-    document.getElementById('shield-media').innerHTML =
-      '<video src="/images/campaign/alphashield-wipe.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Spill wiped clean from an AlphaShield surface"></video>';
+    if (!r.ok || !/^video\//.test(r.headers.get('content-type') || '')) return;
+    var v = '<video src="/images/campaign/alphashield-wipe.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Spill wiped clean from an AlphaShield surface"></video>';
+    document.getElementById('shield-media').innerHTML = v;
+    document.getElementById('pillar-shield').innerHTML = v;
   }).catch(function () {});
+  fetch('/images/campaign/discover-intro.mp4', { method: 'HEAD' }).then(function (r) {
+    if (!r.ok || !/^video\//.test(r.headers.get('content-type') || '')) return;
+    var box = document.getElementById('intro-video');
+    box.innerHTML = '<video src="/images/campaign/discover-intro.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Alpha Surfaces kitchens"></video>';
+    box.hidden = false;
+  }).catch(function () {});
+  var more = document.getElementById('shield-more');
+  if (more) more.addEventListener('toggle', function () { if (more.open) C.track('ViewContent', { content_name: 'alphashield_learn_more' }); });
 })();
 </script>
 <script src="/newsletter-form.js"></script>

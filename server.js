@@ -506,13 +506,22 @@ function notifySubmissionSafely(submission, label) {
 // notifySubmissionSafely, which alerts staff — these go to the person who
 // submitted. Never awaited and never rethrows: a mail failure must leave the
 // submission itself untouched.
-function notifyConfirmationSafely(formType, submission, sampleItems, reference) {
+// The Meta campaign enquiry form (/discover/enquire, and campaign-builder pages
+// /c/<slug>/enquire) posts to /api/contact as a Contact Enquiry. It promises a
+// reply within 24 hours and the customer gets a receipt (Claire, 19 Oct 2026).
+// Other Contact Enquiry forms (partner pages, the plain contact form) are unchanged.
+function isCampaignEnquiry(formType, fields) {
+  return formType === 'Contact Enquiry' &&
+    /^\/(discover|c)\//.test(String((fields && fields.landing_page) || ''));
+}
+
+function notifyConfirmationSafely(formType, submission, sampleItems, reference, fields) {
   let send = null;
   if (formType === 'Sample Request') {
     send = notifications.sendSampleConfirmationEmail(submission, sampleItems, reference);
   } else if (formType === 'Warranty Activation') {
     send = notifications.sendWarrantyConfirmationEmail(submission, reference);
-  } else if (formType === 'Enquiry') {
+  } else if (formType === 'Enquiry' || isCampaignEnquiry(formType, fields)) {
     send = notifications.sendEnquiryConfirmationEmail(submission, reference);
   }
   if (send && typeof send.catch === 'function') {
@@ -597,7 +606,7 @@ async function persistPublicFormSubmission(formType, fields, sampleItems, option
   // the customer a durable copy of it. Fire-and-forget: notifyConfirmationSafely
   // swallows everything, so SendGrid being down can never fail a registration.
   if (!saved.duplicate) {
-    notifyConfirmationSafely(formType, submission, sampleItems, typed && typed.reference);
+    notifyConfirmationSafely(formType, submission, sampleItems, typed && typed.reference, fields);
   }
 
   if (!saved.duplicate) trackOutreachConversion(formType, fields, id);
@@ -713,6 +722,10 @@ async function handleForm(req, res, formType) {
       // Normalise before anything persists it, so 'qld' and 'QLD' are one
       // value in the database and one option in Pipedrive.
       fields.state = String(fields.state).trim().toUpperCase();
+    }
+    if (isCampaignEnquiry(formType, fields) && !/^\d{4}$/.test(String(fields.postcode || '').trim())) {
+      // Postcode is required on the campaign enquiry form (Claire, 19 Oct).
+      return res.status(400).json({ ok: false, error: 'Please enter your 4-digit postcode.' });
     }
     if (formType === 'Warranty Activation') {
       // `warranty_type` is accepted as an alias so an older cached copy of

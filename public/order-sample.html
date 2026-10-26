@@ -266,6 +266,19 @@ input[name="samples"]:disabled + label { opacity:0.4; cursor:not-allowed; }
   preselectedList = preselectedList.slice(0, 3);
   if (campaignPage) {
     var h = document.querySelector('.order-heading'); if (h) h.textContent = 'Order your free samples';
+    // Claire, 19 Oct: 'Order a sample' is already chosen as the reason, and the
+    // page says up front how long delivery takes. Delivery wording to confirm
+    // with Jess / Belinda before launch (same words as the /free-samples FAQ).
+    var why = document.querySelector('select[name="reason"]'); if (why) why.value = 'Sample request';
+    var desc = document.querySelector('.order-desc');
+    if (desc && !document.getElementById('cp-delivery-note')) {
+      var note = document.createElement('p');
+      note.id = 'cp-delivery-note';
+      note.className = 'order-desc';
+      note.style.marginTop = '14px';
+      note.innerHTML = '<strong>Delivery:</strong> samples are usually posted within two business days by Australia Post. Please allow up to two weeks for them to arrive.';
+      desc.parentNode.insertBefore(note, desc.nextSibling);
+    }
   }
 
   fetch('/data/stones.json')

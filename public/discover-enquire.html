@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="/animation.css?v=19">
 <link rel="stylesheet" href="/nav.css?v=19">
 <link rel="stylesheet" href="/mobile.css?v=19">
-<link rel="stylesheet" href="/campaign.css?v=3">
+<link rel="stylesheet" href="/campaign.css?v=4">
 <!-- ALPHA_ANALYTICS_V1 -->
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-W0841557EV"></script>
@@ -63,10 +63,11 @@
               <option value="Stonemason">Stonemason</option>
               <option value="Other">Other</option>
             </select></div>
-          <div class="cp-field"><label for="postcode">Postcode <span class="opt">(optional)</span></label><input id="postcode" name="postcode" inputmode="numeric" maxlength="4" autocomplete="postal-code"></div>
+          <div class="cp-field"><label for="postcode">Postcode <span class="req">*</span></label><input id="postcode" name="postcode" inputmode="numeric" maxlength="4" autocomplete="postal-code" required></div>
         </div>
         <div class="cp-field"><label for="message">Your message <span class="req">*</span></label><textarea id="message" name="message" required placeholder="Tell us a bit about your project"></textarea></div>
         <label class="cp-check"><input type="checkbox" name="marketing_consent"> Keep me updated with new designs and news from Alpha Surfaces.</label>
+        <p class="cp-consent-note">By subscribing you agree to receive marketing emails from Alpha Surfaces Pty Ltd (ABN 21 677 729 350). Your information is handled in accordance with our <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>. You can unsubscribe at any time.</p>
         <p class="cp-err" id="err"></p>
         <div><button class="cp-btn" type="submit">Send enquiry</button></div>
       </form>
@@ -84,7 +85,7 @@
 <!-- FOOTER -->
 <script src="/animation.js?v=19"></script>
 <script src="/nav.js?v=23"></script>
-<script src="/campaign.js?v=2"></script>
+<script src="/campaign.js?v=3"></script>
 <script>
 (function () {
   var C = window.AlphaCampaign, form = document.getElementById('enquire'), err = document.getElementById('err');
@@ -99,7 +100,7 @@
     if (!f.first_name || !f.last_name) return fail('Please tell us your name.');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email || '')) return fail('Please enter a valid email address.');
     if (!f.role) return fail('Please tell us which one you are.');
-    if (f.postcode && !/^\d{4}$/.test(f.postcode)) return fail('Postcode should be four digits.');
+    if (!/^\d{4}$/.test(f.postcode || '')) return fail('Please enter your 4-digit postcode.');
     if (!f.message) return fail('Please include a message.');
     f.name = f.first_name + ' ' + f.last_name;
     f.reason = 'General enquiry';
@@ -112,7 +113,7 @@
         C.track('Contact', { content_name: 'discover_enquire' });
         form.outerHTML = '<div class="cp-done"><div style="font-size:44px;color:#564d22">&#10003;</div>' +
           '<h2 class="cp-h2" style="font-size:26px;margin-top:10px">Thanks &mdash; we have your enquiry.</h2>' +
-          '<p class="cp-sub" style="margin:0 auto">Someone from Alpha Surfaces will be in touch within 24 hours.</p>' +
+          '<p class="cp-sub" style="margin:0 auto">A member of the Alpha Surfaces team will be in touch within 24 hours. We&rsquo;ve emailed you a copy of your enquiry.</p>' +
           '<div class="cp-btns" style="justify-content:center"><a class="cp-btn" href="' + C.withParams('/discover#collection') + '">Order a free sample</a></div></div>';
       })
       .catch(function (x) { btn.disabled = false; btn.textContent = 'Send enquiry'; fail(x.message + ' You can also call us on 1300 257 420.'); });

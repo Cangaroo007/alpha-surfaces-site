@@ -199,3 +199,35 @@ body { color: var(--black); }
 .cp-sub, .cp-point span, .cp-room p, .cp-dir span, .cp-group-p, .cp-howto, .cp-tile .coll, .cp-empty { color: var(--muted); }
 .cp-close .cp-h2 { color: var(--cream); }
 .cp-field label { color: var(--black); }
+
+/* --- Claire's review, 19 Oct 2026 --- */
+/* Benefit pillars with a small photo under each heading */
+.cp-point .cp-point-img { display: block; aspect-ratio: 4 / 3; border-radius: 3px; overflow: hidden; background: #e8e6dc; margin: 4px 0 14px; }
+.cp-point .cp-point-img img, .cp-point .cp-point-img video { width: 100%; height: 100%; object-fit: cover; }
+/* Short intro copy above a section's content */
+.cp-intro { font-family: 'Concrette S', serif; font-size: 19px; line-height: 1.45; color: var(--black); max-width: 760px; }
+.cp-centre { text-align: center; }
+.cp-centre .cp-intro, .cp-centre .cp-sub { margin-left: auto; margin-right: auto; }
+/* Certifications centred so they don't read as the footer */
+.cp-certs-wrap { text-align: center; }
+.cp-certs-wrap .cp-sub { margin: 0 auto; }
+.cp-certs-wrap .cp-certs { justify-content: center; }
+/* Video under the hero (shown only when the file exists) */
+.cp-video { max-width: 980px; margin: 0 auto; border-radius: 4px; overflow: hidden; background: #000; aspect-ratio: 16 / 9; }
+.cp-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* "Learn more" that opens in place: no pop-up, nobody leaves the page */
+.cp-more { margin-top: 18px; }
+.cp-more summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; color: var(--olive); border: 1px solid var(--olive); border-radius: 40px; padding: 10px 22px; font-size: 15px; }
+.cp-more summary::-webkit-details-marker { display: none; }
+.cp-more summary::after { content: '+'; font-size: 18px; line-height: 1; }
+.cp-more[open] summary::after { content: '\2212'; }
+.cp-more .body { margin-top: 18px; padding: 20px 22px; background: var(--white); border-left: 3px solid var(--olive); border-radius: 4px; font-size: 16px; line-height: 1.6; color: var(--black); }
+.cp-more .body p + p { margin-top: 10px; }
+.cp-more .body ul { margin: 10px 0 0 18px; }
+/* Why Alpha as an expandable list (same look as the FAQ) */
+.cp-why { margin-top: 22px; }
+.cp-why summary { font-size: 20px; }
+/* Delivery note on the order page and the consent wording under the checkbox */
+.cp-note { font-size: 14px; color: var(--muted); line-height: 1.5; }
+.cp-consent-note { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: -14px 0 0 26px; }
+.cp-consent-note a { color: var(--olive); }
