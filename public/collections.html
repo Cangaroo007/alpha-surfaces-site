@@ -425,7 +425,7 @@ img { display: block; max-width: 100%; }
           info.className = 'stone-card-info';
           info.innerHTML =
             '<div class="stone-card-name">' + stone.name + '</div>' +
-            '<div class="stone-card-finish">' + collection.name.replace(' — Discontinued', '') + ' | ' + finishLabel + '</div>';
+            '<div class="stone-card-finish">' + collection.name.replace(' — Discontinued', '') + (finishLabel ? ' | ' + finishLabel : '') + '</div>';
           card.appendChild(info);
 
           grid.appendChild(card);
