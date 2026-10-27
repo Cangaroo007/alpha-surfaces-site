@@ -253,6 +253,28 @@ app.use((err, req, res, next) => {
 });
 app.use(cookieParser());
 app.use(helmet());
+// sprintrep's cookie notice and first-party tracker (t.js and /t/collect) load
+// from the sprintrep API host. Set on Railway (neither is a secret):
+//   SPRINTREP_TRACKER_ORIGIN  https://<sprintrep api host>
+//   SPRINTREP_SITE_ID         the site's public id (32 hex characters), from
+//                             sprintrep: Website traffic -> Cookies and settings
+//                             -> Add to another website
+// With both set, every page carrying the ALPHA_ANALYTICS_V2 block gets the
+// tracker line before </body>. Unset, nothing is added - and because Google
+// Analytics, Clarity and the Meta pixel wait for the notice's consent, they
+// do not load either.
+const SPRINTREP_TRACKER_ORIGIN = /^https:\/\/[a-z0-9.-]+$/i.test(String(process.env.SPRINTREP_TRACKER_ORIGIN || '').replace(/\/+$/, ''))
+  ? String(process.env.SPRINTREP_TRACKER_ORIGIN).replace(/\/+$/, '')
+  : null;
+const SPRINTREP_SITE_ID = /^[a-f0-9]{32}$/.test(String(process.env.SPRINTREP_SITE_ID || '').trim())
+  ? String(process.env.SPRINTREP_SITE_ID).trim()
+  : null;
+const SPRINTREP_TRACKER_TAG = SPRINTREP_TRACKER_ORIGIN && SPRINTREP_SITE_ID
+  ? '<!-- sprintrep: cookie notice + first-party visit tracking -->\n<script src="' + SPRINTREP_TRACKER_ORIGIN + '/t.js?site=' + SPRINTREP_SITE_ID + '" async></script>\n'
+  : '';
+if (!SPRINTREP_TRACKER_TAG) {
+  console.warn('[sprintrep] SPRINTREP_TRACKER_ORIGIN / SPRINTREP_SITE_ID not set: no cookie notice, and analytics and pixels stay off');
+}
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -261,7 +283,8 @@ app.use(
         "'self'", "'unsafe-inline'", "'unsafe-eval'",
         "https://cdn.jsdelivr.net", "https://online.flippingbook.com", "https://d33i2vgywgme2s.cloudfront.net",
         "https://www.googletagmanager.com", "https://www.google-analytics.com",
-        "https://www.clarity.ms", "https://*.clarity.ms"
+        "https://www.clarity.ms", "https://*.clarity.ms",
+        ...(SPRINTREP_TRACKER_ORIGIN ? [SPRINTREP_TRACKER_ORIGIN] : [])
       ],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://online.flippingbook.com", "https://*.flippingbook.com"],
       imgSrc: [
@@ -277,7 +300,8 @@ app.use(
         "https://analytics.google.com",
         "https://www.clarity.ms", "https://c.clarity.ms", "https://d.clarity.ms",
         "https://*.clarity.ms",
-        "https://roadrunner-api-staging.up.railway.app"
+        "https://roadrunner-api-staging.up.railway.app",
+        ...(SPRINTREP_TRACKER_ORIGIN ? [SPRINTREP_TRACKER_ORIGIN] : [])
       ],
       frameSrc: ["'self'", "https://online.flippingbook.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
@@ -350,6 +374,10 @@ function renderHtml(filePath) {
   let html = fs.readFileSync(filePath, 'utf8');
   if (!html.includes('rel="icon"') && html.includes('</head>')) {
     html = html.replace('</head>', FAVICON_TAGS + '\n</head>');
+  }
+  if (SPRINTREP_TRACKER_TAG && html.includes('<!-- ALPHA_ANALYTICS_V2 -->') && html.includes('</body>')) {
+    const at = html.lastIndexOf('</body>');
+    html = html.slice(0, at) + SPRINTREP_TRACKER_TAG + html.slice(at);
   }
   return html.includes(FOOTER_MARKER)
     ? html.replace(FOOTER_MARKER, FOOTER_PARTIAL)
