@@ -18,7 +18,8 @@
 // marker when SPRINTREP_TRACKER_ORIGIN and SPRINTREP_SITE_ID are set on the
 // host. Until then no consent is ever given, so nothing optional loads.
 //
-// Pages without a V1 block (internal agendas, training pages) are left alone.
+// Pages without a V1 block (internal agendas, training pages) are left alone,
+// except the colour pages (public/surfaces), which get the V2 block.
 //
 // GA4 and Clarity: if sprintrep already loaded them (their ids are set in
 // sprintrep's Website traffic settings), this block does not load them again.
@@ -114,6 +115,13 @@ function listHtmlFiles() {
       .filter(f => f.endsWith('.html'))
       .forEach(f => out.push(path.join('partners', f)));
   }
+  // Colour pages never had the V1 block; they get the consent-gated block too.
+  const surfacesDir = path.join(PUBLIC_DIR, 'surfaces');
+  if (fs.existsSync(surfacesDir)) {
+    fs.readdirSync(surfacesDir)
+      .filter(f => f.endsWith('.html'))
+      .forEach(f => out.push(path.join('surfaces', f)));
+  }
   return out;
 }
 
@@ -153,7 +161,8 @@ function injectInto(relPath) {
   }
 
   // Analytics: V1 replaced by V2, only on pages that had V1 (customer-facing).
-  if (html.indexOf(ANALYTICS_MARKER) === -1 && html.indexOf(V1_MARKER) !== -1) {
+  const colourPage = relPath.indexOf('surfaces' + path.sep) === 0;
+  if (html.indexOf(ANALYTICS_MARKER) === -1 && (html.indexOf(V1_MARKER) !== -1 || colourPage)) {
     if (html.indexOf('</head>') === -1) {
       return { relPath, skipped: 'no </head>' };
     }
