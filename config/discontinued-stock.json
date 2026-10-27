@@ -1,0 +1,32 @@
+{
+  "as_at": "2026-10-27",
+  "source": "Pam's stock on hand, 27 October 2026 (Brisbane)",
+  "note": "Alpha Zero (discontinued) colours with stock are listed on /collections#alpha-zero. Colours at zero are taken off that list only; a current-range colour with the same name (Taj Mahal, Viola Ligera, Whitehaven) is not touched. Counts are not shown on the website.",
+  "in_stock": [
+    { "name": "Silver Travertine", "slug": "silver-travertine", "slabs": 4 },
+    { "name": "Taj Mahal Biscotti", "slug": "taj-mahal-biscotti", "slabs": 16 },
+    { "name": "Grande Glacier", "slug": "grande-glacier", "slabs": 22 },
+    { "name": "Basaltina", "slug": "basaltina", "slabs": 67 },
+    { "name": "Carbon", "slug": "carbon", "slabs": 1 },
+    { "name": "Acropolis", "slug": "acropolis", "slabs": 19 },
+    { "name": "Glacier Grey", "slug": "glacier-grey", "slabs": 26 },
+    { "name": "Noosa", "slug": "noosa", "slabs": 2 },
+    { "name": "Calacatta Oro", "slug": "calacatta-oro", "slabs": 49 },
+    { "name": "Serena", "slug": "serena", "slabs": 49 },
+    { "name": "Venatino", "slug": "venatino", "slabs": 2 },
+    { "name": "Crystello", "slug": "crystello", "slabs": 3 },
+    { "name": "Travertino Classico", "slug": "travertino-classico", "slabs": 2 },
+    { "name": "Dolomite", "slug": "dolomite", "slabs": 7 },
+    { "name": "Statuario Grigio", "slug": "statuario-grigio", "slabs": 30 },
+    { "name": "Infinity White", "slug": "infinity-white", "slabs": 14 },
+    { "name": "Patagonia", "slug": "patagonia", "slabs": 19 },
+    { "name": "Calacatta Borghini", "slug": "calacatta-borghini", "slabs": 18 }
+  ],
+  "zero_stock": [
+    { "name": "Infinity Gris", "slug": "infinity-gris" },
+    { "name": "Viola Ligera", "slug": "viola-ligera" },
+    { "name": "Unique Carrara", "slug": "unique-carrara" },
+    { "name": "Whitehaven (Old Version)", "slug": "whitehaven-old-version" },
+    { "name": "Taj Mahal", "slug": "taj-mahal" }
+  ]
+}

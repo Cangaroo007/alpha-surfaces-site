@@ -594,6 +594,18 @@
           "slab": "/images/stones/silver-travertine-slab.webp"
         },
         {
+          "name": "Taj Mahal Biscotti",
+          "finish": "Polished Finish",
+          "slug": "taj-mahal-biscotti",
+          "uv_stable": false,
+          "discontinued": true,
+          "images_pending": false,
+          "image": "",
+          "thumbnail": "",
+          "swatch": "",
+          "slab": ""
+        },
+        {
           "name": "Grande Glacier",
           "finish": "Matte Finish",
           "slug": "grande-glacier",
@@ -738,18 +750,6 @@
           "slab": "/images/stones/dolomite-slab.webp"
         },
         {
-          "name": "Infinity Gris",
-          "finish": "Polished Finish",
-          "slug": "infinity-gris",
-          "uv_stable": false,
-          "discontinued": true,
-          "images_pending": true,
-          "image": "",
-          "thumbnail": "",
-          "swatch": "",
-          "slab": ""
-        },
-        {
           "name": "Statuario Grigio",
           "finish": "Polished Finish",
           "slug": "statuario-grigio",
@@ -760,6 +760,42 @@
           "thumbnail": "/images/stones/statuario-grigio-thumb.webp",
           "swatch": "/images/stones/statuario-grigio-swatch.webp",
           "slab": "/images/stones/statuario-grigio-slab.webp"
+        },
+        {
+          "name": "Infinity White",
+          "finish": "",
+          "slug": "infinity-white",
+          "uv_stable": false,
+          "discontinued": true,
+          "images_pending": false,
+          "image": "",
+          "thumbnail": "",
+          "swatch": "",
+          "slab": ""
+        },
+        {
+          "name": "Patagonia",
+          "finish": "Matte Finish",
+          "slug": "patagonia",
+          "uv_stable": false,
+          "discontinued": true,
+          "images_pending": false,
+          "image": "/images/stones/patagonia.webp",
+          "thumbnail": "/images/stones/patagonia-thumb.webp",
+          "swatch": "/images/stones/patagonia-thumb.webp",
+          "slab": ""
+        },
+        {
+          "name": "Calacatta Borghini",
+          "finish": "Polished Finish",
+          "slug": "calacatta-borghini",
+          "uv_stable": false,
+          "discontinued": true,
+          "images_pending": false,
+          "image": "/images/stones/calacatta-borghini.webp",
+          "thumbnail": "/images/stones/calacatta-borghini-thumb.webp",
+          "swatch": "/images/stones/calacatta-borghini-swatch.webp",
+          "slab": "/images/stones/calacatta-borghini-slab.webp"
         }
       ]
     }
