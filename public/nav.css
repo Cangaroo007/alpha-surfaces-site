@@ -335,3 +335,7 @@
   .mega-menu { display: none; }
   .nav-dropdown-menu { display: none; }
 }
+
+/* sprintrep cookie settings dialog: the page reset (* { margin: 0 }) pins a
+   native <dialog> to the top-left corner; centre it again. */
+.sr-cc-dialog { margin: auto; }

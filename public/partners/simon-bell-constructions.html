@@ -185,24 +185,42 @@ img { display: block; max-width: 100%; }
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap">
-<!-- ALPHA_ANALYTICS_V1 -->
-<!-- Google Analytics 4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-W0841557EV"></script>
+<style>.note-logo-text{font-family:'Concrette S',serif;font-weight:700;font-size:30px;line-height:1.15;color:var(--olive);margin:0}.ph{display:inline-block;background:#fff3cd;color:#6b5310;border:1px dashed #c9a227;border-radius:3px;padding:1px 7px;font-family:'Degular',sans-serif;font-weight:600;font-size:0.92em;letter-spacing:0.3px}.cta-contact-card .ph{background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.45)}</style>
+<!-- ALPHA_ANALYTICS_V2 -->
+<!-- Google Analytics 4 + Microsoft Clarity: loaded only after analytics consent (sprintrep cookie notice) -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-W0841557EV');
+  gtag('consent', 'default', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+  (function () {
+    var loaded = false;
+    function has(part) { return !!document.querySelector('script[src*="' + part + '"]'); }
+    function load() {
+      if (loaded) { return; }
+      loaded = true;
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+      if (!has('googletagmanager.com/gtag/js')) {
+        var g = document.createElement('script');
+        g.async = true;
+        g.src = 'https://www.googletagmanager.com/gtag/js?id=G-W0841557EV';
+        document.head.appendChild(g);
+        gtag('js', new Date());
+        gtag('config', 'G-W0841557EV');
+      }
+      if (!has('clarity.ms/tag/')) (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "wsphsnhr52");
+    }
+    // The sprintrep tracker decides (saved choice, region, Global Privacy
+    // Control) and announces it on load and on every change.
+    if (window.sprintrepConsent && window.sprintrepConsent.analytics) { load(); }
+    document.addEventListener('sprintrep:consent', function (e) {
+      if (e.detail && e.detail.analytics) { load(); }
+    });
+  })();
 </script>
-<!-- Microsoft Clarity -->
-<script type="text/javascript">
-  (function(c,l,a,r,i,t,y){
-    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-  })(window, document, "clarity", "script", "wsphsnhr52");
-</script>
-<style>.note-logo-text{font-family:'Concrette S',serif;font-weight:700;font-size:30px;line-height:1.15;color:var(--olive);margin:0}.ph{display:inline-block;background:#fff3cd;color:#6b5310;border:1px dashed #c9a227;border-radius:3px;padding:1px 7px;font-family:'Degular',sans-serif;font-weight:600;font-size:0.92em;letter-spacing:0.3px}.cta-contact-card .ph{background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.45)}</style>
 </head>
 <body>
 <nav class="nav" id="main-nav"></nav>
@@ -396,6 +414,7 @@ img { display: block; max-width: 100%; }
 
 <footer class="footer">
   <p>Copyright &copy; 2026 Alpha Surfaces – ALL RIGHTS RESERVED &nbsp;|&nbsp; PRIVATE CLIENT PAGE</p>
+<!-- ALPHA_COOKIE_LINK_V1 --><p class="alpha-cookie-link"><a href="#cookie-settings" data-sr-consent style="text-decoration:underline;text-underline-offset:2px;">Cookie settings</a></p>
 </footer>
 
 <script src="../animation.js?v=18"></script>
