@@ -178,7 +178,10 @@ function stonemasonNote(f) {
   if (!status) return '';
   const typed = String(f.stonemason_name || '').trim();
   if (status === 'yes') {
-    if (f.stonemason_org_id) return `Stonemason: ${escape(typed)} (linked)<br>`;
+    // The org id rides on the line so sprintrep's Requests inbox (ADR 0065) can link the
+    // request to the same company: Pipedrive's API cannot read lead custom fields back.
+    const orgId = String(f.stonemason_org_id || '').trim();
+    if (/^\d{1,12}$/.test(orgId)) return `Stonemason: ${escape(typed)} (linked, org ${orgId})<br>`;
     if (typed) return `Stonemason: ${escape(typed)} — NOT MATCHED, please identify and link<br>`;
     return 'Stonemason: says they have one, none named<br>';
   }
@@ -914,6 +917,7 @@ module.exports = {
   DEFAULT_PD_BASE,
   toPipedriveDate,
   // Exported for tests — pure helpers, no network.
+  stonemasonNote,
   businessCategoryIdFor,
   productCategoryIdsFor,
   mergeSetField,

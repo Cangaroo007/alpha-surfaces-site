@@ -24,6 +24,11 @@
         <input type="email" class="smf-input" name="email" placeholder="Email *" required>\
         <input type="tel" class="smf-input" name="phone" placeholder="Phone *" required>\
         <div class="smf-row">\
+          <input type="text" class="smf-input" name="unit" placeholder="Unit / House No. *" required>\
+          <input type="text" class="smf-input" name="street" placeholder="Street *" required>\
+        </div>\
+        <input type="text" class="smf-input" name="suburb" placeholder="Suburb *" required>\
+        <div class="smf-row">\
           <input type="text" class="smf-input" name="postcode" placeholder="Postcode *" required>\
           <div style="flex:1;">\
             <select class="smf-select" name="state" required>\
@@ -40,15 +45,30 @@
           </div>\
         </div>\
         <div>\
-          <select class="smf-select" name="role">\
-            <option value="" disabled selected>I am a...</option>\
-            <option value="homeowner">Homeowner</option>\
-            <option value="designer">Designer / Architect</option>\
-            <option value="builder">Builder</option>\
-            <option value="fabricator">Fabricator</option>\
-            <option value="developer">Developer</option>\
-            <option value="other">Other</option>\
+          <select class="smf-select" name="role" required>\
+            <option value="" disabled selected>I am a... *</option>\
+            <option value="Homeowner">Homeowner</option>\
+            <option value="Stonemason">Stonemason</option>\
+            <option value="Cabinet maker">Cabinet maker / kitchen company</option>\
+            <option value="Project home builder">Project home builder</option>\
+            <option value="Builder/developer">Builder / developer</option>\
+            <option value="Architect">Architect</option>\
+            <option value="Interior designer">Interior designer</option>\
+            <option value="Tile outlet">Tile outlet / retailer</option>\
+            <option value="Other">Other</option>\
           </select>\
+        </div>\
+        <div class="smf-sm" id="smf-sm" style="display:none">\
+          <span class="smf-label">Who is making your benchtop?</span>\
+          <label class="smf-radio"><input type="radio" name="stonemason_status" value="yes"> I already work with a stonemason or cabinetmaker</label>\
+          <label class="smf-radio"><input type="radio" name="stonemason_status" value="no"> Not yet &mdash; please refer one who works with your stone</label>\
+          <label class="smf-radio"><input type="radio" name="stonemason_status" value="unsure"> Not sure yet</label>\
+          <label class="smf-radio"><input type="radio" name="stonemason_status" value="decline"> Prefer not to say</label>\
+          <div id="smf-sm-lookup" style="display:none">\
+            <input type="text" class="smf-input" name="stonemason_name" id="smf-sm-name" placeholder="Their business name" autocomplete="off">\
+            <input type="hidden" name="stonemason_org_id" id="smf-sm-org">\
+            <div id="smf-sm-results"></div>\
+          </div>\
         </div>\
         <input type="hidden" name="stone_slug"       id="sample-modal-slug">\
         <input type="hidden" name="stone_name"       id="sample-modal-name">\
@@ -144,6 +164,69 @@
       if (info) info.appendChild(btn);
     });
   }
+
+  // "Who is making your benchtop?" (ADR 0065) - the same question /order-sample asks, so
+  // popup requests reach Pipedrive with the stonemason line too. Hidden for stonemasons.
+  // Picking a listed company posts its Pipedrive org id (public/data/stonemasons.json).
+  (function () {
+    var form = backdrop.querySelector('.sample-modal-form');
+    var role = form.querySelector('select[name="role"]');
+    var block = document.getElementById('smf-sm');
+    var lookup = document.getElementById('smf-sm-lookup');
+    var name = document.getElementById('smf-sm-name');
+    var org = document.getElementById('smf-sm-org');
+    var results = document.getElementById('smf-sm-results');
+    var list = null;
+    function clearLookup() { name.value = ''; org.value = ''; results.innerHTML = ''; }
+    function load() {
+      if (list) return;
+      list = [];
+      fetch('/data/stonemasons.json')
+        .then(function (r) { return r.json(); })
+        .then(function (d) { list = Array.isArray(d) ? d : []; })
+        .catch(function () { list = []; });
+    }
+    role.addEventListener('change', function () {
+      var show = role.value && role.value !== 'Stonemason';
+      block.style.display = show ? '' : 'none';
+      if (!show) {
+        var picked = form.querySelector('input[name="stonemason_status"]:checked');
+        if (picked) picked.checked = false;
+        lookup.style.display = 'none';
+        clearLookup();
+      }
+    });
+    Array.prototype.forEach.call(form.querySelectorAll('input[name="stonemason_status"]'), function (r) {
+      r.addEventListener('change', function () {
+        lookup.style.display = r.value === 'yes' ? '' : 'none';
+        if (r.value === 'yes') load(); else clearLookup();
+      });
+    });
+    name.addEventListener('input', function () {
+      org.value = '';
+      var q = name.value.trim().toLowerCase();
+      if (q.length < 2 || !list || !list.length) { results.innerHTML = ''; return; }
+      var hits = list.filter(function (x) { return (x.name || '').toLowerCase().indexOf(q) !== -1; })
+        .sort(function (a, b) {
+          var ap = (a.name || '').toLowerCase().indexOf(q) === 0;
+          var bp = (b.name || '').toLowerCase().indexOf(q) === 0;
+          return ap === bp ? 0 : (ap ? -1 : 1);
+        }).slice(0, 5);
+      results.innerHTML = '';
+      hits.forEach(function (x) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'smf-sm-hit';
+        b.textContent = x.name + (x.suburb ? ' \u00b7 ' + x.suburb + ' ' + (x.state || '') : '');
+        b.addEventListener('click', function () {
+          name.value = x.name || '';
+          org.value = String(x.id || '');
+          results.innerHTML = '';
+        });
+        results.appendChild(b);
+      });
+    });
+  })();
 
   // Observe for dynamically added stone cards (from stones.json)
   var observer = new MutationObserver(function() {

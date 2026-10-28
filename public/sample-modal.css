@@ -225,3 +225,11 @@
   .smf-row { flex-direction: column; gap: 20px; }
   .sample-modal-title { font-size: 24px; }
 }
+
+/* "Who is making your benchtop?" (ADR 0065) */
+.smf-sm { display: flex; flex-direction: column; gap: 8px; }
+.smf-radio { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.4; cursor: pointer; min-height: 32px; }
+.smf-radio input { margin-top: 3px; }
+#smf-sm-lookup { display: flex; flex-direction: column; gap: 6px; }
+.smf-sm-hit { text-align: left; padding: 10px 12px; border: 1px solid #ddd8c4; border-radius: 3px; background: #fff; cursor: pointer; font: inherit; font-size: 14px; }
+.smf-sm-hit:hover { background: #f6f3ea; }
