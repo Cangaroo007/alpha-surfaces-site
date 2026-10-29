@@ -69,3 +69,19 @@ The embed script redirects to d33i2vgywgme2s.cloudfront.net, which must remain
 in the CSP scriptSrc in server.js. Without it the script is silently blocked and
 the brochure page renders blank. If FlippingBook migrates CDN this host changes;
 the symptom is a blank brochure with a CSP error in the console.
+
+## Forms through sprintrep (FORMS_VIA_SPRINTREP)
+Each public form can be sent to sprintrep server to server (`sprintrep-forms.js`;
+sprintrep ADR 0080, runbook docs/platform/website-forms-cutover.md in
+Cangaroo007/roadrunner). `FORMS_VIA_SPRINTREP` lists the forms that go:
+newsletter, contact, enquiry, showroom-checkin, sample-modal, order-sample,
+warranty. Unset or empty: every form works exactly as before.
+- A switched-on form is numbered by sprintrep (SR-, WA-, ...). Never number it
+  here: if sprintrep is unreachable the website handles it as before but with an
+  FB- reference, keeps the copy in `sprintrep_form_copies` and retries every
+  minute, telling sprintrep what it already did so nothing is done twice.
+- The two sample forms share the SR- series and are always switched together.
+- Needs `SPRINTREP_SITE_KEY`, `SPRINTREP_FORMS_SECRET` (and optionally
+  `SPRINTREP_FORMS_URL`). Without them the switch is ignored and logged.
+- Keep `PIPEDRIVE_*`, SendGrid and Twilio variables: the fallback needs them.
+- `node --test address.test.js sprintrep-forms.test.js` runs the tests.

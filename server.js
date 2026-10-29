@@ -28,6 +28,9 @@ const pipedrive = require('./pipedrive');
 // Fire-and-forget mirror of website engagement into RoadRunner (CRM). Gated on
 // ROADRUNNER_INGEST_URL + ROADRUNNER_API_KEY; off (no-op) when either is unset.
 const roadrunner = require('./roadrunner');
+// Forms through sprintrep (FORMS_VIA_SPRINTREP): a switched-on form is sent to sprintrep, which
+// numbers it, writes Pipedrive and sends the emails. Off by default; see sprintrep-forms.js.
+const sprintrepForms = require('./sprintrep-forms');
 const cmsCore = require('./cms-core');
 
 const app = express();
@@ -550,6 +553,10 @@ function trackOutreachConversion(formType, fields, id) {
 async function persistPublicFormSubmission(formType, fields, sampleItems, options = {}) {
   const shouldNotify = options.notify !== false;
   const shouldSyncPipedrive = options.syncPipedrive !== false;
+  // Set when the form goes through sprintrep but sprintrep couldn't be reached: do everything
+  // as always except numbering it (sprintrep issues the SR-/WA- number when it gets it, and
+  // sends the customer's confirmation then). The FB- reference stands in until then.
+  const sprintrepFallback = options.sprintrepFallback || null;
   await ensureDatabaseReady();
   const saved = await saveSubmission(formType, fields, sampleItems);
   const { id } = saved;
@@ -566,6 +573,21 @@ async function persistPublicFormSubmission(formType, fields, sampleItems, option
     }
   } catch (err) {
     console.error('[form] post-save refetch error:', err.message);
+  }
+
+  if (sprintrepFallback) {
+    submission.reference = sprintrepFallback;
+    submission.message = [
+      submission.message,
+      `Reference ${sprintrepFallback}: sprintrep couldn't be reached, so the website handled this one. sprintrep will number it and email the customer when it is back.`
+    ].filter(Boolean).join('\n\n');
+    if (shouldNotify && !saved.duplicate) notifySubmissionSafely(submission, formType);
+    if (shouldSyncPipedrive && !saved.duplicate && process.env.PIPEDRIVE_API_TOKEN) {
+      pipedrive.syncFormToPipedrive(formType, fields, sampleItems, { reference: sprintrepFallback })
+        .catch(err => console.error('[pipedrive] sync error:', err.message));
+    }
+    if (!saved.duplicate) trackOutreachConversion(formType, fields, id);
+    return { id, reference: sprintrepFallback };
   }
 
   if (shouldNotify && !saved.duplicate) notifySubmissionSafely(submission, formType);
@@ -732,6 +754,19 @@ async function handleForm(req, res, formType) {
       });
       fallbackSampleItems = sampleItems;
     }
+    const sprintrepFormId = sprintrepForms.formIdFor(formType, req.body || {});
+    if (sprintrepFormId) {
+      return await sprintrepForms.handle(req, res, sprintrepDeps(), {
+        formId: sprintrepFormId,
+        fields,
+        sampleItems,
+        done: ['staff_alert', 'crm'],
+        localFallback: fbRef => persistPublicFormSubmission(formType, fields, sampleItems, { sprintrepFallback: fbRef }),
+        queueFallback: err => queueFallbackFormResponse(req, res, formType, fields, sampleItems, err),
+        // Landing-page outreach attribution stays on this site, as before.
+        onForwarded: () => trackOutreachConversion(formType, fields, null)
+      });
+    }
     const result = await persistPublicFormSubmission(formType, fields, sampleItems);
     return res.json({ ok: true, id: result.id, reference: result.reference });
   } catch (err) {
@@ -820,6 +855,19 @@ async function persistShowroomCheckin(fields, options = {}) {
   const shouldNotify = options.notify !== false;
   const shouldSyncPipedrive = options.syncPipedrive !== false;
   await ensureDatabaseReady();
+  if (options.sprintrepFallback) {
+    // Through sprintrep, which couldn't be reached: kept and handled here, but not numbered
+    // (sprintrep issues the SC- number when it gets it).
+    const ref = options.sprintrepFallback;
+    const saved = await saveSubmission('Showroom Check-In', fields, []);
+    const submission = buildNotificationSubmission('Showroom Check-In', fields, [], saved.id, ref);
+    if (shouldNotify && !saved.duplicate) notifySubmissionSafely(submission, 'Showroom Check-In');
+    if (shouldSyncPipedrive && !saved.duplicate && process.env.PIPEDRIVE_API_TOKEN) {
+      pipedrive.syncFormToPipedrive('Showroom Check-In', fields, [], { reference: ref })
+        .catch(err => console.error('[pipedrive] showroom sync error:', err.message));
+    }
+    return { id: saved.id, reference: ref };
+  }
   const typed = await insertTypedSubmission(pool, 'Showroom Check-In', fields);
   if (!typed) throw new Error('Could not save check-in.');
 
@@ -874,6 +922,16 @@ async function handleShowroomCheckin(req, res) {
       message: f.message || f.notes || null,
       consent: !!f.consent
     };
+    if (sprintrepForms.formIdFor('Showroom Check-In', fields)) {
+      return await sprintrepForms.handle(req, res, sprintrepDeps(), {
+        formId: 'showroom-checkin',
+        fields,
+        sampleItems: [],
+        done: ['staff_alert', 'crm'],
+        localFallback: fbRef => persistShowroomCheckin(fields, { sprintrepFallback: fbRef }),
+        queueFallback: err => queueFallbackFormResponse(req, res, 'Showroom Check-In', fields, [], err)
+      });
+    }
     const typed = await persistShowroomCheckin(fields);
 
     return res.json({ ok: true, id: typed.id, reference: typed.reference });
@@ -910,6 +968,27 @@ app.post('/api/subscribe', async (req, res) => {
     fallbackMeta = meta;
     await ensureDatabaseReady();
     const row = await saveSubscriber(email, meta);
+    // The subscriber and their consent stay recorded here (unsubscribe and suppression live on
+    // this site); sprintrep sends the welcome when the newsletter goes through it.
+    if (sprintrepForms.formIdFor('Newsletter', req.body || {})) {
+      const subscribeFields = {
+        email,
+        consent: true,
+        _client_submission_id: req.body && (req.body._client_submission_id || req.body.client_submission_id || req.body.submission_uuid)
+      };
+      return await sprintrepForms.handle(req, res, sprintrepDeps(), {
+        formId: 'newsletter',
+        fields: subscribeFields,
+        sampleItems: [],
+        extraMeta: { unsubscribeUrl: generateUnsubscribeUrl(email) },
+        done: ['staff_alert', 'customer_email'],
+        localFallback: async () => {
+          await notifySubscribe(email, row.id, row.consent_timestamp_utc);
+          return { id: row.id };
+        },
+        queueFallback: () => res.json({ ok: true })
+      });
+    }
     notifySubscribe(email, row.id, row.consent_timestamp_utc).catch(err =>
       console.error('[notify] Subscribe error:', err.message)
     );
@@ -2912,6 +2991,37 @@ app.get('/api/admin/outreach/stats', authMiddleware, async (req, res) => {
 });
 
 let fallbackReplayRunning = false;
+function sprintrepDeps() {
+  return { pool, queue: formFallbackQueue, env: process.env };
+}
+
+let sprintrepRetrying = false;
+let lastSprintrepAlertAt = 0;
+async function retrySprintrepForms() {
+  if (sprintrepRetrying || !sprintrepForms.configured(process.env)) return;
+  sprintrepRetrying = true;
+  try {
+    const stats = await sprintrepForms.retryWaiting(sprintrepDeps(), 25);
+    if (stats.sent || stats.invalid) console.log('[sprintrep-forms] retry:', JSON.stringify(stats));
+    const waiting = await sprintrepForms.waitingSummary(pool);
+    const now = Date.now();
+    if (waiting.n > 0 && waiting.oldest && now - new Date(waiting.oldest).getTime() > FALLBACK_STUCK_AFTER_MS
+        && now - lastSprintrepAlertAt > FALLBACK_ALERT_EVERY_MS) {
+      lastSprintrepAlertAt = now;
+      const subject = 'Alpha website: ' + waiting.n + ' form(s) not yet in sprintrep';
+      await notifications.sendOpsAlert(subject, [
+        subject,
+        '',
+        'The website handled them itself (staff emailed, Pipedrive written) and keeps them in',
+        'sprintrep_form_copies. They retry every minute. Oldest: ' + new Date(waiting.oldest).toISOString(),
+        'Railway logs: filter "sprintrep-forms".'
+      ].join('\n'));
+    }
+  } finally {
+    sprintrepRetrying = false;
+  }
+}
+
 async function replayFallbackQueue(limit = 25) {
   if (fallbackReplayRunning) return { ok: true, skipped: true, reason: 'already running' };
   fallbackReplayRunning = true;
@@ -2927,6 +3037,28 @@ async function replayFallbackQueue(limit = 25) {
     stats.checked = pending.length;
     for (const item of pending) {
       try {
+        // Through sprintrep: never numbered or re-done here. The staff were told when it was
+        // queued (and, for a sprintrep fallback, the CRM written); sprintrep does the rest.
+        const viaSprintrep = item.kind === 'sprintrep'
+          ? sprintrepForms.canonical(item.formType)
+          : (item.kind === 'form' ? sprintrepForms.formIdFor(item.formType, item.fields || {}) : null);
+        if (viaSprintrep) {
+          const sent = await sprintrepForms.forward({
+            clientSubmissionId: sprintrepForms.clientSubmissionId(item.fields) || item.id,
+            formId: viaSprintrep,
+            fields: item.fields || {},
+            sampleItems: item.sampleItems || [],
+            submittedAt: item.created_at,
+            meta: item.meta || {},
+            done: (item.meta && item.meta.done) || ['staff_alert']
+          }, sprintrepDeps());
+          if (sent.kind === 'ok') {
+            formFallbackQueue.markReplayed(item.id, sent.id, sent.reference);
+            stats.replayed += 1;
+            continue;
+          }
+          throw new Error(sent.kind === 'invalid' ? 'sprintrep refused it: ' + sent.error : sent.error);
+        }
         if (item.kind === 'subscribe') {
           try {
             await ensureDatabaseReady();
@@ -3123,6 +3255,12 @@ async function startServer() {
   setInterval(() => replayFallbackQueue().catch(err =>
     console.error('[form-fallback] replay scheduler error:', err.message)
   ), 5 * 60 * 1000);
+  // Forms through sprintrep: send what fell back to the website, every minute; keep the copies
+  // for 30 days; page a person when something has waited over 30 minutes.
+  setInterval(() => retrySprintrepForms().catch(err =>
+    console.error('[sprintrep-forms] retry error:', err.message)
+  ), 60 * 1000);
+  setInterval(() => sprintrepForms.pruneCopies(pool), 24 * 60 * 60 * 1000);
   // Weekly Friday 5pm Brisbane sales report.
   // DISABLED 1 Sep 2026 — weekly sales report retired at client request.
   // setInterval(checkWeeklyReport, 5 * 60 * 1000);
