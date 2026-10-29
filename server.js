@@ -277,8 +277,10 @@ app.use(
         "https://analytics.google.com",
         "https://www.clarity.ms", "https://c.clarity.ms", "https://d.clarity.ms",
         "https://*.clarity.ms",
-        "https://roadrunner-api-staging.up.railway.app"
+        "https://api.sprintrep.ai"
       ],
+      // Expo sample form falls back to a plain POST to sprintrep without JS.
+      formAction: ["'self'", "https://api.sprintrep.ai"],
       frameSrc: ["'self'", "https://online.flippingbook.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
     },

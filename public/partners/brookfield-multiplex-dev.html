@@ -580,9 +580,10 @@ footer .meta a { color: white; }
 </footer>
 
 <script>
-// === Alpha × Partner — Roadrunner-wired tracking ===
+// === Alpha × Partner — sprintrep-wired tracking ===
 (function() {
-  var ROADRUNNER_API = (window.ROADRUNNER_API_URL || "https://roadrunner.alphasurfaces.com.au").replace(/\/$/, "");
+  var SPRINTREP_API = "https://api.sprintrep.ai";
+  var SPRINTREP_SITE_KEY = window.SPRINTREP_SITE_ID || "3ca961d866b54e89b41137493ffa7589";
   var slug = document.body.dataset.slug;
   var params = new URLSearchParams(window.location.search);
   var pid = params.get("pid") || "";
@@ -597,7 +598,7 @@ footer .meta a { color: white; }
   });
   var ref = document.getElementById("referrer"); if (ref) ref.value = document.referrer || "";
 
-  // --- Form submission (Roadrunner /api/partners-public/:slug/lead) ---
+  // --- Form submission (sprintrep /leads/:siteKey/:slug) ---
   var form = document.getElementById("partnerForm");
   if (form) {
     form.addEventListener("submit", function(e) {
@@ -609,7 +610,7 @@ footer .meta a { color: white; }
       fd.forEach(function(v, k) { data[k] = v; });
       data.partner_slug = slug;
       data.pid = pid || undefined;
-      var url = ROADRUNNER_API + "/api/partners-public/" + encodeURIComponent(slug) + "/lead";
+      var url = SPRINTREP_API + "/leads/" + encodeURIComponent(SPRINTREP_SITE_KEY) + "/" + encodeURIComponent(slug);
       fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) })
         .then(function(r) {
           if (!r.ok) throw new Error("submit failed");

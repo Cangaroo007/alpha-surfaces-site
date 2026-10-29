@@ -6,6 +6,11 @@
 // Every failure is swallowed and logged so a RoadRunner outage, timeout or
 // bad response can never block or throw into the visitor-facing request path —
 // the same discipline the Pipedrive integration uses.
+//
+// RETIRED (29 Oct 2026, AEST): old RoadRunner is being replaced by sprintrep.
+// ROADRUNNER_INGEST_URL and ROADRUNNER_API_KEY should be removed from the
+// website's Railway variables (staging and production). Once they are unset
+// every call below returns immediately and nothing leaves the server.
 
 function getConfig() {
   return {

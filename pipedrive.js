@@ -277,10 +277,9 @@ const WARRANTY_PERSON_FIELDS = [
 const SHOWROOM_ACTIVITY_TYPE = process.env.PIPEDRIVE_SHOWROOM_ACTIVITY_TYPE || 'showroom_visit';
 
 // Where Jess dispatches a sample from. Pipedrive has no way to run this, so
-// the lead note carries the link and the note is the way in. Overridable so a
-// staging site can point at a staging RoadRunner.
-const ROADRUNNER_BASE = (process.env.ROADRUNNER_PUBLIC_URL || 'https://roadrunner.alphasurfaces.com.au')
-  .replace(/\/+$/, '');
+// the lead note carries the link and the note is the way in. The link opens
+// the request in sprintrep's Requests inbox.
+const SPRINTREP_REQUEST_BASE = 'https://app.sprintrep.ai/requests/lead';
 
 // Forms whose product line is implied by the form itself.
 const PRODUCT_INTEREST_BY_FORM = {
@@ -490,8 +489,8 @@ async function createLead({ title, personId, orgId, notes, labelIds, leadFields,
     const body = dispatchLink
       ? notes +
         `<br><br><b>Send the samples:</b> ` +
-        `<a href="${ROADRUNNER_BASE}/samples/${leadId}">` +
-        `${ROADRUNNER_BASE}/samples/${leadId}</a>`
+        `<a href="${SPRINTREP_REQUEST_BASE}/${leadId}">` +
+        `${SPRINTREP_REQUEST_BASE}/${leadId}</a>`
       : notes;
     await pdPost('notes', { lead_id: leadId, content: body });
   }
