@@ -2779,8 +2779,12 @@ app.get(['/agenda/7-september', '/agenda/7-september.html'], (req, res) => {
 app.get(['/agenda/3-september', '/agenda/3-september.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'agenda-3sep.html'));
 });
+app.get(['/agenda/12-november', '/agenda/12-november.html', '/agenda/11-november', '/agenda/11-november.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'agenda-12nov.html'));
+});
 app.get(['/agenda', '/agenda.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'agenda-20oct.html'));
+  res.set('Cache-Control', 'no-store, max-age=0');
+  res.sendFile(path.join(__dirname, 'public', 'agenda-12nov.html'));
 });
 // --- end agenda archive -----------------------------------------------------
 app.get(['/sprint-plan/17-september', '/sprint-plan/17-september.html'], (req, res) => {
